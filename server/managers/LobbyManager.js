@@ -1,21 +1,26 @@
 import Lobby from "../models/Lobby.js";
 
-export default class LobbyManager{
-    constructor(){
+export default class LobbyManager {
+    constructor() {
+        if (LobbyManager.instance) {
+            return LobbyManager.instance;
+        }
         this.lobbies = new Map();
+        LobbyManager.instance = this;
     }
-    createLobby(){
+    createLobby() {
         const lobby = new Lobby();
-        this.lobbies.set(lobby.uuid,lobby);
+        this.lobbies.set(lobby.uuid, lobby);
         return lobby;
     }
-    deleteLobby(uuid){
-        return this.lobbies.delete(uuid)
+    deleteLobby(uuid) {
+        return this.lobbies.delete(uuid);
     }
-    getLobby(uuid){
-        return this.lobbies.get(uuid)
+    getLobby(uuid) {
+        return this.lobbies.get(uuid);
     }
-    canJoinLobby(lobbyId){
+    canJoinLobby(lobbyId) {
+        console.log(lobbyId);
         return true;
     }
 }
