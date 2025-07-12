@@ -1,0 +1,21 @@
+import User from "../models/User";
+export default class UserManager {
+    constructor() {
+        if (UserManager.instance) {
+            return UserManager.instance;
+        }
+        UserManager.instance = this;
+        this.users = new Map();
+    }
+    createUser() {
+        const user = new User();
+        this.users.set(user.uuid, user);
+        return user.uuid;
+    }
+    deleteUser(uuid) {
+        return this.users.delete(uuid);
+    }
+    getUser(uuid) {
+        this.users.get(uuid);
+    }
+}
