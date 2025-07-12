@@ -6,11 +6,16 @@ export default class EventEmmiter {
         this.io = io;
         EventEmmiter.instance = this;
     }
+    
     toUser(socketId, eventName, data) {
         this.io.to(socketId).emit(eventName, data);
     }
 
     toRoom(roomId, eventName, data) {
         this.io.to(roomId).emit(eventName, data);
+    }
+
+    toAll(eventName, data) {
+        this.io.emit(eventName, data);
     }
 }
