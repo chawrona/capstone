@@ -1,6 +1,8 @@
+import generateUUID from "../utils/generateUUID.js";
+
 export default class User {
     constructor() {
-        this.uuid = 1;
+        this.uuid = generateUUID();
         this.name = 1;
     }
 }

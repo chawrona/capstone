@@ -1,6 +1,6 @@
 import EventEmmiter from "../services/EventEmmiter.js";
 
-export default class ConnectionManager {
+export default class ConnectionEvents {
     constructor(socket) {
         this.socket = socket;
         this.registerEvents();
@@ -18,6 +18,6 @@ export default class ConnectionManager {
     }
     connect() {
         const ee = new EventEmmiter();
-        ee.toAll("connect","connected");
+        ee.toAll("connect", "connected");
     }
 }

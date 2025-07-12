@@ -3,8 +3,8 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 
-import ConnectionManager from "./managers/ConnectionManager.js";
 import ClientRoutes from "./routes/ClientRoutes.js";
+import ConnectionEvents from "./socketEvents/ConnectionEvents.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -19,7 +19,8 @@ app.use("/", clientRoutes.getRouter());
 
 // Tutaj ustawiamy w na jakie event w komunikacji socket-io będziemy nasłuchiwać i reagować
 io.on("connection", (socket) => {
-    new ConnectionManager(socket);
+    new ConnectionEvents(socket);
+    // lobby events
 });
 
 server.listen(process.env.PORT, () =>

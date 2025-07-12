@@ -6,7 +6,7 @@ export default class EventEmmiter {
         this.io = io;
         EventEmmiter.instance = this;
     }
-    
+
     toUser(socketId, eventName, data) {
         this.io.to(socketId).emit(eventName, data);
     }
