@@ -2,5 +2,4 @@
 node_modules/
 server/storage/logs.txt
 .env
-client
 todo

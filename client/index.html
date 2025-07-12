@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.IO Event Sender</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+    <h1>Send Event to Server</h1>
+    <form id="eventForm">
+        <label for="eventName">Event Name:</label>
+        <input type="text" id="eventName" name="eventName" required>
+        <button type="submit">Send</button>
+    </form>
+
+    <h2>Received Events:</h2>
+    <div id="eventsLog"></div>
+
+    <script>
+        const socket = io();
+        const form = document.getElementById('eventForm');
+        const eventsLog = document.getElementById('eventsLog');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const eventName = document.getElementById('eventName').value.trim();
+            if (eventName) {
+                socket.emit(eventName, {});
+                alert(`Event "${eventName}" sent with empty object.`);
+                form.reset();
+            }
+        });
+
+        // Listen for all events and display them
+        socket.onAny((event, data) => {
+            const para = document.createElement('p');
+            para.textContent = `Received event: "${event}" with data: ${JSON.stringify(data)}`;
+            eventsLog.prepend(para);
+        });
+    </script>
+
+</body>
+</html>

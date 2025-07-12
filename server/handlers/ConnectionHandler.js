@@ -1,4 +1,4 @@
-import UserManager from "../managers/UserManager";
+import UserManager from "../managers/UserManager.js";
 
 export default class ConnectionHandler {
     constructor() {
