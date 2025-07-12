@@ -3,6 +3,7 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 
+import ConnectionManager from "./managers/ConnectionManager";
 import ClientRoutes from "./routes/ClientRoutes";
 
 const app = express();
@@ -17,9 +18,9 @@ app.use(express.static("clients"));
 app.use("/", clientRoutes.getRouter());
 
 // Tutaj ustawiamy w na jakie event w komunikacji socket-io będziemy nasłuchiwać i reagować
-io.on("connection", (socket) =>
-    socket.on("disconnect", () => console.log("User disconnected:", socket.id)),
-);
+io.on("connection", (socket) => {
+    new ConnectionManager(socket);
+});
 
 server.listen(process.env.PORT, () =>
     console.log(`Server running on http://localhost:${process.env.PORT}`),

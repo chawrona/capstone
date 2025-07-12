@@ -1,4 +1,4 @@
-import UserManager from "../managers/UserManager"
+import UserManager from "../managers/UserManager";
 
 export default class ConnectionHandler {
     constructor() {
@@ -16,13 +16,13 @@ export default class ConnectionHandler {
     }
 
     addUser(socketId) {
-        const userManager = new UserManager()
-        const uuid = userManager.createUser()
+        const userManager = new UserManager();
+        const uuid = userManager.createUser();
         this.uuidToSocketId.set(uuid, socketId);
         // this.socketIdToUuid.set(socketId, uuid);
     }
 
     deleteUser(uuid) {
-        return this.uuidToSocketId.delete(uuid)
+        return this.uuidToSocketId.delete(uuid);
     }
 }

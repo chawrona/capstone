@@ -4,7 +4,8 @@
     "dev": "nodemon server/app.js",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test": "node server/tests/test.js"
+    "test": "node server/tests/test.js",
+    "fix": "npx eslint . --fix"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
