@@ -10,12 +10,14 @@ export default class UserManager {
     createUser() {
         const user = new User();
         this.users.set(user.uuid, user);
-        return user.uuid;
     }
     deleteUser(uuid) {
         return this.users.delete(uuid);
     }
     getUser(uuid) {
         this.users.get(uuid);
+    }
+    doesUserExist(uuid){
+        return this.users.has(uuid);
     }
 }

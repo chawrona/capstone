@@ -25,4 +25,8 @@ export default class ConnectionHandler {
     deleteUser(uuid) {
         return this.uuidToSocketId.delete(uuid);
     }
+
+    getUserSocketId(){
+        return this.uuidToSocketId.get(userId);
+    }
 }

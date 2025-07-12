@@ -1,3 +1,5 @@
+import LobbyHandler from "../handlers/LobbyHandler.js";
+import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
 
 export default class ConnectionEvents {
@@ -10,10 +12,20 @@ export default class ConnectionEvents {
         this.socket.on("disconnect", this.disconnect);
         this.socket.on("connection", this.connect);
     }
-    authorization() {
-        console.log("authorized");
-        const ee = new EventEmmiter();
-        ee.toAll("abc", "connected");
+    authorization(redirectRequest) {
+        const userId = redirectRequest.UUID;
+        const lobbyId = redirectRequest.data.lobbyId;
+        const userManager = new UserManager()
+        if (userManager.doesUserExist(userId)){
+            const lobbyHandler = new LobbyHandler()
+            if(lobbyHandler.doesUserHaveLobby()){
+
+            } else{
+
+            }
+        } else{
+            userManager.createUser();
+        }
     }
     disconnect() {
         console.log("disconnected");
@@ -22,5 +34,13 @@ export default class ConnectionEvents {
         console.log("Połączono");
         // const ee = new EventEmmiter();
         // ee.toAll("connect", "connected");
+    }
+    isLobbyIdGiven(userId,lobbyId){
+        if(lobbyId){
+
+        } else{
+            const ee = new EventEmmiter()
+            const socketId = 
+        }
     }
 }
