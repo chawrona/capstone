@@ -4,6 +4,7 @@ import http from "http";
 import { Server } from "socket.io";
 
 import ClientRoutes from "./routes/ClientRoutes.js";
+import EventEmmiter from "./services/EventEmmiter.js";
 import ConnectionEvents from "./socketEvents/ConnectionEvents.js";
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.static("clients"));
 app.use("/", clientRoutes.getRouter());
 
 // Tutaj ustawiamy w na jakie event w komunikacji socket-io będziemy nasłuchiwać i reagować
+new EventEmmiter(io);
 io.on("connection", (socket) => {
     new ConnectionEvents(socket);
     // lobby events

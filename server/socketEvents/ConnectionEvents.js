@@ -8,16 +8,19 @@ export default class ConnectionEvents {
     registerEvents() {
         this.socket.on("authorization", this.authorization);
         this.socket.on("disconnect", this.disconnect);
-        this.socket.on("connect", this.connect);
+        this.socket.on("connection", this.connect);
     }
     authorization() {
         console.log("authorized");
+        const ee = new EventEmmiter();
+        ee.toAll("abc", "connected");
     }
     disconnect() {
         console.log("disconnected");
     }
     connect() {
-        const ee = new EventEmmiter();
-        ee.toAll("connect", "connected");
+        console.log("Połączono");
+        // const ee = new EventEmmiter();
+        // ee.toAll("connect", "connected");
     }
 }
