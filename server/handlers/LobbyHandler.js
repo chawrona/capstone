@@ -1,18 +1,18 @@
 export default class LobbyHandler {
     constructor() {
-        this.mapUUIDToLobby = new Map();
+        this.userIdToLobbyId = new Map();
     }
     addUserToLobby(userId, lobbyId) {
-        this.mapUUIDToLobby.set(userId, lobbyId);
+        this.userIdToLobbyId.set(userId, lobbyId);
     }
     removeUserFromLobby(userId) {
-        this.mapUUIDToLobby.delete(userId);
+        this.userIdToLobbyId.delete(userId);
     }
     doesUserBelongToLobby(userId, lobbyId) {
-        return this.mapUUIDToLobby.get(userId) === lobbyId;
+        return this.userIdToLobbyId.get(userId) === lobbyId;
     }
     doesUserHaveLobby(userId){
-        return this.mapUUIDToLobby.has(userId)
+        return this.userIdToLobbyId.has(userId)
     }
     whoIsInLobby() {
         console.log("TESTOWO");

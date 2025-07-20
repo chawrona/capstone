@@ -7,17 +7,17 @@ export default class UserManager {
         UserManager.instance = this;
         this.users = new Map();
     }
-    createUser() {
-        const user = new User();
-        this.users.set(user.uuid, user);
+    createUser(userId) {
+        const user = new User(userId);
+        this.users.set(user.id, user);
     }
-    deleteUser(uuid) {
-        return this.users.delete(uuid);
+    deleteUser(userId) {
+        return this.users.delete(userId);
     }
-    getUser(uuid) {
-        this.users.get(uuid);
+    getUser(userId) {
+        this.users.get(userId);
     }
-    doesUserExist(uuid){
-        return this.users.has(uuid);
+    doesUserExist(userId){
+        return this.users.has(userId);
     }
 }

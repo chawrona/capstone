@@ -1,10 +1,10 @@
-import ConnectionHandler from "../handlers/ConnectionHandler.js";
+import UserHandler from "../handlers/UserHandler.js";
 import LobbyHandler from "../handlers/LobbyHandler.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
 
-export default class ConnectionEvents {
+export default class UserEvents {
     constructor(socket) {
         this.socket = socket;
         this.registerEvents();
@@ -15,15 +15,15 @@ export default class ConnectionEvents {
         this.socket.on("connection", this.connect);
     }
     authorization(redirectRequest) {
-        const userId = redirectRequest.UUID;
+        const userId = redirectRequest.userId;
         const lobbyId = redirectRequest.data.lobbyId;
         const userManager = new UserManager();
         if (userManager.doesUserExist(userId)) {
             const lobbyHandler = new LobbyHandler();
             if (lobbyHandler.doesUserHaveLobby()) {
                 const ee = new EventEmmiter();
-                const connectionHandler = new ConnectionHandler();
-                const socketId = connectionHandler.getUserSocketId(userId);
+                const userHandler = new UserHandler();
+                const socketId = userHandler.getUserSocketId(userId);
                 ee.toUser(socketId, "brianboru");
             } else {
                 this.isLobbyIdGiven(userId, lobbyId);
@@ -43,8 +43,8 @@ export default class ConnectionEvents {
     }
     isLobbyIdGiven(userId, lobbyId) {
         const ee = new EventEmmiter();
-        const connectionHandler = new ConnectionHandler();
-        const socketId = connectionHandler.getUserSocketId(userId);
+        const userHandler = new UserHandler();
+        const socketId = userHandler.getUserSocketId(userId);
         if (lobbyId) {
             const lobbyManager = new LobbyManager();
             if (lobbyManager.canJoinLobby(lobbyId)) {
