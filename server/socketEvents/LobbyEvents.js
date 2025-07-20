@@ -14,8 +14,8 @@ export default class ConnectionManager {
     join() {
         console.log("join");
     }
-    leave(UUID) {
+    leave(lobbyId) {
         console.log("leave");
-        console.log(UUID);
+        console.log(lobbyId);
     }
 }

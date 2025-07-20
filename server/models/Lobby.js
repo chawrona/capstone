@@ -2,7 +2,7 @@ import generateUUID from "../utils/generateUUID.js";
 
 export default class Lobby {
     constructor(maxPlayers, gameType, game, isGameActive) {
-        this.uuid = generateUUID();
+        this.id = generateUUID();
         this.maxPlayers = maxPlayers;
         this.gameType = gameType;
         this.game = game;

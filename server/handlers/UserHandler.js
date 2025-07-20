@@ -5,28 +5,26 @@ export default class UserHandler {
         if (UserHandler.instance) {
             return UserHandler.instance;
         }
-        this.uuidToSocketId = new Map();
-        // this.socketIdToUuid = new Map();
+        this.userIdToSocketId = new Map();
 
         UserHandler.instance = this;
     }
 
-    doesUserExist(uuid) {
-        return this.uuidToSocketId.has(uuid);
+    doesUserExist(userId) {
+        return this.userIdToSocketId.has(userId);
     }
 
     addUser(socketId) {
         const userManager = new UserManager();
-        const uuid = userManager.createUser();
-        this.uuidToSocketId.set(uuid, socketId);
-        // this.socketIdToUuid.set(socketId, uuid);
+        const userId = userManager.createUser();
+        this.userIdToSocketId.set(userId, socketId);
     }
 
-    deleteUser(uuid) {
-        return this.uuidToSocketId.delete(uuid);
+    deleteUser(userId) {
+        return this.userIdToSocketId.delete(userId);
     }
 
     getUserSocketId(userId) {
-        return this.uuidToSocketId.get(userId);
+        return this.userIdToSocketId.get(userId);
     }
 }

@@ -10,14 +10,14 @@ export default class LobbyManager {
     }
     createLobby() {
         const lobby = new Lobby();
-        this.lobbies.set(lobby.uuid, lobby);
+        this.lobbies.set(lobby.id, lobby);
         return lobby;
     }
-    deleteLobby(uuid) {
-        return this.lobbies.delete(uuid);
+    deleteLobby(lobbyId) {
+        return this.lobbies.delete(lobbyId);
     }
-    getLobby(uuid) {
-        return this.lobbies.get(uuid);
+    getLobby(lobbyId) {
+        return this.lobbies.get(lobbyId);
     }
     canJoinLobby(lobbyId) {
         console.log(lobbyId);

@@ -15,7 +15,7 @@ export default class UserEvents {
         this.socket.on("connection", this.connect);
     }
     authorization(redirectRequest) {
-        const userId = redirectRequest.UUID;
+        const userId = redirectRequest.userId;
         const lobbyId = redirectRequest.data.lobbyId;
         const userManager = new UserManager();
         if (userManager.doesUserExist(userId)) {
