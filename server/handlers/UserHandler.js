@@ -1,14 +1,14 @@
 import UserManager from "../managers/UserManager.js";
 
-export default class ConnectionHandler {
+export default class UserHandler {
     constructor() {
-        if (ConnectionHandler.instance) {
-            return ConnectionHandler.instance;
+        if (UserHandler.instance) {
+            return UserHandler.instance;
         }
         this.uuidToSocketId = new Map();
         // this.socketIdToUuid = new Map();
 
-        ConnectionHandler.instance = this;
+        UserHandler.instance = this;
     }
 
     doesUserExist(uuid) {
