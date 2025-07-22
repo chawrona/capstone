@@ -10,11 +10,11 @@ export default class UserEvents {
         this.registerEvents();
     }
     registerEvents() {
-        this.socket.on("authorization", this.authorization);
-        this.socket.on("disconnect", this.disconnect);
-        this.socket.on("connection", this.connect);
+        this.socket.on("authorization", this.onInitialRequest);
+        this.socket.on("disconnect", this.onDisconnect);
+        this.socket.on("connection", this.onConnect);
     }
-    authorization(redirectRequest) {
+    onInitialRequest(redirectRequest) {
         const userId = redirectRequest.userId;
         const lobbyId = redirectRequest.data.lobbyId;
         const userManager = new UserManager();
@@ -33,10 +33,10 @@ export default class UserEvents {
             this.isLobbyIdGiven(userId, lobbyId);
         }
     }
-    disconnect() {
+    onDisconnect() {
         console.log("disconnected");
     }
-    connect() {
+    onConnect() {
         console.log("Połączono");
         // const ee = new EventEmmiter();
         // ee.toAll("connect", "connected");
