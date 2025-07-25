@@ -8,28 +8,29 @@ export default class UserEvents {
     constructor(socket) {
         this.socket = socket;
         this.registerEvents();
+        this.eventEmmiter = new EventEmmiter();
+        this.userHandler = new UserHandler();
+        this.userManager = new UserManager();
+        this.lobbyManager = new LobbyManager();
     }
     registerEvents() {
-        this.socket.on("authorization", this.authorization);
+        this.socket.on("initalRequest", this.onInitalRequest);
         this.socket.on("disconnect", this.disconnect);
         this.socket.on("connection", this.connect);
     }
-    authorization(redirectRequest) {
+    onInitalRequest(redirectRequest) {
         const userId = redirectRequest.userId;
         const lobbyId = redirectRequest.data.lobbyId;
-        const userManager = new UserManager();
         if (userManager.doesUserExist(userId)) {
             const lobbyHandler = new LobbyHandler();
             if (lobbyHandler.doesUserHaveLobby()) {
-                const ee = new EventEmmiter();
-                const userHandler = new UserHandler();
-                const socketId = userHandler.getUserSocketId(userId);
-                ee.toUser(socketId, "brianboru");
+                const socketId = this.userHandler.getUserSocketId(userId);
+                this.eventEmmiter.toUser(socketId, "brianboru");
             } else {
                 this.isLobbyIdGiven(userId, lobbyId);
             }
         } else {
-            userManager.createUser();
+            this.userHandler.addUser(userId, this.socket.id)
             this.isLobbyIdGiven(userId, lobbyId);
         }
     }
@@ -38,22 +39,17 @@ export default class UserEvents {
     }
     connect() {
         console.log("Połączono");
-        // const ee = new EventEmmiter();
-        // ee.toAll("connect", "connected");
     }
     isLobbyIdGiven(userId, lobbyId) {
-        const ee = new EventEmmiter();
-        const userHandler = new UserHandler();
-        const socketId = userHandler.getUserSocketId(userId);
+        const socketId = this.userHandler.getUserSocketId(userId);
         if (lobbyId) {
-            const lobbyManager = new LobbyManager();
-            if (lobbyManager.canJoinLobby(lobbyId)) {
-                ee.toUser(socketId, "lobby");
+            if (this.lobbyManager.canJoinLobby(lobbyId)) {
+                this.eventEmmiter.toUser(socketId, "lobby");
             } else {
-                ee.toUser(socketId, "homepage", { error: "500" });
+                this.eventEmmiter.toUser(socketId, "homepage", { error: "500" });
             }
         } else {
-            ee.toUser(socketId, "homepage");
+            this.eventEmmiter.toUser(socketId, "homepage");
         }
     }
 }
