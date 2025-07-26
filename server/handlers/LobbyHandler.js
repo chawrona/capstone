@@ -18,7 +18,7 @@ export default class LobbyHandler {
     doesUserHaveLobby(userId) {
         return this.userIdToLobbyId.has(userId);
     }
-    
+
     whoIsInLobby() {
         console.log("TESTOWO");
     }

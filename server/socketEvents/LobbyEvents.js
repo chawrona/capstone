@@ -3,7 +3,7 @@ export default class ConnectionManager {
         this.socket = socket;
         this.registerEvents();
     }
-    
+
     registerEvents() {
         this.socket.on("create", this.onCreate);
         this.socket.on("join", this.onJoin);

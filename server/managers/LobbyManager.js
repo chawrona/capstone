@@ -22,7 +22,7 @@ export default class LobbyManager {
     getLobby(lobbyId) {
         return this.lobbies.get(lobbyId);
     }
-    
+
     canJoinLobby(lobbyId) {
         console.log(lobbyId);
         return true;

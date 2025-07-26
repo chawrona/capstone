@@ -17,7 +17,7 @@ export default class Lobby {
     lobbyInformation() {
         console.log("Information about lobby");
     }
-    
+
     endGameJoinLobby() {
         console.log("Thanks for playing, redirecting to lobby...");
     }

@@ -7,7 +7,7 @@ export default class UserManager {
         UserManager.instance = this;
         this.users = new Map();
     }
-    
+
     createUser(userId) {
         const user = new User(userId);
         this.users.set(user.id, user);
