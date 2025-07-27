@@ -1,4 +1,4 @@
-export default class ConnectionManager {
+export default class LobbyEvents {
     constructor(socket) {
         this.socket = socket;
         this.registerEvents();
