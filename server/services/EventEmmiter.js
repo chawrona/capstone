@@ -5,9 +5,11 @@ export default class EventEmmiter {
         }
         this.io = io;
         EventEmmiter.instance = this;
+
     }
 
-    toUser(socketId, eventName, data) {
+    toUser(userId, eventName, data) {
+        const socketId = userHandler.getUserSocketId(userId);
         this.io.to(socketId).emit(eventName, data);
     }
 
