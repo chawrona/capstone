@@ -1,14 +1,21 @@
 import generateUUID from "../utils/generateUUID.js";
 
 export default class Lobby {
-    constructor(maxPlayers, gameType, game, isGameActive) {
+    constructor() {
         this.id = generateUUID();
-        this.maxPlayers = maxPlayers;
-        this.gameType = gameType;
-        this.game = game;
-        this.isGameActive = isGameActive;
+        this.maxPlayers = 5;
+        this.gameType = "brianboru";
+        this.game = null;
+        this.isActive = false;
     }
 
+    start(){
+        switch(this.gameType){
+            case "brianboru":
+                this.game = new Game();
+        }
+        this.isActive = true;
+    }
     canJoinLobby() {
         console.log("To be seen");
         return true;
