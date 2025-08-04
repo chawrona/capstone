@@ -3,3 +3,4 @@ node_modules/
 server/storage/logs.txt
 .env
 todo
+server/storage
