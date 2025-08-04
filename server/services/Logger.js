@@ -1,4 +1,5 @@
-import fs from "fs";
+import fs from "fs/promises";
+
 export default class Logger {
     constructor() {
         if (Logger.instance) {
@@ -8,12 +9,12 @@ export default class Logger {
         Logger.instance = this;
     }
 
-    log(message) {
+    async log(message) {
         const timestamp = new Date().toISOString();
         const logLine = `[${timestamp}] ${message}`;
 
         console.log(logLine);
 
-        fs.appendFile("./server/storage/logs.txt", logLine + "\n");
+        await fs.appendFile("./server/storage/logs.txt", logLine + "\n");
     }
 }

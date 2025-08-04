@@ -11,6 +11,7 @@ export default class UserManager {
     createUser(userId) {
         const user = new User(userId);
         this.users.set(user.id, user);
+        console.log("Stworzono");
     }
 
     deleteUser(userId) {
@@ -18,7 +19,7 @@ export default class UserManager {
     }
 
     getUser(userId) {
-        this.users.get(userId);
+        return this.users.get(userId);
     }
 
     doesUserExist(userId) {
