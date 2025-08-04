@@ -18,9 +18,9 @@ export default class UserEvents {
         const lobbyId = redirectRequest.data.lobbyId;
         const userManager = new UserManager();
         if (userManager.doesUserExist(userId)) {
-            const user = userManager().getUser();
+            const user = userManager.getUser(userId);
             if (user.hasLobby()) {
-                this.socket.join(roomId);
+                this.socket.join(lobbyId);
                 const ee = new EventEmmiter();
                 const userHandler = new UserHandler();
                 const socketId = userHandler.getUserSocketId(userId);
