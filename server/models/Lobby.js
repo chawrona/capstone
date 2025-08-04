@@ -1,5 +1,5 @@
-import generateUUID from "../utils/generateUUID.js";
 import Game from "../models/Game.js";
+import generateUUID from "../utils/generateUUID.js";
 
 export default class Lobby {
     constructor() {
@@ -8,10 +8,11 @@ export default class Lobby {
         this.gameType = "brianboru";
         this.game = null;
         this.isActive = false;
+        this.users = new Set();
     }
 
-    start(){
-        switch(this.gameType){
+    start() {
+        switch (this.gameType) {
             case "brianboru":
                 this.game = new Game();
                 break;

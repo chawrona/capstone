@@ -17,6 +17,7 @@ export default class UserHandler {
     }
 
     addUser(userId, socketId) {
+        console.log("DODANO");
         this.userManager.createUser(userId);
         this.userIdToSocketId.set(userId, socketId);
     }

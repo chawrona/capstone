@@ -1,45 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Socket.IO Event Sender</title>
-    <script src="/socket.io/socket.io.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Socket.IO Event Sender</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
 
-    <h1>Send Event to Server</h1>
-    <form id="eventForm">
-        <label for="eventName">Event Name:</label>
-        <input type="text" id="eventName" name="eventName" required>
-        <button type="submit">Send</button>
-    </form>
+  <h1>Send Event to Server</h1>
 
-    <h2>Received Events:</h2>
-    <div id="eventsLog"></div>
+  <!-- Przyciski do wstawiania nazw eventów -->
+  <div>
+    <strong>Wstaw nazwę eventu:</strong><br>
+    <button type="button" class="eventNameButton">initialRequest</button>
+    <button type="button" class="eventNameButton">createLobby</button>
+  </div>
+  <br>
 
-    <script>
-        const socket = io();
-        const form = document.getElementById('eventForm');
-        const eventsLog = document.getElementById('eventsLog');
+  <form id="eventForm">
+    <label for="eventName">Event Name:</label>
+    <input type="text" id="eventName" name="eventName" required><br><br>
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const eventName = document.getElementById('eventName').value.trim();
-            if (eventName) {
-                socket.emit(eventName, {});
-                alert(`Event "${eventName}" sent with empty object.`);
-                form.reset();
-            }
-        });
+    <label for="eventData">Event Data (JSON):</label><br>
+    <textarea id="eventData" name="eventData" rows="5" cols="50" placeholder='e.g. { "name": "John", "age": 30 }'></textarea><br><br>
 
-        // Listen for all events and display them
-        socket.onAny((event, data) => {
-            const para = document.createElement('p');
-            para.textContent = `Received event: "${event}" with data: ${JSON.stringify(data)}`;
-            eventsLog.prepend(para);
-        });
-    </script>
+    <!-- Przyciski wklejające dane -->
+    <button type="button" id="insertSample">Wklej przykładowy JSON</button><br><br>
+
+    <button type="submit">Send</button>
+  </form>
+
+  <h2>Received Events:</h2>
+  <div id="eventsLog"></div>
+
+  <script>
+    const socket = io();
+    const form = document.getElementById('eventForm');
+    const eventsLog = document.getElementById('eventsLog');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const eventName = document.getElementById('eventName').value.trim();
+      const eventDataRaw = document.getElementById('eventData').value.trim();
+
+      if (eventName) {
+        let data = {};
+
+        if (eventDataRaw) {
+          try {
+            data = JSON.parse(eventDataRaw);
+          } catch (err) {
+            alert("Invalid JSON data:\n" + err.message);
+            return;
+          }
+        }
+
+        socket.emit(eventName, data);
+        alert(`Event "${eventName}" sent with data: ${JSON.stringify(data)}`);
+        form.reset();
+      }
+    });
+
+    socket.onAny((event, data) => {
+      const para = document.createElement('p');
+      para.textContent = `Received event: "${event}" with data: ${JSON.stringify(data)}`;
+      eventsLog.prepend(para);
+    });
+
+    document.getElementById('insertSample').addEventListener('click', () => {
+      const exampleData = {
+        data: {
+          message: "To jest przykładowa wiadomość",
+        },
+        userId: "Dawid"
+      };
+
+      document.getElementById('eventData').value = JSON.stringify(exampleData, null, 2);
+    });
+
+    // Obsługa przycisków do wklejania nazw eventów
+    document.querySelectorAll('.eventNameButton').forEach(button => {
+      button.addEventListener('click', () => {
+        document.getElementById('eventName').value = button.textContent;
+      });
+    });
+  </script>
 
 </body>
 </html>
