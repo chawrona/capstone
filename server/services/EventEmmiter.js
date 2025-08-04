@@ -1,4 +1,4 @@
-import UserHandler from "../handlers/UserHandler.js"
+import UserHandler from "../handlers/UserHandler.js";
 
 export default class EventEmmiter {
     constructor(io) {
@@ -8,10 +8,11 @@ export default class EventEmmiter {
         this.io = io;
         EventEmmiter.instance = this;
 
+        this.userHandler = new UserHandler();
     }
 
     toUser(userId, eventName, data) {
-        const socketId = UserHandler.getUserSocketId(userId);
+        const socketId = this.userHandler.getUserSocketId(userId);
         this.io.to(socketId).emit(eventName, data);
     }
 
