@@ -30,9 +30,8 @@ export default class UserEvents {
         if (this.userManager.doesUserExist(userId)) {
             const user = this.userManager.getUser();
             if (user.hasLobby()) {
-                const socketId = this.userHandler.getUserSocketId(userId);
                 this.socket.join(user.lobbyId);
-                this.eventEmmiter.toUser(socketId, "brianboru");
+                this.eventEmmiter.toUser(userId, "brianboru");
             } else {
                 this.isLobbyIdGiven(userId, lobbyId);
             }
@@ -43,19 +42,19 @@ export default class UserEvents {
     }
 
     isLobbyIdGiven(userId, lobbyId) {
-        const socketId = this.userHandler.getUserSocketId(userId);
+        // const socketId = this.userHandler.getUserSocketId(userId);
         if (lobbyId) {
             if (this.lobbyManager.canJoinLobby(lobbyId)) {
                 const user = this.userManager.getUser(userId);
                 user.lobbyId = lobbyId;
-                this.eventEmmiter.toUser(socketId, "lobby");
+                this.eventEmmiter.toUser(userId, "lobby");
             } else {
-                this.eventEmmiter.toUser(socketId, "homepage", {
+                this.eventEmmiter.toUser(userId, "homepage", {
                     error: "500",
                 });
             }
         } else {
-            this.eventEmmiter.toUser(socketId, "homepage");
+            this.eventEmmiter.toUser(userId, "homepage");
         }
     }
 
