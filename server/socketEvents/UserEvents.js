@@ -1,4 +1,3 @@
-import LobbyHandler from "../handlers/LobbyHandler.js";
 import UserHandler from "../handlers/UserHandler.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
@@ -12,20 +11,26 @@ export default class UserEvents {
         this.userHandler = new UserHandler();
         this.userManager = new UserManager();
         this.lobbyManager = new LobbyManager();
-        this.lobbyHandler = new LobbyHandler();
     }
 
     registerEvents() {
-        this.socket.on("initalRequest", this.onInitalRequest);
-        this.socket.on("disconnect", this.onDisconnect);
+        this.socket.on("initialRequest", (redirectRequest) =>
+            this.onInitalRequest(redirectRequest),
+        );
+        this.socket.on("disconnect", () => this.onDisconnect());
     }
 
     onInitalRequest(redirectRequest) {
         const userId = redirectRequest.userId;
+        this.socket.data.userId = this.socket.data;
+
+        if (!redirectRequest.data) return;
         const lobbyId = redirectRequest.data.lobbyId;
+
         if (this.userManager.doesUserExist(userId)) {
-            if (this.lobbyHandler.doesUserHaveLobby()) {
-                // const socketId = this.userHandler.getUserSocketId(userId);
+            const user = this.userManager.getUser();
+            if (user.hasLobby()) {
+                this.socket.join(user.lobbyId);
                 this.eventEmmiter.toUser(userId, "brianboru");
             } else {
                 this.isLobbyIdGiven(userId, lobbyId);
@@ -40,6 +45,8 @@ export default class UserEvents {
         // const socketId = this.userHandler.getUserSocketId(userId);
         if (lobbyId) {
             if (this.lobbyManager.canJoinLobby(lobbyId)) {
+                const user = this.userManager.getUser(userId);
+                user.lobbyId = lobbyId;
                 this.eventEmmiter.toUser(userId, "lobby");
             } else {
                 this.eventEmmiter.toUser(userId, "homepage", {
@@ -52,6 +59,20 @@ export default class UserEvents {
     }
 
     onDisconnect() {
-        console.log("disconnected");
+        const { userId } = this.socket.data;
+
+        if (!userId) return;
+
+        const lobby = this.lobbyManager.getLobby(userId);
+
+        if (lobby) {
+            lobby.users.delete(userId);
+            if (lobby.users.size <= 0) {
+                this.lobbyManager.deleteLobby(lobby.id);
+            }
+        }
+
+        const user = this.userManager.getUser(userId);
+        if (user) user.lobbyId = null;
     }
 }
