@@ -20,12 +20,14 @@ export default class UserEvents {
 
     onInitalRequest(redirectRequest) {
         const userId = redirectRequest.userId;
+        this.socket.data.userId = this.socket.data;
+
         const lobbyId = redirectRequest.data.lobbyId;
         if (this.userManager.doesUserExist(userId)) {
-            const user = userManager.getUser()
+            const user = this.userManager.getUser();
             if (user.hasLobby()) {
                 const socketId = this.userHandler.getUserSocketId(userId);
-                this.socket.join(user.lobbyId)
+                this.socket.join(user.lobbyId);
                 this.eventEmmiter.toUser(socketId, "brianboru");
             } else {
                 this.isLobbyIdGiven(userId, lobbyId);
@@ -40,8 +42,8 @@ export default class UserEvents {
         const socketId = this.userHandler.getUserSocketId(userId);
         if (lobbyId) {
             if (this.lobbyManager.canJoinLobby(lobbyId)) {
-                const user = this.userManager.getUser(userId)
-                user.lobbyId = lobbyId
+                const user = this.userManager.getUser(userId);
+                user.lobbyId = lobbyId;
                 this.eventEmmiter.toUser(socketId, "lobby");
             } else {
                 this.eventEmmiter.toUser(socketId, "homepage", {
@@ -54,15 +56,20 @@ export default class UserEvents {
     }
 
     onDisconnect() {
-        const user = this.userManager.getUser(userId)
-        if(user.lobbyId){
-            const lobby = this.lobbyManager.getLobby(user.lobbyId)
-            lobby.users.delete(user.id)
-            if(lobby.users.size <= 0){
-                this.lobbyManager.deleteLobby(lobby.id)
+        const { userId } = this.socket.data;
+
+        if (!userId) return;
+
+        const lobby = this.lobbyManager.getLobby(userId);
+
+        if (lobby) {
+            lobby.users.delete(userId);
+            if (lobby.users.size <= 0) {
+                this.lobbyManager.deleteLobby(lobby.id);
             }
-            user.lobbyId = null
         }
-        console.log("disconnected");
+
+        const user = this.userManager.getUser(userId);
+        if (user) user.lobbyId = null;
     }
 }
