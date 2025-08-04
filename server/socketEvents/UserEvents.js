@@ -40,7 +40,7 @@ export default class UserEvents {
         const socketId = this.userHandler.getUserSocketId(userId);
         if (lobbyId) {
             if (this.lobbyManager.canJoinLobby(lobbyId)) {
-                const user = userManager.getUser(userId)
+                const user = this.userManager.getUser(userId)
                 user.lobbyId = lobbyId
                 this.eventEmmiter.toUser(socketId, "lobby");
             } else {
@@ -54,6 +54,15 @@ export default class UserEvents {
     }
 
     onDisconnect() {
+        const user = this.userManager.getUser(userId)
+        if(user.lobbyId){
+            const lobby = this.lobbyManager.getLobby(user.lobbyId)
+            lobby.users.delete(user.id)
+            if(lobby.users.size <= 0){
+                this.lobbyManager.deleteLobby(lobby.id)
+            }
+            user.lobbyId = null
+        }
         console.log("disconnected");
     }
 }
