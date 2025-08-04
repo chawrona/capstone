@@ -14,15 +14,19 @@ export default class UserEvents {
     }
 
     registerEvents() {
-        this.socket.on("initalRequest", this.onInitalRequest);
-        this.socket.on("disconnect", this.onDisconnect);
+        this.socket.on("initialRequest", (redirectRequest) =>
+            this.onInitalRequest(redirectRequest),
+        );
+        this.socket.on("disconnect", () => this.onDisconnect());
     }
 
     onInitalRequest(redirectRequest) {
         const userId = redirectRequest.userId;
         this.socket.data.userId = this.socket.data;
 
+        if (!redirectRequest.data) return;
         const lobbyId = redirectRequest.data.lobbyId;
+
         if (this.userManager.doesUserExist(userId)) {
             const user = this.userManager.getUser();
             if (user.hasLobby()) {

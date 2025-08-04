@@ -1,5 +1,5 @@
-import LobbyManager from "../models/LobbyManager.js";
-import UserManager from "../models/UserManager.js";
+import LobbyManager from "../managers/LobbyManager.js";
+import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
 import Logger from "../services/Logger.js";
 
@@ -14,25 +14,29 @@ export default class LobbyEvents {
     }
 
     registerEvents() {
-        this.socket.on("createLobby", this.onCreateLobby);
-        this.socket.on("join", this.onJoin);
-        this.socket.on("leave", this.onLeave);
+        this.socket.on("createLobby", (payload) => this.onCreateLobby(payload));
+        this.socket.on("join", () => this.onJoin());
+        this.socket.on("leave", (payload) => this.onLeave(payload));
     }
 
     onCreateLobby(payload) {
-        try{
-            const lobby = this.lobbyManager.createLobby()
-            const user = this.userManager.getUser(payload.userId)
-            user.lobbyId = lobby.id
-            this.socket.join(lobby.id)
-            lobby.users.add(user.id)
-            this.eventEmmiter.toUser(user.id,"lobby",{lobbyId: lobby.id});
-        } catch(error){
-            this.eventEmmiter.toUser(user.id,"error",{lobbyId: lobby.id});
-            this.logger.log(error)
-        } 
+        const lobby = this.lobbyManager.createLobby();
+        console.log(payload.userId);
+        const user = this.userManager.getUser(payload.userId);
 
-        this.logger.log(`Stworzono lobby o id ${lobby.id} przez gracza ${user.id}`) // Tworzenie lobby
+        try {
+            user.lobbyId = lobby.id;
+            this.socket.join(lobby.id);
+            lobby.users.add(user.id);
+            this.eventEmmiter.toUser(user.id, "lobby", { lobbyId: lobby.id });
+        } catch (error) {
+            this.eventEmmiter.toUser(user.id, "error", { lobbyId: lobby.id });
+            this.logger.log(error);
+        }
+
+        this.logger.log(
+            `Stworzono lobby o id ${lobby.id} przez gracza ${user.id}`,
+        );
 
         console.log("create");
     }
@@ -41,8 +45,8 @@ export default class LobbyEvents {
         console.log("join");
     }
 
-    onLeave(lobbyId) {
+    onLeave(payload) {
         console.log("leave");
-        console.log(lobbyId);
+        console.log(payload);
     }
 }

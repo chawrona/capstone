@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 
 import ClientRoutes from "./routes/ClientRoutes.js";
 import EventEmmiter from "./services/EventEmmiter.js";
+import LobbyEvents from "./socketEvents/LobbyEvents.js";
 import UserEvents from "./socketEvents/UserEvents.js";
 
 const app = express();
@@ -22,6 +23,7 @@ app.use("/", clientRoutes.getRouter());
 new EventEmmiter(io);
 io.on("connection", (socket) => {
     new UserEvents(socket);
+    new LobbyEvents(socket);
     // lobby events
 });
 
