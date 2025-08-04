@@ -1,5 +1,5 @@
-import Game from "../models/Game.js";
 import generateUUID from "../utils/generateUUID.js";
+import Game from "./Game.js";
 
 export default class Lobby {
     constructor() {
