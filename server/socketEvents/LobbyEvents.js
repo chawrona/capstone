@@ -11,7 +11,7 @@ export default class ConnectionManager {
         this.socket.on("create", this.onCreate);
         this.socket.on("join", this.onJoin);
         this.socket.on("leave", this.onLeave);
-        this.socket.on("start", this.onGameStart);
+        this.socket.on("start", this.GameStart);
     }
 
     onCreate() {
@@ -26,7 +26,7 @@ export default class ConnectionManager {
         console.log("leave");
         console.log(lobbyId);
     }
-    onGameStart(payload){
+    GameStart(payload){
         const userId = payload.userId;
         const lobby = this.lobbyManager.getLobby(userId);
         lobby.start();

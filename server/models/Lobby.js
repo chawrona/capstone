@@ -1,4 +1,5 @@
 import generateUUID from "../utils/generateUUID.js";
+import Game from "../models/Game.js";
 
 export default class Lobby {
     constructor() {
@@ -13,6 +14,7 @@ export default class Lobby {
         switch(this.gameType){
             case "brianboru":
                 this.game = new Game();
+                break;
         }
         this.isActive = true;
     }
