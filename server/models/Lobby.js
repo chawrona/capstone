@@ -9,13 +9,16 @@ export default class Lobby {
         this.isGameActive = isGameActive;
         this.users = new Set();
     }
+
     canJoinLobby() {
         console.log("To be seen");
         return true;
     }
+
     lobbyInformation() {
         console.log("Information about lobby");
     }
+
     endGameJoinLobby() {
         console.log("Thanks for playing, redirecting to lobby...");
     }

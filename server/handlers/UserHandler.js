@@ -7,6 +7,8 @@ export default class UserHandler {
         }
         this.userIdToSocketId = new Map();
 
+        this.userManager = new UserManager();
+
         UserHandler.instance = this;
     }
 
@@ -14,9 +16,8 @@ export default class UserHandler {
         return this.userIdToSocketId.has(userId);
     }
 
-    addUser(socketId) {
-        const userManager = new UserManager();
-        const userId = userManager.createUser();
+    addUser(userId, socketId) {
+        this.userManager.createUser(userId);
         this.userIdToSocketId.set(userId, socketId);
     }
 

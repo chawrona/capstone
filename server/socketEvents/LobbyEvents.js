@@ -3,18 +3,22 @@ export default class LobbyEvents {
         this.socket = socket;
         this.registerEvents();
     }
+
     registerEvents() {
-        this.socket.on("create", this.create);
-        this.socket.on("join", this.join);
-        this.socket.on("leave", this.leave);
+        this.socket.on("create", this.onCreate);
+        this.socket.on("join", this.onJoin);
+        this.socket.on("leave", this.onLeave);
     }
-    create() {
+
+    onCreate() {
         console.log("create");
     }
-    join() {
+
+    onJoin() {
         console.log("join");
     }
-    leave(lobbyId) {
+
+    onLeave(lobbyId) {
         console.log("leave");
         console.log(lobbyId);
     }
