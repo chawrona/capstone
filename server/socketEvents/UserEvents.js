@@ -1,4 +1,3 @@
-import LobbyHandler from "../handlers/LobbyHandler.js";
 import UserHandler from "../handlers/UserHandler.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
@@ -12,7 +11,6 @@ export default class UserEvents {
         this.userHandler = new UserHandler();
         this.userManager = new UserManager();
         this.lobbyManager = new LobbyManager();
-        this.lobbyHandler = new LobbyHandler();
     }
 
     registerEvents() {
@@ -24,8 +22,10 @@ export default class UserEvents {
         const userId = redirectRequest.userId;
         const lobbyId = redirectRequest.data.lobbyId;
         if (this.userManager.doesUserExist(userId)) {
-            if (this.lobbyHandler.doesUserHaveLobby()) {
+            const user = userManager.getUser()
+            if (user.hasLobby()) {
                 const socketId = this.userHandler.getUserSocketId(userId);
+                this.socket.join(user.lobbyId)
                 this.eventEmmiter.toUser(socketId, "brianboru");
             } else {
                 this.isLobbyIdGiven(userId, lobbyId);
@@ -40,6 +40,8 @@ export default class UserEvents {
         const socketId = this.userHandler.getUserSocketId(userId);
         if (lobbyId) {
             if (this.lobbyManager.canJoinLobby(lobbyId)) {
+                const user = userManager.getUser(userId)
+                user.lobbyId = lobbyId
                 this.eventEmmiter.toUser(socketId, "lobby");
             } else {
                 this.eventEmmiter.toUser(socketId, "homepage", {

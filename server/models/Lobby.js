@@ -7,6 +7,7 @@ export default class Lobby {
         this.gameType = gameType;
         this.game = game;
         this.isGameActive = isGameActive;
+        this.users = new Set();
     }
 
     canJoinLobby() {
