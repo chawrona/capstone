@@ -15,12 +15,12 @@ export default class UserEvents {
 
     registerEvents() {
         this.socket.on("initialRequest", (redirectRequest) =>
-            this.onInitalRequest(redirectRequest),
+            this.onInitialRequest(redirectRequest),
         );
         this.socket.on("disconnect", () => this.onDisconnect());
     }
 
-    onInitalRequest(redirectRequest) {
+    onInitialRequest(redirectRequest) { 
         const userId = redirectRequest.userId;
         this.socket.data.userId = this.socket.data;
 
@@ -28,8 +28,9 @@ export default class UserEvents {
         const lobbyId = redirectRequest.data.lobbyId;
 
         if (this.userManager.doesUserExist(userId)) {
-            const user = this.userManager.getUser();
-            if (user.hasLobby()) {
+            const user = this.userManager.getUser(userId);
+            // if (user.hasLobby()) { czemu tego nie ma w userze?
+            if (user.lobbyId){
                 this.socket.join(user.lobbyId);
                 this.eventEmmiter.toUser(userId, "brianboru");
             } else {
@@ -47,6 +48,7 @@ export default class UserEvents {
             if (this.lobbyManager.canJoinLobby(lobbyId)) {
                 const user = this.userManager.getUser(userId);
                 user.lobbyId = lobbyId;
+                this.socket.join(lobbyId)
                 this.eventEmmiter.toUser(userId, "lobby");
             } else {
                 this.eventEmmiter.toUser(userId, "homepage", {
@@ -63,16 +65,20 @@ export default class UserEvents {
 
         if (!userId) return;
 
-        const lobby = this.lobbyManager.getLobby(userId);
-
-        if (lobby) {
-            lobby.users.delete(userId);
-            if (lobby.users.size <= 0) {
-                this.lobbyManager.deleteLobby(lobby.id);
-            }
-        }
+        // const lobby = this.lobbyManager.getLobby(userId); To chyba szuka lobby po id lobby a jak będzie chcialo wyszukac lobby po id uzytkownika to po prostu będzie szukalo po losowych dla siebie cyferkach no nie?
 
         const user = this.userManager.getUser(userId);
+
+        if (user && user.lobbyId) {
+            const lobby = this.lobbyManager.getLobby(user.lobbyId);
+            if (lobby) {
+                lobby.users.delete(userId);
+                if (lobby.users.size <= 0) {
+                    this.lobbyManager.deleteLobby(lobby.id);
+                }
+            }
+        }
+        
         if (user) user.lobbyId = null;
     }
 }
