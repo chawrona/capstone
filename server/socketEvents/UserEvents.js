@@ -20,36 +20,37 @@ export default class UserEvents {
         this.socket.on("disconnect", () => this.onDisconnect());
     }
 
-    onInitalRequest(redirectRequest) {
-        const userId = redirectRequest.userId;
-        this.socket.data.userId = this.socket.data;
+        onInitalRequest(redirectRequest) {               
+        const userId = redirectRequest.userId;       // przypisanie zmiennej userId wartości z pola userId obiektu o nazwie redirectRequest
+        this.socket.data.userId = userId; 
 
-        if (!redirectRequest.data) return;
-        const lobbyId = redirectRequest.data.lobbyId;
+        if (!redirectRequest.data) return;                       // zwraca true albo false w zależności od tego czy obiekt this.userManager w polu users (this.userManager.users), który jest mapą,
+                                                                 // przechowuje wartość pod kluczem którym jest to konkretne id użytkownika
+        const lobbyId = redirectRequest.data.lobbyId;  // do zmiennej user przypisujemy obekt instancji klasy User
 
-        if (this.userManager.doesUserExist(userId)) {
-            const user = this.userManager.getUser();
-            if (user.hasLobby()) {
-                this.socket.join(user.lobbyId);
-                this.eventEmmiter.toUser(userId, "brianboru");
+        if (this.userManager.doesUserExist(userId)) {  // zwracam id usera jeżeli istnieje
+            const user = this.userManager.getUser(userId);   // zmiennej user przypisuje userId obiektu
+            if (user.hasLobby(lobbyId)) {                     // sprawdzam czy user ma lobby
+                this.socket.join(user.lobbyId);        // Dołączam (socket) usera do pokoju o id user.lobbyId
+                this.eventEmmiter.toUser(userId, "brianboru");  // event o nazwie 'brianboru' do usera o id 'userId'
             } else {
-                this.isLobbyIdGiven(userId, lobbyId);
+                this.isLobbyIdGiven(userId, lobbyId);  // sprawdzamy czy frontend wysłał nam informację do jakiego lobby chce dołączyć
             }
-        } else {
-            this.userHandler.addUser(userId, this.socket.id);
-            this.isLobbyIdGiven(userId, lobbyId);
+        } else { 
+            this.userHandler.addUser(userId, this.socket.id); 
+            this.isLobbyIdGiven(userId, lobbyId); 
         }
     }
 
     isLobbyIdGiven(userId, lobbyId) {
-        // const socketId = this.userHandler.getUserSocketId(userId);
-        if (lobbyId) {
-            if (this.lobbyManager.canJoinLobby(lobbyId)) {
-                const user = this.userManager.getUser(userId);
+        if (lobbyId) { // frontend przekazał id lobby
+            if (this.lobbyManager.canJoinLobby(lobbyId)) { // trzeba zmienic canJoinLobby na inne bo zawsze zwraca true (a my chcemy dostac informacje o tym czy mozna czy nie)
+                const user = this.userManager.getUser(userId); // dostajemy obiekt usera
                 user.lobbyId = lobbyId;
+                this.socket.join(lobbyId)
                 this.eventEmmiter.toUser(userId, "lobby");
             } else {
-                this.eventEmmiter.toUser(userId, "homepage", {
+                this.eventEmmiter.toUser(userId, "homepage", { //  W tym konkretnym wypadku dołączamy dane, danymi jest obiekt, który ma pole error, a wartością pod tym polem jest string "500"
                     error: "500",
                 });
             }
