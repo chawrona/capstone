@@ -19,10 +19,6 @@ export default class Lobby {
         }
         this.isActive = true;
     }
-    canJoinLobby() {
-        console.log("To be seen");
-        return true;
-    }
 
     lobbyInformation() {
         console.log("Information about lobby");

@@ -15,20 +15,20 @@ export default class UserEvents {
 
     registerEvents() {
         this.socket.on("initialRequest", (redirectRequest) =>
-            this.onInitalRequest(redirectRequest),
+            this.onInitialRequest(redirectRequest),
         );
         this.socket.on("disconnect", () => this.onDisconnect());
     }
 
-    onInitalRequest(redirectRequest) {
+    onInitialRequest(redirectRequest) {
         const userId = redirectRequest.userId;
-        this.socket.data.userId = this.socket.data;
+        this.socket.data.userId = userId;
 
         if (!redirectRequest.data) return;
         const lobbyId = redirectRequest.data.lobbyId;
 
         if (this.userManager.doesUserExist(userId)) {
-            const user = this.userManager.getUser();
+            const user = this.userManager.getUser(userId);
             if (user.hasLobby()) {
                 this.socket.join(user.lobbyId);
                 this.eventEmmiter.toUser(userId, "brianboru");
@@ -42,11 +42,12 @@ export default class UserEvents {
     }
 
     isLobbyIdGiven(userId, lobbyId) {
-        // const socketId = this.userHandler.getUserSocketId(userId);
         if (lobbyId) {
-            if (this.lobbyManager.canJoinLobby(lobbyId)) {
+            const lobby = this.lobbyManager.getLobby(lobbyId);
+            if (lobby.joinUser(userId)) {
                 const user = this.userManager.getUser(userId);
                 user.lobbyId = lobbyId;
+                this.socket.join(user.lobbyId);
                 this.eventEmmiter.toUser(userId, "lobby");
             } else {
                 this.eventEmmiter.toUser(userId, "homepage", {
@@ -60,10 +61,8 @@ export default class UserEvents {
 
     onDisconnect() {
         const { userId } = this.socket.data;
-
-        if (!userId) return;
-
-        const lobby = this.lobbyManager.getLobby(userId);
+        const user = this.userManager.getUser(userId);
+        const lobby = this.lobbyManager.getLobby(user.lobbyId);
 
         if (lobby) {
             lobby.users.delete(userId);
@@ -72,7 +71,6 @@ export default class UserEvents {
             }
         }
 
-        const user = this.userManager.getUser(userId);
-        if (user) user.lobbyId = null;
+        user.lobbyId = null;
     }
 }

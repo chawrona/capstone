@@ -4,4 +4,8 @@ export default class User {
         this.name = 1;
         this.lobbyId = null;
     }
+
+    hasLobby() {
+        return Boolean(this.lobbyId);
+    }
 }
