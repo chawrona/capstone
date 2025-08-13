@@ -28,6 +28,7 @@ export default class UserEvents {
         const lobbyId = redirectRequest.data.lobbyId;
 
         if (this.userManager.doesUserExist(userId)) {
+            this.userHandler.updateUserSocketId(userId, this.socket.id);
             const user = this.userManager.getUser(userId);
             if (user.hasLobby()) {
                 this.socket.join(user.lobbyId);
@@ -42,6 +43,7 @@ export default class UserEvents {
     }
 
     isLobbyIdGiven(userId, lobbyId) {
+        console.log(`User o id: ${userId}. Podał lobbyId: ${lobbyId}`);
         if (lobbyId) {
             const lobby = this.lobbyManager.getLobby(lobbyId);
             if (lobby && lobby.joinUser(userId)) {
