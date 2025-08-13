@@ -44,14 +44,14 @@ export default class UserEvents {
     isLobbyIdGiven(userId, lobbyId) {
         if (lobbyId) {
             const lobby = this.lobbyManager.getLobby(lobbyId);
-            if (lobby.joinUser(userId)) {
+            if (lobby && lobby.joinUser(userId)) {
                 const user = this.userManager.getUser(userId);
                 user.lobbyId = lobbyId;
                 this.socket.join(user.lobbyId);
                 this.eventEmmiter.toUser(userId, "lobby");
             } else {
                 this.eventEmmiter.toUser(userId, "homepage", {
-                    error: "500",
+                    error: "Lobby nie istnieje",
                 });
             }
         } else {
