@@ -11,6 +11,13 @@ import UserEvents from "./socketEvents/UserEvents.js";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+// FRONTEND DEVELOPMENT
+// const io = new Server(server, {
+//     cors: {
+//         origin: "http://localhost:5173",
+//         methods: ["GET", "POST"],
+//     },
+// });
 const clientRoutes = new ClientRoutes();
 
 dotenv.config();
