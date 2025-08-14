@@ -53,7 +53,7 @@ export default class UserEvents {
                 this.eventEmmiter.toUser(userId, "lobby");
             } else {
                 this.eventEmmiter.toUser(userId, "homepage", {
-                    errorMessage: "Lobby nie istnieje",
+                    errorMessage: `Nie znaleziono lobby #${lobbyId}.`,
                 });
             }
         } else {

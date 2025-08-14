@@ -15,8 +15,8 @@ export default class LobbyEvents {
 
     registerEvents() {
         this.socket.on("createLobby", (payload) => this.onCreateLobby(payload));
-        this.socket.on("join", () => this.onJoin());
-        this.socket.on("leave", (payload) => this.onLeave(payload));
+        this.socket.on("joinLobby", (payload) => this.onJoinLobby(payload));
+        this.socket.on("leaveLobby", () => this.onLeaveLobby());
         this.socket.on("gameStart", () => this.onGameStart());
     }
 
@@ -42,14 +42,14 @@ export default class LobbyEvents {
         console.log("create");
     }
 
-    onJoin() {
+    onJoinLobby() {
         console.log("join");
     }
 
-    onLeave(payload) {
+    onLeaveLobby() {
         console.log("leave");
-        console.log(payload);
     }
+
     onGameStart(payload) {
         const userId = payload.userId;
         const lobby = this.lobbyManager.getLobby(userId);
