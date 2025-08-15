@@ -1,8 +1,8 @@
 {
-    "eslint.format.enable": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit",
-    },
-    "eslint.run": "onSave",
-    "eslint.validate": ["javascript", "typescript"],
+  "eslint.format.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.run": "onSave",
+  "eslint.validate": ["javascript", "typescript"]
 }

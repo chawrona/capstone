@@ -3,9 +3,10 @@
   "scripts": {
     "dev": "nodemon server/app.js",
     "lint": "eslint .",
-    "format": "prettier --write .",
+    "format-prettier": "prettier --write ./server/",
     "test": "node server/tests/test.js",
-    "fix": "npx eslint . --fix"
+    "format-eslint": "npx eslint ./server/ --fix",
+    "fix": "npm run format-prettier && npm run format-eslint"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
