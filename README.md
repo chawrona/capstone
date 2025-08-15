@@ -28,13 +28,4 @@ git merge main
 1. Napraw konflikty w kodzie (terminal pokaże pliki z konfliktami — wystarczy otworzyć je po kolei). 
 Komendą `git status` sprawdzisz, które pliki wymagają interwencji.
 
-2. Po naprawie kontynuuj jak w sekcji **Nowe zmiany**:
-
-```bash
-git add .
-git commit -m "resolve conflicts"
-git push origin <branch-name>
-```
-
-git push origin <branch-name>
-```
+2. Po naprawie kontynuuj jak w sekcji **Nowe zmiany**.
