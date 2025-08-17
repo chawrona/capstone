@@ -16,14 +16,13 @@ export default class LobbyEvents {
     registerEvents() {
         this.socket.on("createLobby", (payload) => this.onCreateLobby(payload));
         this.socket.on("joinLobby", (payload) => this.onJoinLobby(payload));
-        this.socket.on("leaveLobby", () => this.onLeaveLobby());
+        this.socket.on("leaveLobby", (payload) => this.onLeaveLobby(payload));
         this.socket.on("gameStart", () => this.onGameStart());
     }
 
-    onCreateLobby(payload) {
+    onCreateLobby({ userId }) {
         const lobby = this.lobbyManager.createLobby();
-        console.log(payload.userId);
-        const user = this.userManager.getUser(payload.userId);
+        const user = this.userManager.getUser(userId);
 
         try {
             user.lobbyId = lobby.id;
@@ -46,12 +45,23 @@ export default class LobbyEvents {
         console.log("join");
     }
 
-    onLeaveLobby() {
-        console.log("leave");
+    onLeaveLobby({ userId }) {
+        const user = this.userManager.getUser(userId);
+        const lobby = this.lobbyManager.getLobby(user.lobbyId);
+        lobby.removeUser(userId);
+        this.socket.leave(user.lobbyId);
+        user.lobbyId = null;
     }
 
-    onGameStart(payload) {
-        const userId = payload.userId;
+    onGameStart({ userId }) {
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring#unpacking_properties_from_objects_passed_as_a_function_parameter
+        // onGameStart({ userId: uId }) {
+        // {} to swego typu getter, tworzy zmienną o nazwie takiej jaka jest w klamerkach i przypisuje tam wartość z tego co zostalo w tym miejscu przekazane
+        // onGameStart(payload) {
+        // const { userId, lobbyId } = payload;
+        // To samo co
+        // const userId = payload.userId
+        // const lobbyId = payload.lobbyId
         const lobby = this.lobbyManager.getLobby(userId);
         lobby.start();
     }
