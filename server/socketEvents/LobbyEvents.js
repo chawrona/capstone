@@ -25,13 +25,17 @@ export default class LobbyEvents {
         console.log(payload.userId);
         const user = this.userManager.getUser(payload.userId);
 
-        try {
+        try{
             user.lobbyId = lobby.id;
             this.socket.join(lobby.id);
-            lobby.users.add(user.id);
+            lobby.joinUser(user.id);
             this.eventEmmiter.toUser(user.id, "lobby", { lobbyId: lobby.id });
+            
+            this.logger.log(`Stworzono lobby o id ${lobby.id} przez gracza ${user.id}`);
         } catch (error) {
-            this.eventEmmiter.toUser(user.id, "error", { lobbyId: lobby.id });
+            this.eventEmmiter.toUser(user.id, "error", { 
+                errorMessage: `Wystąpił błąd z tworzeniem lobby.`
+            });
             this.logger.log(error);
         }
 
@@ -42,8 +46,27 @@ export default class LobbyEvents {
         console.log("create");
     }
 
-    onJoinLobby() {
-        console.log("join");
+    onJoinLobby(payload) {
+        const lobby = this.lobbyManager.getLobby(payload.data.lobbyId);
+        const user = this.userManager.getUser(payload.userId);
+        try{
+            if (!lobby) throw Error(`Lobby #${payload.data.lobbyId} nie istnieje.`);
+            lobby.joinUser(user.id);
+            user.lobbyId = lobby.id;
+            this.socket.join(lobby.id);
+            
+            this.eventEmmiter.toUser(user.id, "joinLobby", {
+                userId: user.id,
+                data: { lobbyId: lobby.id }
+        });
+
+        this.logger.log(`Użytkownik o id ${user.id } dołączył do lobby#${lobby.id}.`)
+
+        } catch (error) {
+            this.eventEmmiter.toUser(user.id, "error", { 
+            errorMessage: `Wystąpił błąd w dołączaniu użytkownika do lobby.`
+            })
+        }
     }
 
     onLeaveLobby() {
