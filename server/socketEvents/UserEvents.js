@@ -52,9 +52,10 @@ isLobbyIdGiven(userId, lobbyId) {
                 user.lobbyId = lobbyId;
                 this.socket.join(user.lobbyId);
                 this.eventEmmiter.toUser(userId, "lobby");
+                throw new Error(`Nie znaleziono pokoju #${lobbyId}.`)
             } catch(error) {
                 this.eventEmmiter.toUser(userId, "homepage", {
-                    errorMessage: `Nie znaleziono pokoju #${lobbyId}.`,
+                    error: error.message,
                 });
             }
         } else {
