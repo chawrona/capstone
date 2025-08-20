@@ -16,14 +16,13 @@ export default class LobbyEvents {
     registerEvents() {
         this.socket.on("createLobby", (payload) => this.onCreateLobby(payload));
         this.socket.on("joinLobby", (payload) => this.onJoinLobby(payload));
-        this.socket.on("leaveLobby", () => this.onLeaveLobby());
+        this.socket.on("leaveLobby", (payload) => this.onLeaveLobby(payload));
         this.socket.on("gameStart", () => this.onGameStart());
     }
 
-    onCreateLobby(payload) {
+    onCreateLobby({ userId }) {
         const lobby = this.lobbyManager.createLobby();
-        console.log(payload.userId);
-        const user = this.userManager.getUser(payload.userId);
+        const user = this.userManager.getUser(userId);
 
         try {
             user.lobbyId = lobby.id;
@@ -38,20 +37,26 @@ export default class LobbyEvents {
         this.logger.log(
             `Stworzono lobby o id ${lobby.id} przez gracza ${user.id}`,
         );
-
-        console.log("create");
     }
 
     onJoinLobby() {
         console.log("join");
     }
 
-    onLeaveLobby() {
-        console.log("leave");
+    onLeaveLobby({ userId }) {
+        const user = this.userManager.getUser(userId);
+        const lobby = this.lobbyManager.getLobby(user.lobbyId);
+        lobby.removeUser(userId);
+
+        if (!lobby.getPlayerCount()) {
+            this.lobbyManager.deleteLobby(lobby.id);
+        }
+
+        this.socket.leave(user.lobbyId);
+        user.lobbyId = null;
     }
 
-    onGameStart(payload) {
-        const userId = payload.userId;
+    onGameStart({ userId }) {
         const lobby = this.lobbyManager.getLobby(userId);
         lobby.start();
     }

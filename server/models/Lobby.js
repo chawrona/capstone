@@ -1,3 +1,4 @@
+import LobbyManager from "../managers/LobbyManager.js";
 import generateUUID from "../utils/generateUUID.js";
 import Game from "./Game.js";
 
@@ -9,6 +10,7 @@ export default class Lobby {
         this.game = null;
         this.isActive = false;
         this.users = new Set();
+        this.lobbyManager = new LobbyManager();
     }
 
     start() {
@@ -26,5 +28,13 @@ export default class Lobby {
 
     endGameJoinLobby() {
         console.log("Thanks for playing, redirecting to lobby...");
+    }
+
+    getPlayerCount() {
+        return this.users.size;
+    }
+
+    removeUser(userId) {
+        return this.users.delete(userId);
     }
 }

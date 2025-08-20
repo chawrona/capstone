@@ -67,8 +67,9 @@ export default class UserEvents {
         const lobby = this.lobbyManager.getLobby(user.lobbyId);
 
         if (lobby) {
-            lobby.users.delete(userId);
-            if (lobby.users.size <= 0) {
+            lobby.removeUser(userId);
+
+            if (!lobby.getPlayerCount()) {
                 this.lobbyManager.deleteLobby(lobby.id);
             }
         }
