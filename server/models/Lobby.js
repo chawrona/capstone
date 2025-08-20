@@ -30,6 +30,12 @@ export default class Lobby {
         console.log("Thanks for playing, redirecting to lobby...");
     }
 
+    joinUser(userId) {
+        if (this.users.size >= this.maxPlayers) {
+            throw new Error("The room is full.");
+        }
+        this.users.add(userId);
+    }
     getPlayerCount() {
         return this.users.size;
     }
