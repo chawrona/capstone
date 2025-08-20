@@ -1,3 +1,4 @@
+import LobbyManager from "../managers/LobbyManager.js";
 import generateUUID from "../utils/generateUUID.js";
 import Game from "./Game.js";
 
@@ -9,6 +10,7 @@ export default class Lobby {
         this.game = null;
         this.isActive = false;
         this.users = new Set();
+        this.lobbyManager = new LobbyManager();
     }
 
     start() {
@@ -33,5 +35,12 @@ export default class Lobby {
             throw new Error("The room is full.");
         }
         this.users.add(userId);
+    }
+    getPlayerCount() {
+        return this.users.size;
+    }
+
+    removeUser(userId) {
+        return this.users.delete(userId);
     }
 }
