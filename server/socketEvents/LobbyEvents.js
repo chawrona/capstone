@@ -20,54 +20,44 @@ export default class LobbyEvents {
         this.socket.on("gameStart", () => this.onGameStart());
     }
 
-    onCreateLobby({userId}) {
+    onCreateLobby({ userId }) {
         const lobby = this.lobbyManager.createLobby();
-        console.log(userId);
+        const lobbyId = lobby.id;
         const user = this.userManager.getUser(userId);
 
-        try{
-            user.lobbyId = lobby.id;
-            this.socket.join(lobby.id);
-            lobby.joinUser(user.id);
-            this.eventEmmiter.toUser(user.id, "lobby", { lobbyId: lobby.id });
-            
-            throw new Error(`Wystąpił błąd z tworzeniem lobby.`);
-            // nic nie wykonuje się po throw nie mogę dać tutaj this.logger.log(`Stworzono lobby o id ${lobby.id} przez gracza ${user.id}`,)
-            // możnaby to zrobić if'em ale nie wiem dokładnie co mógłbym tutaj zanegować, z jakiego powodu powstaje ten error
-        } catch (error) {
-            this.eventEmmiter.toUser(user.id, "error", { 
-                error: error.message
-            });
-            this.logger.log(error);
-        }
-        
-        this.logger.log( 
-            `Stworzono lobby o id ${lobby.id} przez gracza ${user.id}`,
-        );
+        try {
+            user.lobbyId = lobbyId;
+            this.socket.join(lobbyId);
+            lobby.joinUser(userId);
+            this.eventEmmiter.toUser(userId, "lobby", { lobbyId });
 
-        console.log("create");
+            this.logger.log(
+                `Stworzono lobby o id ${lobbyId} przez gracza ${userId}`,
+            );
+        } catch (error) {
+            this.eventEmmiter.toUserError(userId, error);
+        }
     }
 
-    onJoinLobby({userId, lobbyId: {lobbyId}}) {
+    onJoinLobby({ userId, lobbyId }) {
         const lobby = this.lobbyManager.getLobby(lobbyId);
         const user = this.userManager.getUser(userId);
-        try{
+        try {
             if (!lobby) throw new Error(`Lobby #${lobbyId} nie istnieje.`);
-            lobby.joinUser(user.id);
-            user.lobbyId = lobby.id;
-            this.socket.join(lobby.id);
-            
-            this.eventEmmiter.toUser(user.id, "joinLobby", {
-                userId: user.id,
-                data: { lobbyId: lobby.id }
-        });
+            lobby.joinUser(userId);
+            user.lobbyId = lobbyId;
+            this.socket.join(lobbyId);
 
-        this.logger.log(`Użytkownik o id ${user.id } dołączył do lobby#${lobby.id}.`)
+            this.eventEmmiter.toUser(userId, "joinLobby", {
+                userId,
+                data: { lobbyId },
+            });
 
+            this.logger.log(
+                `Użytkownik o id ${userId} dołączył do lobby#${lobbyId}.`,
+            );
         } catch (error) {
-            this.eventEmmiter.toUser(user.id, "error", { 
-            error: `Wystąpił błąd w dołączaniu użytkownika do lobby.`
-            })
+            this.eventEmmiter.toUserError(userId, error);
         }
     }
 

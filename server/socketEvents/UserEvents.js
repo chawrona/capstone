@@ -42,27 +42,22 @@ export default class UserEvents {
         }
     }
 
-isLobbyIdGiven(userId, lobbyId) {
-        console.log(`User o id: ${userId}. Podał lobbyId: ${lobbyId}`);
-        if (lobbyId) {
-            const lobby = this.lobbyManager.getLobby(lobbyId);
-            try{ 
-                (lobby && lobby.joinUser(userId));
+    isLobbyIdGiven(userId, lobbyId) {
+        try {
+            if (lobbyId) {
+                const lobby = this.lobbyManager.getLobby(lobbyId);
+                lobby && lobby.joinUser(userId);
                 const user = this.userManager.getUser(userId);
                 user.lobbyId = lobbyId;
                 this.socket.join(user.lobbyId);
                 this.eventEmmiter.toUser(userId, "lobby");
-                throw new Error(`Nie znaleziono pokoju #${lobbyId}.`)
-            } catch(error) {
-                this.eventEmmiter.toUser(userId, "homepage", {
-                    error: error.message,
-                });
+            } else {
+                throw new Error(`Nie znaleziono pokoju #${lobbyId}.`);
             }
-        } else {
-            this.eventEmmiter.toUser(userId, "homepage");
+        } catch (error) {
+            this.eventEmmiter.toUserError(userId, error);
         }
     }
-
 
     onDisconnect() {
         const { userId } = this.socket.data;
