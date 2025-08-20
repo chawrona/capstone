@@ -1,5 +1,4 @@
 import LobbyManager from "../managers/LobbyManager.js";
-import UserManager from "../managers/UserManager.js";
 import generateUUID from "../utils/generateUUID.js";
 import Game from "./Game.js";
 
@@ -11,7 +10,6 @@ export default class Lobby {
         this.game = null;
         this.isActive = false;
         this.users = new Set();
-        this.userManager = new UserManager();
         this.lobbyManager = new LobbyManager();
     }
 
@@ -37,9 +35,6 @@ export default class Lobby {
     }
 
     removeUser(userId) {
-        this.users.delete(userId);
-        if (this.getPlayerCount() <= 0) {
-            this.lobbyManager.deleteLobby(this.id);
-        }
+        return this.users.delete(userId);
     }
 }

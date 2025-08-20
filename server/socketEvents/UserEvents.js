@@ -68,6 +68,10 @@ export default class UserEvents {
 
         if (lobby) {
             lobby.removeUser(userId);
+
+            if (!lobby.getPlayerCount()) {
+                this.lobbyManager.deleteLobby(lobby.id);
+            }
         }
 
         user.lobbyId = null;

@@ -37,8 +37,6 @@ export default class LobbyEvents {
         this.logger.log(
             `Stworzono lobby o id ${lobby.id} przez gracza ${user.id}`,
         );
-
-        console.log("create");
     }
 
     onJoinLobby() {
@@ -49,19 +47,16 @@ export default class LobbyEvents {
         const user = this.userManager.getUser(userId);
         const lobby = this.lobbyManager.getLobby(user.lobbyId);
         lobby.removeUser(userId);
+
+        if (!lobby.getPlayerCount()) {
+            this.lobbyManager.deleteLobby(lobby.id);
+        }
+
         this.socket.leave(user.lobbyId);
         user.lobbyId = null;
     }
 
     onGameStart({ userId }) {
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring#unpacking_properties_from_objects_passed_as_a_function_parameter
-        // onGameStart({ userId: uId }) {
-        // {} to swego typu getter, tworzy zmienną o nazwie takiej jaka jest w klamerkach i przypisuje tam wartość z tego co zostalo w tym miejscu przekazane
-        // onGameStart(payload) {
-        // const { userId, lobbyId } = payload;
-        // To samo co
-        // const userId = payload.userId
-        // const lobbyId = payload.lobbyId
         const lobby = this.lobbyManager.getLobby(userId);
         lobby.start();
     }
