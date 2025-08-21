@@ -6,23 +6,33 @@ export default class UserManager {
         }
         UserManager.instance = this;
         this.users = new Map();
+        this.userIdToSocketId = new Map();
     }
 
-    createUser(userId) {
+    createUser(userId, socketId) {
         const user = new User(userId);
         this.users.set(user.id, user);
-        console.log("Stworzono");
-    }
-
-    deleteUser(userId) {
-        return this.users.delete(userId);
+        this.updateUserSocketId(userId, socketId);
     }
 
     getUser(userId) {
         return this.users.get(userId);
     }
 
+    getUserSocketId(userId) {
+        return this.userIdToSocketId.get(userId);
+    }
+
     doesUserExist(userId) {
         return this.users.has(userId);
+    }
+
+    updateUserSocketId(userId, socketId) {
+        this.userIdToSocketId.set(userId, socketId);
+    }
+
+    deleteUser(userId) {
+        this.userIdToSocketId.delete(userId);
+        this.users.delete(userId);
     }
 }
