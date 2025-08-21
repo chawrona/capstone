@@ -19,9 +19,10 @@ export default class EventEmmiter {
     }
 
     toUserError(userId, error) {
-        this.eventEmmiter.toUser(userId, "error", {
+        this.toUser(userId, "error", {
             error: error.message,
         });
+        console.log(error);
         this.logger.error(error.message);
     }
 

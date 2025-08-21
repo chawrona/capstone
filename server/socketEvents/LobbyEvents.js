@@ -32,29 +32,29 @@ export default class LobbyEvents {
             this.eventEmmiter.toUser(userId, "lobby", { lobbyId });
 
             this.logger.log(
-                `Stworzono lobby o id ${lobbyId} przez gracza ${userId}`,
+                `Stworzono pokój o id ${lobbyId} przez gracza ${userId}`,
             );
         } catch (error) {
             this.eventEmmiter.toUserError(userId, error);
         }
     }
 
-    onJoinLobby({ userId, lobbyId }) {
+    onJoinLobby({ userId, data: { lobbyId } }) {
         const lobby = this.lobbyManager.getLobby(lobbyId);
         const user = this.userManager.getUser(userId);
         try {
-            if (!lobby) throw new Error(`Lobby #${lobbyId} nie istnieje.`);
+            if (!lobby) throw new Error(`Pokój #${lobbyId} nie istnieje.`);
             lobby.joinUser(userId);
             user.lobbyId = lobbyId;
             this.socket.join(lobbyId);
 
-            this.eventEmmiter.toUser(userId, "joinLobby", {
+            this.eventEmmiter.toUser(userId, "lobby", {
                 userId,
                 data: { lobbyId },
             });
 
             this.logger.log(
-                `Użytkownik o id ${userId} dołączył do lobby#${lobbyId}.`,
+                `Użytkownik o id ${userId} dołączył do pokoju #${lobbyId}.`,
             );
         } catch (error) {
             this.eventEmmiter.toUserError(userId, error);
@@ -72,6 +72,7 @@ export default class LobbyEvents {
 
         this.socket.leave(user.lobbyId);
         user.lobbyId = null;
+        console.log("Wyszedł");
     }
 
     onGameStart({ userId }) {

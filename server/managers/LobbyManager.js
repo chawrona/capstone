@@ -16,6 +16,7 @@ export default class LobbyManager {
     }
 
     deleteLobby(lobbyId) {
+        console.log("Usunięto pokój");
         return this.lobbies.delete(lobbyId);
     }
 

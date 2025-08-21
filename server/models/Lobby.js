@@ -35,6 +35,7 @@ export default class Lobby {
             throw new Error("The room is full.");
         }
         this.users.add(userId);
+        console.log("Dołączył do pokoju");
     }
     getPlayerCount() {
         return this.users.size;
