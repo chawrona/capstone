@@ -1,4 +1,4 @@
-import UserHandler from "../handlers/UserHandler.js";
+import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
@@ -8,7 +8,7 @@ export default class UserEvents {
         this.socket = socket;
         this.registerEvents();
         this.eventEmmiter = new EventEmmiter();
-        this.userHandler = new UserHandler();
+
         this.userManager = new UserManager();
         this.lobbyManager = new LobbyManager();
     }
@@ -28,7 +28,7 @@ export default class UserEvents {
         const lobbyId = redirectRequest.data.lobbyId;
 
         if (this.userManager.doesUserExist(userId)) {
-            this.userHandler.updateUserSocketId(userId, this.socket.id);
+            this.userManager.updateUserSocketId(userId, this.socket.id);
             const user = this.userManager.getUser(userId);
             if (user.hasLobby()) {
                 this.socket.join(user.lobbyId);
@@ -37,25 +37,38 @@ export default class UserEvents {
                 this.isLobbyIdGiven(userId, lobbyId);
             }
         } else {
-            this.userHandler.addUser(userId, this.socket.id);
+            this.userManager.createUser(userId, this.socket.id);
             this.isLobbyIdGiven(userId, lobbyId);
         }
     }
 
     isLobbyIdGiven(userId, lobbyId) {
         try {
-            if (lobbyId) {
-                const lobby = this.lobbyManager.getLobby(lobbyId);
-                lobby && lobby.joinUser(userId);
-                const user = this.userManager.getUser(userId);
-                user.lobbyId = lobbyId;
-                this.socket.join(user.lobbyId);
-                this.eventEmmiter.toUser(userId, "lobby");
-            } else {
-                throw new Error(`Nie znaleziono pokoju #${lobbyId}.`);
+            if (!lobbyId) {
+                return this.eventEmmiter.toUser(userId, "homepage");
             }
+
+            const lobby = this.lobbyManager.getLobby(lobbyId);
+
+            if (!lobby) {
+                throw new LobbyDoesNotExistError(
+                    `Pokój #${lobbyId} nie istnieje.`,
+                );
+            }
+
+            lobby.joinUser(userId);
+            const user = this.userManager.getUser(userId);
+            user.lobbyId = lobbyId;
+            this.socket.join(user.lobbyId);
+            this.eventEmmiter.toUser(userId, "lobby");
         } catch (error) {
-            this.eventEmmiter.toUserError(userId, error);
+            if (error instanceof LobbyDoesNotExistError) {
+                this.eventEmmiter.toUser(userId, "homepage", {
+                    error: error.message,
+                });
+            } else {
+                this.eventEmmiter.toUserError(userId, error);
+            }
         }
     }
 
