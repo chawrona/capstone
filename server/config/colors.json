@@ -1,0 +1,26 @@
+[
+  {
+    "name": "crimson",
+    "hex": "#d72638"
+  },
+  {
+    "name": "blue",
+    "hex": "#3b82f6"
+  },
+  {
+    "name": "green",
+    "hex": "#22c55e"
+  },
+  {
+    "name": "yellow",
+    "hex": "#facc15"
+  },
+  {
+    "name": "purple",
+    "hex": "#9333ea"
+  },
+  {
+    "name": "orange",
+    "hex": "#f97316"
+  }
+]
