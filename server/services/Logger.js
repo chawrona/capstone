@@ -21,6 +21,5 @@ export default class Logger {
         const timestamp = new Date().toISOString();
         const logLine = `[ERROR] [${timestamp}] ${message}`;
         await fs.appendFile("./server/storage/logs.txt", logLine + "\n");
-        console.log(logLine);
     }
 }

@@ -37,6 +37,7 @@ export default class Lobby {
         this.users.add(userId);
         console.log("Dołączył do pokoju");
     }
+
     getPlayerCount() {
         return this.users.size;
     }

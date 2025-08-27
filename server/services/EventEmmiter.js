@@ -22,7 +22,7 @@ export default class EventEmmiter {
         this.toUser(userId, "error", {
             error: error.message,
         });
-        console.log(error);
+
         this.logger.error(error.message);
     }
 
