@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+
 export default class UserManager {
     constructor() {
         if (UserManager.instance) {
@@ -7,16 +8,28 @@ export default class UserManager {
         UserManager.instance = this;
         this.users = new Map();
         this.userIdToSocketId = new Map();
+        this.publicIdToId = new Map();
     }
 
     createUser(userId, socketId) {
         const user = new User(userId);
-        this.users.set(user.id, user);
+        this.users.set(userId, user);
+        this.publicIdToId.set(user.publicId, userId);
         this.updateUserSocketId(userId, socketId);
     }
 
     getUser(userId) {
         return this.users.get(userId);
+    }
+
+    getUserByPublicId(publicId) {
+        const userId = this.publicIdToId.get(publicId);
+        if (!userId) return null;
+        return this.users.get(userId);
+    }
+
+    getUserIdByPublicId(publicId) {
+        return this.publicIdToId.get(publicId);
     }
 
     getUserSocketId(userId) {
@@ -32,6 +45,10 @@ export default class UserManager {
     }
 
     deleteUser(userId) {
+        const user = this.users.get(userId);
+        if (user) {
+            this.publicIdToId.delete(user.publicId);
+        }
         this.userIdToSocketId.delete(userId);
         this.users.delete(userId);
     }

@@ -1,14 +1,14 @@
-import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
+import EventHelper from "./EventHelper.js";
 
 export default class UserEvents {
     constructor(socket) {
         this.socket = socket;
         this.registerEvents();
         this.eventEmmiter = new EventEmmiter();
-
+        this.eventHelper = new EventHelper();
         this.userManager = new UserManager();
         this.lobbyManager = new LobbyManager();
     }
@@ -34,41 +34,11 @@ export default class UserEvents {
                 this.socket.join(user.lobbyId);
                 this.eventEmmiter.toUser(userId, "brianboru");
             } else {
-                this.isLobbyIdGiven(userId, lobbyId);
+                this.eventHelper.isLobbyIdGiven(userId, lobbyId);
             }
         } else {
             this.userManager.createUser(userId, this.socket.id);
-            this.isLobbyIdGiven(userId, lobbyId);
-        }
-    }
-
-    isLobbyIdGiven(userId, lobbyId) {
-        try {
-            if (!lobbyId) {
-                return this.eventEmmiter.toUser(userId, "homepage");
-            }
-
-            const lobby = this.lobbyManager.getLobby(lobbyId);
-
-            if (!lobby) {
-                throw new LobbyDoesNotExistError(
-                    `Pokój #${lobbyId} nie istnieje.`,
-                );
-            }
-
-            lobby.joinUser(userId);
-            const user = this.userManager.getUser(userId);
-            user.lobbyId = lobbyId;
-            this.socket.join(user.lobbyId);
-            this.eventEmmiter.toUser(userId, "lobby");
-        } catch (error) {
-            if (error instanceof LobbyDoesNotExistError) {
-                this.eventEmmiter.toUser(userId, "homepage", {
-                    error: error.message,
-                });
-            } else {
-                this.eventEmmiter.toUserError(userId, error);
-            }
+            this.eventHelper.isLobbyIdGiven(userId, lobbyId);
         }
     }
 
@@ -82,9 +52,13 @@ export default class UserEvents {
 
             if (!lobby.getPlayerCount()) {
                 this.lobbyManager.deleteLobby(lobby.id);
+            } else if (lobby.isAdmin) {
+                lobby.admin = [...lobby.users][0];
+                this.eventHelper.sendLobbyData(lobby.id);
             }
         }
 
         user.lobbyId = null;
+        user.isReady = false;
     }
 }
