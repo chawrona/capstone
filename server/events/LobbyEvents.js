@@ -125,7 +125,6 @@ export default class LobbyEvents {
 
         const lobbyData = {
             lobbyUsers,
-            maxPlayers: lobby.maxPlayers,
             currentUser: user.publicId,
             availableColors: colors,
             gameData: lobby.gameType,

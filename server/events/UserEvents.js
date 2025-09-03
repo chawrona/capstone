@@ -46,19 +46,26 @@ export default class UserEvents {
         const { userId } = this.socket.data;
         const user = this.userManager.getUser(userId);
         const lobby = this.lobbyManager.getLobby(user.lobbyId);
+        try{
+            if (lobby){ 
+                lobby.removeUser(userId);
 
-        if (lobby) {
-            lobby.removeUser(userId);
-
-            if (!lobby.getPlayerCount()) {
-                this.lobbyManager.deleteLobby(lobby.id);
-            } else if (lobby.isAdmin) {
-                lobby.admin = [...lobby.users][0];
-                this.eventHelper.sendLobbyData(lobby.id);
+                if (!lobby.getPlayerCount()) {
+                    this.lobbyManager.deleteLobby(lobby.id);
+                } else if (lobby.isAdmin) {
+                    lobby.admin = [...lobby.users][0];
+                    this.eventHelper.sendLobbyData(lobby.id);
+                }
+                
+                this.socket.leave(lobby.id);
             }
-        }
-
+            
         user.lobbyId = null;
         user.isReady = false;
+
+        } catch(error){
+            this.logger.log(`Błąd podczas rozłączania użytkownika o id: ${userId}`);
+            this.eventEmmiter.toUserError(userId, error);
+        }
     }
 }

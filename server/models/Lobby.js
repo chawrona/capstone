@@ -7,7 +7,6 @@ import games from "../config/games.json";
 export default class Lobby {
     constructor() {
         this.id = generateShortId();
-        this.maxPlayers = 5;
         this.gameType = games[0].game;
         this.game = null;
         this.isActive = false;
