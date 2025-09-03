@@ -3,7 +3,6 @@ import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
 import colors from "../config/colors.json";
-import Lobby from "../models/Lobby.js";
 
 export default class EventHelper {
     constructor() {
