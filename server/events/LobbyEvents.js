@@ -4,6 +4,7 @@ import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
 import Logger from "../services/Logger.js";
 import EventHelper from "./EventHelper.js";
+import colors from "../config/colors.json";
 
 export default class LobbyEvents {
     constructor(socket) {
@@ -126,8 +127,8 @@ export default class LobbyEvents {
             lobbyUsers,
             maxPlayers: lobby.maxPlayers,
             currentUser: user.publicId,
-            availableColors: [{ name: "red", hex: "#ff00000" }],
-            gameData: { name: "brianboru", maxPlayers: 5 },
+            availableColors: colors,
+            gameData: lobby.gameType,
         };
 
         this.eventEmmiter.toUser(userId, "lobbyData", lobbyData);

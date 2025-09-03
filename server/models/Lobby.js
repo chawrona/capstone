@@ -2,12 +2,13 @@ import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import generateShortId from "../utils/generateShortId.js";
 import Game from "./Game.js";
+import games from "../config/games.json";
 
 export default class Lobby {
     constructor() {
         this.id = generateShortId();
         this.maxPlayers = 5;
-        this.gameType = "brianboru";
+        this.gameType = games[0].game;
         this.game = null;
         this.isActive = false;
         this.users = new Set();
