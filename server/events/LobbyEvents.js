@@ -82,6 +82,7 @@ export default class LobbyEvents {
                 this.lobbyManager.deleteLobby(lobby.id);
             } else if (lobby.isAdmin) {
                 lobby.admin = [...lobby.users][0];
+                this.eventHelper.sendLobbyData(lobby.id);
             }
 
             this.socket.leave(user.lobbyId);
@@ -89,8 +90,6 @@ export default class LobbyEvents {
             user.isReady = false;
 
             this.logger.log(`Użytkownik o id ${userId} opuścił pokój.`);
-
-            this.eventHelper.sendLobbyData(lobby.id);
         } catch (error) {
             this.eventEmmiter.toUserError(userId, error);
         }
@@ -127,6 +126,8 @@ export default class LobbyEvents {
             lobbyUsers,
             maxPlayers: lobby.maxPlayers,
             currentUser: user.publicId,
+            availableColors: [{ name: "red", hex: "#ff00000" }],
+            gameData: { name: "brianboru", maxPlayers: 5 },
         };
 
         this.eventEmmiter.toUser(userId, "lobbyData", lobbyData);

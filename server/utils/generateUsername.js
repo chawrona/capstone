@@ -29,7 +29,6 @@ const animals = [
 export default function generateUsername() {
     const adjective = adjectives[randomInt(0, adjectives.length)];
     const animal = animals[randomInt(0, animals.length)];
-    const number = randomInt(1000, 9999); // czterocyfrowy numer dla unikalności
-
+    const number = randomInt(1000, 9999);
     return `${adjective}${animal}${number}`;
 }
