@@ -2,6 +2,7 @@ import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
 import EventHelper from "./EventHelper.js";
+import colors from "../config/colors.json"
 
 export default class UserEvents {
     constructor(socket) {
@@ -18,6 +19,9 @@ export default class UserEvents {
             this.onInitialRequest(redirectRequest),
         );
         this.socket.on("disconnect", () => this.onDisconnect());
+        this.socket.on("changeUserColor", (payload) => {
+            const { newColor } = payload.data;
+            this.onChangeUserColor(newColor);} )
     }
 
     onInitialRequest(redirectRequest) {
@@ -68,4 +72,21 @@ export default class UserEvents {
             this.eventEmmiter.toUserError(userId, error);
         }
     }
+onChangeUserColor(newColor) {
+    const user = this.userManager.getUser(this.socket.userId);
+    if (!user) return;
+
+    if (!colors.includes(newColor)) {
+        console.warn(`Nieprawidłowy kolor: ${newColor}`);
+        return; 
+    }
+
+    user.color = newColor;
+
+    if (user.lobbyId) {
+        this.eventHelper.sendLobbyData(user.lobbyId);
+    }
+}
+
+
 }

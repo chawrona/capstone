@@ -15,13 +15,14 @@ export default class EventHelper {
         const lobby = this.lobbyManager.getLobby(lobbyId);
         const lobbyUsers = [];
         for (const lobbyUserId of lobby.users) {
-            const { username, isReady, publicId } =
+            const { username, isReady, publicId, color } =
                 this.userManager.getUser(lobbyUserId);
             lobbyUsers.push({
                 username,
                 isReady,
                 publicId,
                 isAdmin: lobby.isAdmin(lobbyUserId),
+                color,
             });
         }
 

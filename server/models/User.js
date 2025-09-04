@@ -9,6 +9,7 @@ export default class User {
         this.lobbyId = null;
         this.isReady = false;
         this.username = generateUsername();
+        this.color = null;
     }
 
     hasLobby() {

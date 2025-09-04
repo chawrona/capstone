@@ -35,6 +35,8 @@ export default class LobbyEvents {
         const user = this.userManager.getUser(userId);
 
         try {
+            user.color = null;
+            
             user.lobbyId = lobbyId;
             this.socket.join(lobbyId);
             lobby.joinUser(userId);
@@ -54,6 +56,8 @@ export default class LobbyEvents {
         const user = this.userManager.getUser(userId);
         try {
             if (!lobby) throw new Error(`Pokój #${lobbyId} nie istnieje.`);
+            user.color = null;
+
             lobby.joinUser(userId);
             user.lobbyId = lobbyId;
             this.socket.join(lobbyId);
@@ -113,13 +117,14 @@ export default class LobbyEvents {
 
         const lobbyUsers = [];
         for (const lobbyUserId of lobby.users) {
-            const { username, isReady, publicId } =
+            const { username, isReady, publicId, color } =
                 this.userManager.getUser(lobbyUserId);
             lobbyUsers.push({
                 username,
                 isReady,
                 publicId,
                 isAdmin: lobby.isAdmin(lobbyUserId),
+                color,
             });
         }
 
