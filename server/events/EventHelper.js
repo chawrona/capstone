@@ -1,4 +1,9 @@
+// Parsing error: Unexpected token assert
+import colors from "../config/colors.json" with { type: "json" };
+import BadUsernameError from "../errors/BadUsernameError.js";
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
+import WrongUsernameCharacters from "../errors/WrongUsernameCharacters.js";
+import WrongUsernameLength from "../errors/WrongUsernameLength.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
@@ -14,25 +19,29 @@ export default class EventHelper {
         const lobby = this.lobbyManager.getLobby(lobbyId);
         const lobbyUsers = [];
         for (const lobbyUserId of lobby.users) {
-            const { username, isReady, publicId } =
+            const { name, isReady, publicId, color } =
                 this.userManager.getUser(lobbyUserId);
             lobbyUsers.push({
-                username,
+                username: name,
                 isReady,
                 publicId,
                 isAdmin: lobby.isAdmin(lobbyUserId),
+                color,
             });
         }
 
         const lobbyData = {
             lobbyUsers,
             maxPlayers: lobby.maxPlayers,
+            availableColors: colors,
+            gameData: lobby.gameType,
         };
 
         for (const lobbyUserId of lobby.users) {
+            const user = this.userManager.getUser(lobbyUserId);
             this.eventEmmiter.toUser(lobbyUserId, "lobbyData", {
                 ...lobbyData,
-                currentUser: this.userManager.getUser(lobbyUserId),
+                currentUser: user.publicId,
             });
         }
     }
@@ -54,8 +63,9 @@ export default class EventHelper {
             lobby.joinUser(userId);
             const user = this.userManager.getUser(userId);
             user.lobbyId = lobbyId;
-            this.socket.join(user.lobbyId);
-            this.eventEmmiter.toUser(userId, "lobby");
+            this.eventEmmiter.toUser(userId, "lobby", lobbyId);
+            this.sendLobbyData(lobbyId);
+            return true;
         } catch (error) {
             if (error instanceof LobbyDoesNotExistError) {
                 this.eventEmmiter.toUser(userId, "homepage", {
@@ -64,6 +74,21 @@ export default class EventHelper {
             } else {
                 this.eventEmmiter.toUserError(userId, error);
             }
+        }
+    }
+
+    validateUsername(username) {
+        if (!username || typeof username !== "string") {
+            throw new BadUsernameError();
+        }
+
+        if (username.length < 3 || username.length > 20) {
+            throw new WrongUsernameLength();
+        }
+
+        const regex = /^(?!.* {2})[A-Za-z0-9 ]+$/;
+        if (!regex.test(username)) {
+            throw new WrongUsernameCharacters();
         }
     }
 }
