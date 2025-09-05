@@ -21,8 +21,10 @@ export default class UserEvents {
         );
         this.socket.on("disconnect", () => this.onDisconnect());
         this.socket.on("changeUserColor", (payload) => {
-            const { newColor } = payload.data;
-            this.onChangeUserColor(newColor);
+            this.onChangeUserColor(payload);
+        });
+        this.socket.on("changeUsername", (payload) => {
+            this.onChangeUsername(payload);
         });
     }
 
@@ -53,7 +55,7 @@ export default class UserEvents {
     onChangeUserColor({ userId, data: { newColor } }) {
         try {
             const user = this.userManager.getUser(userId);
-            if (!colors.includes(newColor)) {
+            if (!colors.some((color) => color.name === newColor.name)) {
                 throw new ColorDoesNotExistError();
             }
             user.color = newColor;

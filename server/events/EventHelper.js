@@ -33,14 +33,15 @@ export default class EventHelper {
         const lobbyData = {
             lobbyUsers,
             maxPlayers: lobby.maxPlayers,
-            avaibleColors: colors,
+            availableColors: colors,
             gameData: lobby.gameType,
         };
 
         for (const lobbyUserId of lobby.users) {
+            const user = this.userManager.getUser(lobbyUserId);
             this.eventEmmiter.toUser(lobbyUserId, "lobbyData", {
                 ...lobbyData,
-                currentUser: this.userManager.getUser(lobbyUserId),
+                currentUser: user.publicId,
             });
         }
     }

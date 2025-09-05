@@ -112,30 +112,34 @@ export default class LobbyEvents {
     }
 
     onLobbyDataRequest({ userId }) {
-        const user = this.userManager.getUser(userId);
-        const lobby = this.lobbyManager.getLobby(user.lobbyId);
+        try {
+            const user = this.userManager.getUser(userId);
+            const lobby = this.lobbyManager.getLobby(user.lobbyId);
 
-        const lobbyUsers = [];
-        for (const lobbyUserId of lobby.users) {
-            const { name, isReady, publicId, color } =
-                this.userManager.getUser(lobbyUserId);
-            lobbyUsers.push({
-                username: name,
-                isReady,
-                publicId,
-                isAdmin: lobby.isAdmin(lobbyUserId),
-                color,
-            });
+            const lobbyUsers = [];
+            for (const lobbyUserId of lobby.users) {
+                const { name, isReady, publicId, color } =
+                    this.userManager.getUser(lobbyUserId);
+                lobbyUsers.push({
+                    username: name,
+                    isReady,
+                    publicId,
+                    isAdmin: lobby.isAdmin(lobbyUserId),
+                    color,
+                });
+            }
+
+            const lobbyData = {
+                lobbyUsers,
+                currentUser: user.publicId,
+                availableColors: colors,
+                gameData: lobby.gameType,
+            };
+
+            this.eventEmmiter.toUser(userId, "lobbyData", lobbyData);
+        } catch (error) {
+            this.eventEmmiter.toUserError(userId, error);
         }
-
-        const lobbyData = {
-            lobbyUsers,
-            currentUser: user.publicId,
-            availableColors: colors,
-            gameData: lobby.gameType,
-        };
-
-        this.eventEmmiter.toUser(userId, "lobbyData", lobbyData);
     }
 
     onRemoveUser({ userId, data: { userToKickPublicId } }) {
