@@ -22,7 +22,6 @@ export default class LobbyEvents {
         this.socket.on("createLobby", (payload) => this.onCreateLobby(payload));
         this.socket.on("joinLobby", (payload) => this.onJoinLobby(payload));
         this.socket.on("leaveLobby", (payload) => this.onLeaveLobby(payload));
-        this.socket.on("toggleReady", (payload) => this.onToggleReady(payload));
         this.socket.on("lobbyDataRequest", (payload) =>
             this.onLobbyDataRequest(payload),
         );
@@ -42,7 +41,7 @@ export default class LobbyEvents {
             this.socket.join(lobbyId);
             lobby.joinUser(userId);
             lobby.admin = userId;
-            this.eventEmmiter.toUser(userId, "lobby", { lobbyId });
+            this.eventEmmiter.toUser(userId, "lobby", lobbyId);
 
             this.logger.log(
                 `Stworzono pokój o id ${lobbyId} przez gracza ${userId}`,
@@ -68,10 +67,7 @@ export default class LobbyEvents {
             user.lobbyId = lobbyId;
             this.socket.join(lobbyId);
 
-            this.eventEmmiter.toUser(userId, "lobby", {
-                userId,
-                data: { lobbyId },
-            });
+            this.eventEmmiter.toUser(userId, "lobby", lobbyId);
 
             this.logger.log(
                 `Użytkownik o id ${userId} dołączył do pokoju #${lobbyId}.`,
@@ -116,6 +112,14 @@ export default class LobbyEvents {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
 
+            if (!lobby) {
+                // Jak użytkownik odświeża stronę, a był w lobby, to serwer wyrzuca go z lobby
+                // Ale jednocześnie klient ładuje komponent z lobby zanim serwer go ponownie przekieruje na homepage
+                // Z tego powodu wysyła ponownie event z prośbą o dane, jednak lobby już nie istnieje
+                // Na chwilę obecną ignorujemy wysyłany event
+                throw new LobbyDoesNotExistError();
+            }
+
             const lobbyUsers = [];
             for (const lobbyUserId of lobby.users) {
                 const { name, isReady, publicId, color } =
@@ -135,34 +139,34 @@ export default class LobbyEvents {
                 availableColors: colors,
                 gameData: lobby.gameType,
             };
-
             this.eventEmmiter.toUser(userId, "lobbyData", lobbyData);
         } catch (error) {
+            if (error instanceof LobbyDoesNotExistError) return;
             this.eventEmmiter.toUserError(userId, error);
         }
     }
 
     onRemoveUser({ userId, data: { userToKickPublicId } }) {
         try {
-            const lobby = this.lobbyManager.getLobby(userId);
+            const user = this.userManager.getUser(userId);
+            const lobby = this.lobbyManager.getLobby(user.lobbyId);
             if (userId != lobby.admin) {
                 throw new UserIsNotAdminError(userId);
             }
             const userIdToKick =
                 this.userManager.getUserIdByPublicId(userToKickPublicId);
             lobby.removeUser(userIdToKick);
+
             this.eventEmmiter.toUser(userId, "info", {
                 info: `Pomyślnie usunięto gracza z pokoju.`,
             });
-            this.eventEmmiter.toUser(userToKickPublicId, "homepage", {
+            this.eventEmmiter.toUser(userIdToKick, "homepage", {
                 error: `Zostałeś wyrzucony z pokoju`,
             });
 
             this.eventHelper.sendLobbyData(lobby.id);
         } catch (error) {
-            if (error instanceof UserIsNotAdminError) {
-                this.eventEmmiter.toUserError(userId, error);
-            }
+            this.eventEmmiter.toUserError(userId, error);
         }
     }
 }

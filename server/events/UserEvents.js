@@ -19,13 +19,15 @@ export default class UserEvents {
         this.socket.on("initialRequest", (redirectRequest) =>
             this.onInitialRequest(redirectRequest),
         );
-        this.socket.on("disconnect", () => this.onDisconnect());
+
+        this.socket.on("toggleReady", (payload) => this.onToggleReady(payload));
         this.socket.on("changeUserColor", (payload) => {
             this.onChangeUserColor(payload);
         });
         this.socket.on("changeUsername", (payload) => {
             this.onChangeUsername(payload);
         });
+        this.socket.on("disconnect", () => this.onDisconnect());
     }
 
     onInitialRequest(redirectRequest) {
@@ -46,9 +48,17 @@ export default class UserEvents {
                 this.eventHelper.isLobbyIdGiven(userId, lobbyId);
             }
         } else {
-            if (!this.eventHelper.validateUsername(username)) username = null;
+            try {
+                !this.eventHelper.validateUsername(username);
+            } catch {
+                username = null;
+            }
+
             this.userManager.createUser(userId, this.socket.id, username);
-            this.eventHelper.isLobbyIdGiven(userId, lobbyId);
+
+            if (this.eventHelper.isLobbyIdGiven(userId, lobbyId)) {
+                this.socket.join(lobbyId);
+            }
         }
     }
 

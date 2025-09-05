@@ -63,8 +63,9 @@ export default class EventHelper {
             lobby.joinUser(userId);
             const user = this.userManager.getUser(userId);
             user.lobbyId = lobbyId;
-            this.socket.join(user.lobbyId);
-            this.eventEmmiter.toUser(userId, "lobby");
+            this.eventEmmiter.toUser(userId, "lobby", lobbyId);
+            this.sendLobbyData(lobbyId);
+            return true;
         } catch (error) {
             if (error instanceof LobbyDoesNotExistError) {
                 this.eventEmmiter.toUser(userId, "homepage", {
