@@ -1,8 +1,9 @@
+import colors from "../config/colors.json";
+import ColorDoesNotExistError from "../errors/ColorDoesNotExistError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
 import EventHelper from "./EventHelper.js";
-import colors from "../config/colors.json"
 
 export default class UserEvents {
     constructor(socket) {
@@ -21,7 +22,8 @@ export default class UserEvents {
         this.socket.on("disconnect", () => this.onDisconnect());
         this.socket.on("changeUserColor", (payload) => {
             const { newColor } = payload.data;
-            this.onChangeUserColor(newColor);} )
+            this.onChangeUserColor(newColor);
+        });
     }
 
     onInitialRequest(redirectRequest) {
@@ -46,12 +48,32 @@ export default class UserEvents {
         }
     }
 
+    onChangeUserColor({ userId, data: { newColor } }) {
+        try {
+            const user = this.userManager.getUser(userId);
+            if (!colors.includes(newColor)) {
+                throw new ColorDoesNotExistError();
+            }
+            user.color = newColor;
+            this.eventHelper.sendLobbyData(user.lobbyId);
+        } catch (error) {
+            this.eventEmmiter.toUserError(userId, error);
+        }
+    }
+
+    onToggleReady({ userId }) {
+        const user = this.userManager.getUser(userId);
+        user.isReady = !user.isReady;
+        this.eventHelper.sendLobbyData(user.lobbyId);
+    }
+
     onDisconnect() {
         const { userId } = this.socket.data;
-        const user = this.userManager.getUser(userId);
-        const lobby = this.lobbyManager.getLobby(user.lobbyId);
-        try{
-            if (lobby){ 
+        try {
+            const user = this.userManager.getUser(userId);
+            const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
+            if (lobby) {
                 lobby.removeUser(userId);
 
                 if (!lobby.getPlayerCount()) {
@@ -60,33 +82,14 @@ export default class UserEvents {
                     lobby.admin = [...lobby.users][0];
                     this.eventHelper.sendLobbyData(lobby.id);
                 }
-                
+
                 this.socket.leave(lobby.id);
             }
-            
-        user.lobbyId = null;
-        user.isReady = false;
 
-        } catch(error){
-            this.logger.log(`Błąd podczas rozłączania użytkownika o id: ${userId}`);
+            user.lobbyId = null;
+            user.isReady = false;
+        } catch (error) {
             this.eventEmmiter.toUserError(userId, error);
         }
     }
-onChangeUserColor(newColor) {
-    const user = this.userManager.getUser(this.socket.userId);
-    if (!user) return;
-
-    if (!colors.includes(newColor)) {
-        console.warn(`Nieprawidłowy kolor: ${newColor}`);
-        return; 
-    }
-
-    user.color = newColor;
-
-    if (user.lobbyId) {
-        this.eventHelper.sendLobbyData(user.lobbyId);
-    }
-}
-
-
 }

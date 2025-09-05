@@ -1,10 +1,11 @@
+import colors from "../config/colors.json";
+import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import UserIsNotAdminError from "../errors/UserIsNotAdminError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
 import Logger from "../services/Logger.js";
 import EventHelper from "./EventHelper.js";
-import colors from "../config/colors.json";
 
 export default class LobbyEvents {
     constructor(socket) {
@@ -30,13 +31,13 @@ export default class LobbyEvents {
     }
 
     onCreateLobby({ userId }) {
-        const lobby = this.lobbyManager.createLobby();
-        const lobbyId = lobby.id;
-        const user = this.userManager.getUser(userId);
-
         try {
+            const lobby = this.lobbyManager.createLobby();
+            const lobbyId = lobby.id;
+            const user = this.userManager.getUser(userId);
+
             user.color = null;
-            
+
             user.lobbyId = lobbyId;
             this.socket.join(lobbyId);
             lobby.joinUser(userId);
@@ -52,10 +53,15 @@ export default class LobbyEvents {
     }
 
     onJoinLobby({ userId, data: { lobbyId } }) {
-        const lobby = this.lobbyManager.getLobby(lobbyId);
-        const user = this.userManager.getUser(userId);
         try {
-            if (!lobby) throw new Error(`Pokój #${lobbyId} nie istnieje.`);
+            const lobby = this.lobbyManager.getLobby(lobbyId);
+            const user = this.userManager.getUser(userId);
+
+            if (!lobby)
+                throw new LobbyDoesNotExistError(
+                    `Pokój #${lobbyId} nie istnieje.`,
+                );
+
             user.color = null;
 
             lobby.joinUser(userId);
@@ -78,9 +84,9 @@ export default class LobbyEvents {
     }
 
     onLeaveLobby({ userId }) {
-        const user = this.userManager.getUser(userId);
-        const lobby = this.lobbyManager.getLobby(user.lobbyId);
         try {
+            const user = this.userManager.getUser(userId);
+            const lobby = this.lobbyManager.getLobby(user.lobbyId);
             lobby.removeUser(userId);
 
             if (!lobby.getPlayerCount()) {
@@ -103,12 +109,6 @@ export default class LobbyEvents {
     onGameStart({ userId }) {
         const lobby = this.lobbyManager.getLobby(userId);
         lobby.start();
-    }
-
-    onToggleReady({ userId }) {
-        const user = this.userManager.getUser(userId);
-        user.isReady = !user.isReady;
-        this.eventHelper.sendLobbyData(user.lobbyId);
     }
 
     onLobbyDataRequest({ userId }) {
@@ -142,9 +142,7 @@ export default class LobbyEvents {
         try {
             const lobby = this.lobbyManager.getLobby(userId);
             if (userId != lobby.admin) {
-                throw new UserIsNotAdminError(
-                    `Użytkownik #${userId} nie ma uprawnień do wyrzucania graczy z pokoju.`,
-                );
+                throw new UserIsNotAdminError(userId);
             }
             const userIdToKick =
                 this.userManager.getUserIdByPublicId(userToKickPublicId);
