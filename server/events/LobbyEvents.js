@@ -1,4 +1,4 @@
-import colors from "../config/colors.json";
+import colors from "../config/colors.json" with { type: "json" };
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import UserIsNotAdminError from "../errors/UserIsNotAdminError.js";
 import LobbyManager from "../managers/LobbyManager.js";
@@ -117,10 +117,10 @@ export default class LobbyEvents {
 
         const lobbyUsers = [];
         for (const lobbyUserId of lobby.users) {
-            const { username, isReady, publicId, color } =
+            const { name, isReady, publicId, color } =
                 this.userManager.getUser(lobbyUserId);
             lobbyUsers.push({
-                username,
+                username: name,
                 isReady,
                 publicId,
                 isAdmin: lobby.isAdmin(lobbyUserId),

@@ -1,4 +1,4 @@
-import colors from "../config/colors.json";
+import colors from "../config/colors.json" with { type: "json" };
 import ColorDoesNotExistError from "../errors/ColorDoesNotExistError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
@@ -28,6 +28,7 @@ export default class UserEvents {
 
     onInitialRequest(redirectRequest) {
         const userId = redirectRequest.userId;
+        let username = redirectRequest.data.username;
         this.socket.data.userId = userId;
 
         if (!redirectRequest.data) return;
@@ -43,7 +44,8 @@ export default class UserEvents {
                 this.eventHelper.isLobbyIdGiven(userId, lobbyId);
             }
         } else {
-            this.userManager.createUser(userId, this.socket.id);
+            if (!this.eventHelper.validateUsername(username)) username = null;
+            this.userManager.createUser(userId, this.socket.id, username);
             this.eventHelper.isLobbyIdGiven(userId, lobbyId);
         }
     }
@@ -55,6 +57,20 @@ export default class UserEvents {
                 throw new ColorDoesNotExistError();
             }
             user.color = newColor;
+            this.eventHelper.sendLobbyData(user.lobbyId);
+        } catch (error) {
+            this.eventEmmiter.toUserError(userId, error);
+        }
+    }
+
+    onChangeUsername({ userId, data: { newUsername } }) {
+        try {
+            this.eventHelper.validateUsername(newUsername);
+
+            const user = this.userManager.getUser(userId);
+
+            user.name = newUsername.trim();
+
             this.eventHelper.sendLobbyData(user.lobbyId);
         } catch (error) {
             this.eventEmmiter.toUserError(userId, error);

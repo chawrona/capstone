@@ -1,4 +1,4 @@
-import games from "../config/games.json";
+import games from "../config/games.json" with { type: "json" };
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import generateShortId from "../utils/generateShortId.js";
