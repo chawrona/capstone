@@ -1,6 +1,5 @@
 import games from "../config/games.json" with { type: "json" };
 import LobbyManager from "../managers/LobbyManager.js";
-import UserManager from "../managers/UserManager.js";
 import generateShortId from "../utils/generateShortId.js";
 import Game from "./Game.js";
 
@@ -12,14 +11,13 @@ export default class Lobby {
         this.isActive = false;
         this.users = new Set();
         this.lobbyManager = new LobbyManager();
-        this.userManager = new UserManager();
         this.admin = null;
     }
 
-    start() {
+    start(players) {
         switch (this.gameType) {
-            case "brianboru":
-                this.game = new Game();
+            case "game":
+                this.game = new Game(players, () => this.endGame());
                 break;
         }
         this.isActive = true;
@@ -51,5 +49,8 @@ export default class Lobby {
 
     isAdmin(userId) {
         return userId === this.admin;
+    }
+    endGame(){
+        this.isActive = false;
     }
 }

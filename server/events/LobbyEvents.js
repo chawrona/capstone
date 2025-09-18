@@ -104,7 +104,19 @@ export default class LobbyEvents {
 
     onGameStart({ userId }) {
         const lobby = this.lobbyManager.getLobby(userId);
-        lobby.start();
+        const users = lobby.users;
+        //const user = this.userManager.getUser(userId);
+        const players = [];
+        for(const userId of users){
+            const user = this.userManager.getUser(userId);
+            const player = {
+                publicId: user.publicId,
+                color: user.color,
+                username: user.name
+            };
+            players.push(player);
+        }
+        lobby.start(players);
     }
 
     onLobbyDataRequest({ userId }) {

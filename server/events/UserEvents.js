@@ -34,16 +34,20 @@ export default class UserEvents {
         const userId = redirectRequest.userId;
         let username = redirectRequest.data.username;
         this.socket.data.userId = userId;
+        const user = this.userManager.getUser(userId);
+        const lobbyId = user.lobbyId;
 
         if (!redirectRequest.data) return;
-        const lobbyId = redirectRequest.data.lobbyId;
+        lobbyId = redirectRequest.data.lobbyId;
 
         if (this.userManager.doesUserExist(userId)) {
             this.userManager.updateUserSocketId(userId, this.socket.id);
-            const user = this.userManager.getUser(userId);
+            const lobby = this.lobbyManager.getLobby(lobbyId);
             if (user.hasLobby()) {
                 this.socket.join(user.lobbyId);
-                this.eventEmmiter.toUser(userId, "brianboru");
+                this.eventEmmiter.toUser(userId, "game", {
+                    gameName: lobby.gameType.game,
+                });
             } else {
                 this.eventHelper.isLobbyIdGiven(userId, lobbyId);
             }
