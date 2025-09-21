@@ -1,5 +1,4 @@
 import games from "../config/games.json" with { type: "json" };
-import LobbyManager from "../managers/LobbyManager.js";
 import generateShortId from "../utils/generateShortId.js";
 import Game from "./Game.js";
 
@@ -10,7 +9,6 @@ export default class Lobby {
         this.game = null;
         this.isActive = false;
         this.users = new Set();
-        this.lobbyManager = new LobbyManager();
         this.admin = null;
     }
 

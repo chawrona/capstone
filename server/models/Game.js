@@ -7,9 +7,9 @@ export default class Game {
         this.playersQueue = [];
         this.currentPlayerIndex = 0;
         this.data = {};
-        this.initializeGameData();
-        this.createTurnOrder();
         this.createPlayers(players);
+        this.createTurnOrder();
+        this.initializeGameData();
     }
 
     initializeGameData(){
@@ -25,7 +25,7 @@ export default class Game {
 
     createPlayers(players){
         for(const player of players){
-            this.players.set(player.publicId, new Player(player.username, player.publicId, player.color));
+            this.players.set(player.publicId, new Player(player.username, player.color, player.publicId));
             this.playersQueue.push(player.publicId);
         }
     }
@@ -40,7 +40,7 @@ export default class Game {
     processGameData(data){
         try {
             return this[data.eventName](data);
-        } catch (error) {
+        } catch {
             return [{
                 target: data.publicId,
                 eventName: "error",
@@ -49,10 +49,7 @@ export default class Game {
         }
     }
 
-    addWood(data){
-        const player = this.players.get(data.publicId);
-        player.setData("wood", (oldWood) => oldWood + 5);
-        this.data.addedWood++;
+    dataWithTarget(){
         return [	
             {
                 target: "lobby",
@@ -61,9 +58,15 @@ export default class Game {
             }
         ]
     }
+
+    addWood(data){
+        const player = this.players.get(data.publicId);
+        player.setData("wood", (oldWood) => oldWood + 5);
+        this.data.addedWood++;
+        return [this.dataWithTarget()];
+    }
     
     sayHello(data){
-        const player = this.players.get(data.publicId);
         return [	
             {
                 target: data.publicId,

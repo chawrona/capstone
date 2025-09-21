@@ -102,12 +102,11 @@ export default class LobbyEvents {
         }
     }
 
-    onGameStart({ userId }) {
-        const lobby = this.lobbyManager.getLobby(userId);
-        const users = lobby.users;
-        //const user = this.userManager.getUser(userId);
+    onGameStart({ lobbyId }) { // jeżeli payload zawiera w sobie lobbyId
+        // const lobby = this.lobbyManager.getLobby(userId);
+        const lobby = this.lobbyManager.getLobby(lobbyId);
         const players = [];
-        for(const userId of users){
+        for(const userId of lobby.users){
             const user = this.userManager.getUser(userId);
             const player = {
                 publicId: user.publicId,

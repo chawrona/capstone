@@ -1,5 +1,6 @@
 import UserManager from "../managers/UserManager.js";
 import Logger from "./Logger.js";
+import GameEvents from "../events/GameEvents.js";
 
 export default class EventEmmiter {
     constructor(io) {
@@ -11,6 +12,7 @@ export default class EventEmmiter {
 
         this.userManager = new UserManager();
         this.logger = new Logger();
+        this.gameEvents = new GameEvents();
     }
 
     toUser(userId, eventName, data) {
@@ -35,16 +37,8 @@ export default class EventEmmiter {
     toAll(eventName, data) {
         this.io.emit(eventName, data);
     }
-    toPublicUser(targets){
-        for(const target of targets){
-            if(target === "lobby"){
-                const lobby = data.lobby;
-                const lobbyId = lobby.id;
-                this.toRoom(lobbyId, eventName, data);
-            }else if(target != null){
-                const userId = this.userManager.getUserIdByPublicId(data.publicId);
-                toUser(userId, eventName, data);
-            }
-        }
+    toPublicUser(publicId, eventName, data){
+        const userId = this.userManager.getUserIdByPublicId(publicId);
+        this.gameEvents.onGameData({userId, eventName, data});
     }
 }
