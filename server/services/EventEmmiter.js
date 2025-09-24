@@ -1,6 +1,6 @@
+import GameEvents from "../events/GameEvents.js";
 import UserManager from "../managers/UserManager.js";
 import Logger from "./Logger.js";
-import GameEvents from "../events/GameEvents.js";
 
 export default class EventEmmiter {
     constructor(io) {
@@ -37,8 +37,10 @@ export default class EventEmmiter {
     toAll(eventName, data) {
         this.io.emit(eventName, data);
     }
-    toPublicUser(publicId, eventName, data){
+
+    toPublicUser(publicId, eventName, data) {
         const userId = this.userManager.getUserIdByPublicId(publicId);
-        this.gameEvents.onGameData({userId, eventName, data});
+        // Tutaj toUser użyć
+        this.gameEvents.onGameData({ userId, eventName, data });
     }
 }

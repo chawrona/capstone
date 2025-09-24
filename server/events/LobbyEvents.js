@@ -102,16 +102,17 @@ export default class LobbyEvents {
         }
     }
 
-    onGameStart({ lobbyId }) { // jeżeli payload zawiera w sobie lobbyId
+    onGameStart({ lobbyId }) {
+        // jeżeli payload zawiera w sobie lobbyId
         // const lobby = this.lobbyManager.getLobby(userId);
         const lobby = this.lobbyManager.getLobby(lobbyId);
         const players = [];
-        for(const userId of lobby.users){
+        for (const userId of lobby.users) {
             const user = this.userManager.getUser(userId);
             const player = {
                 publicId: user.publicId,
                 color: user.color,
-                username: user.name
+                username: user.name,
             };
             players.push(player);
         }

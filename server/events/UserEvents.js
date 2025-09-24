@@ -41,7 +41,6 @@ export default class UserEvents {
         // lobbyId = redirectRequest.data.lobbyId;
         let username = redirectRequest.data.username;
 
-
         if (this.userManager.doesUserExist(userId)) {
             this.userManager.updateUserSocketId(userId, this.socket.id);
             // const lobby = this.lobbyManager.getLobby(lobbyId);
