@@ -115,9 +115,9 @@ export default class LobbyEvents {
             };
             players.push(player);
         }
-        lobby.start(players);
+        const gameName = lobby.start(players);
         this.eventEmmiter.toLobby(lobby.id, "game", {
-            game: "game",
+            game: gameName,
             lobbyId: lobby.id,
         });
     }

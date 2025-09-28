@@ -19,7 +19,7 @@ export default class Lobby {
                 break;
         }
         this.isActive = true;
-        console.log(this.game);
+        return this.gameType.game;
     }
 
     lobbyInformation() {
