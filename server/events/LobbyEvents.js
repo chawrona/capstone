@@ -23,7 +23,7 @@ export default class LobbyEvents {
         this.socket.on("joinLobby", (payload) => this.onJoinLobby(payload));
         this.socket.on("leaveLobby", (payload) => this.onLeaveLobby(payload));
         this.socket.on("lobbyDataRequest", (payload) =>
-            this.onLobbyDataRequest(payload)
+            this.onLobbyDataRequest(payload),
         );
         this.socket.on("removeUser", (payload) => this.onRemoveUser(payload));
         this.socket.on("gameStart", (payload) => this.onGameStart(payload));

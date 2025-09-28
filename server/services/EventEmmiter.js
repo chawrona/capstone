@@ -43,9 +43,8 @@ export default class EventEmmiter {
         this.toUser(userId, eventName, data);
     }
 
-    toPublicUserError(publicId, error){
+    toPublicUserError(publicId, error) {
         const userId = this.userManager.getUserIdByPublicId(publicId);
         this.toUserError(userId, error);
     }
-
 }

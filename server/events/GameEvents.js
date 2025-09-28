@@ -25,11 +25,22 @@ export default class GameEvents {
 
         for (const targetObject of targets) {
             if (targetObject.target === "lobby") {
-                this.eventEmmiter.toRoom(user.lobbyId, targetObject.eventName, targetObject.data);
+                this.eventEmmiter.toRoom(
+                    user.lobbyId,
+                    targetObject.eventName,
+                    targetObject.data,
+                );
             } else if (targetObject.eventName === "error") {
-                this.eventEmmiter.toPublicUserError(targetObject.target, targetObject.error);
+                this.eventEmmiter.toPublicUserError(
+                    targetObject.target,
+                    targetObject.error,
+                );
             } else {
-                this.eventEmmiter.toPublicUser(targetObject.target, targetObject.eventName, targetObject.data);
+                this.eventEmmiter.toPublicUser(
+                    targetObject.target,
+                    targetObject.eventName,
+                    targetObject.data,
+                );
             }
         }
     }

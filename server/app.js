@@ -3,11 +3,11 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 
+import GameEvents from "./events/GameEvents.js";
 import LobbyEvents from "./events/LobbyEvents.js";
 import UserEvents from "./events/UserEvents.js";
 import ClientRoutes from "./routes/ClientRoutes.js";
 import EventEmmiter from "./services/EventEmmiter.js";
-import GameEvents from "./events/GameEvents.js";
 
 const app = express();
 const server = http.createServer(app);
