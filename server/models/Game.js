@@ -76,7 +76,7 @@ export default class Game {
         const player = this.players.get(data.publicId);
         player.setData("wood", (oldWood) => oldWood + 5);
         this.data.addedWood++;
-        return [this.dataWithTarget()];
+        return this.dataWithTarget();
     }
 
     sayHello(data) {

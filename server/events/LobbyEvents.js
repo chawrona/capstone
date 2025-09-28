@@ -23,10 +23,10 @@ export default class LobbyEvents {
         this.socket.on("joinLobby", (payload) => this.onJoinLobby(payload));
         this.socket.on("leaveLobby", (payload) => this.onLeaveLobby(payload));
         this.socket.on("lobbyDataRequest", (payload) =>
-            this.onLobbyDataRequest(payload),
+            this.onLobbyDataRequest(payload)
         );
         this.socket.on("removeUser", (payload) => this.onRemoveUser(payload));
-        this.socket.on("gameStart", () => this.onGameStart());
+        this.socket.on("gameStart", (payload) => this.onGameStart(payload));
     }
 
     onCreateLobby({ userId }) {
@@ -102,10 +102,10 @@ export default class LobbyEvents {
         }
     }
 
-    onGameStart({ lobbyId }) {
-        // jeżeli payload zawiera w sobie lobbyId
-        // const lobby = this.lobbyManager.getLobby(userId);
-        const lobby = this.lobbyManager.getLobby(lobbyId);
+    onGameStart({ userId }) {
+        const givenUser = this.userManager.getUser(userId);
+        const lobby = this.lobbyManager.getLobby(givenUser.lobbyId);
+        // wiemy, że nie należy tworzyć zmiennej żeby użyć ją tylko raz natomiast bez stworzenia tej zmiennej tworzy się straszny tasiemiec kodu
         const players = [];
         for (const userId of lobby.users) {
             const user = this.userManager.getUser(userId);

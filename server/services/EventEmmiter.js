@@ -40,7 +40,12 @@ export default class EventEmmiter {
 
     toPublicUser(publicId, eventName, data) {
         const userId = this.userManager.getUserIdByPublicId(publicId);
-        // Tutaj toUser użyć
-        this.gameEvents.onGameData({ userId, eventName, data });
+        this.toUser(userId, eventName, data);
     }
+
+    toPublicUserError(publicId, error){
+        const userId = this.userManager.getUserIdByPublicId(publicId);
+        this.toUserError(userId, error);
+    }
+
 }
