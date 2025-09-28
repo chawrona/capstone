@@ -1,10 +1,8 @@
-import LobbyManager from "../managers/LobbyManager";
-import UserManager from "../managers/UserManager";
-import EventEmmiter from "../services/EventEmmiter";
+import LobbyManager from "../managers/LobbyManager.js";
+import UserManager from "../managers/UserManager.js";
+import EventEmmiter from "../services/EventEmmiter.js";
 
 export default class GameEvents {
-    // Pamiętajcie o komentarzach z rzeczami do poprawy na githubie, bo pojawiły się nowe, a one nie były omawiane na spotkaniu
-
     constructor(socket) {
         this.socket = socket;
         this.registerEvents();
@@ -14,33 +12,24 @@ export default class GameEvents {
     }
 
     registerEvents() {
-        this.socket.on("GameData", (payload) => this.onGameData(payload));
+        this.socket.on("gameData", (payload) => this.onGameData(payload));
     }
 
     onGameData({ userId, data }) {
         const user = this.userManager.getUser(userId);
         const lobby = this.lobbyManager.getLobby(user.lobbyId);
-        data.publicId = user.publicId;
-        const targets = lobby.game.processGameData(data);
+        const targets = lobby.game.processGameData({
+            ...data,
+            publicId: user.publicId,
+        });
 
-        for (const targetObject of targets) {
-            if (targetObject.target === "lobby") {
-                this.eventEmmiter.toRoom(
-                    user.lobbyId,
-                    targetObject.eventName,
-                    targetObject.data,
-                );
-            } else if (targetObject.eventName === "error") {
-                this.eventEmmiter.toPublicUserError(
-                    targetObject.target,
-                    targetObject.error,
-                );
+        for (const { target, eventName, data } of targets) {
+            if (target === "lobby") {
+                this.eventEmmiter.toLobby(user.lobbyId, eventName, data);
+            } else if (eventName === "error") {
+                this.eventEmmiter.toPublicUserError(target, data);
             } else {
-                this.eventEmmiter.toPublicUser(
-                    targetObject.target,
-                    targetObject.eventName,
-                    targetObject.data,
-                );
+                this.eventEmmiter.toPublicUser(target, eventName, data);
             }
         }
     }

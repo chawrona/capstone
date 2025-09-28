@@ -13,12 +13,13 @@ export default class Lobby {
     }
 
     start(players) {
-        switch (this.gameType) {
+        switch (this.gameType.game) {
             case "game":
                 this.game = new Game(players, () => this.endGame());
                 break;
         }
         this.isActive = true;
+        console.log(this.game);
     }
 
     lobbyInformation() {
@@ -31,7 +32,7 @@ export default class Lobby {
 
     joinUser(userId) {
         if (this.users.size >= this.maxPlayers) {
-            throw new Error("The room is full.");
+            throw new Error("Pokój jest pełny.");
         }
         this.users.add(userId);
         console.log("Dołączył do pokoju");

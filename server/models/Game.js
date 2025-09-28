@@ -1,4 +1,4 @@
-import Player from "./Player";
+import Player from "./Player.js";
 
 export default class Game {
     constructor(players, endGame) {
@@ -28,10 +28,13 @@ export default class Game {
 
     createPlayers(players) {
         for (const player of players) {
-            this.players.set(
+            const newPlayer = new Player(
+                player.username,
+                player.color,
                 player.publicId,
-                new Player(player.username, player.color, player.publicId),
             );
+            newPlayer.setData("wood", () => 5);
+            this.players.set(player.publicId, newPlayer);
             this.playersQueue.push(player.publicId);
         }
     }
@@ -51,39 +54,39 @@ export default class Game {
                 {
                     target: data.publicId,
                     eventName: "error",
-                    error: "Nieprawidłowa akcja",
+                    data: new Error("Nieprawidłowa akcja"),
                 },
             ];
         }
     }
 
     dataWithTarget() {
-        return [
-            {
-                target: "lobby",
-                eventName: "gameData",
-                data: this.data,
-            },
-            {
-                target: "lobby",
-                eventName: "card",
-                data: "lucky card",
-            },
-        ];
+        return {
+            target: "lobby",
+            eventName: "gameData",
+            data: this.data,
+        };
     }
 
     addWood(data) {
         const player = this.players.get(data.publicId);
         player.setData("wood", (oldWood) => oldWood + 5);
         this.data.addedWood++;
-        return this.dataWithTarget();
+        return [
+            this.dataWithTarget(),
+            {
+                target: data.publicId,
+                eventName: "wood",
+                data: player.getData("wood"),
+            },
+        ];
     }
 
     sayHello(data) {
         return [
             {
                 target: data.publicId,
-                eventName: "gameData",
+                eventName: "hello",
                 data: "Hello",
             },
         ];

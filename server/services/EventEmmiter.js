@@ -1,4 +1,3 @@
-import GameEvents from "../events/GameEvents.js";
 import UserManager from "../managers/UserManager.js";
 import Logger from "./Logger.js";
 
@@ -12,7 +11,6 @@ export default class EventEmmiter {
 
         this.userManager = new UserManager();
         this.logger = new Logger();
-        this.gameEvents = new GameEvents();
     }
 
     toUser(userId, eventName, data) {
@@ -30,8 +28,8 @@ export default class EventEmmiter {
         this.logger.error(error.message);
     }
 
-    toRoom(roomId, eventName, data) {
-        this.io.to(roomId).emit(eventName, data);
+    toLobby(lobbyId, eventName, data) {
+        this.io.to(lobbyId).emit(eventName, data);
     }
 
     toAll(eventName, data) {

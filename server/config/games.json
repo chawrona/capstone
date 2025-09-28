@@ -1,5 +1,10 @@
 [
   {
+    "game": "game",
+    "maxPlayers": 5,
+    "description": "Testowa gra"
+  },
+  {
     "game": "brianboru",
     "maxPlayers": 5,
     "description": "Lorem ipsum dolorez"

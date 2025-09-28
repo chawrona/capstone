@@ -103,9 +103,8 @@ export default class LobbyEvents {
     }
 
     onGameStart({ userId }) {
-        const givenUser = this.userManager.getUser(userId);
-        const lobby = this.lobbyManager.getLobby(givenUser.lobbyId);
-        // wiemy, że nie należy tworzyć zmiennej żeby użyć ją tylko raz natomiast bez stworzenia tej zmiennej tworzy się straszny tasiemiec kodu
+        const user = this.userManager.getUser(userId);
+        const lobby = this.lobbyManager.getLobby(user.lobbyId);
         const players = [];
         for (const userId of lobby.users) {
             const user = this.userManager.getUser(userId);
@@ -117,6 +116,10 @@ export default class LobbyEvents {
             players.push(player);
         }
         lobby.start(players);
+        this.eventEmmiter.toLobby(lobby.id, "game", {
+            game: "game",
+            lobbyId: lobby.id,
+        });
     }
 
     onLobbyDataRequest({ userId }) {
