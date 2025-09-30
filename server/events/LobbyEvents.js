@@ -26,7 +26,7 @@ export default class LobbyEvents {
             this.onLobbyDataRequest(payload),
         );
         this.socket.on("removeUser", (payload) => this.onRemoveUser(payload));
-        this.socket.on("gameStart", () => this.onGameStart());
+        this.socket.on("gameStart", (payload) => this.onGameStart(payload));
     }
 
     onCreateLobby({ userId }) {
@@ -103,8 +103,23 @@ export default class LobbyEvents {
     }
 
     onGameStart({ userId }) {
-        const lobby = this.lobbyManager.getLobby(userId);
-        lobby.start();
+        const user = this.userManager.getUser(userId);
+        const lobby = this.lobbyManager.getLobby(user.lobbyId);
+        const players = [];
+        for (const userId of lobby.users) {
+            const user = this.userManager.getUser(userId);
+            const player = {
+                publicId: user.publicId,
+                color: user.color,
+                username: user.name,
+            };
+            players.push(player);
+        }
+        const gameName = lobby.start(players);
+        this.eventEmmiter.toLobby(lobby.id, "game", {
+            game: gameName,
+            lobbyId: lobby.id,
+        });
     }
 
     onLobbyDataRequest({ userId }) {

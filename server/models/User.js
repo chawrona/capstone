@@ -5,7 +5,6 @@ export default class User {
     constructor(userId, username) {
         this.id = userId;
         this.publicId = generateUuid();
-        this.name = 1;
         this.lobbyId = null;
         this.isReady = false;
         this.color = null;

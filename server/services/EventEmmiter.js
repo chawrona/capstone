@@ -28,11 +28,21 @@ export default class EventEmmiter {
         this.logger.error(error.message);
     }
 
-    toRoom(roomId, eventName, data) {
-        this.io.to(roomId).emit(eventName, data);
+    toLobby(lobbyId, eventName, data) {
+        this.io.to(lobbyId).emit(eventName, data);
     }
 
     toAll(eventName, data) {
         this.io.emit(eventName, data);
+    }
+
+    toPublicUser(publicId, eventName, data) {
+        const userId = this.userManager.getUserIdByPublicId(publicId);
+        this.toUser(userId, eventName, data);
+    }
+
+    toPublicUserError(publicId, error) {
+        const userId = this.userManager.getUserIdByPublicId(publicId);
+        this.toUserError(userId, error);
     }
 }

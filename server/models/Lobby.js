@@ -1,6 +1,4 @@
 import games from "../config/games.json" with { type: "json" };
-import LobbyManager from "../managers/LobbyManager.js";
-import UserManager from "../managers/UserManager.js";
 import generateShortId from "../utils/generateShortId.js";
 import Game from "./Game.js";
 
@@ -11,18 +9,17 @@ export default class Lobby {
         this.game = null;
         this.isActive = false;
         this.users = new Set();
-        this.lobbyManager = new LobbyManager();
-        this.userManager = new UserManager();
         this.admin = null;
     }
 
-    start() {
-        switch (this.gameType) {
-            case "brianboru":
-                this.game = new Game();
+    start(players) {
+        switch (this.gameType.game) {
+            case "game":
+                this.game = new Game(players, () => this.endGame());
                 break;
         }
         this.isActive = true;
+        return this.gameType.game;
     }
 
     lobbyInformation() {
@@ -35,7 +32,7 @@ export default class Lobby {
 
     joinUser(userId) {
         if (this.users.size >= this.maxPlayers) {
-            throw new Error("The room is full.");
+            throw new Error("Pokój jest pełny.");
         }
         this.users.add(userId);
         console.log("Dołączył do pokoju");
@@ -51,5 +48,8 @@ export default class Lobby {
 
     isAdmin(userId) {
         return userId === this.admin;
+    }
+    endGame() {
+        this.isActive = false;
     }
 }
