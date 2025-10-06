@@ -10,6 +10,7 @@ export default class Lobby {
         this.isActive = false;
         this.users = new Set();
         this.admin = null;
+        this.maxPlayers = 11;
     }
 
     start(players) {

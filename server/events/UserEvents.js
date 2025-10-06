@@ -1,5 +1,7 @@
 import colors from "../config/colors.json" with { type: "json" };
+import ColorAlreadyTakenError from "../errors/ColorAlreadyTakenError.js";
 import ColorDoesNotExistError from "../errors/ColorDoesNotExistError.js";
+import UserAlreadyOnlineError from "../errors/UserAlreadyOnlineError";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
@@ -31,47 +33,65 @@ export default class UserEvents {
     }
 
     onInitialRequest(redirectRequest) {
-        const userId = redirectRequest.userId;
-        this.socket.data.userId = userId;
-        // const user = this.userManager.getUser(userId);
-        // const lobbyId = user.lobbyId;
+        let userId = null;
+        try {
+            const userId = redirectRequest.userId;
+            this.socket.data.userId = userId;
+            // const user = this.userManager.getUser(userId);
+            // const lobbyId = user.lobbyId;
 
-        if (!redirectRequest.data) return;
-        const lobbyId = redirectRequest.data.lobbyId;
-        // lobbyId = redirectRequest.data.lobbyId;
-        let username = redirectRequest.data.username;
+            if (!redirectRequest.data) return;
+            const lobbyId = redirectRequest.data.lobbyId;
+            // lobbyId = redirectRequest.data.lobbyId;
+            let username = redirectRequest.data.username;
 
-        if (this.userManager.doesUserExist(userId)) {
-            this.userManager.updateUserSocketId(userId, this.socket.id);
-            // const lobby = this.lobbyManager.getLobby(lobbyId);
-            const user = this.userManager.getUser(userId);
-            if (user.hasLobby()) {
-                const lobby = this.lobbyManager.getLobby(user.lobbyId);
-                this.socket.join(user.lobbyId);
-                this.eventEmmiter.toUser(userId, "game", {
-                    gameName: lobby.gameType.game,
-                });
+            if (this.userManager.doesUserExist(userId)) {
+                this.userManager.updateUserSocketId(userId, this.socket.id);
+                // const lobby = this.lobbyManager.getLobby(lobbyId);
+                const user = this.userManager.getUser(userId);
+                if (user.isOnline) {
+                    throw new UserAlreadyOnlineError(
+                        `Użytkownik jest już online`,
+                    );
+                }
+                if (user.hasLobby()) {
+                    const lobby = this.lobbyManager.getLobby(user.lobbyId);
+                    this.socket.join(user.lobbyId);
+                    this.eventEmmiter.toUser(userId, "game", {
+                        gameName: lobby.gameType.game,
+                    });
+                } else {
+                    this.eventHelper.isLobbyIdGiven(userId, lobbyId);
+                }
             } else {
-                this.eventHelper.isLobbyIdGiven(userId, lobbyId);
-            }
-        } else {
-            try {
-                !this.eventHelper.validateUsername(username);
-            } catch {
-                username = null;
-            }
+                try {
+                    !this.eventHelper.validateUsername(username);
+                } catch {
+                    username = null;
+                }
 
-            this.userManager.createUser(userId, this.socket.id, username);
+                this.userManager.createUser(userId, this.socket.id, username);
 
-            if (this.eventHelper.isLobbyIdGiven(userId, lobbyId)) {
-                this.socket.join(lobbyId);
+                if (this.eventHelper.isLobbyIdGiven(userId, lobbyId)) {
+                    this.socket.join(lobbyId);
+                }
             }
+        } catch (error) {
+            this.eventEmmiter.toUserError(userId, error);
         }
     }
 
     onChangeUserColor({ userId, data: { newColor } }) {
         try {
             const user = this.userManager.getUser(userId);
+            const lobby = this.lobbyManager.getLobby(user.lobbyId);
+            const usersIds = Array.from(lobby.users);
+            const userObjects = usersIds.map((userId) =>
+                this.userManager.getUser(userId),
+            );
+            if (!userObjects.every((user) => user.color != newColor)) {
+                throw new ColorAlreadyTakenError();
+            }
             if (!colors.some((color) => color.name === newColor.name)) {
                 throw new ColorDoesNotExistError();
             }
@@ -123,6 +143,7 @@ export default class UserEvents {
 
             user.lobbyId = null;
             user.isReady = false;
+            user.isOnline = false;
         } catch (error) {
             this.eventEmmiter.toUserError(userId, error);
         }

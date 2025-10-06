@@ -1,6 +1,12 @@
 import colors from "../config/colors.json" with { type: "json" };
+import ColorsDuplicatedError from "../errors/ColorsDuplicatedError";
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
+import PlayerLacksColorError from "../errors/PlayerLacksColorError";
+import UserAlreadyInLobbyError from "../errors/UserAlreadyInLobbyError.js";
 import UserIsNotAdminError from "../errors/UserIsNotAdminError.js";
+import UserNotAdminError from "../errors/UserNotAdminError.js";
+import UsersNotReadyError from "../errors/UsersNotReadyError.js";
+import WrongNumberOfPlayersError from "../errors/WrongNumberOfPlayersError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
@@ -61,6 +67,11 @@ export default class LobbyEvents {
                     `Pokój #${lobbyId} nie istnieje.`,
                 );
 
+            if (user.lobbyId)
+                throw new UserAlreadyInLobbyError(
+                    `Użytkownik #${user.username} znajduje się już w lobby.`,
+                );
+
             user.color = null;
 
             lobby.joinUser(userId);
@@ -103,23 +114,65 @@ export default class LobbyEvents {
     }
 
     onGameStart({ userId }) {
-        const user = this.userManager.getUser(userId);
-        const lobby = this.lobbyManager.getLobby(user.lobbyId);
-        const players = [];
-        for (const userId of lobby.users) {
+        try {
             const user = this.userManager.getUser(userId);
-            const player = {
-                publicId: user.publicId,
-                color: user.color,
-                username: user.name,
-            };
-            players.push(player);
+            const lobby = this.lobbyManager.getLobby(user.lobbyId);
+            if (!lobby.isAdmin(userId)) {
+                throw new UserNotAdminError( // Mamy teraz 2 errory administratora, przyjrzyj się temu proszę i zadecyduj co z tym zrobić
+                    `Gracz #${user.username} nie ma uprawnień do rozpoczęcia rozgrywki`,
+                );
+            }
+            const players = [];
+            if (
+                lobby.users.size < lobby.gameType.minPlayers ||
+                lobby.users.size > lobby.gameType.maxPlayers
+            )
+                throw new WrongNumberOfPlayersError(
+                    `W pokoju #${lobby.id} znajduje się nieodpowiednia ilość graczy do uruchomienia gry ${lobby.gameType.game}`,
+                );
+            const usersIds = Array.from(lobby.users);
+            const userObjects = usersIds.map(
+                (userId) => this.userManager.getUser(userId).isReady,
+            );
+            const userColors = usersIds.map(
+                (userId) => this.userManager.getUser(userId).color,
+            );
+            const colorIsNotNull = (currentVariable) => currentVariable != null;
+            const userIsReady = (currentVariable) => currentVariable != false;
+            const colorsDuplicates =
+                new Set(userColors).size != userColors.length;
+            if (colorsDuplicates) {
+                throw new ColorsDuplicatedError(
+                    `Kilku graczy ma ten sam kolor`,
+                );
+            }
+            if (!userColors.every(colorIsNotNull)) {
+                throw new PlayerLacksColorError(
+                    `Nie każdy gracz ma przydzielony kolor`,
+                );
+            }
+            if (!userObjects.every(userIsReady))
+                throw new UsersNotReadyError(
+                    `Gracze nie są gotowi do rozpoczęcia rozgrywki`,
+                );
+            for (const userId of lobby.users) {
+                const user = this.userManager.getUser(userId);
+                const player = {
+                    publicId: user.publicId,
+                    color: user.color,
+                    username: user.name,
+                };
+                players.push(player);
+            }
+            const gameName = lobby.start(players);
+            this.eventEmmiter.toLobby(lobby.id, "game", {
+                game: gameName,
+                lobbyId: lobby.id,
+            });
+            this.logger.log(`Gra ${gameName} została wystartowana.`);
+        } catch (error) {
+            this.eventEmmiter.toUserError(userId, error);
         }
-        const gameName = lobby.start(players);
-        this.eventEmmiter.toLobby(lobby.id, "game", {
-            game: gameName,
-            lobbyId: lobby.id,
-        });
     }
 
     onLobbyDataRequest({ userId }) {
