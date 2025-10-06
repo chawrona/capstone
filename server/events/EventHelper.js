@@ -1,5 +1,6 @@
 // Parsing error: Unexpected token assert
 import colors from "../config/colors.json" with { type: "json" };
+import games from "../config/games.json" with { type: "json" };
 import BadUsernameError from "../errors/BadUsernameError.js";
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import WrongUsernameCharacters from "../errors/WrongUsernameCharacters.js";
@@ -14,8 +15,7 @@ export default class EventHelper {
         this.userManager = new UserManager();
         this.eventEmmiter = new EventEmmiter();
     }
-
-    sendLobbyData(lobbyId) {
+    createLobbyData(lobbyId) {
         const lobby = this.lobbyManager.getLobby(lobbyId);
         const lobbyUsers = [];
         for (const lobbyUserId of lobby.users) {
@@ -30,12 +30,19 @@ export default class EventHelper {
             });
         }
 
-        const lobbyData = {
+        return {
             lobbyUsers,
-            maxPlayers: lobby.maxPlayers,
             availableColors: colors,
-            gameData: lobby.gameType,
+            gameData: {
+                currentGame: lobby.gameType,
+                availableGames: games
+            }
         };
+    }
+
+    sendLobbyData(lobbyId) {
+        const lobby = this.lobbyManager.getLobby(lobbyId);
+        const lobbyData = this.createLobbyData(lobbyId);
 
         for (const lobbyUserId of lobby.users) {
             const user = this.userManager.getUser(lobbyUserId);
@@ -91,4 +98,5 @@ export default class EventHelper {
             throw new WrongUsernameCharacters();
         }
     }
+    
 }

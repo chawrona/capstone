@@ -1,4 +1,5 @@
-import colors from "../config/colors.json" with { type: "json" };
+import games from "../config/games.json" with { type: "json" };
+import GameDoesNotExistError from "../errors/GameDoesNotExistError.js"
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import UserIsNotAdminError from "../errors/UserIsNotAdminError.js";
 import LobbyManager from "../managers/LobbyManager.js";
@@ -27,6 +28,7 @@ export default class LobbyEvents {
         );
         this.socket.on("removeUser", (payload) => this.onRemoveUser(payload));
         this.socket.on("gameStart", (payload) => this.onGameStart(payload));
+        this.socket.on("changeGameRequest", (payload) => this.onGameChangeRequest(payload))
     }
 
     onCreateLobby({ userId }) {
@@ -134,27 +136,11 @@ export default class LobbyEvents {
                 // Na chwilę obecną ignorujemy wysyłany event
                 throw new LobbyDoesNotExistError();
             }
-
-            const lobbyUsers = [];
-            for (const lobbyUserId of lobby.users) {
-                const { name, isReady, publicId, color } =
-                    this.userManager.getUser(lobbyUserId);
-                lobbyUsers.push({
-                    username: name,
-                    isReady,
-                    publicId,
-                    isAdmin: lobby.isAdmin(lobbyUserId),
-                    color,
-                });
-            }
-
-            const lobbyData = {
-                lobbyUsers,
-                currentUser: user.publicId,
-                availableColors: colors,
-                gameData: lobby.gameType,
-            };
-            this.eventEmmiter.toUser(userId, "lobbyData", lobbyData);
+            const lobbyData = this.eventHelper.createLobbyData(user.lobbyId);
+            
+            this.eventEmmiter.toUser(userId, "lobbyData", {
+                ...lobbyData,
+                currentUser: user.publicId,});
         } catch (error) {
             if (error instanceof LobbyDoesNotExistError) return;
             this.eventEmmiter.toUserError(userId, error);
@@ -181,6 +167,29 @@ export default class LobbyEvents {
 
             this.eventHelper.sendLobbyData(lobby.id);
         } catch (error) {
+            this.eventEmmiter.toUserError(userId, error);
+        }
+    }
+    onGameChangeRequest({userId, data: {gameName}}){
+        try{
+            const user = this.userManager.getUser(userId);
+            const lobby = this.lobbyManager.getLobby(user.lobbyId);
+            if (!lobby) {
+                throw new LobbyDoesNotExistError();
+            }
+
+            const gameData = games.find(game => game.game === gameName);
+
+            if (!gameData){
+                throw new GameDoesNotExistError();
+            }
+
+            lobby.gameType = gameData.game;
+            this.eventHelper.sendLobbyData(lobby.id);
+
+        } catch (error) {
+            if (error instanceof LobbyDoesNotExistError) return;
+            if (error instanceof GameDoesNotExistError) return;
             this.eventEmmiter.toUserError(userId, error);
         }
     }
