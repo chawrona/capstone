@@ -1,4 +1,5 @@
-import colors from "../config/colors.json" with { type: "json" };
+import games from "../config/games.json" with { type: "json" };
+import GameDoesNotExistError from "../errors/GameDoesNotExistError.js";
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import UserIsNotAdminError from "../errors/UserIsNotAdminError.js";
 import LobbyManager from "../managers/LobbyManager.js";
@@ -27,6 +28,7 @@ export default class LobbyEvents {
         );
         this.socket.on("removeUser", (payload) => this.onRemoveUser(payload));
         this.socket.on("gameStart", (payload) => this.onGameStart(payload));
+        this.socket.on("changeGame", (payload) => this.onChangeGame(payload));
     }
 
     onCreateLobby({ userId }) {
@@ -115,9 +117,9 @@ export default class LobbyEvents {
             };
             players.push(player);
         }
-        const gameName = lobby.start(players);
+        const gameTitle = lobby.start(players);
         this.eventEmmiter.toLobby(lobby.id, "game", {
-            game: gameName,
+            game: gameTitle,
             lobbyId: lobby.id,
         });
     }
@@ -135,26 +137,12 @@ export default class LobbyEvents {
                 throw new LobbyDoesNotExistError();
             }
 
-            const lobbyUsers = [];
-            for (const lobbyUserId of lobby.users) {
-                const { name, isReady, publicId, color } =
-                    this.userManager.getUser(lobbyUserId);
-                lobbyUsers.push({
-                    username: name,
-                    isReady,
-                    publicId,
-                    isAdmin: lobby.isAdmin(lobbyUserId),
-                    color,
-                });
-            }
+            const lobbyData = this.eventHelper.createLobbyData(user.lobbyId);
 
-            const lobbyData = {
-                lobbyUsers,
+            this.eventEmmiter.toUser(userId, "lobbyData", {
+                ...lobbyData,
                 currentUser: user.publicId,
-                availableColors: colors,
-                gameData: lobby.gameType,
-            };
-            this.eventEmmiter.toUser(userId, "lobbyData", lobbyData);
+            });
         } catch (error) {
             if (error instanceof LobbyDoesNotExistError) return;
             this.eventEmmiter.toUserError(userId, error);
@@ -181,6 +169,30 @@ export default class LobbyEvents {
 
             this.eventHelper.sendLobbyData(lobby.id);
         } catch (error) {
+            this.eventEmmiter.toUserError(userId, error);
+        }
+    }
+
+    onChangeGame({ userId, data: { gameTitle } }) {
+        try {
+            const user = this.userManager.getUser(userId);
+            const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
+            if (!lobby) {
+                throw new LobbyDoesNotExistError();
+            }
+
+            const gameInfo = games.find((game) => game.title === gameTitle);
+
+            if (!gameInfo) {
+                throw new GameDoesNotExistError();
+            }
+
+            lobby.gameInfo = gameInfo;
+            this.eventHelper.sendLobbyData(lobby.id);
+        } catch (error) {
+            if (error instanceof LobbyDoesNotExistError) return;
+            if (error instanceof GameDoesNotExistError) return;
             this.eventEmmiter.toUserError(userId, error);
         }
     }
