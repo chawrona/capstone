@@ -15,8 +15,10 @@ export default class EventHelper {
         this.userManager = new UserManager();
         this.eventEmmiter = new EventEmmiter();
     }
+
     createLobbyData(lobbyId) {
         const lobby = this.lobbyManager.getLobby(lobbyId);
+
         const lobbyUsers = [];
         for (const lobbyUserId of lobby.users) {
             const { name, isReady, publicId, color } =
@@ -33,10 +35,8 @@ export default class EventHelper {
         return {
             lobbyUsers,
             availableColors: colors,
-            gameData: {
-                currentGame: lobby.gameType,
-                availableGames: games
-            }
+            currentGame: lobby.gameInfo,
+            availableGames: games,
         };
     }
 
@@ -72,6 +72,7 @@ export default class EventHelper {
             user.lobbyId = lobbyId;
             this.eventEmmiter.toUser(userId, "lobby", lobbyId);
             this.sendLobbyData(lobbyId);
+
             return true;
         } catch (error) {
             if (error instanceof LobbyDoesNotExistError) {
@@ -98,5 +99,4 @@ export default class EventHelper {
             throw new WrongUsernameCharacters();
         }
     }
-    
 }

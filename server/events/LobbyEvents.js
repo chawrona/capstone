@@ -1,5 +1,5 @@
 import games from "../config/games.json" with { type: "json" };
-import GameDoesNotExistError from "../errors/GameDoesNotExistError.js"
+import GameDoesNotExistError from "../errors/GameDoesNotExistError.js";
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import UserIsNotAdminError from "../errors/UserIsNotAdminError.js";
 import LobbyManager from "../managers/LobbyManager.js";
@@ -28,7 +28,7 @@ export default class LobbyEvents {
         );
         this.socket.on("removeUser", (payload) => this.onRemoveUser(payload));
         this.socket.on("gameStart", (payload) => this.onGameStart(payload));
-        this.socket.on("changeGameRequest", (payload) => this.onGameChangeRequest(payload))
+        this.socket.on("changeGame", (payload) => this.onChangeGame(payload));
     }
 
     onCreateLobby({ userId }) {
@@ -117,9 +117,9 @@ export default class LobbyEvents {
             };
             players.push(player);
         }
-        const gameName = lobby.start(players);
+        const gameTitle = lobby.start(players);
         this.eventEmmiter.toLobby(lobby.id, "game", {
-            game: gameName,
+            game: gameTitle,
             lobbyId: lobby.id,
         });
     }
@@ -136,11 +136,13 @@ export default class LobbyEvents {
                 // Na chwilę obecną ignorujemy wysyłany event
                 throw new LobbyDoesNotExistError();
             }
+
             const lobbyData = this.eventHelper.createLobbyData(user.lobbyId);
-            
+
             this.eventEmmiter.toUser(userId, "lobbyData", {
                 ...lobbyData,
-                currentUser: user.publicId,});
+                currentUser: user.publicId,
+            });
         } catch (error) {
             if (error instanceof LobbyDoesNotExistError) return;
             this.eventEmmiter.toUserError(userId, error);
@@ -170,23 +172,24 @@ export default class LobbyEvents {
             this.eventEmmiter.toUserError(userId, error);
         }
     }
-    onGameChangeRequest({userId, data: {gameName}}){
-        try{
+
+    onChangeGame({ userId, data: { gameTitle } }) {
+        try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
             if (!lobby) {
                 throw new LobbyDoesNotExistError();
             }
 
-            const gameData = games.find(game => game.game === gameName);
+            const gameInfo = games.find((game) => game.title === gameTitle);
 
-            if (!gameData){
+            if (!gameInfo) {
                 throw new GameDoesNotExistError();
             }
 
-            lobby.gameType = gameData.game;
+            lobby.gameInfo = gameInfo;
             this.eventHelper.sendLobbyData(lobby.id);
-
         } catch (error) {
             if (error instanceof LobbyDoesNotExistError) return;
             if (error instanceof GameDoesNotExistError) return;
