@@ -8,5 +8,11 @@
     "game": "brianboru",
     "maxPlayers": 5,
     "description": "Lorem ipsum dolorez"
+  },
+  {
+    "game": "Chińczyk",
+    "maxPlayers": 4,
+    "minPlayers": 2,
+    "description": "Standardowa gra w chińczyka"
   }
 ]
