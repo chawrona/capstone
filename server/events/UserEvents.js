@@ -1,7 +1,7 @@
 import colors from "../config/colors.json" with { type: "json" };
-import ColorAlreadyTakenError from "../errors/ColorAlreadyTakenError.js";
 import ColorDoesNotExistError from "../errors/ColorDoesNotExistError.js";
-import UserAlreadyOnlineError from "../errors/UserAlreadyOnlineError";
+import ColorDuplicatedError from "../errors/ColorDuplicatedError.js";
+import UserOnlineError from "../errors/UserOnlineError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
@@ -37,19 +37,15 @@ export default class UserEvents {
         try {
             const userId = redirectRequest.userId;
             this.socket.data.userId = userId;
-            // const user = this.userManager.getUser(userId);
-            // const lobbyId = user.lobbyId;
 
             if (!redirectRequest.data) return;
             const lobbyId = redirectRequest.data.lobbyId;
-            // lobbyId = redirectRequest.data.lobbyId;
             let username = redirectRequest.data.username;
 
             if (this.userManager.doesUserExist(userId)) {
                 this.userManager.updateUserSocketId(userId, this.socket.id);
-                // const lobby = this.lobbyManager.getLobby(lobbyId);
                 const user = this.userManager.getUser(userId);
-                if (user.isOnline) throw new UserAlreadyOnlineError();
+                if (user.isOnline) throw new UserOnlineError();
                 if (user.hasLobby()) {
                     const lobby = this.lobbyManager.getLobby(user.lobbyId);
                     this.socket.join(user.lobbyId);
@@ -81,21 +77,14 @@ export default class UserEvents {
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
-             const isColorTaken  = [...lobby.users]
-            .map((userId) => {
-                    return this.userManager.getUser(userId)
+            const isColorTaken = [...lobby.users]
+                .map((userId) => {
+                    return this.userManager.getUser(userId);
                 })
-            .some(user => {
-                    return user.color.name === newColor.name
-                })
-            if (isColorTaken) throw new ColorAlreadyTakenError();
-            // const usersIds = Array.from(lobby.users);
-            // const userObjects = usersIds.map((userId) =>
-            //     this.userManager.getUser(userId),
-            // );
-            // if (!userObjects.every((user) => user.color != newColor)) {
-            //     throw new ColorAlreadyTakenError();
-            // }
+                .some((user) => {
+                    return user.color.name === newColor.name;
+                });
+            if (isColorTaken) throw new ColorDuplicatedError();
             if (!colors.some((color) => color.name === newColor.name)) {
                 throw new ColorDoesNotExistError();
             }

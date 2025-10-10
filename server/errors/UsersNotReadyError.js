@@ -1,6 +1,6 @@
 export default class UsersNotReadyError extends Error {
     constructor(
-        message = "Użytkownicy nie są gotowi do rozpoczęcia rozgrywki",
+        message = "Użytkownicy nie są gotowi do rozpoczęcia rozgrywki.",
     ) {
         super(message);
         this.name = "UsersNotReadyError";

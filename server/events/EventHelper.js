@@ -1,9 +1,8 @@
-// Parsing error: Unexpected token assert
 import colors from "../config/colors.json" with { type: "json" };
-import BadUsernameError from "../errors/BadUsernameError.js";
+import InvalidUsernameCharactersError from "../errors/InvalidUsernameCharactersError.js";
+import InvalidUsernameError from "../errors/InvalidUsernameError.js";
+import InvalidUsernameLengthError from "../errors/InvalidUsernameLengthError.js";
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
-import WrongUsernameCharacters from "../errors/WrongUsernameCharacters.js";
-import WrongUsernameLength from "../errors/WrongUsernameLength.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
@@ -79,16 +78,16 @@ export default class EventHelper {
 
     validateUsername(username) {
         if (!username || typeof username !== "string") {
-            throw new BadUsernameError();
+            throw new InvalidUsernameError();
         }
 
         if (username.length < 3 || username.length > 20) {
-            throw new WrongUsernameLength();
+            throw new InvalidUsernameLengthError();
         }
 
         const regex = /^(?!.* {2})[A-Za-z0-9 ]+$/;
         if (!regex.test(username)) {
-            throw new WrongUsernameCharacters();
+            throw new InvalidUsernameCharactersError();
         }
     }
 }

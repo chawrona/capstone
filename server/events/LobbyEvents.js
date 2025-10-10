@@ -1,11 +1,11 @@
 import colors from "../config/colors.json" with { type: "json" };
-import ColorsDuplicatedError from "../errors/ColorsDuplicatedError";
+import ColorDuplicatedError from "../errors/ColorDuplicatedError.js";
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
-import PlayerLacksColorError from "../errors/PlayerLacksColorError";
-import UserAlreadyInLobbyError from "../errors/UserAlreadyInLobbyError.js";
+import PlayerLacksColorError from "../errors/PlayerLacksColorError.js";
+import UserCountMismatchError from "../errors/UserCountMismatchError.js";
+import UserInLobbyError from "../errors/UserInLobbyError.js";
 import UserNotAdminError from "../errors/UserNotAdminError.js";
 import UsersNotReadyError from "../errors/UsersNotReadyError.js";
-import WrongNumberOfPlayersError from "../errors/WrongNumberOfUsersError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
@@ -62,7 +62,7 @@ export default class LobbyEvents {
             const user = this.userManager.getUser(userId);
 
             if (!lobby) throw new LobbyDoesNotExistError();
-            if (user.lobbyId) throw new UserAlreadyInLobbyError();
+            if (user.lobbyId) throw new UserInLobbyError();
 
             user.color = null;
 
@@ -111,28 +111,32 @@ export default class LobbyEvents {
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
             const { minPlayers, maxPlayers } = lobby.gameType;
             const userCount = lobby.users.size;
+
             if (!lobby.isAdmin(userId)) throw new UserNotAdminError();
 
-            if (
-                userCount < minPlayers ||
-                userCount > maxPlayers
-            ){
-                throw new WrongNumberOfPlayersError();
+            if (userCount < minPlayers || userCount > maxPlayers) {
+                throw new UserCountMismatchError();
             }
-                
-            const users = [...lobby.users].map(
-                (userId) => this.userManager.getUser(userId),
+
+            const users = [...lobby.users].map((userId) =>
+                this.userManager.getUser(userId),
             );
-            // const colorsDuplicates =
-            //     new Set(userColors).size != userColors.length;
-            const colorsInUse = new Set()
+
+            const colorsInUse = new Set();
             for (const user of users) {
                 if (!user.color) throw new PlayerLacksColorError();
-                if (colorsInUse.has(user.color)) throw new ColorsDuplicatedError();
+                if (colorsInUse.has(user.color))
+                    throw new ColorDuplicatedError();
                 colorsInUse.add(user.color);
             }
-            // if (colorsDuplicates) throw new ColorsDuplicatedError();
-            if (users.some(user => !user.isReady)) throw new UsersNotReadyError();
+
+            if (
+                users.some((user) => !user.isReady && !lobby.isAdmin(user.id))
+            ) {
+                // => to return
+                throw new UsersNotReadyError();
+            }
+
             const players = [];
             for (const userId of lobby.users) {
                 const user = this.userManager.getUser(userId);
@@ -143,11 +147,14 @@ export default class LobbyEvents {
                 };
                 players.push(player);
             }
+
             const gameName = lobby.start(players);
+
             this.eventEmmiter.toLobby(lobby.id, "game", {
                 game: gameName,
                 lobbyId: lobby.id,
             });
+
             this.logger.log(`Gra ${gameName} została wystartowana.`);
         } catch (error) {
             this.eventEmmiter.toUserError(userId, error);
@@ -161,9 +168,9 @@ export default class LobbyEvents {
 
             if (!lobby) {
                 // Jak użytkownik odświeża stronę, a był w lobby, to serwer wyrzuca go z lobby
-                // Ale jednocześnie klient ładuje komponent z lobby zanim serwer go ponownie przekieruje na homepage
-                // Z tego powodu wysyła ponownie event z prośbą o dane, jednak lobby już nie istnieje
-                // Na chwilę obecną ignorujemy wysyłany event
+                // Ale jednocześnie klient ładuje komponent z lobby zanim serwer go ponownie
+                // przekieruje na homepage Z tego powodu wysyła ponownie event z prośbą o dane,
+                // jednak lobby już nie istnieje. Na chwilę obecną ignorujemy wysyłany event
                 throw new LobbyDoesNotExistError();
             }
 
@@ -198,7 +205,7 @@ export default class LobbyEvents {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
             if (userId != lobby.admin) {
-                throw new UserNotAdminError(userId);
+                throw new UserNotAdminError();
             }
             const userIdToKick =
                 this.userManager.getUserIdByPublicId(userToKickPublicId);
