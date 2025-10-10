@@ -3,10 +3,9 @@ import ColorsDuplicatedError from "../errors/ColorsDuplicatedError";
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import PlayerLacksColorError from "../errors/PlayerLacksColorError";
 import UserAlreadyInLobbyError from "../errors/UserAlreadyInLobbyError.js";
-import UserIsNotAdminError from "../errors/UserIsNotAdminError.js";
 import UserNotAdminError from "../errors/UserNotAdminError.js";
 import UsersNotReadyError from "../errors/UsersNotReadyError.js";
-import WrongNumberOfPlayersError from "../errors/WrongNumberOfPlayersError.js";
+import WrongNumberOfPlayersError from "../errors/WrongNumberOfUsersError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
@@ -62,15 +61,8 @@ export default class LobbyEvents {
             const lobby = this.lobbyManager.getLobby(lobbyId);
             const user = this.userManager.getUser(userId);
 
-            if (!lobby)
-                throw new LobbyDoesNotExistError(
-                    `Pokój #${lobbyId} nie istnieje.`,
-                );
-
-            if (user.lobbyId)
-                throw new UserAlreadyInLobbyError(
-                    `Użytkownik #${user.username} znajduje się już w lobby.`,
-                );
+            if (!lobby) throw new LobbyDoesNotExistError();
+            if (user.lobbyId) throw new UserAlreadyInLobbyError();
 
             user.color = null;
 
@@ -117,44 +109,31 @@ export default class LobbyEvents {
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
-            if (!lobby.isAdmin(userId)) {
-                throw new UserNotAdminError( // Mamy teraz 2 errory administratora, przyjrzyj się temu proszę i zadecyduj co z tym zrobić
-                    `Gracz #${user.username} nie ma uprawnień do rozpoczęcia rozgrywki`,
-                );
-            }
-            const players = [];
+            const { minPlayers, maxPlayers } = lobby.gameType;
+            const userCount = lobby.users.size;
+            if (!lobby.isAdmin(userId)) throw new UserNotAdminError();
+
             if (
-                lobby.users.size < lobby.gameType.minPlayers ||
-                lobby.users.size > lobby.gameType.maxPlayers
-            )
-                throw new WrongNumberOfPlayersError(
-                    `W pokoju #${lobby.id} znajduje się nieodpowiednia ilość graczy do uruchomienia gry ${lobby.gameType.game}`,
-                );
-            const usersIds = Array.from(lobby.users);
-            const userObjects = usersIds.map(
-                (userId) => this.userManager.getUser(userId).isReady,
-            );
-            const userColors = usersIds.map(
-                (userId) => this.userManager.getUser(userId).color,
-            );
-            const colorIsNotNull = (currentVariable) => currentVariable != null;
-            const userIsReady = (currentVariable) => currentVariable != false;
-            const colorsDuplicates =
-                new Set(userColors).size != userColors.length;
-            if (colorsDuplicates) {
-                throw new ColorsDuplicatedError(
-                    `Kilku graczy ma ten sam kolor`,
-                );
+                userCount < minPlayers ||
+                userCount > maxPlayers
+            ){
+                throw new WrongNumberOfPlayersError();
             }
-            if (!userColors.every(colorIsNotNull)) {
-                throw new PlayerLacksColorError(
-                    `Nie każdy gracz ma przydzielony kolor`,
-                );
+                
+            const users = [...lobby.users].map(
+                (userId) => this.userManager.getUser(userId),
+            );
+            // const colorsDuplicates =
+            //     new Set(userColors).size != userColors.length;
+            const colorsInUse = new Set()
+            for (const user of users) {
+                if (!user.color) throw new PlayerLacksColorError();
+                if (colorsInUse.has(user.color)) throw new ColorsDuplicatedError();
+                colorsInUse.add(user.color);
             }
-            if (!userObjects.every(userIsReady))
-                throw new UsersNotReadyError(
-                    `Gracze nie są gotowi do rozpoczęcia rozgrywki`,
-                );
+            // if (colorsDuplicates) throw new ColorsDuplicatedError();
+            if (users.some(user => !user.isReady)) throw new UsersNotReadyError();
+            const players = [];
             for (const userId of lobby.users) {
                 const user = this.userManager.getUser(userId);
                 const player = {
@@ -219,7 +198,7 @@ export default class LobbyEvents {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
             if (userId != lobby.admin) {
-                throw new UserIsNotAdminError(userId);
+                throw new UserNotAdminError(userId);
             }
             const userIdToKick =
                 this.userManager.getUserIdByPublicId(userToKickPublicId);

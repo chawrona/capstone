@@ -49,11 +49,7 @@ export default class UserEvents {
                 this.userManager.updateUserSocketId(userId, this.socket.id);
                 // const lobby = this.lobbyManager.getLobby(lobbyId);
                 const user = this.userManager.getUser(userId);
-                if (user.isOnline) {
-                    throw new UserAlreadyOnlineError(
-                        `Użytkownik jest już online`,
-                    );
-                }
+                if (user.isOnline) throw new UserAlreadyOnlineError();
                 if (user.hasLobby()) {
                     const lobby = this.lobbyManager.getLobby(user.lobbyId);
                     this.socket.join(user.lobbyId);
@@ -85,13 +81,21 @@ export default class UserEvents {
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
-            const usersIds = Array.from(lobby.users);
-            const userObjects = usersIds.map((userId) =>
-                this.userManager.getUser(userId),
-            );
-            if (!userObjects.every((user) => user.color != newColor)) {
-                throw new ColorAlreadyTakenError();
-            }
+             const isColorTaken  = [...lobby.users]
+            .map((userId) => {
+                    return this.userManager.getUser(userId)
+                })
+            .some(user => {
+                    return user.color.name === newColor.name
+                })
+            if (isColorTaken) throw new ColorAlreadyTakenError();
+            // const usersIds = Array.from(lobby.users);
+            // const userObjects = usersIds.map((userId) =>
+            //     this.userManager.getUser(userId),
+            // );
+            // if (!userObjects.every((user) => user.color != newColor)) {
+            //     throw new ColorAlreadyTakenError();
+            // }
             if (!colors.some((color) => color.name === newColor.name)) {
                 throw new ColorDoesNotExistError();
             }
