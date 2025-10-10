@@ -7,6 +7,7 @@ export default class User {
         this.publicId = generateUuid();
         this.lobbyId = null;
         this.isReady = false;
+        this.isOnline = true;
         this.color = null;
         this.name = username || generateUsername();
     }
