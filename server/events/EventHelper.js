@@ -1,4 +1,5 @@
 import colors from "../config/colors.json" with { type: "json" };
+import games from "../config/games.json" with { type: "json" };
 import InvalidUsernameCharactersError from "../errors/InvalidUsernameCharactersError.js";
 import InvalidUsernameError from "../errors/InvalidUsernameError.js";
 import InvalidUsernameLengthError from "../errors/InvalidUsernameLengthError.js";
@@ -14,8 +15,9 @@ export default class EventHelper {
         this.eventEmmiter = new EventEmmiter();
     }
 
-    sendLobbyData(lobbyId) {
+    createLobbyData(lobbyId) {
         const lobby = this.lobbyManager.getLobby(lobbyId);
+
         const lobbyUsers = [];
         for (const lobbyUserId of lobby.users) {
             const { name, isReady, publicId, color } =
@@ -29,12 +31,17 @@ export default class EventHelper {
             });
         }
 
-        const lobbyData = {
+        return {
             lobbyUsers,
-            maxPlayers: lobby.maxPlayers,
             availableColors: colors,
-            gameData: lobby.gameType,
+            currentGame: lobby.gameInfo,
+            availableGames: games,
         };
+    }
+
+    sendLobbyData(lobbyId) {
+        const lobby = this.lobbyManager.getLobby(lobbyId);
+        const lobbyData = this.createLobbyData(lobbyId);
 
         for (const lobbyUserId of lobby.users) {
             const user = this.userManager.getUser(lobbyUserId);
@@ -64,6 +71,7 @@ export default class EventHelper {
             user.lobbyId = lobbyId;
             this.eventEmmiter.toUser(userId, "lobby", lobbyId);
             this.sendLobbyData(lobbyId);
+
             return true;
         } catch (error) {
             if (error instanceof LobbyDoesNotExistError) {

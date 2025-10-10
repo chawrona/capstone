@@ -5,6 +5,7 @@ import UserOnlineError from "../errors/UserOnlineError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
+import generateUUID from "../utils/generateUuid.js";
 import EventHelper from "./EventHelper.js";
 
 export default class UserEvents {
@@ -33,7 +34,6 @@ export default class UserEvents {
     }
 
     onInitialRequest(redirectRequest) {
-        let userId = null;
         try {
             const userId = redirectRequest.userId;
             this.socket.data.userId = userId;
@@ -50,10 +50,12 @@ export default class UserEvents {
                     const lobby = this.lobbyManager.getLobby(user.lobbyId);
                     this.socket.join(user.lobbyId);
                     this.eventEmmiter.toUser(userId, "game", {
-                        gameName: lobby.gameType.game,
+                        gameTitle: lobby.gameInfo.title,
                     });
                 } else {
-                    this.eventHelper.isLobbyIdGiven(userId, lobbyId);
+                    if (this.eventHelper.isLobbyIdGiven(userId, lobbyId)) {
+                        this.socket.join(lobbyId);
+                    }
                 }
             } else {
                 try {
@@ -69,7 +71,15 @@ export default class UserEvents {
                 }
             }
         } catch (error) {
-            this.eventEmmiter.toUserError(userId, error);
+            if (error instanceof UserOnlineError) {
+                this.eventEmmiter.toUser(
+                    redirectRequest.userId,
+                    "userIdChangeRequest",
+                    generateUUID(),
+                );
+            } else {
+                this.eventEmmiter.toUserError(redirectRequest.userId, error);
+            }
         }
     }
 

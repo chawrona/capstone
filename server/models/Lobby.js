@@ -5,7 +5,7 @@ import Game from "./Game.js";
 export default class Lobby {
     constructor() {
         this.id = generateShortId();
-        this.gameType = games[0];
+        this.gameInfo = games[0];
         this.game = null;
         this.isActive = false;
         this.users = new Set();
@@ -14,13 +14,13 @@ export default class Lobby {
     }
 
     start(players) {
-        switch (this.gameType.game) {
+        switch (this.gameInfo.title) {
             case "game":
                 this.game = new Game(players, () => this.endGame());
                 break;
         }
         this.isActive = true;
-        return this.gameType.game;
+        return this.gameInfo.title;
     }
 
     lobbyInformation() {

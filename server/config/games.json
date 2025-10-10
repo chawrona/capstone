@@ -1,12 +1,12 @@
 [
   {
-    "game": "game",
+    "title": "game",
     "maxPlayers": 5,
     "minPlayers": 2,
     "description": "Testowa gra"
   },
   {
-    "game": "brianboru",
+    "title": "brianboru",
     "maxPlayers": 5,
     "minPlayers": 2,
     "description": "Lorem ipsum dolorez"
