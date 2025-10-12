@@ -6,6 +6,7 @@ import UserOnlineError from "../errors/UserOnlineError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
+import Logger from "../services/Logger.js";
 import generateUUID from "../utils/generateUuid.js";
 import EventHelper from "./EventHelper.js";
 
@@ -17,6 +18,7 @@ export default class UserEvents {
         this.eventHelper = new EventHelper();
         this.userManager = new UserManager();
         this.lobbyManager = new LobbyManager();
+        this.logger = new Logger();
     }
 
     registerEvents() {
@@ -60,6 +62,7 @@ export default class UserEvents {
                     this.socket.join(user.lobbyId);
                     this.eventEmmiter.toUser(userId, "game", {
                         gameTitle: lobby.gameInfo.title,
+                        lobbyId: lobby.id,
                     });
                 } else {
                     if (this.eventHelper.isLobbyIdGiven(userId, lobbyId)) {
@@ -101,7 +104,7 @@ export default class UserEvents {
                     return this.userManager.getUser(userId);
                 })
                 .some((user) => {
-                    return user.color.name === newColor.name;
+                    return user.color && user.color.name === newColor.name;
                 });
             if (isColorTaken) throw new ColorDuplicatedError();
             if (!colors.some((color) => color.name === newColor.name)) {
@@ -153,8 +156,8 @@ export default class UserEvents {
 
                     this.userManager.deleteUser(userId);
                 } else {
-                    (lobby.game.pause(),
-                        this.eventEmmiter.toLobby(lobby.id, "pause"));
+                    lobby.game.pause();
+                    this.eventEmmiter.toLobby(lobby.id, "pause");
                     const timeoutId = setTimeout(
                         () => {
                             lobby.isActive = false;
@@ -181,6 +184,7 @@ export default class UserEvents {
                         3 * 60 * 1000,
                     );
                     this.userManager.createTimeout(user.id, timeoutId);
+                    user.isOnline = false;
                 }
             } else {
                 this.userManager.deleteUser(userId);
