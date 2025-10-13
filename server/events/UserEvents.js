@@ -1,5 +1,5 @@
 import colors from "../config/colors.json" with { type: "json" };
-import UserDoesNotExistError from "../error/UserDoesNotExistError.js";
+import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
 import ColorDoesNotExistError from "../errors/ColorDoesNotExistError.js";
 import ColorDuplicatedError from "../errors/ColorDuplicatedError.js";
 import UserOnlineError from "../errors/UserOnlineError.js";
