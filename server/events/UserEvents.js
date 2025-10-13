@@ -8,7 +8,6 @@ import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
 import Logger from "../services/Logger.js";
-import generateUUID from "../utils/generateUuid.js";
 import EventHelper from "./EventHelper.js";
 
 export default class UserEvents {
@@ -47,10 +46,15 @@ export default class UserEvents {
             let username = redirectRequest.data.username;
 
             if (this.userManager.doesUserExist(userId)) {
-                this.userManager.updateUserSocketId(userId, this.socket.id);
                 const user = this.userManager.getUser(userId);
-                if (user.isOnline) throw new UserOnlineError();
+
+                if (user.isOnline) {
+                    throw new UserOnlineError();
+                }
+
+                this.userManager.updateUserSocketId(userId, this.socket.id);
                 user.isOnline = true;
+
                 if (user.hasLobby()) {
                     const lobby = this.lobbyManager.getLobby(user.lobbyId);
 
@@ -85,10 +89,10 @@ export default class UserEvents {
             }
         } catch (error) {
             if (error instanceof UserOnlineError) {
-                this.eventEmmiter.toUser(
-                    redirectRequest.userId,
-                    "userIdChangeRequest",
-                    generateUUID(),
+                // Specyficzny przypadek, jak jesteście ciekaw to mnie spytajcie
+                this.eventEmmiter.toLobbyError(
+                    this.socket.id,
+                    new Error("Aplikacja jest już otwarta w innej karcie"),
                 );
             } else {
                 this.eventEmmiter.toUserError(redirectRequest.userId, error);
