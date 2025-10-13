@@ -2,10 +2,12 @@ import colors from "../config/colors.json" with { type: "json" };
 import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
 import ColorDoesNotExistError from "../errors/ColorDoesNotExistError.js";
 import ColorDuplicatedError from "../errors/ColorDuplicatedError.js";
+import GameAbortedPlayerLeftError from "../errors/GameAbortedPlayerLeftError.js";
 import UserOnlineError from "../errors/UserOnlineError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
+import Logger from "../services/Logger.js";
 import generateUUID from "../utils/generateUuid.js";
 import EventHelper from "./EventHelper.js";
 
@@ -17,6 +19,7 @@ export default class UserEvents {
         this.eventHelper = new EventHelper();
         this.userManager = new UserManager();
         this.lobbyManager = new LobbyManager();
+        this.logger = new Logger();
     }
 
     registerEvents() {
@@ -47,11 +50,20 @@ export default class UserEvents {
                 this.userManager.updateUserSocketId(userId, this.socket.id);
                 const user = this.userManager.getUser(userId);
                 if (user.isOnline) throw new UserOnlineError();
+                user.isOnline = true;
                 if (user.hasLobby()) {
                     const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
+                    if (this.userManager.hasTimeout(user.id)) {
+                        this.userManager.clearTimeout(user.id);
+                        lobby.game.resume();
+                        this.eventEmmiter.toLobby(lobby.id, "resume");
+                    }
+
                     this.socket.join(user.lobbyId);
                     this.eventEmmiter.toUser(userId, "game", {
                         gameTitle: lobby.gameInfo.title,
+                        lobbyId: lobby.id,
                     });
                 } else {
                     if (this.eventHelper.isLobbyIdGiven(userId, lobbyId)) {
@@ -93,7 +105,7 @@ export default class UserEvents {
                     return this.userManager.getUser(userId);
                 })
                 .some((user) => {
-                    return user.color.name === newColor.name;
+                    return user.color && user.color.name === newColor.name;
                 });
             if (isColorTaken) throw new ColorDuplicatedError();
             if (!colors.some((color) => color.name === newColor.name)) {
@@ -137,29 +149,59 @@ export default class UserEvents {
     }
 
     onDisconnect() {
-        const { userId } = this.socket.data;
         try {
+            const { userId } = this.socket.data;
             const user = this.userManager.getUser(userId);
-            const lobby = this.lobbyManager.getLobby(user.lobbyId);
 
-            if (lobby) {
-                lobby.removeUser(userId);
+            if (user.hasLobby()) {
+                const lobby = this.lobbyManager.getLobby(user.lobbyId);
+                if (!lobby.isActive) {
+                    lobby.removeUser(userId);
 
-                if (!lobby.getPlayerCount()) {
-                    this.lobbyManager.deleteLobby(lobby.id);
-                } else if (lobby.isAdmin) {
-                    lobby.admin = [...lobby.users][0];
-                    this.eventHelper.sendLobbyData(lobby.id);
+                    if (!lobby.getPlayerCount()) {
+                        this.lobbyManager.deleteLobby(lobby.id);
+                    } else if (lobby.isAdmin) {
+                        lobby.admin = [...lobby.users][0];
+                        this.eventHelper.sendLobbyData(lobby.id);
+                    }
+
+                    this.userManager.deleteUser(userId);
+                } else {
+                    lobby.game.pause();
+                    this.eventEmmiter.toLobby(lobby.id, "pause");
+                    const timeoutId = setTimeout(
+                        () => {
+                            lobby.isActive = false;
+                            lobby.game = null;
+
+                            if (user.isAdmin) {
+                                lobby.admin = [...lobby.users][0];
+                                this.eventHelper.sendLobbyData(lobby.id);
+                            }
+
+                            this.eventEmmiter.toLobby(
+                                lobby.id,
+                                "lobby",
+                                lobby.id,
+                            );
+
+                            this.eventEmmiter.toLobbyError(
+                                lobby.id,
+                                new GameAbortedPlayerLeftError(),
+                            );
+
+                            this.userManager.deleteUser(userId);
+                        },
+                        3 * 60 * 1000,
+                    );
+                    this.userManager.createTimeout(user.id, timeoutId);
+                    user.isOnline = false;
                 }
-
-                this.socket.leave(lobby.id);
+            } else {
+                this.userManager.deleteUser(userId);
             }
-
-            user.lobbyId = null;
-            user.isReady = false;
-            user.isOnline = false;
         } catch (error) {
-            this.eventEmmiter.toUserError(userId, error);
+            this.logger.error(error.message);
         }
     }
 }

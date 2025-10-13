@@ -110,7 +110,7 @@ export default class LobbyEvents {
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
-            const { minPlayers, maxPlayers } = lobby.gameType;
+            const { minPlayers, maxPlayers } = lobby.gameInfo;
             const userCount = lobby.users.size;
 
             if (!lobby.isAdmin(userId)) throw new UserNotAdminError();
@@ -151,7 +151,7 @@ export default class LobbyEvents {
 
             const gameTitle = lobby.start(players);
             this.eventEmmiter.toLobby(lobby.id, "game", {
-                game: gameTitle,
+                gameTitle: gameTitle,
                 lobbyId: lobby.id,
             });
 

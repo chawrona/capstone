@@ -10,6 +10,7 @@ export default class UserManager {
         this.users = new Map();
         this.userIdToSocketId = new Map();
         this.publicIdToId = new Map();
+        this.userIdToTimeoutId = new Map();
     }
 
     createUser(userId, socketId, username) {
@@ -17,6 +18,14 @@ export default class UserManager {
         this.users.set(userId, user);
         this.publicIdToId.set(user.publicId, userId);
         this.updateUserSocketId(userId, socketId);
+    }
+
+    createTimeout(userId, timeoutId) {
+        this.userIdToTimeoutId.set(userId, timeoutId);
+    }
+
+    updateUserSocketId(userId, socketId) {
+        this.userIdToSocketId.set(userId, socketId);
     }
 
     getUser(userId) {
@@ -51,8 +60,13 @@ export default class UserManager {
         return this.users.has(userId);
     }
 
-    updateUserSocketId(userId, socketId) {
-        this.userIdToSocketId.set(userId, socketId);
+    hasTimeout(userId) {
+        return this.userIdToTimeoutId.has(userId);
+    }
+
+    clearTimeout(userId) {
+        clearTimeout(this.userIdToTimeoutId.get(userId));
+        this.userIdToTimeoutId.delete(userId);
     }
 
     deleteUser(userId) {
@@ -62,5 +76,6 @@ export default class UserManager {
         }
         this.userIdToSocketId.delete(userId);
         this.users.delete(userId);
+        this.clearTimeout(userId);
     }
 }
