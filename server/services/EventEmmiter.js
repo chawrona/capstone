@@ -32,6 +32,15 @@ export default class EventEmmiter {
         this.io.to(lobbyId).emit(eventName, data);
     }
 
+    toLobbyError(lobbyId, error) {
+        if (lobbyId) {
+            this.toLobby(lobbyId, "error", {
+                error: error.message,
+            });
+        }
+        this.logger.error(error.message);
+    }
+
     toAll(eventName, data) {
         this.io.emit(eventName, data);
     }

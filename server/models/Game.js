@@ -91,4 +91,12 @@ export default class Game {
             },
         ];
     }
+
+    pause() {
+        console.log("pause");
+    }
+
+    resume() {
+        console.log("resume");
+    }
 }
