@@ -11,6 +11,7 @@ export default class Player {
         this.data[dataName] = updateField(this.data[dataName]);
         return this.data[dataName];
     }
+
     getData(dataName) {
         return this.data[dataName];
     }

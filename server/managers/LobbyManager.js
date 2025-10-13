@@ -1,3 +1,4 @@
+import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import Lobby from "../models/Lobby.js";
 
 export default class LobbyManager {
@@ -21,6 +22,10 @@ export default class LobbyManager {
     }
 
     getLobby(lobbyId) {
-        return this.lobbies.get(lobbyId);
+        const lobby = this.lobbies.get(lobbyId);
+        if (!lobby) {
+            throw new LobbyDoesNotExistError("Lobby nie istnieje");
+        }
+        return lobby;
     }
 }

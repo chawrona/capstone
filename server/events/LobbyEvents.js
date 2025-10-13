@@ -63,7 +63,6 @@ export default class LobbyEvents {
             const lobby = this.lobbyManager.getLobby(lobbyId);
             const user = this.userManager.getUser(userId);
 
-            if (!lobby) throw new LobbyDoesNotExistError();
             if (user.lobbyId) throw new UserInLobbyError();
 
             user.color = null;
@@ -165,15 +164,7 @@ export default class LobbyEvents {
     onLobbyDataRequest({ userId }) {
         try {
             const user = this.userManager.getUser(userId);
-            const lobby = this.lobbyManager.getLobby(user.lobbyId);
-
-            if (!lobby) {
-                // Jak użytkownik odświeża stronę, a był w lobby, to serwer wyrzuca go z lobby
-                // Ale jednocześnie klient ładuje komponent z lobby zanim serwer go ponownie
-                // przekieruje na homepage Z tego powodu wysyła ponownie event z prośbą o dane,
-                // jednak lobby już nie istnieje. Na chwilę obecną ignorujemy wysyłany event
-                throw new LobbyDoesNotExistError();
-            }
+            // const lobby = this.lobbyManager.getLobby(user.lobbyId);
 
             const lobbyData = this.eventHelper.createLobbyData(user.lobbyId);
 
@@ -182,6 +173,10 @@ export default class LobbyEvents {
                 currentUser: user.publicId,
             });
         } catch (error) {
+            // Jak użytkownik odświeża stronę, a był w lobby, to serwer wyrzuca go z lobby
+            // Ale jednocześnie klient ładuje komponent z lobby zanim serwer go ponownie
+            // przekieruje na homepage Z tego powodu wysyła ponownie event z prośbą o dane,
+            // jednak lobby już nie istnieje. Na chwilę obecną ignorujemy wysyłany event
             if (error instanceof LobbyDoesNotExistError) return;
             this.eventEmmiter.toUserError(userId, error);
         }
@@ -215,10 +210,6 @@ export default class LobbyEvents {
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
-
-            if (!lobby) {
-                throw new LobbyDoesNotExistError();
-            }
 
             const gameInfo = games.find((game) => game.title === gameTitle);
 

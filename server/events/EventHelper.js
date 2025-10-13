@@ -4,6 +4,7 @@ import InvalidUsernameCharactersError from "../errors/InvalidUsernameCharactersE
 import InvalidUsernameError from "../errors/InvalidUsernameError.js";
 import InvalidUsernameLengthError from "../errors/InvalidUsernameLengthError.js";
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
+import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
@@ -16,39 +17,51 @@ export default class EventHelper {
     }
 
     createLobbyData(lobbyId) {
-        const lobby = this.lobbyManager.getLobby(lobbyId);
+        try {
+            const lobby = this.lobbyManager.getLobby(lobbyId);
 
-        const lobbyUsers = [];
-        for (const lobbyUserId of lobby.users) {
-            const { name, isReady, publicId, color } =
-                this.userManager.getUser(lobbyUserId);
-            lobbyUsers.push({
-                username: name,
-                isReady,
-                publicId,
-                isAdmin: lobby.isAdmin(lobbyUserId),
-                color,
-            });
+            const lobbyUsers = [];
+            for (const lobbyUserId of lobby.users) {
+                const { name, isReady, publicId, color } =
+                    this.userManager.getUser(lobbyUserId);
+                lobbyUsers.push({
+                    username: name,
+                    isReady,
+                    publicId,
+                    isAdmin: lobby.isAdmin(lobbyUserId),
+                    color,
+                });
+            }
+
+            return {
+                lobbyUsers,
+                availableColors: colors,
+                currentGame: lobby.gameInfo,
+                availableGames: games,
+            };
+        } catch (error) {
+            if (error instanceof UserDoesNotExistError) return;
+            if (error instanceof LobbyDoesNotExistError) return;
+            this.eventEmmiter.toUserError(lobbyId, error);
         }
-
-        return {
-            lobbyUsers,
-            availableColors: colors,
-            currentGame: lobby.gameInfo,
-            availableGames: games,
-        };
     }
 
     sendLobbyData(lobbyId) {
-        const lobby = this.lobbyManager.getLobby(lobbyId);
-        const lobbyData = this.createLobbyData(lobbyId);
+        try {
+            const lobby = this.lobbyManager.getLobby(lobbyId);
+            const lobbyData = this.createLobbyData(lobbyId);
 
-        for (const lobbyUserId of lobby.users) {
-            const user = this.userManager.getUser(lobbyUserId);
-            this.eventEmmiter.toUser(lobbyUserId, "lobbyData", {
-                ...lobbyData,
-                currentUser: user.publicId,
-            });
+            for (const lobbyUserId of lobby.users) {
+                const user = this.userManager.getUser(lobbyUserId);
+                this.eventEmmiter.toUser(lobbyUserId, "lobbyData", {
+                    ...lobbyData,
+                    currentUser: user.publicId,
+                });
+            }
+        } catch (error) {
+            if (error instanceof UserDoesNotExistError) return;
+            if (error instanceof LobbyDoesNotExistError) return;
+            this.eventEmmiter.toUserError(lobbyId, error);
         }
     }
 
@@ -60,12 +73,6 @@ export default class EventHelper {
 
             const lobby = this.lobbyManager.getLobby(lobbyId);
 
-            if (!lobby) {
-                throw new LobbyDoesNotExistError(
-                    `Pokój #${lobbyId} nie istnieje.`,
-                );
-            }
-
             lobby.joinUser(userId);
             const user = this.userManager.getUser(userId);
             user.lobbyId = lobbyId;
@@ -76,7 +83,7 @@ export default class EventHelper {
         } catch (error) {
             if (error instanceof LobbyDoesNotExistError) {
                 this.eventEmmiter.toUser(userId, "homepage", {
-                    error: error.message,
+                    error: `Pokój #${lobbyId} nie istnieje.`,
                 });
             } else {
                 this.eventEmmiter.toUserError(userId, error);
