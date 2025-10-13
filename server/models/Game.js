@@ -91,7 +91,7 @@ export default class Game {
             },
         ];
     }
-  
+
     dataWithPlayerTarget(publicId) {
         return {
             target: publicId,
@@ -99,12 +99,9 @@ export default class Game {
             data: this.data,
         };
     }
-  
+
     gameDataRequest(data) {
-        return [
-            this.dataWithTarget(),
-            this.dataWithPlayerTarget(data.publicId),
-        ];
+        return [this.dataWithPlayerTarget(data.publicId)];
     }
 
     pause() {

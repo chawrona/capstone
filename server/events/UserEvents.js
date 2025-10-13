@@ -1,8 +1,8 @@
 import colors from "../config/colors.json" with { type: "json" };
-import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
 import ColorDoesNotExistError from "../errors/ColorDoesNotExistError.js";
 import ColorDuplicatedError from "../errors/ColorDuplicatedError.js";
 import GameAbortedPlayerLeftError from "../errors/GameAbortedPlayerLeftError.js";
+import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
 import UserOnlineError from "../errors/UserOnlineError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
