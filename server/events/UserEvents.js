@@ -39,7 +39,6 @@ export default class UserEvents {
     onInitialRequest(redirectRequest) {
         try {
             const userId = redirectRequest.userId;
-            this.socket.data.userId = userId;
 
             if (!redirectRequest.data) return;
             const lobbyId = redirectRequest.data.lobbyId;
@@ -87,6 +86,8 @@ export default class UserEvents {
                     this.socket.join(lobbyId);
                 }
             }
+
+            this.socket.data.userId = userId;
         } catch (error) {
             if (error instanceof UserOnlineError) {
                 // Specyficzny przypadek, jak jesteście ciekaw to mnie spytajcie
