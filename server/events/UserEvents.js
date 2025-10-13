@@ -1,4 +1,5 @@
 import colors from "../config/colors.json" with { type: "json" };
+import UserDoesNotExistError from "../error/UserDoesNotExistError.js";
 import ColorDoesNotExistError from "../errors/ColorDoesNotExistError.js";
 import ColorDuplicatedError from "../errors/ColorDuplicatedError.js";
 import UserOnlineError from "../errors/UserOnlineError.js";
@@ -120,9 +121,19 @@ export default class UserEvents {
     }
 
     onToggleReady({ userId }) {
-        const user = this.userManager.getUser(userId);
-        user.isReady = !user.isReady;
-        this.eventHelper.sendLobbyData(user.lobbyId);
+        try {
+            const user = this.userManager.getUser(userId);
+            user.isReady = !user.isReady;
+            this.eventHelper.sendLobbyData(user.lobbyId);
+        } catch (error) {
+            if (error instanceof UserDoesNotExistError) {
+                this.eventEmmiter.toUser(userId, "homepage", {
+                    error: `Użytkownik o ID ${userId} nie istnieje.`,
+                });
+            } else {
+                this.eventEmmiter.toUserError(userId, error);
+            }
+        }
     }
 
     onDisconnect() {

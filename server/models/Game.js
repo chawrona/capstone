@@ -91,4 +91,17 @@ export default class Game {
             },
         ];
     }
+    dataWithPlayerTarget(publicId) {
+        return {
+            target: publicId,
+            eventName: "gameData",
+            data: this.data,
+        };
+    }
+    gameDataRequest(data) {
+        return [
+            this.dataWithTarget(),
+            this.dataWithPlayerTarget(data.publicId),
+        ];
+    }
 }

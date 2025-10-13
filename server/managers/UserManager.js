@@ -1,3 +1,4 @@
+import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
 import User from "../models/User.js";
 
 export default class UserManager {
@@ -19,13 +20,23 @@ export default class UserManager {
     }
 
     getUser(userId) {
-        return this.users.get(userId);
+        const user = this.users.get(userId);
+        if (!user) {
+            throw new UserDoesNotExistError();
+        }
+        return user;
     }
 
     getUserByPublicId(publicId) {
         const userId = this.publicIdToId.get(publicId);
-        if (!userId) return null;
-        return this.users.get(userId);
+        if (!userId) {
+            throw new UserDoesNotExistError();
+        }
+        const user = this.users.get(userId);
+        if (!user) {
+            throw new UserDoesNotExistError();
+        }
+        return user;
     }
 
     getUserIdByPublicId(publicId) {
