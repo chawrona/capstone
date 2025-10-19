@@ -9,6 +9,7 @@ export default class Game {
         this.data = {};
         this.createPlayers(players);
         this.createTurnOrder();
+        this.setPlayersData();
         this.initializeGameData();
     }
 
@@ -33,10 +34,23 @@ export default class Game {
                 player.color,
                 player.publicId,
             );
-            newPlayer.setData("wood", () => 5);
+
             this.players.set(player.publicId, newPlayer);
             this.playersQueue.push(player.publicId);
         }
+    }
+
+    setPlayersData() {
+        let i = 1;
+        for (const publicId of this.playersQueue) {
+            const player = this.players.get(publicId);
+            player.setData("turnOrder", () => i++);
+            this.setPlayerData(player);
+        }
+    }
+
+    setPlayerData(player) {
+        player.setData("wood", () => 5);
     }
 
     nextTurn() {
