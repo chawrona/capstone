@@ -10,6 +10,8 @@ export default class Game {
         this.createPlayers(players);
         this.createTurnOrder();
         this.initializeGameData();
+        this.disconnectedPlayers = new Set();
+        this.paused = false;
     }
 
     initializeGameData() {
@@ -48,6 +50,19 @@ export default class Game {
 
     processGameData(data) {
         try {
+            if (this.paused && data.eventName !== "gameDataRequest") {
+                console.log("Nie można wykonać, ponieważ gra jest wstrzymana");
+                return [
+                    {
+                        target: data.publicId,
+                        eventName: "paused",
+                        data: {
+                            message:
+                                "Gra jest wstrzymana — poczekaj na wznowienie.",
+                        },
+                    },
+                ];
+            }
             return this[data.eventName](data);
         } catch {
             return [
@@ -104,11 +119,47 @@ export default class Game {
         return [this.dataWithPlayerTarget(data.publicId)];
     }
 
-    pause() {
-        console.log("pause");
+    pauseWithTarget(message = "Gra została wstrzymana") {
+        return {
+            target: "lobby",
+            eventName: "pause",
+            data: { message },
+        };
     }
 
-    resume() {
-        console.log("resume");
+    resumeWithTarget(message = "Wszyscy gracze wrócili") {
+        return {
+            target: "lobby",
+            eventName: "resume",
+            data: { message },
+        };
+    }
+
+    pause(userId) {
+        this.disconnectedPlayers.add(userId);
+
+        if (this.paused) {
+            return [this.pauseWithTarget("Gracz się rozłączył")];
+        }
+
+        this.paused = true;
+        console.log("pause");
+        return [this.pauseWithTarget("Gra została wstrzymana")];
+    }
+
+    resume(userId) {
+        this.disconnectedPlayers.delete(userId);
+        if (this.disconnectedPlayers.size > 0) {
+            return [
+                this.pauseWithTarget("Czekanie na powrót wszystkich graczy"),
+            ];
+        }
+
+        if (this.paused && this.disconnectedPlayers.size === 0) {
+            this.paused = false;
+            console.log("resume");
+            return [this.resumeWithTarget()];
+        }
+        return [];
     }
 }

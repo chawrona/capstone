@@ -59,7 +59,7 @@ export default class UserEvents {
 
                     if (this.userManager.hasTimeout(user.id)) {
                         this.userManager.clearTimeout(user.id);
-                        lobby.game.resume();
+                        lobby.game.resume(user.id);
                         this.eventEmmiter.toLobby(lobby.id, "resume");
                     }
 
@@ -172,7 +172,7 @@ export default class UserEvents {
 
                     this.userManager.deleteUser(userId);
                 } else {
-                    lobby.game.pause();
+                    lobby.game.pause(userId);
                     this.eventEmmiter.toLobby(lobby.id, "pause");
                     const timeoutId = setTimeout(
                         () => {
