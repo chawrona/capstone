@@ -59,8 +59,9 @@ export default class UserEvents {
 
                     if (this.userManager.hasTimeout(user.id)) {
                         this.userManager.clearTimeout(user.id);
-                        lobby.game.resume(user.id);
-                        this.eventEmmiter.toLobby(lobby.id, "resume");
+                        if (lobby.game.resume(user.id)) {
+                            this.eventEmmiter.toLobby(lobby.id, "resume");
+                        }
                     }
 
                     this.socket.join(user.lobbyId);
