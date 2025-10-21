@@ -11,6 +11,8 @@ export default class Game {
         this.createTurnOrder();
         this.setPlayersData();
         this.initializeGameData();
+        this.disconnectedPlayers = new Set();
+        this.paused = false;
     }
 
     initializeGameData() {
@@ -62,13 +64,17 @@ export default class Game {
 
     processGameData(data) {
         try {
+            if (this.paused && data.eventName !== "gameDataRequest") {
+                throw new Error("Gra wstrzymana");
+            }
             return this[data.eventName](data);
-        } catch {
+        } catch (error) {
+            const errorMessage = error ? error.message : "Nieprawidłowa akcja";
             return [
                 {
                     target: data.publicId,
                     eventName: "error",
-                    data: new Error("Nieprawidłowa akcja"),
+                    data: new Error(errorMessage),
                 },
             ];
         }
@@ -118,11 +124,17 @@ export default class Game {
         return [this.dataWithPlayerTarget(data.publicId)];
     }
 
-    pause() {
-        console.log("pause");
+    pause(userId) {
+        this.disconnectedPlayers.add(userId);
+        this.paused = true;
     }
 
-    resume() {
-        console.log("resume");
+    resume(userId) {
+        this.disconnectedPlayers.delete(userId);
+        if (this.disconnectedPlayers.size === 0) {
+            this.paused = false;
+            return true;
+        }
+        return false;
     }
 }
