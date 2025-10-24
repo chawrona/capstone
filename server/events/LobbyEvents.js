@@ -164,9 +164,12 @@ export default class LobbyEvents {
     onLobbyDataRequest({ userId }) {
         try {
             const user = this.userManager.getUser(userId);
-            // const lobby = this.lobbyManager.getLobby(user.lobbyId);
 
             const lobbyData = this.eventHelper.createLobbyData(user.lobbyId);
+
+            if (lobbyData instanceof LobbyDoesNotExistError) {
+                throw lobbyData;
+            }
 
             this.eventEmmiter.toUser(userId, "lobbyData", {
                 ...lobbyData,
