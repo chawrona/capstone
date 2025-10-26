@@ -1,14 +1,20 @@
 [
   {
     "title": "game",
+    "polishTitle": "Przykładowa gra",
     "maxPlayers": 5,
     "minPlayers": 2,
-    "description": "Testowa gra"
+    "description": "Strategiczna gra planszowa, w której gracze rywalizują o dominację nad planszą. Każda rozgrywka różni się dzięki losowym wydarzeniom i zmiennym celom.",
+    "time": "30-60 minut",
+    "difficulty": "średni"
   },
   {
     "title": "brianboru",
+    "polishTitle": "Brian Boru",
     "maxPlayers": 5,
     "minPlayers": 2,
-    "description": "Lorem ipsum dolorez"
+    "description": "Gra osadzona w średniowiecznej Irlandii, w której gracze rywalizują o tron. Mechanika łączy draft kart, kontrolę terytoriów i zarządzanie zasobami.",
+    "time": "45-75 minut",
+    "difficulty": "trudny"
   }
 ]
