@@ -5,7 +5,7 @@
     "maxPlayers": 5,
     "minPlayers": 2,
     "description": "Strategiczna gra planszowa, w której gracze rywalizują o dominację nad planszą. Każda rozgrywka różni się dzięki losowym wydarzeniom i zmiennym celom.",
-    "time": "30-60 minut",
+    "time": "30-60 min.",
     "difficulty": "średni"
   },
   {
@@ -14,7 +14,7 @@
     "maxPlayers": 5,
     "minPlayers": 2,
     "description": "Gra osadzona w średniowiecznej Irlandii, w której gracze rywalizują o tron. Mechanika łączy draft kart, kontrolę terytoriów i zarządzanie zasobami.",
-    "time": "45-75 minut",
+    "time": "45-75 min.",
     "difficulty": "trudny"
   }
 ]
