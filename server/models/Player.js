@@ -15,4 +15,13 @@ export default class Player {
     getData(dataName) {
         return this.data[dataName];
     }
+
+    getPlayerData() {
+        return {
+            username: this.username,
+            color: this.color,
+            publicId: this.publicId,
+            ...this.data,
+        };
+    }
 }
