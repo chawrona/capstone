@@ -4,7 +4,7 @@
     "polishTitle": "Przykładowa gra",
     "maxPlayers": 5,
     "minPlayers": 2,
-    "description": "Strategiczna gra planszowa, w której gracze rywalizują o dominację nad planszą. Każda rozgrywka różni się dzięki losowym wydarzeniom i zmiennym celom.",
+    "description": "Strategiczna gra planszowa, w której gracze rywalizują o dominację nad planszą. Każda rozgrywka różni się dzięki losowym wydarzeniom.",
     "time": "30-60 min.",
     "difficulty": "średni"
   },
