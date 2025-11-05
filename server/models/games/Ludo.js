@@ -19,7 +19,7 @@ export default class Ludo extends Game {
         this.gameData.currentAction = "Rzut kością";
         this.gameData.startingPositionArea = this._setPawns("start");
         this.gameData.finishPositions = this._setPawns("finish");
-        this.gameData.timesThrown = 1;
+        this.gameData.timesThrown = 0;
         this.gameData.diceThrowResult = 0;
         this.gameData.playersStartingPoints = this._setPlayersStartingPoints();
         //     gameDataRequest(data) {  ------- gameDataRequest odsyla this.data (to jest
@@ -129,15 +129,7 @@ export default class Ludo extends Game {
     }
 
     _currentPlayer() {
-        const currentPlayer = {};
-        for (const [, player] of this.players) {
-            //ustawiamy sobie obecnego gracza na podstawie porównania
-            // id gracza obecnej tury do gracza z tablicy graczy
-            if (player.publicId === this.playersQueue[currentPlayerIndex]) {
-                currentPlayer = player.getPlayerData();
-            }
-        }
-        return currentPlayer;
+        return this.players.get(this.playersQueue[this.currentPlayerIndex]);
     }
 
     // osobna funkcja dająca info o tym które pionki są dostępne do ruchu
@@ -152,6 +144,7 @@ export default class Ludo extends Game {
         if (this.gameData.currentAction != "Rzut kością") {
             throw new Error("Nieprawidłowa akcja.");
         }
+        this.gameData.timesThrown += 1;
         //bardzo wishfull myślenie, bo wiem ze to co robi wysyla w data
         // a nie gameData, ale zakladam, ze gdy uzytkownik kliknie pionka
         // wysle sie nam gameData.currentAction === "Ruch pionka", jezeli nie to do poprawki
@@ -167,9 +160,9 @@ export default class Ludo extends Game {
                 this.gameData.diceThrowResult === 6 ||
                 this.gameData.diceThrowResult === 1
             ) {
-                this.gameData.timesThrown = 1; // reset ile razy wyrzucono kosci
+                this.gameData.timesThrown = 0; // reset ile razy wyrzucono kosci
                 if (possibleMoves === false) {
-                    //jezeli possibleMoves wynosi false to oznacza, ze gracz nie
+                    // jezeli possibleMoves wynosi false to oznacza, ze gracz nie
                     // moze sie ruszyc zadnym pionkiem, nawet tymi na starcie,
                     // przez co traci ture, nie ma kolejnego rzutu bo to nie jest tura startowa
                     this.gameData.currentAction = "Rzut kością";
@@ -180,53 +173,32 @@ export default class Ludo extends Game {
                     return _dataWithPlayersTarget();
                 }
             } else {
-                //prawdopodobnie możemy tutaj zastosować possibleMoves w
-                // celu sprawdzania czy pionki na mapie/na finiszu, DO PÓŹNIEJSZEJ IMPLEMENTACJI
                 // rzut od 2 do 5
-                for (const element of this.gameMap) {
-                    //sprawdzamy czy jest jakiś pionek na mapie za pomocą porównania
-                    // pierwszego indeksu tablicy pionka (pId) z publicznym Id gracza
-                    if (!element.isInteger()) {
-                        if (element[0] === currentPlayer.publicId) {
-                            this.gameData.currentAction = "Ruch pionka";
-                            this.gameData.timesThrown = 1;
-                            return _dataWithPlayersTarget();
-                        }
+                if(possibleMoves[0].length > 1 || possibleMoves[2].length > 1){ // w tych tabelach długość ponad 1 oznacza, że są możliwe ruchy do wykonania
+                    this.gameData.currentAction = "Ruch pionka";
+                    this.gameData.timesThrown = 0;
+                    return _dataWithPlayersTarget();    
+                }
+                const pawnsInStartingArea = 0;
+                for (const pawn of this.startingPositionArea) {
+                    if (pawn[0] === currentPlayer.publicId){
+                        pawnsInStartingArea += 1
                     }
                 }
-                const finishPositionPawns = 0;
-                // jeżeli wcześniejsze sprawdzenie nie wywolalo returna,
-                // znaczy ze nie ma pionka na mapie.
-                // Sprawdzamy czy są pionki na pozycji końcowej,
-                // ponieważ jeżeli są to osoba nie ma kolejnego rzutu,
-                // gdyż jest to środek gry a nie sam jej początek
-                for (const pawns of this.finishPositions) {
-                    for (const playerPawn of pawns)
-                        if (
-                            playerPawn[0] === currentPlayer.publicId &&
-                            playerPawn[1] != 0
-                        ) {
-                            finishPositionPawns++;
-                        }
-                }
-                if (finishPositionPawns === 0) {
-                    //jeżeli liczba pionków na pozycji końcowej wynosi 0 i nie ma
-                    // pionkow na mapie gracz dostaje kolejny rzut,
-                    // ponieważ dopiero rozpoczela sie gra
-                    this.gameData.timesThrown += 1;
+                if(pawnsInStartingArea === 4){
                     this.gameData.currentAction = "Rzut kością";
                     return _dataWithPlayersTarget();
-                } else {
-                    //w przeciwnym wypadku tura innego gracza
-                    this.gameData.timesThrown = 1;
+                }
+                if(possibleMoves === false){
+                    this.gameData.timesThrown = 0;
                     this.gameData.currentAction = "Rzut kością";
                     this.nextTurn();
                     return _dataWithPlayersTarget();
                 }
-            }
+            }                
         } else {
             // jeżeli użytkownik próbuje rzucić kością 4 raz to tura przechodzi do innego gracza
-            this.gameData.timesThrown = 1;
+            this.gameData.timesThrown = 0;
             this.gameData.currentAction = "Rzut kością";
             this.nextTurn();
             return _dataWithPlayersTarget();
@@ -235,9 +207,9 @@ export default class Ludo extends Game {
 
     _possibleMoves(currentPlayer) {
         const possibleMoves = [
-            ["PionkiNaPlanszy"],
-            ["PionkiNaStarcie"],
-            ["PionkiNaFinishu"],
+            [], // "PionkiNaPlanszy"
+            [], // "PionkiNaStarcie"
+            [], // "PionkiNaFinishu"
         ]; // wygodniej byłoby na obiektach ale nie chcemy ich
         // przekazywać chyba, że będziemy je rozpakowywać?? Do ustalenia
         const anyPossibleMoves = false;
@@ -289,22 +261,15 @@ export default class Ludo extends Game {
         }
     }
 
-    _possibleMovesFinish(possibleMoves) {
-        for (pawnGroup of this.finishPositions) {
-            for (const pawn of pawnGroup) {
-                if (
-                    pawn[0] === currentPlayer.publicId &&
-                    pawn[1] != 0 &&
-                    this.finishPositions[
-                        this.finishPositions.indexOf(pawn) +
-                            this.gameData.diceThrowResult
-                    ][1] === 0
-                ) {
-                    //jeżeli pionki na pozycji finiszu
-                    // moga sie ruszyc o 1 dodajemy do mozliwych ruchow
-                    possibleMoves[2].push([pawn]);
+    _possibleMovesFinish(possibleMoves){
+        const index = 0;
+        for(const pawns of this.finishPositions[this.currentPlayerIndex]){
+            if(index + this.gameData.diceThrowResult <= (this.finishPositions[this.currentPlayerIndex].length - 1)){
+                if(pawns[index][1] != 0 && pawns[index + this.gameData.diceThrowResult][1] === 0){
+                    possibleMoves[0].push(pawns[index]);    
                 }
             }
+            index += 1;
         }
     }
 
@@ -326,28 +291,22 @@ export default class Ludo extends Game {
                         // sprawdzic czy moze wejsc na finisz
                         const result =
                             indexOf(element) + this.gameData.diceThrowResult;
-                        result = result - currentPlayerMapStartPoint;
+                        if(currentPlayerMapStartPoint != 0){
+                            result = result - currentPlayerMapStartPoint;  
+                        }else{
+                            result = result - 40;
+                        }
                         // nie odejmujemy już 1 ponieważ tablica
                         // pionków na finiszu rozpoczyna się od 0, tak więc
                         // jeżeli tutaj result wyjdzie równy
                         // 0 to będzie to odpowiadać pierwszemu miejscu na tablicy finiszy
-                        for (pawnGroup of this.finishPositions) {
-                            for (const pawn of pawnGroup) {
-                                if (
-                                    pawn[0] === currentPlayer.publicId &&
-                                    pawn[1] != 0 &&
-                                    this.finishPositions[result][1] === 0
-                                ) {
-                                    //jeżeli pionki na pozycji finiszu moga sie ruszyc o 1
-                                    // dodajemy do mozliwych ruchow
-                                    possibleMoves[0].push([pawn]);
-                                }
-                            }
+                        if(this.finishPositions[this.currentPlayerIndex][result][1] === 0){
+                            possibleMoves[0].push([element]);
                         }
                     } else if (
                         this.gameMap[
                             indexOf(element) + this.gameData.diceThrowResult
-                        ] != 0
+                        ] != 0 // sprawdzamy czy na tym polu stoi jakiś pionek
                     ) {
                         const spaceTaken =
                             this.gameMap[
@@ -357,7 +316,7 @@ export default class Ludo extends Game {
                             //sprawdzamy czy publiczne id jest różne od pId obecnego gracza,
                             // gdyby bylo takie samo to ten gracz nie moze wejsc na pole
                             // okupowane przez swoj wlasny pionek
-                            possibleMoves[0].push([pawn]);
+                            possibleMoves[0].push([element]);
                             //Tutaj następuje zbijanie pionka
                         }
                     } else {
@@ -368,76 +327,34 @@ export default class Ludo extends Game {
         }
     }
 
-    pawnMovement() {
-        if (
-            data.publicId === this.playersQueue[currentPlayerIndex] &&
-            this.gameData.currentAction === "Ruch pionka"
-        ) {
-            const currentPlayer = this.currentPlayer();
-            const possiblePawnMoves = _possibleMoves(currentPlayer.publicId);
-
-            const mapStartPoint = 0;
-            const firstPawnToGo = [];
-            for (const pId of this.playersQueue) {
-                //ustawiamy punkt startowy na który trafiają pionki gracza, gracz
-                // pierwszy w kolejce ma indeks tablicy 0 tak więc startuje na polu 0,
-                //  drugi ma indeks 1 więc 10 itd.
-                if (pId === currentPlayer.publicId) {
-                    mapStartPoint = this.playersQueue.indexOf(pId) * 10;
-                }
-
-                if (
-                    this.gameData.diceThrowResult === 6 ||
-                    this.gameData.diceThrowResult === 1
-                ) {
-                }
-                if (this.gameData.diceThrowResult === 1) {
+    // 1. Znalezc pionek na podstawie publicId i pawnId.
+    // 2. Znalezc pozycje na ktora ten pionek ma isc.
+    // 3. Przeniesc dane pionka z jednej pozycji na druga.
+    // 4. Co zrobic jezeli na drugiej pozycji cos juz jest.
+    // 5. Refaktoryzacja (np. rozbic pawnMovement na mniejsze funkcje)
+    // 6. Sprawdzic czy gra dziala dla x osob (np. miejsca startowe)
+    // 7. Zakonczenie gry (obiekt z informacja kto wygral, kto ma drugie miejsce itd)
+    // 8. Dodac config
+    
+    pawnMovement(data) {
+        if (data.publicId != this.playersQueue[currentPlayerIndex]) {
+            throw new Error("Poczekaj na swoją turę.");
+        }
+        if (this.gameData.currentAction != "Rzut kością") {
+            throw new Error("Nieprawidłowa akcja.");
+        }
+        const currentPlayer = this.currentPlayer();
+        const possiblePawnMoves = _possibleMoves(currentPlayer.publicId);
+        const currentPawn = []
+        const pawnGroupIndex = 0; // 0 - plansza, 1 - start, 2 - finish
+        for(const pawnGroup of possiblePawnMoves){
+            for(const pawn of pawnGroup){
+                if(pawn[0] === data.publicId && data.pawnId){
+                    currentPawn.push(pawn, pawnGroupIndex); // [[publicId, pawnId], pawnGroupId]
                 }
             }
-            // for(const pawn of this.startingPositionArea)
-            // { //wyznaczamy pionka który jako pierwszy wyjdzie na mape
-            //         if(pawn[0] === currentPlayer.publicId){
-            //             firstPawnToGo = pawn
-            //             break
-            //     }
-            //     }
-            //     this.gameMap[mapStartPoint] = firstPawnToGo
-            //     this.startingPositionArea.pop(firstPawnToGo)
-            // //wychodzimy pionkiem na mape, usuwamy go z pozycji startowej
-            // }
-            // else if("Gracz podjal decyzje ze ruszy sie pionkiem z pola startowego")
-            // { //dokladny warunek ifa do zmiany po konsultacji
-
-            // }
-            // } else{ //jeżeli nie jest to gracz którego jest tura lub
-            // nacisnal nie to co trzeba zwracamy error
-            //     throw new InvalidActionError();
-            // }
+            pawnGroupIndex += 1;
         }
+        // //wychodzimy pionkiem na mape, usuwamy go z pozycji startowej
     }
-
-    // whoseTurnIsIt(){
-
-    // }
-
-    // leaveStartingArea(){
-
-    // }
-
-    // funkcja tylko dla tej klasy funkcja prywatna gracz nie moze miec do tego dostepu
-    // _enterFinishArea(){
-
-    // }
-
-    // captureAPawn(){
-
-    // }
-
-    // selectPawn(){
-
-    // }
-
-    // endGame(){
-
-    // }
 }
