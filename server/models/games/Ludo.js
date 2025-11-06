@@ -10,7 +10,9 @@ export default class Ludo extends Game {
 
     // dane ktore chcemy wyslac wszystkim to this.gameData
 
-    initializeGameData() { // SPRAWDZIC CZY POWINNISMY PISAC gameData ODWOLUJAC SIE DO TYCH ZMIENNYCH!!!!!!!!!!!!!!!!!!!!!
+    initializeGameData() {
+        // SPRAWDZIC CZY POWINNISMY PISAC gameData
+        // ODWOLUJAC SIE DO TYCH ZMIENNYCH!!!!!!!!!!!!!!!!!!!!!
         this.gameData.gameMap = Array.from({ length: 40 }, () => 0);
         // [0,0,0,0,[pIdNiebieskiego,1],0,0,0]
         // this.gameData.currentPlayerIndex = this.currentPlayerIndex;
@@ -33,7 +35,7 @@ export default class Ludo extends Game {
 
     _setPlayersStartingPoints() {
         const playersStartingPoints = [];
-        const mapStartPoint = 0;
+        let mapStartPoint = 0;
         for (const pId of this.playersQueue) {
             //ustawiamy punkt startowy na który trafiają pionki gracza,
             // gracz pierwszy w kolejce ma indeks tablicy 0 tak więc
@@ -110,7 +112,9 @@ export default class Ludo extends Game {
 
     _dataWithPlayersTarget() {
         const targets = [];
-        const possiblePawnMoves = _possibleMoves(this.playersQueue[this.currentPlayerIndex])
+        const possiblePawnMoves = this._possibleMoves(
+            this.playersQueue[this.currentPlayerIndex],
+        );
         for (const player of this.players) {
             targets.push({
                 target: player.publicId,
@@ -138,7 +142,7 @@ export default class Ludo extends Game {
         //zastanowic sie nad sprawdzaniem czy to tura gracza żeby zablokować;
         // rozbić to na ruch gracza; jezeli ktos wybierze nielegalna akcje
         // to error a nie na sztywno ustawianie co moze co nie moze
-        if (data.publicId != this.playersQueue[currentPlayerIndex]) {
+        if (data.publicId != this.playersQueue[this.currentPlayerIndex]) {
             throw new Error("Poczekaj na swoją turę.");
         }
         if (this.gameData.currentAction != "Rzut kością") {
@@ -154,7 +158,7 @@ export default class Ludo extends Game {
             const currentPlayer = this._currentPlayer();
 
             this.gameData.diceThrowResult = Math.floor(Math.random() * 6) + 1;
-            const possibleMoves = _possibleMoves(currentPlayer);
+            const possibleMoves = this._possibleMoves(currentPlayer);
 
             if (
                 this.gameData.diceThrowResult === 6 ||
@@ -167,41 +171,45 @@ export default class Ludo extends Game {
                     // przez co traci ture, nie ma kolejnego rzutu bo to nie jest tura startowa
                     this.gameData.currentAction = "Rzut kością";
                     this.nextTurn();
-                    return _dataWithPlayersTarget();
+                    return this._dataWithPlayersTarget();
                 } else {
                     this.gameData.currentAction = "Ruch pionka";
-                    return _dataWithPlayersTarget();
+                    return this._dataWithPlayersTarget();
                 }
             } else {
                 // rzut od 2 do 5
-                if(possibleMoves[0].length > 1 || possibleMoves[2].length > 1){ // w tych tabelach długość ponad 1 oznacza, że są możliwe ruchy do wykonania
+                if (
+                    possibleMoves[0].length > 1 ||
+                    possibleMoves[2].length > 1
+                ) {
+                    // w tych tabelach długość ponad 1 oznacza, że są możliwe ruchy do wykonania
                     this.gameData.currentAction = "Ruch pionka";
                     this.gameData.timesThrown = 0;
-                    return _dataWithPlayersTarget();    
+                    return this._dataWithPlayersTarget();
                 }
-                const pawnsInStartingArea = 0;
+                let pawnsInStartingArea = 0;
                 for (const pawn of this.startingPositionArea) {
-                    if (pawn[0] === currentPlayer.publicId){
-                        pawnsInStartingArea += 1
+                    if (pawn[0] === currentPlayer.publicId) {
+                        pawnsInStartingArea += 1;
                     }
                 }
-                if(pawnsInStartingArea === 4){
+                if (pawnsInStartingArea === 4) {
                     this.gameData.currentAction = "Rzut kością";
-                    return _dataWithPlayersTarget();
+                    return this._dataWithPlayersTarget();
                 }
-                if(possibleMoves === false){
+                if (possibleMoves === false) {
                     this.gameData.timesThrown = 0;
                     this.gameData.currentAction = "Rzut kością";
                     this.nextTurn();
-                    return _dataWithPlayersTarget();
+                    return this._dataWithPlayersTarget();
                 }
-            }                
+            }
         } else {
             // jeżeli użytkownik próbuje rzucić kością 4 raz to tura przechodzi do innego gracza
             this.gameData.timesThrown = 0;
             this.gameData.currentAction = "Rzut kością";
             this.nextTurn();
-            return _dataWithPlayersTarget();
+            return this._dataWithPlayersTarget();
         }
     }
 
@@ -212,8 +220,8 @@ export default class Ludo extends Game {
             [], // "PionkiNaFinishu"
         ]; // wygodniej byłoby na obiektach ale nie chcemy ich
         // przekazywać chyba, że będziemy je rozpakowywać?? Do ustalenia
-        const anyPossibleMoves = false;
-        const currentPlayerMapStartPoint = 0;
+        let anyPossibleMoves = false;
+        let currentPlayerMapStartPoint = 0;
         for (const startingPoint of this.gameData.playersStartingPoints) {
             //znajdujemy punkt startowy obecnego gracza
             if (startingPoint[0] === currentPlayer.publicId) {
@@ -225,11 +233,11 @@ export default class Ludo extends Game {
             this.gameData.diceThrowResult === 1
         ) {
             if (this.gameData.diceThrowResult === 1) {
-                _possibleMovesFinish(possibleMoves);
+                this._possibleMovesFinish(possibleMoves);
                 anyPossibleMoves = true;
             }
 
-            _possibleMovesMap(
+            this._possibleMovesMap(
                 currentPlayer,
                 currentPlayerMapStartPoint,
                 possibleMoves,
@@ -243,11 +251,11 @@ export default class Ludo extends Game {
             }
         } else {
             if (this.gameData.diceThrowResult <= 3) {
-                _possibleMovesFinish(possibleMoves);
+                this._possibleMovesFinish(possibleMoves);
                 anyPossibleMoves = true;
             }
 
-            _possibleMovesMap(
+            this._possibleMovesMap(
                 currentPlayer,
                 currentPlayerMapStartPoint,
                 possibleMoves,
@@ -261,12 +269,18 @@ export default class Ludo extends Game {
         }
     }
 
-    _possibleMovesFinish(possibleMoves){
-        const index = 0;
-        for(const pawns of this.finishPositions[this.currentPlayerIndex]){
-            if(index + this.gameData.diceThrowResult <= (this.finishPositions[this.currentPlayerIndex].length - 1)){
-                if(pawns[index][1] != 0 && pawns[index + this.gameData.diceThrowResult][1] === 0){
-                    possibleMoves[0].push(pawns[index]);    
+    _possibleMovesFinish(possibleMoves) {
+        let index = 0;
+        for (const pawns of this.finishPositions[this.currentPlayerIndex]) {
+            if (
+                index + this.gameData.diceThrowResult <=
+                this.finishPositions[this.currentPlayerIndex].length - 1
+            ) {
+                if (
+                    pawns[index][1] != 0 &&
+                    pawns[index + this.gameData.diceThrowResult][1] === 0
+                ) {
+                    possibleMoves[0].push(pawns[index]);
                 }
             }
             index += 1;
@@ -285,32 +299,40 @@ export default class Ludo extends Game {
                 if (element[0] === currentPlayer.publicId) {
                     //jeżeli pionek jest na planszy to dodajemy go do możliwych ruchów.
                     if (
-                        indexOf(element) + this.gameData.diceThrowResult >
+                        this.gameMap.indexof(element) +
+                            this.gameData.diceThrowResult >
                         currentPlayerMapStartPoint - 1
                     ) {
                         // sprawdzic czy moze wejsc na finisz
-                        const result =
-                            indexOf(element) + this.gameData.diceThrowResult;
-                        if(currentPlayerMapStartPoint != 0){
-                            result = result - currentPlayerMapStartPoint;  
-                        }else{
+                        let result =
+                            this.gameMap.indexof(element) +
+                            this.gameData.diceThrowResult;
+                        if (currentPlayerMapStartPoint != 0) {
+                            result = result - currentPlayerMapStartPoint;
+                        } else {
                             result = result - 40;
                         }
                         // nie odejmujemy już 1 ponieważ tablica
                         // pionków na finiszu rozpoczyna się od 0, tak więc
                         // jeżeli tutaj result wyjdzie równy
                         // 0 to będzie to odpowiadać pierwszemu miejscu na tablicy finiszy
-                        if(this.finishPositions[this.currentPlayerIndex][result][1] === 0){
+                        if (
+                            this.finishPositions[this.currentPlayerIndex][
+                                result
+                            ][1] === 0
+                        ) {
                             possibleMoves[0].push([element]);
                         }
                     } else if (
                         this.gameMap[
-                            indexOf(element) + this.gameData.diceThrowResult
+                            this.gameMap.indexof(element) +
+                                this.gameData.diceThrowResult
                         ] != 0 // sprawdzamy czy na tym polu stoi jakiś pionek
                     ) {
                         const spaceTaken =
                             this.gameMap[
-                                indexOf(element) + this.gameData.diceThrowResult
+                                this.gameMap.indexof(element) +
+                                    this.gameData.diceThrowResult
                             ];
                         if (spaceTaken[0] != currentPlayer.publicId) {
                             //sprawdzamy czy publiczne id jest różne od pId obecnego gracza,
@@ -333,89 +355,111 @@ export default class Ludo extends Game {
     // 4. Co zrobic jezeli na drugiej pozycji cos juz jest. JEST
     // 5. Refaktoryzacja (np. rozbic pawnMovement na mniejsze funkcje) NIE
     // 6. Sprawdzic czy gra dziala dla x osob (np. miejsca startowe) NIE
-    // 7. Zakonczenie gry (obiekt z informacja kto wygral, kto ma drugie miejsce itd) NIE
-    // 8. UWAGA: przy wychodzeniu pionkiem ze startu, pionek laduje na swoim polu startowym, w momencie gdy uzytkownik
-    // drugi raz wylosuje 6 lub 1, musimy sprawdzic czy na polu startowym nie znajduje sie juz jego pionek, jezeli tak to zablokowac
+    // 7. Zakonczenie gry (obiekt z informacja kto wygral,
+    // kto ma drugie miejsce itd) NIE
+    // 8. UWAGA: przy wychodzeniu pionkiem ze startu,
+    // pionek laduje na swoim polu startowym, w momencie gdy uzytkownik
+    // drugi raz wylosuje 6 lub 1, musimy sprawdzic czy na polu startowym
+    // nie znajduje sie juz jego pionek, jezeli tak to zablokowac
     // mu wyjscie pionkiem na plansze i zmusic do ruchu pionkiem na plansze. NIE
-    // 9. Sprawdzic czy mamy zaimplementowane kilka rzutow koscia, gdy uzytkownik wyrzuca ciagle 6. NIE
+    // 9. Sprawdzic czy mamy zaimplementowane kilka rzutow koscia,
+    // gdy uzytkownik wyrzuca ciagle 6. NIE
     // 10. Dodac config
-    
+
     pawnMovement(data) {
-        if (data.publicId != this.playersQueue[currentPlayerIndex]) {
+        if (data.publicId != this.playersQueue[this.currentPlayerIndex]) {
             throw new Error("Poczekaj na swoją turę.");
         }
         if (this.gameData.currentAction != "Rzut kością") {
             throw new Error("Nieprawidłowa akcja.");
         }
         const currentPlayer = this.currentPlayer();
-        const possiblePawnMoves = _possibleMoves(currentPlayer.publicId);
-        const currentPawn = []
-        const pawnGroupIndex = 0; // 0 - plansza, 1 - start, 2 - finish
-        const currentPlayerMapStartPoint = 0;
+        const possiblePawnMoves = this._possibleMoves(currentPlayer.publicId);
+        const currentPawn = [];
+        let pawnGroupIndex = 0; // 0 - plansza, 1 - start, 2 - finish
+        let currentPlayerMapStartPoint = 0;
         for (const startingPoint of this.gameData.playersStartingPoints) {
             //znajdujemy punkt startowy obecnego gracza
             if (startingPoint[0] === currentPlayer.publicId) {
                 currentPlayerMapStartPoint = startingPoint[1];
             }
         }
-        for(const pawnGroup of possiblePawnMoves){
-            for(const pawn of pawnGroup){
-                if(pawn[0] === data.publicId && data.pawnId){
+        for (const pawnGroup of possiblePawnMoves) {
+            for (const pawn of pawnGroup) {
+                if (pawn[0] === data.publicId && data.pawnId) {
                     currentPawn.push(pawn, pawnGroupIndex); // [[publicId, pawnId], pawnGroupId]
                 }
             }
             pawnGroupIndex += 1;
         }
-        const currentPawnPlayerPublicId = currentPawn[0][0]
-        if(currentPawn[1] === 0){
-            for (const element of this.gameMap){
+        const currentPawnPlayerPublicId = currentPawn[0][0];
+        if (currentPawn[1] === 0) {
+            for (const element of this.gameMap) {
                 if (!element.isInteger()) {
-                    if(currentPawnPlayerPublicId === element[0]){
+                    if (currentPawnPlayerPublicId === element[0]) {
                         if (
-                            indexOf(element) + this.gameData.diceThrowResult >
+                            this.gameMap.indexof(element) +
+                                this.gameData.diceThrowResult >
                             currentPlayerMapStartPoint - 1
                         ) {
                             // sprawdzic czy moze wejsc na finisz
-                            const result =
-                                indexOf(element) + this.gameData.diceThrowResult;
-                            if(currentPlayerMapStartPoint != 0){
-                                result = result - currentPlayerMapStartPoint;  
-                            }else{
+                            let result =
+                                this.gameMap.indexof(element) +
+                                this.gameData.diceThrowResult;
+                            if (currentPlayerMapStartPoint != 0) {
+                                result = result - currentPlayerMapStartPoint;
+                            } else {
                                 result = result - 40;
                             }
-                            if(this.finishPositions[this.currentPlayerIndex][result][1] === 0){
-                                this.finishPositions[this.currentPlayerIndex][result][1] = currentPawn[0][1];
-                                this.gameMap[indexof(element)] = 0;
-                            }
-                        else if (
+                            if (
+                                this.finishPositions[this.currentPlayerIndex][
+                                    result
+                                ][1] === 0
+                            ) {
+                                this.finishPositions[this.currentPlayerIndex][
+                                    result
+                                ][1] = currentPawn[0][1];
+                                this.gameMap[this.gameMap.indexof(element)] = 0;
+                            } else if (
                                 this.gameMap[
-                                    indexOf(element) + this.gameData.diceThrowResult
+                                    this.gameMap.indexof(element) +
+                                        this.gameData.diceThrowResult
                                 ] != 0 // sprawdzamy czy na tym polu stoi jakiś pionek
                             ) {
-
                                 const otherPawn =
                                     this.gameMap[
-                                        indexOf(element) + this.gameData.diceThrowResult
+                                        this.gameMap.indexof(element) +
+                                            this.gameData.diceThrowResult
                                     ];
                                 if (otherPawn[0] != currentPlayer.publicId) {
                                     //sprawdzamy czy publiczne id jest różne od pId obecnego gracza,
                                     // gdyby bylo takie samo to ten gracz nie moze wejsc na pole
                                     // okupowane przez swoj wlasny pionek
                                     //Tutaj następuje zbijanie pionka
-                                    this.gameMap[indexOf(element) + this.gameData.diceThrowResult] = currentPawn[0][1];
-                                    this.gameMap[indexof(element)] = 0;
-                                    this.gameData.startingPositionArea.push(otherPawn)
+                                    this.gameMap[
+                                        this.gameMap.indexof(element) +
+                                            this.gameData.diceThrowResult
+                                    ] = currentPawn[0][1];
+                                    this.gameMap[
+                                        this.gameMap.indexof(element)
+                                    ] = 0;
+                                    this.gameData.startingPositionArea.push(
+                                        otherPawn,
+                                    );
                                 }
                             } else {
-                                this.gameMap[indexOf(element) + this.gameData.diceThrowResult] = currentPawn[0][1];
-                                this.gameMap[indexof(element)] = 0;
+                                this.gameMap[
+                                    this.gameMap.indexof(element) +
+                                        this.gameData.diceThrowResult
+                                ] = currentPawn[0][1];
+                                this.gameMap[this.gameMap.indexof(element)] = 0;
                             }
                         }
                     }
                 }
             }
-        }else if(currentPawn[1] === 1){
-            const currentPlayerMapStartPoint = 0;
+        } else if (currentPawn[1] === 1) {
+            let currentPlayerMapStartPoint = 0;
             for (const startingPoint of this.gameData.playersStartingPoints) {
                 if (startingPoint[0] === currentPlayer.publicId) {
                     currentPlayerMapStartPoint = startingPoint[1];
@@ -423,16 +467,27 @@ export default class Ludo extends Game {
             }
             for (const pawn of this.startingPositionArea) {
                 if (pawn[0] === currentPlayer.publicId)
-                    this.startingPositionArea.pop(pawn); // usuwa/wyciaga pionka z obszaru startowego
-                    this.gameMap[currentPlayerMapStartPoint] = pawn;
+                    this.startingPositionArea.pop(pawn); // usuwa/wyciaga pionka
+                //z obszaru startowego
+                this.gameMap[currentPlayerMapStartPoint] = pawn;
             }
-        }else{
-            const index = 0;
-            for(const pawns of this.finishPositions[this.currentPlayerIndex]){
-                if(index + this.gameData.diceThrowResult <= (this.finishPositions[this.currentPlayerIndex].length - 1)){
-                    if(pawns[index][1] != 0 && pawns[index + this.gameData.diceThrowResult][1] === 0){
-                        this.finishPositions[this.currentPlayerIndex][index + this.gameData.diceThrowResult][1] = pawns[index][1];
-                        this.finishPositions[this.currentPlayerIndex][index][1] = 0; 
+        } else {
+            let index = 0;
+            for (const pawns of this.finishPositions[this.currentPlayerIndex]) {
+                if (
+                    index + this.gameData.diceThrowResult <=
+                    this.finishPositions[this.currentPlayerIndex].length - 1
+                ) {
+                    if (
+                        pawns[index][1] != 0 &&
+                        pawns[index + this.gameData.diceThrowResult][1] === 0
+                    ) {
+                        this.finishPositions[this.currentPlayerIndex][
+                            index + this.gameData.diceThrowResult
+                        ][1] = pawns[index][1];
+                        this.finishPositions[this.currentPlayerIndex][
+                            index
+                        ][1] = 0;
                     }
                 }
                 index += 1;
