@@ -41,7 +41,7 @@ export default class Ludo extends Game {
             //ustawiamy punkt startowy na który trafiają pionki gracza,
             // gracz pierwszy w kolejce ma indeks tablicy 0 tak więc
             // startuje na polu 0, drugi ma indeks 1 więc 10 itd.
-            if (pId === this.currentPlayer.publicId) {
+            if (pId === this._currentPlayer().publicId) {
                 if (this.playersQueue.length == 2) {
                     mapStartPoint = this.playersQueue.indexOf(pId) * 20;
                     playersStartingPoints.push([pId, mapStartPoint]);
@@ -61,7 +61,11 @@ export default class Ludo extends Game {
             {
                 target: data.publicId,
                 eventName: "players",
-                data: this.getPlayersData(),
+                data: {
+                    players: this.getPlayersData(),
+                    ...this.gameData,
+                    currentPlayerIndex: this.currentPlayerIndex,
+                },
             },
         ];
     }
@@ -285,7 +289,7 @@ export default class Ludo extends Game {
                         this.gameData.anyPossibleMoves = true;
                     } else if (
                         this.gameData.gameMap[currentPlayerMapStartPoint][0] !=
-                        this.currentPlayer.publicId
+                        this._currentPlayer().publicId
                     ) {
                         //sprawdzamy czy tam jest pionek inny niż pionek obecnego gracza,
                         // ponieważ tylko na taki może tam wejść
@@ -344,7 +348,7 @@ export default class Ludo extends Game {
         for (const element of this.gameData.gameMap) {
             //sprawdzamy czy jest jakiś pionek na mapie za pomocą
             // porównania pierwszego indeksu tablicy pionka (pId) z publicznym Id gracza
-            if (!element.isInteger()) {
+            if (!Number.isInteger(element)) {
                 if (element[0] === currentPlayer.publicId) {
                     //jeżeli pionek jest na planszy to dodajemy go do możliwych ruchów.
                     if (
@@ -425,7 +429,7 @@ export default class Ludo extends Game {
         if (this.gameData.currentAction != "Rzut kością") {
             throw new Error("Nieprawidłowa akcja.");
         }
-        const currentPlayer = this.currentPlayer();
+        const currentPlayer = this._currentPlayer();
         const possiblePawnMoves = this._possibleMoves(currentPlayer.publicId);
         const currentPawn = [];
         let pawnGroupIndex = 0; // 0 - plansza, 1 - start, 2 - finish
@@ -447,7 +451,7 @@ export default class Ludo extends Game {
         const currentPawnPlayerPublicId = currentPawn[0][0];
         if (currentPawn[1] === 0) {
             for (const element of this.gameData.gameMap) {
-                if (!element.isInteger()) {
+                if (!Number.isInteger(element)) {
                     if (currentPawnPlayerPublicId === element[0]) {
                         if (
                             this.gameData.gameMap.indexof(element) +
@@ -575,7 +579,7 @@ export default class Ludo extends Game {
                         return this._dataWithPlayersTarget();
                     } else if (
                         this.gameData.gameMap[currentPlayerMapStartPoint][0] !=
-                        this.currentPlayer.publicId
+                        this._currentPlayer().publicId
                     ) {
                         //sprawdzamy czy tam jest pionek inny niż pionek obecnego gracza,
                         // ponieważ tylko na taki może tam wejść

@@ -18,6 +18,9 @@ export default class Lobby {
             case "game":
                 this.game = new Game(players, () => this.endGame());
                 break;
+            case "ludo":
+                this.game = new Game(players, () => this.endGame());
+                break;
         }
         this.isActive = true;
         return this.gameInfo.title;
