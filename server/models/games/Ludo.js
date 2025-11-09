@@ -41,31 +41,27 @@ export default class Ludo extends Game {
             //ustawiamy punkt startowy na który trafiają pionki gracza,
             // gracz pierwszy w kolejce ma indeks tablicy 0 tak więc
             // startuje na polu 0, drugi ma indeks 1 więc 10 itd.
-            if (pId === this._currentPlayer().publicId) {
-                if (this.playersQueue.length == 2) {
-                    mapStartPoint = this.playersQueue.indexOf(pId) * 20;
-                    playersStartingPoints.push([pId, mapStartPoint]);
-                } else {
-                    mapStartPoint = this.playersQueue.indexOf(pId) * 10;
-                    playersStartingPoints.push([pId, mapStartPoint]);
-                }
+            // if (pId === this._currentPlayer().publicId) {
+            if (this.playersQueue.length == 2) {
+                mapStartPoint = this.playersQueue.indexOf(pId) * 20;
+                playersStartingPoints.push([pId, mapStartPoint]);
+            } else {
+                mapStartPoint = this.playersQueue.indexOf(pId) * 10;
+                playersStartingPoints.push([pId, mapStartPoint]);
             }
-            return playersStartingPoints;
+            // }
         }
+        return playersStartingPoints;
     }
 
     gameDataRequest(data) {
         // bierze wszystkie dane dot. gry i odsyla
         return [
-            this.dataWithPlayerTarget(data.publicId),
+            this._dataWithPlayerTarget(data.publicId),
             {
                 target: data.publicId,
                 eventName: "players",
-                data: {
-                    players: this.getPlayersData(),
-                    ...this.gameData,
-                    currentPlayerIndex: this.currentPlayerIndex,
-                },
+                data: this.getPlayersData(),
             },
         ];
     }
@@ -99,7 +95,7 @@ export default class Ludo extends Game {
         } else {
             const tempPawns = [];
             const index = 4;
-            for (const [player] of this.players) {
+            for (const [, player] of this.players) {
                 tempPawns.push([player.publicId, 0]); // [[niebieski,0],
                 // [czerwony,0],[zielony,0],[zolty,0]]
             }
@@ -125,7 +121,7 @@ export default class Ludo extends Game {
         const possiblePawnMoves = this._possibleMoves(
             this.playersQueue[this.currentPlayerIndex],
         );
-        for (const player of this.players) {
+        for (const [, player] of this.players) {
             targets.push({
                 target: player.publicId,
                 eventName: "gameData",
@@ -142,6 +138,35 @@ export default class Ludo extends Game {
         return targets;
     }
 
+    _dataWithPlayerTarget(publicId) {
+        let currentPlayer = [];
+        for (const [, player] of this.players) {
+            if (player.publicId == publicId) {
+                currentPlayer = player;
+            }
+        }
+        console.log(currentPlayer);
+        console.log(publicId === currentPlayer.publicId);
+        // console.log(...this.gameData)
+        console.log(this.currentPlayerIndex);
+        const possiblePawnMoves = this._possibleMoves(currentPlayer);
+        console.log(possiblePawnMoves);
+        console.log("AAAA");
+        return {
+            target: publicId,
+            eventName: "gameData",
+            data: {
+                ...this.gameData,
+                yourTurn: publicId === currentPlayer.publicId, // to myślę trzeba usunąć, bo do
+                // wszystkich wysylamy sprawdzenie obecnego gracza, wiec kazdemu sie wysle ze jest
+                // jego tura
+                // this.playersQueue[this.currentPlayerIndex],
+                currentPlayerIndex: this.currentPlayerIndex,
+                possiblePawnMoves, // pamiętać żeby zerować
+            },
+        };
+    }
+
     _gameEndWithTarget() {
         const gameEndStats = [];
         for (const pawns of this.gameData.finishPositions) {
@@ -155,7 +180,7 @@ export default class Ludo extends Game {
         }
         gameEndStats.sort((a, b) => b[1] - a[1]);
         const targets = [];
-        for (const player of this.players) {
+        for (const [, player] of this.players) {
             targets.push({
                 target: player.publicId,
                 eventName: "gameEnd",
@@ -249,6 +274,9 @@ export default class Ludo extends Game {
     }
 
     _possibleMoves(currentPlayer) {
+        console.log(
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        );
         const possibleMoves = [
             [], // "PionkiNaPlanszy"
             [], // "PionkiNaStarcie"
@@ -257,12 +285,14 @@ export default class Ludo extends Game {
         // przekazywać chyba, że będziemy je rozpakowywać?? Do ustalenia
         // let anyPossibleMoves = false;
         let currentPlayerMapStartPoint = 0;
+        console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
         for (const startingPoint of this.gameData.playersStartingPoints) {
             //znajdujemy punkt startowy obecnego gracza
             if (startingPoint[0] === currentPlayer.publicId) {
                 currentPlayerMapStartPoint = startingPoint[1];
             }
         }
+        console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
         if (
             this.gameData.diceThrowResult === 6 ||
             this.gameData.diceThrowResult === 1
@@ -271,13 +301,13 @@ export default class Ludo extends Game {
                 this._possibleMovesFinish(possibleMoves);
                 // anyPossibleMoves = true;
             }
-
+            console.log("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
             this._possibleMovesMap(
                 currentPlayer,
                 currentPlayerMapStartPoint,
                 possibleMoves,
             );
-
+            console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
             for (const pawn of this.gameData.startingPositionArea) {
                 //jeżeli pionek jest na starcie to dodajemy go do możliwych ruchów
                 if (pawn[0] === currentPlayer.publicId) {
@@ -287,6 +317,9 @@ export default class Ludo extends Game {
                         //sprawdzamy czy pole jest puste
                         possibleMoves[1].push([pawn]);
                         this.gameData.anyPossibleMoves = true;
+                        console.log(
+                            "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+                        );
                     } else if (
                         this.gameData.gameMap[currentPlayerMapStartPoint][0] !=
                         this._currentPlayer().publicId
@@ -295,13 +328,22 @@ export default class Ludo extends Game {
                         // ponieważ tylko na taki może tam wejść
                         possibleMoves[1].push([pawn]);
                         this.gameData.anyPossibleMoves = true;
+                        console.log(
+                            "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+                        );
                     }
                 }
             }
         } else {
-            if (this.gameData.diceThrowResult <= 3) {
+            if (
+                this.gameData.diceThrowResult <= 3 &&
+                this.gameData.diceThrowResult != 0
+            ) {
                 this._possibleMovesFinish(possibleMoves);
                 // anyPossibleMoves = true;
+                console.log(
+                    "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+                );
             }
 
             this._possibleMovesMap(
@@ -312,13 +354,16 @@ export default class Ludo extends Game {
             // anyPossibleMoves = true;
         }
         if (this.gameData.anyPossibleMoves === true) {
+            console.log("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
             return possibleMoves;
         } else {
+            console.log("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ");
             return false;
         }
     }
 
     _possibleMovesFinish(possibleMoves) {
+        console.log("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
         let index = 0;
         for (const pawns of this.gameData.finishPositions[
             this.currentPlayerIndex
@@ -345,6 +390,7 @@ export default class Ludo extends Game {
         currentPlayerMapStartPoint,
         possibleMoves,
     ) {
+        console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
         for (const element of this.gameData.gameMap) {
             //sprawdzamy czy jest jakiś pionek na mapie za pomocą
             // porównania pierwszego indeksu tablicy pionka (pId) z publicznym Id gracza

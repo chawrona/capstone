@@ -1,6 +1,7 @@
 import games from "../config/games.json" with { type: "json" };
 import generateShortId from "../utils/generateShortId.js";
 import Game from "./Game.js";
+import Ludo from "./games/Ludo.js";
 
 export default class Lobby {
     constructor() {
@@ -19,7 +20,7 @@ export default class Lobby {
                 this.game = new Game(players, () => this.endGame());
                 break;
             case "ludo":
-                this.game = new Game(players, () => this.endGame());
+                this.game = new Ludo(players, () => this.endGame());
                 break;
         }
         this.isActive = true;
