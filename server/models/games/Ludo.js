@@ -302,7 +302,7 @@ export default class Ludo extends Game {
             this.gameData.diceThrowResult === 1
         ) {
             if (this.gameData.diceThrowResult === 1) {
-                this._possibleMovesFinish(possibleMoves);
+                this._possibleMovesFinish(possibleMoves, publicId);
                 // anyPossibleMoves = true;
             }
             console.log("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
@@ -342,9 +342,9 @@ export default class Ludo extends Game {
         } else {
             if (
                 this.gameData.diceThrowResult <= 3 &&
-                this.gameData.diceThrowResult != 0
+                this.gameData.diceThrowResult >= 1
             ) {
-                this._possibleMovesFinish(possibleMoves);
+                this._possibleMovesFinish(possibleMoves, publicId);
                 // anyPossibleMoves = true;
                 console.log(
                     "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
@@ -367,31 +367,33 @@ export default class Ludo extends Game {
         }
     }
 
-    _possibleMovesFinish(possibleMoves) {
+    _possibleMovesFinish(possibleMoves, publicId) {
         console.log("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
         let index = 0;
-        for (const pawns of this.gameData.finishPositions[
+        for (const pawns of this.gameData.finishPositions/*[
             this.currentPlayerIndex
-        ]) {
-            console.log("dupa_possibleMovesFinish1")
-            if (
-                index + this.gameData.diceThrowResult <=
-                this.gameData.finishPositions[this.currentPlayerIndex].length -
-                    1
-            ) {
-                console.log("dupa_possibleMovesFinish2")
+        ]*/) {
+            if(pawns[0][0] === publicId){
+                console.log("dupa_possibleMovesFinish1")
                 if (
-                    pawns[index][1] != 0 &&
-                    pawns[index + this.gameData.diceThrowResult][1] === 0
+                    index + this.gameData.diceThrowResult <=
+                    this.gameData.finishPositions[this.currentPlayerIndex].length -
+                        1
                 ) {
-                    console.log("dupa_possibleMovesFinish3")
-                    possibleMoves[0].push(pawns[index]);
-                    this.gameData.anyPossibleMoves = true;
+                    console.log("dupa_possibleMovesFinish2")
+                    if (
+                        pawns[index][1] != 0 &&
+                        pawns[index + this.gameData.diceThrowResult][1] === 0
+                    ) {
+                        console.log("dupa_possibleMovesFinish3")
+                        possibleMoves[0].push(pawns[index]);
+                        this.gameData.anyPossibleMoves = true;
+                    }
+                    console.log("dupa_possibleMovesFinish4")
                 }
-                console.log("dupa_possibleMovesFinish4")
+                index += 1;
+                console.log("dupa_possibleMovesFinish5")
             }
-            index += 1;
-            console.log("dupa_possibleMovesFinish5")
         }
     }
 
@@ -490,7 +492,7 @@ export default class Ludo extends Game {
         console.log("DUPARUCHGRACZA1")
         const possiblePawnMoves = this._possibleMoves(currentPlayer.publicId);
         console.log("DUPARUCHGRACZA2")
-        const currentPawn = [];
+        let currentPawn = [];
         let pawnGroupIndex = 0; // 0 - plansza, 1 - start, 2 - finish
         let currentPlayerMapStartPoint = 0;
         console.log("DUPARUCHGRACZA3")
@@ -503,6 +505,9 @@ export default class Ludo extends Game {
         console.log("DUPARUCHGRACZA4")
         for (const pawnGroup of possiblePawnMoves) {
             for (const pawn of pawnGroup) {
+                console.log(pawn)
+                console.log(data.publicId)
+                console.log(data.pawnId)
                 if (pawn[0] === data.publicId && data.pawnId) {
                     currentPawn.push(pawn, pawnGroupIndex); // [[publicId, pawnId], pawnGroupId]
                 }
@@ -510,7 +515,9 @@ export default class Ludo extends Game {
             pawnGroupIndex += 1;
         }
         console.log("DUPARUCHGRACZA5")
+        console.log(currentPawn)
         const currentPawnPlayerPublicId = currentPawn[0][0];
+        console.log("DUPARUCHGRACZA5")
         if (currentPawn[1] === 0) {
             console.log("DUPARUCHGRACZA6")
             for (const element of this.gameData.gameMap) {
