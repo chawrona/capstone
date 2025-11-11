@@ -70,9 +70,9 @@ export default class Ludo extends Game {
         // wyciaga instancje klasy player
         const players = [];
         for (const [, player] of this.players) {
-            players.push(player.getPlayerData());
+            players.push(player);
         }
-        return players;
+        return players.sort((a, b) => {return a.getData("turnOrder") - b.getData("turnOrder") }).map((player) => { return player.getPlayerData()});
     }
 
     _setPawns(startOrFinish) {
