@@ -124,6 +124,7 @@ export default class Ludo extends Game {
     }
 
     _dataWithPlayersTarget() {
+        console.log("dataWithPlayersTarget")
         const targets = [];
         const possiblePawnMoves = this._possibleMoves();
         for (const [, player] of this.players) {
@@ -414,8 +415,39 @@ export default class Ludo extends Game {
                 console.log("CoSieTuOdpierdala.ExeDUPAV2")
                 if (element[0] === publicId) {
                     console.log("CoSieTuOdpierdala.ExeDUPAV3")
+                    console.log(this.gameData.gameMap.indexOf(element))
+                    console.log(this.gameData.diceThrowResult)
+                    console.log(currentPlayerMapStartPoint - 1)
                     //jeżeli pionek jest na planszy to dodajemy go do możliwych ruchów.
-                    if (
+                    if(currentPlayerMapStartPoint == 0 && this.gameData.gameMap.indexOf(element) +
+                        this.gameData.diceThrowResult > 39){
+                        // sprawdzic czy moze wejsc na finisz
+                        let result =
+                            this.gameData.gameMap.indexOf(element) +
+                            this.gameData.diceThrowResult;
+                        if (currentPlayerMapStartPoint != 0) {
+                            result = result - currentPlayerMapStartPoint;
+                        } else {
+                            result = result - 40;
+                        }
+                        // nie odejmujemy już 1 ponieważ tablica
+                        // pionków na finiszu rozpoczyna się od 0, tak więc
+                        // jeżeli tutaj result wyjdzie równy
+                        // 0 to będzie to odpowiadać pierwszemu miejscu na tablicy finiszy
+                        if(result >= 0 && result <= 3){
+                            if (
+                                this.gameData.finishPositions[
+                                    this.currentPlayerIndex
+                                ][result][1] === 0
+                            ) {
+                                console.log([element])
+                                possibleMoves[0].push([element]);
+                                this.gameData.anyPossibleMoves = true;
+                            }
+                        }
+                    }
+                    else if (
+                        this.gameData.gameMap.indexOf(element) < currentPlayerMapStartPoint &&
                         this.gameData.gameMap.indexOf(element) +
                             this.gameData.diceThrowResult >
                         currentPlayerMapStartPoint - 1
@@ -492,6 +524,7 @@ export default class Ludo extends Game {
     // 10. Dodac config
 
     pawnMovement(data) {
+        console.log(data.pawnId)
         const publicId = this.playersQueue[this.currentPlayerIndex]
         console.log("DUPARUCHGRACZA");
         if (data.publicId != publicId) {
@@ -520,11 +553,15 @@ export default class Ludo extends Game {
         console.log(possiblePawnMoves)
         for (const pawnGroup of possiblePawnMoves) {
             console.log("DUPARUCHGRACZAWCHODZIDOFUNKCJIFOR");
+            console.log(pawnGroup)
             for (const pawns of pawnGroup) {
+                console.log(pawns)
                 for (const pawn of pawns) {
                     console.log(pawn);
                     console.log(data.publicId);
+                    console.log("Dupa-----------------------------------------------------")
                     console.log(data.pawnId);
+                    console.log("Dupa-----------------------------------------------------")
                     console.log(pawn[0] === data.publicId);
                     console.log(pawn[1] === data.publicId);
                     if (pawn[0] === data.publicId && pawn[1] === data.pawnId) {
