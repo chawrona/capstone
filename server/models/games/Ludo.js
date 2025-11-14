@@ -49,9 +49,29 @@ export default class Ludo extends Game {
                 mapStartPoint = this.playersQueue.indexOf(pId) * 10;
                 playersStartingPoints.push([pId, mapStartPoint]);
             }
+            this.players.get(pId).setData("startingField", () => mapStartPoint);
             // }
         }
         return playersStartingPoints;
+    }
+
+    _newPosition(){
+        const publicId = this.playersQueue[this.currentPlayerIndex];
+        let newPosition = null;
+        let currentPosition = null;
+        for (const element of this.gameData.gameMap) {
+            if (!Number.isInteger(element)) {
+                if (element[0] === publicId) {
+                    currentPosition = this.gameData.gameMap.indexOf(element)
+                }
+            }
+        }
+        if (currentPosition + this.gameData.diceThrowResult > 39){
+            newPosition = currentPosition + this.gameData.diceThrowResult - 39;
+        }else{
+             newPosition = currentPosition + this.gameData.diceThrowResult;
+        }
+        return newPosition;
     }
 
     gameDataRequest(data) {
@@ -138,6 +158,7 @@ export default class Ludo extends Game {
                         this.playersQueue[this.currentPlayerIndex],
                     currentPlayerIndex: this.currentPlayerIndex,
                     possiblePawnMoves, // pamiętać żeby zerować
+                    yourPublicId: player.publicId,
                 },
             });
         }
@@ -156,6 +177,7 @@ export default class Ludo extends Game {
                     publicId === this.playersQueue[this.currentPlayerIndex],
                 currentPlayerIndex: this.currentPlayerIndex,
                 possiblePawnMoves,
+                yourPublicId: publicId,
             },
         };
     }
@@ -356,6 +378,8 @@ export default class Ludo extends Game {
         }
         if (this.gameData.anyPossibleMoves === true) {
             console.log("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
+            console.log(possibleMoves);
+            console.log("DUPA POSSIBLE MOVES")
             return possibleMoves;
         } else {
             console.log("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ");
@@ -398,6 +422,11 @@ export default class Ludo extends Game {
 
     _possibleMovesMap(currentPlayerMapStartPoint, possibleMoves) {
         const publicId = this.playersQueue[this.currentPlayerIndex];
+        // console.log("=== POSSIBLE MOVES MAP ===");
+        // console.log("publicId:", publicId);
+        // console.log("currentPlayerMapStartPoint:", currentPlayerMapStartPoint);
+        // console.log("diceThrowResult:", this.gameData.diceThrowResult);
+        // console.log("gameMap:", this.gameData.gameMap);
         console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
         console.log(publicId);
         console.log(this._currentPlayer().publicId);
@@ -425,16 +454,15 @@ export default class Ludo extends Game {
                         currentPlayerMapStartPointMinusOne =
                             currentPlayerMapStartPoint - 1;
                     }
+                    const newPosition = this._newPosition();
                     if (
                         /*this.gameData.gameMap.indexOf(element) < currentPlayerMapStartPoint &&*/
-                        this.gameData.gameMap.indexOf(element) +
-                            this.gameData.diceThrowResult >
-                        currentPlayerMapStartPointMinusOne
+                        this.gameData.gameMap.indexOf(element) < currentPlayerMapStartPoint && newPosition >= currentPlayerMapStartPoint
                     ) {
                         // sprawdzic czy moze wejsc na finisz
-                        let result =
-                            this.gameData.gameMap.indexOf(element) +
-                            this.gameData.diceThrowResult;
+                        let result = newPosition;
+                            // this.gameData.gameMap.indexOf(element) +
+                            // this.gameData.diceThrowResult;
                         if (currentPlayerMapStartPoint != 0) {
                             result = result - currentPlayerMapStartPoint;
                         } else {
@@ -458,15 +486,13 @@ export default class Ludo extends Game {
                         }
                     } else if (
                         this.gameData.gameMap[
-                            this.gameData.gameMap.indexOf(element) +
-                                this.gameData.diceThrowResult
+                            newPosition
                         ] != 0 // sprawdzamy czy na tym polu stoi jakiś pionek
                     ) {
                         console.log("DupaHaloWidziszMnie2?");
                         const spaceTaken =
                             this.gameData.gameMap[
-                                this.gameData.gameMap.indexOf(element) +
-                                    this.gameData.diceThrowResult
+                                newPosition
                             ];
                         if (spaceTaken[0] != publicId) {
                             //sprawdzamy czy publiczne id jest różne od pId obecnego gracza,
@@ -549,7 +575,7 @@ export default class Ludo extends Game {
                         "Dupa-----------------------------------------------------",
                     );
                     console.log(pawn[0] === data.publicId);
-                    console.log(pawn[1] === data.publicId);
+                    console.log(pawn[1] === data.pawnId);
                     if (pawn[0] === data.publicId && pawn[1] === data.pawnId) {
                         currentPawn.push(pawn, pawnGroupIndex); // [[publicId, pawnId], pawnGroupId]
                     }
@@ -563,6 +589,7 @@ export default class Ludo extends Game {
         console.log("DUPARUCHGRACZA5");
         console.log(currentPawn);
         console.log("DUPARUCHGRACZA5");
+        const newPosition = this._newPosition();
         if (currentPawn[1] === 0) {
             console.log("DUPARUCHGRACZA6");
             for (const element of this.gameData.gameMap) {
@@ -574,15 +601,11 @@ export default class Ludo extends Game {
                     ) {
                         console.log("DUPARUCHGRACZA8");
                         if (
-                            this.gameData.gameMap.indexOf(element) +
-                                this.gameData.diceThrowResult >
-                            currentPlayerMapStartPoint - 1
+                            newPosition > currentPlayerMapStartPoint - 1
                         ) {
                             console.log("DUPARUCHGRACZA9");
                             // sprawdzic czy moze wejsc na finisz
-                            let result =
-                                this.gameData.gameMap.indexOf(element) +
-                                this.gameData.diceThrowResult;
+                            let result = newPosition;
                             if (currentPlayerMapStartPoint != 0) {
                                 console.log("DUPARUCHGRACZA10");
                                 result = result - currentPlayerMapStartPoint;
@@ -639,15 +662,13 @@ export default class Ludo extends Game {
                                 }
                             } else if (
                                 this.gameData.gameMap[
-                                    this.gameData.gameMap.indexOf(element) +
-                                        this.gameData.diceThrowResult
+                                    newPosition
                                 ] != 0 // sprawdzamy czy na tym polu stoi jakiś pionek
                             ) {
                                 console.log("DUPARUCHGRACZA18");
                                 const otherPawn =
                                     this.gameData.gameMap[
-                                        this.gameData.gameMap.indexOf(element) +
-                                            this.gameData.diceThrowResult
+                                        newPosition
                                     ];
                                 if (otherPawn[0] != publicId) {
                                     console.log("DUPARUCHGRACZA19");
@@ -656,8 +677,7 @@ export default class Ludo extends Game {
                                     // okupowane przez swoj wlasny pionek
                                     //Tutaj następuje zbijanie pionka
                                     this.gameData.gameMap[
-                                        this.gameData.gameMap.indexOf(element) +
-                                            this.gameData.diceThrowResult
+                                        newPosition
                                     ] = element;
                                     this.gameData.gameMap[
                                         this.gameData.gameMap.indexOf(element)
@@ -685,8 +705,7 @@ export default class Ludo extends Game {
                             } else {
                                 console.log("DUPARUCHGRACZA22");
                                 this.gameData.gameMap[
-                                    this.gameData.gameMap.indexOf(element) +
-                                        this.gameData.diceThrowResult
+                                    newPosition
                                 ] = element;
                                 this.gameData.gameMap[
                                     this.gameData.gameMap.indexOf(element)
