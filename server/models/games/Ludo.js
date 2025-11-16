@@ -17,6 +17,16 @@ export default class Ludo extends Game {
         this.gameData.anyPossibleMoves = false;
     }
 
+    setGameMap(data) {
+        this.gameData.gameMap = JSON.parse(data.map);
+        return this._dataWithPlayersTarget();
+    }
+
+    setFinished(data) {
+        this.gameData.finishPositions = JSON.parse(data.finished);
+        return this._dataWithPlayersTarget();
+    }
+
     _setPlayersStartingPoints() {
         const playersStartingPoints = [];
         let mapStartPoint = 0;
