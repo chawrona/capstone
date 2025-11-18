@@ -1,3 +1,4 @@
+import Logger from "../services/Logger.js";
 import Player from "./Player.js";
 
 export default class Game {
@@ -11,8 +12,13 @@ export default class Game {
         this.createTurnOrder();
         this.setPlayersData();
         this.initializeGameData();
+        this.logger = new Logger();
         this.disconnectedPlayers = new Set();
         this.paused = false;
+    }
+
+    log(message) {
+        this.logger.log(message);
     }
 
     initializeGameData() {
