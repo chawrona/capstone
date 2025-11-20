@@ -6,20 +6,31 @@ export default class Logger {
             return Logger.instance;
         }
 
+        this.queue = Promise.resolve();
+
         Logger.instance = this;
     }
 
-    async log(message) {
-        const timestamp = new Date().toISOString();
-        const logLine = `[${timestamp}] ${message}`;
+    enqueueWrite(logLine) {
+        this.queue = this.queue
+            .then(() =>
+                fs.appendFile("./server/storage/logs.txt", logLine + "\n"),
+            )
+            .catch((err) => console.error("Logger error:", err));
 
-        console.log(logLine);
-        await fs.appendFile("./server/storage/logs.txt", logLine + "\n");
+        return this.queue;
     }
 
-    async error(message) {
+    log(message) {
+        const timestamp = new Date().toISOString();
+        const logLine = `[${timestamp}] ${message}`;
+        console.log(logLine);
+        return this.enqueueWrite(logLine);
+    }
+
+    error(message) {
         const timestamp = new Date().toISOString();
         const logLine = `[ERROR] [${timestamp}] ${message}`;
-        await fs.appendFile("./server/storage/logs.txt", logLine + "\n");
+        return this.enqueueWrite(logLine);
     }
 }

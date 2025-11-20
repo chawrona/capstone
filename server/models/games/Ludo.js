@@ -307,18 +307,18 @@ export default class Ludo extends Game {
                         [39, 38, 37, 36, 35, 34].includes(currentPosition) &&
                         newPosition >= currentPlayerMapStartPoint;
 
-                    this.log(`
-Aktualna pozycja: ${currentPosition}
-Edge case dla 0: ${[39, 38, 37, 36, 35, 34].includes(currentPosition)}
-Nowa pozycja: ${newPosition}
-Starting Field: ${currentPlayerMapStartPoint}
-                        `);
+                    //                     this.log(`
+                    // Aktualna pozycja: ${currentPosition}
+                    // Edge case dla 0: ${[39, 38, 37, 36, 35, 34].includes(currentPosition)}
+                    // Nowa pozycja: ${newPosition}
+                    // Starting Field: ${currentPlayerMapStartPoint}
+                    //                         `);
                 }
 
                 if (lapDone) {
-                    this.log(
-                        "OKRĄŻENIE SIĘ WYKONA. PIONEK POWINIEN WEJŚC NA FINISH",
-                    );
+                    // this.log(
+                    //     "OKRĄŻENIE SIĘ WYKONA. PIONEK POWINIEN WEJŚC NA FINISH",
+                    // );
                     // @TO-DO sprawdzić czy napewno dobrze obliczamy finiszowe pozycje
                     let finishPosition =
                         newPosition - currentPlayerMapStartPoint + 1;
@@ -338,31 +338,31 @@ Starting Field: ${currentPlayerMapStartPoint}
                                     }
                                 }
                                 if (!isPawnOnFinishPosition) {
-                                    possibleMoves[0].push(pawn);
-                                    this.log(
-                                        "Dodajemy pionek do possible moves, który może wejść na finish",
-                                    );
+                                    possibleMoves[0].push(this._copyPawn(pawn));
+                                    // this.log(
+                                    //     "Dodajemy pionek do possible moves, który może wejść na finish",
+                                    // );
                                 }
                             }
                         }
                     }
                 } else {
-                    this.log(
-                        "OKRĄŻENIE SIĘ NIE WYKONA, WIĘC PIONEK NORMALNIE RUSZA SIĘ PO MAPIE",
-                    );
+                    // this.log(
+                    //     "OKRĄŻENIE SIĘ NIE WYKONA, WIĘC PIONEK NORMALNIE RUSZA SIĘ PO MAPIE",
+                    // );
                     const pawnOnNewPosition =
                         this.gameData.gameMap[newPosition];
 
-                    this.log("newPosition");
-                    this.log(newPosition);
-                    this.log("pawnOnNewPosition");
-                    this.log(JSON.stringify(pawnOnNewPosition));
+                    // this.log("newPosition");
+                    // this.log(newPosition);
+                    // this.log("pawnOnNewPosition");
+                    // this.log(JSON.stringify(pawnOnNewPosition));
                     if (
                         !pawnOnNewPosition ||
                         pawnOnNewPosition[0] !== currentPlayerPublicId
                     ) {
-                        this.log("Pionek może się ruszyć");
-                        possibleMoves[0].push(pawn);
+                        // this.log("Pionek może się ruszyć");
+                        possibleMoves[0].push(this._copyPawn(pawn));
                     }
                 }
             }
@@ -416,6 +416,10 @@ Starting Field: ${currentPlayerMapStartPoint}
         return this._dataWithPlayersTarget();
     }
 
+    _copyPawn(pawn) {
+        return [pawn[0], pawn[1]];
+    }
+
     _getPlayerStartPoint(publicId) {
         return this.players.get(publicId).getData("startingField");
     }
@@ -438,15 +442,10 @@ Starting Field: ${currentPlayerMapStartPoint}
         let currentPawnPosition = ["map", "starting", "finish"];
         let currentPawn = null;
 
-        this.log("POSSIBLE MOVES");
-        this.log(JSON.stringify(this._possibleMoves()));
-        this.log("PUBLIC ID");
-        this.log(`${data.pawnId}`);
-
         this._possibleMoves().forEach((pawns, index) => {
             for (const pawn of pawns) {
                 if (pawn[1] === data.pawnId) {
-                    currentPawn = pawn;
+                    currentPawn = this._copyPawn(pawn);
                     currentPawnPosition = currentPawnPosition[index];
                 }
             }
@@ -456,7 +455,15 @@ Starting Field: ${currentPlayerMapStartPoint}
             throw new Error("Nie możesz się ruszyć tym pionkiem");
         }
 
-        this.log("Pionek znajduje się na polu: " + currentPawnPosition);
+        this.log("Możliwe ruchy w momencie ruchu pionka:");
+        this.log(JSON.stringify(this._possibleMoves()));
+        this.log("Id pionka, którym gracz chce się ruszyć");
+        this.log(`${data.pawnId}`);
+
+        this.log(
+            "Pionek, którym gracz chce się ruszyć znajduje się na polu: " +
+                currentPawnPosition,
+        );
         if (currentPawnPosition === "starting") {
             const pawnOnStartingField =
                 this.gameData.gameMap[currentPlayerMapStartPoint];
@@ -464,7 +471,8 @@ Starting Field: ${currentPlayerMapStartPoint}
             this.log("Wybrałeś pionek do ruszenia się znajdujący się w bazie.");
             if (!pawnOnStartingField) {
                 this.log("Na polu startowym nie było żadnego pionka");
-                this.gameData.gameMap[currentPlayerMapStartPoint] = currentPawn;
+                this.gameData.gameMap[currentPlayerMapStartPoint] =
+                    this._copyPawn(currentPawn);
                 this.gameData.startingPositionArea =
                     this.gameData.startingPositionArea.filter((pawn) => {
                         return !(
@@ -481,18 +489,26 @@ Starting Field: ${currentPlayerMapStartPoint}
                 if (pawnOnStartingField[0] === currentPlayerPublicId) {
                     throw new Error("Na tym polu znajduje się już Twój pionek");
                 }
-                this.gameData.startingPositionArea.push(pawnOnStartingField);
-                this.gameData.gameMap[currentPlayerMapStartPoint] = currentPawn;
-                this.log("Zbiłeś czyjś pionek");
+                this.gameData.startingPositionArea.push(
+                    this._copyPawn(pawnOnStartingField),
+                );
+                this.gameData.gameMap[currentPlayerMapStartPoint] =
+                    this._copyPawn(currentPawn);
+                this.log(
+                    "Zbiłeś czyjś pionek, który był na Twoim polu startowym",
+                );
                 const returnedTarget = this._finishTurn();
-                this.log("ZWRÓCONY TARGET: \n", JSON.stringify(returnedTarget));
                 return returnedTarget;
             }
         } else if (currentPawnPosition === "map") {
             const currentPosition = this.gameData.gameMap.findIndex((pawn) => {
                 return pawn[0] === currentPawn[0] && pawn[1] === currentPawn[1];
             });
+
+            this.log(`Aktualna pozycja pionka: ${currentPosition}`);
+
             const newPosition = this.gameData.diceThrowResult + currentPosition;
+            this.log(`Nowa pozycja pionka: ${newPosition}`);
             let lapDone =
                 currentPosition < currentPlayerMapStartPoint &&
                 newPosition >= currentPlayerMapStartPoint;
@@ -551,32 +567,28 @@ Starting Field: ${currentPlayerMapStartPoint}
                 }
                 // Tutaj będzie ruszanie się pionkiem po mapie normalnie
             } else {
-                this.log("Okrążenie się nie wykonało");
                 const pawnOnNewPosition = this.gameData.gameMap[newPosition];
                 this.log(
                     JSON.stringify({
                         "PIONEK NA NOWYM POLU":
                             this.gameData.gameMap[newPosition],
-                        newPosition,
-                        "!pawnOnNewPosition": !pawnOnNewPosition,
                     }),
                 );
 
                 if (!pawnOnNewPosition) {
-                    this.log("Pionka nie ma na nowym polu, można wejść");
-                    this.gameData.gameMap[newPosition] = currentPawn;
+                    this.gameData.gameMap[newPosition] =
+                        this._copyPawn(currentPawn);
                     this.gameData.gameMap[currentPosition] = 0;
                     const returnedTarget = this._finishTurn();
-                    this.log(
-                        "ZWRÓCONY TARGET: \n",
-                        JSON.stringify(returnedTarget),
-                    );
                     return returnedTarget;
                 } else if (pawnOnNewPosition[0] !== currentPlayerPublicId) {
-                    this.log("Czyjś pionek jest na nowym polu, można zbić");
-                    this.gameData.startingPositionArea.push(pawnOnNewPosition);
-                    this.gameData.gameMap[currentPlayerMapStartPoint] =
-                        currentPawn;
+                    this.gameData.startingPositionArea.push(
+                        this._copyPawn(pawnOnNewPosition),
+                    );
+                    this.gameData.gameMap[newPosition] =
+                        this._copyPawn(currentPawn);
+
+                    this.gameData.gameMap[currentPosition] = 0;
                     return this._finishTurn();
                 } else {
                     throw new Error("Na tym polu znajduje się już Twój pionek");
