@@ -7,7 +7,6 @@ export default class Ludo extends Game {
 
     initializeGameData() {
         this.gameData.gameMap = Array.from({ length: 40 }, () => 0);
-        // [0,0,0,0,[pIdNiebieskiego,1],0,0,0]
         this.gameData.startingPositionArea = this._setPawns("start");
         this.gameData.finishPositions = this._setPawns("finish");
         this.gameData.timesThrown = 0;
@@ -15,7 +14,16 @@ export default class Ludo extends Game {
         this.gameData.playersStartingPoints = this._setPlayersStartingPoints();
         this.gameData.anyPossibleMoves = false;
         this.gameData.currentAction = `Rzut kością`;
+        this.gameData.isPaused = this.paused;
         this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością.`;
+    }
+
+    _getCompactMap() {
+        return Object.fromEntries(
+            this.gameData.gameMap
+                .map((value, index) => [index, value])
+                .filter((item) => item[1] !== 0),
+        );
     }
 
     _getCurrentPlayerUsername() {
@@ -152,6 +160,7 @@ export default class Ludo extends Game {
                 currentPlayerIndex: this.currentPlayerIndex,
                 possiblePawnMoves,
                 yourPublicId: publicId,
+                isPaused: this.paused,
             },
         };
     }
@@ -252,7 +261,7 @@ export default class Ludo extends Game {
             this.gameData.timesThrown = 0;
             this.gameData.currentAction = "Rzut kością";
             this.nextTurn();
-            this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością.`;
+            this.gameData.actionMessage = `Poprzedni gracz nie mógł wyjść z bazy. ${this._getCurrentPlayerUsername()} rzuca kością.`;
 
             return this._dataWithPlayersTarget();
         }
@@ -410,9 +419,18 @@ export default class Ludo extends Game {
     }
 
     _finishTurn() {
+        this.printGameState(true);
+        this.log(
+            "--------------------------END----------------------------------",
+        );
         this.gameData.currentAction = "Rzut kością";
-        this.nextTurn();
-        this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością.`;
+        this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} ponownie rzuca kością.`;
+
+        if (this.gameData.diceThrowResult !== 6) {
+            this.nextTurn();
+            this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością.`;
+        }
+
         return this._dataWithPlayersTarget();
     }
 
@@ -424,7 +442,24 @@ export default class Ludo extends Game {
         return this.players.get(publicId).getData("startingField");
     }
 
+    printGameState(end) {
+        this.log(
+            JSON.stringify({
+                mapa: this._getCompactMap(),
+                startingPositionArea: this.gameData.startingPositionArea,
+                finishPositions: this.gameData.finishPositions,
+                diceThrowResult: this.gameData.diceThrowResult,
+                action: this.gameData.currentAction,
+                possibleMoves: end ? "end" : this._possibleMoves(),
+            }),
+        );
+    }
+
     pawnMovement(data) {
+        this.log(
+            "-------------------------START-----------------------------------",
+        );
+        this.printGameState();
         const currentPlayerPublicId =
             this.playersQueue[this.currentPlayerIndex];
 
@@ -455,22 +490,22 @@ export default class Ludo extends Game {
             throw new Error("Nie możesz się ruszyć tym pionkiem");
         }
 
-        this.log("Możliwe ruchy w momencie ruchu pionka:");
-        this.log(JSON.stringify(this._possibleMoves()));
-        this.log("Id pionka, którym gracz chce się ruszyć");
-        this.log(`${data.pawnId}`);
+        // this.log("Możliwe ruchy w momencie ruchu pionka:");
+        // this.log(JSON.stringify(this._possibleMoves()));
+        // this.log("Id pionka, którym gracz chce się ruszyć");
+        // this.log(`${data.pawnId}`);
 
-        this.log(
-            "Pionek, którym gracz chce się ruszyć znajduje się na polu: " +
-                currentPawnPosition,
-        );
+        // this.log(
+        //     "Pionek, którym gracz chce się ruszyć znajduje się na polu: " +
+        //         currentPawnPosition,
+        // );
         if (currentPawnPosition === "starting") {
             const pawnOnStartingField =
                 this.gameData.gameMap[currentPlayerMapStartPoint];
             // gdy puste pole na pozycji startowej
-            this.log("Wybrałeś pionek do ruszenia się znajdujący się w bazie.");
+            // this.log("Wybrałeś pionek do ruszenia się znajdujący się w bazie.");
             if (!pawnOnStartingField) {
-                this.log("Na polu startowym nie było żadnego pionka");
+                // this.log("Na polu startowym nie było żadnego pionka");
                 this.gameData.gameMap[currentPlayerMapStartPoint] =
                     this._copyPawn(currentPawn);
                 this.gameData.startingPositionArea =
@@ -480,23 +515,25 @@ export default class Ludo extends Game {
                             pawn[1] === currentPawn[1]
                         );
                     });
-                this.log("Wszedłeś pionkiem na pole startowe");
+                // this.log("Wszedłeś pionkiem na pole startowe");
+
                 return this._finishTurn();
             }
             // gdy pionek znajduje sie na pozycji startowej
             else {
-                this.log("Znajduje się już pionek na polu startowym");
+                // this.log("Znajduje się już pionek na polu startowym");
                 if (pawnOnStartingField[0] === currentPlayerPublicId) {
                     throw new Error("Na tym polu znajduje się już Twój pionek");
                 }
+                this.log("Zbijasz czyjś pionek na swoim polu startowym");
                 this.gameData.startingPositionArea.push(
                     this._copyPawn(pawnOnStartingField),
                 );
                 this.gameData.gameMap[currentPlayerMapStartPoint] =
                     this._copyPawn(currentPawn);
-                this.log(
-                    "Zbiłeś czyjś pionek, który był na Twoim polu startowym",
-                );
+                // this.log(
+                //     "Zbiłeś czyjś pionek, który był na Twoim polu startowym",
+                // );
                 const returnedTarget = this._finishTurn();
                 return returnedTarget;
             }
@@ -507,7 +544,7 @@ export default class Ludo extends Game {
 
             this.log(`Aktualna pozycja pionka: ${currentPosition}`);
 
-            const newPosition = this.gameData.diceThrowResult + currentPosition;
+            let newPosition = this.gameData.diceThrowResult + currentPosition;
             this.log(`Nowa pozycja pionka: ${newPosition}`);
             let lapDone =
                 currentPosition < currentPlayerMapStartPoint &&
@@ -519,7 +556,7 @@ export default class Ludo extends Game {
                     newPosition >= currentPlayerMapStartPoint;
             }
             // Ruszanie się pionkiem w momencie gdy idziesz na finisz
-            this.log("Sprawdzanie okrążenia");
+            // this.log("Sprawdzanie okrążenia");
 
             if (lapDone) {
                 this.log("Okrążenie się wykonało");
@@ -567,13 +604,14 @@ export default class Ludo extends Game {
                 }
                 // Tutaj będzie ruszanie się pionkiem po mapie normalnie
             } else {
+                newPosition = newPosition % 40;
                 const pawnOnNewPosition = this.gameData.gameMap[newPosition];
-                this.log(
-                    JSON.stringify({
-                        "PIONEK NA NOWYM POLU":
-                            this.gameData.gameMap[newPosition],
-                    }),
-                );
+                // this.log(
+                //     JSON.stringify({
+                //         "PIONEK NA NOWYM POLU":
+                //             this.gameData.gameMap[newPosition],
+                //     }),
+                // );
 
                 if (!pawnOnNewPosition) {
                     this.gameData.gameMap[newPosition] =
@@ -582,6 +620,7 @@ export default class Ludo extends Game {
                     const returnedTarget = this._finishTurn();
                     return returnedTarget;
                 } else if (pawnOnNewPosition[0] !== currentPlayerPublicId) {
+                    this.log("Zbijasz czyjś pionek");
                     this.gameData.startingPositionArea.push(
                         this._copyPawn(pawnOnNewPosition),
                     );
@@ -594,7 +633,7 @@ export default class Ludo extends Game {
                     throw new Error("Na tym polu znajduje się już Twój pionek");
                 }
             }
-            this.log("Koniec sprawdzania okrążenia");
+            // this.log("Koniec sprawdzania okrążenia");
         } else if (
             currentPawnPosition === "finish" &&
             ![1, 2, 3].includes(this.gameData.diceThrowResult)
@@ -618,6 +657,8 @@ export default class Ludo extends Game {
                     }
                 }
             }
+        } else if (currentPawnPosition === "finish") {
+            throw new Error("Pionek musiałby wyjść poza mapę. Spokojnie");
         }
     }
 }
