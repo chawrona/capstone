@@ -201,11 +201,16 @@ export default class Ludo extends Game {
         if (this.gameData.currentAction !== "Rzut kością") {
             throw new Error("Nieprawidłowa akcja.");
         }
+
+        this.log(
+            "-------------------------ROLL DICE - START-----------------------------------",
+        );
+        this.printGameState();
+
         this.gameData.timesThrown += 1;
         if (this.gameData.timesThrown < 3) {
             const currentPlayer = this._currentPlayer();
-            const testing = Math.floor(Math.random() * 6) + 1;
-            this.gameData.diceThrowResult = testing % 2 ? 6 : 5;
+            this.gameData.diceThrowResult = Math.floor(Math.random() * 6) + 1;
             const possibleMoves = this._possibleMoves();
             if (
                 this.gameData.diceThrowResult === 6 ||
@@ -220,10 +225,19 @@ export default class Ludo extends Game {
                     this.gameData.currentAction = "Rzut kością";
                     this.nextTurn();
                     this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością.`;
+                    this.printGameState();
+                    this.log(
+                        "-------------------------ROLL DICE - END -----------------------------------",
+                    );
+
                     return this._dataWithPlayersTarget();
                 } else {
                     this.gameData.currentAction = "Ruch pionka";
                     this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} wybiera pionek.`;
+                    this.printGameState();
+                    this.log(
+                        "-------------------------ROLL DICE - END -----------------------------------",
+                    );
                     return this._dataWithPlayersTarget();
                 }
             } else {
@@ -234,6 +248,10 @@ export default class Ludo extends Game {
                     this.gameData.currentAction = "Ruch pionka";
                     this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} wybiera pionek.`;
                     this.gameData.timesThrown = 0;
+                    this.printGameState();
+                    this.log(
+                        "-------------------------ROLL DICE - END -----------------------------------",
+                    );
                     return this._dataWithPlayersTarget();
                 }
                 let pawnsInStartingArea = 0;
@@ -245,6 +263,10 @@ export default class Ludo extends Game {
                 if (pawnsInStartingArea === 4) {
                     this.gameData.currentAction = "Rzut kością";
                     this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością ponownie (${this.gameData.timesThrown}/3)`;
+                    this.printGameState();
+                    this.log(
+                        "-------------------------ROLL DICE - END -----------------------------------",
+                    );
                     return this._dataWithPlayersTarget();
                 }
 
@@ -253,6 +275,10 @@ export default class Ludo extends Game {
                     this.gameData.currentAction = "Rzut kością";
                     this.nextTurn();
                     this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością.`;
+                    this.printGameState();
+                    this.log(
+                        "-------------------------ROLL DICE - END -----------------------------------",
+                    );
                     return this._dataWithPlayersTarget();
                 }
             }
@@ -262,7 +288,10 @@ export default class Ludo extends Game {
             this.gameData.currentAction = "Rzut kością";
             this.nextTurn();
             this.gameData.actionMessage = `Poprzedni gracz nie mógł wyjść z bazy. ${this._getCurrentPlayerUsername()} rzuca kością.`;
-
+            this.printGameState();
+            this.log(
+                "-------------------------ROLL DICE - END -----------------------------------",
+            );
             return this._dataWithPlayersTarget();
         }
     }
@@ -346,6 +375,7 @@ export default class Ludo extends Game {
                                         isPawnOnFinishPosition = true;
                                     }
                                 }
+
                                 if (!isPawnOnFinishPosition) {
                                     possibleMoves[0].push(this._copyPawn(pawn));
                                     // this.log(
@@ -378,7 +408,7 @@ export default class Ludo extends Game {
         });
 
         // Dodawanie pionków z finiszu
-        if (![1, 2, 3].includes(rollResult)) {
+        if ([1, 2, 3].includes(rollResult)) {
             for (const playerPawns of this.gameData.finishPositions) {
                 if (playerPawns[0][0] === currentPlayerPublicId) {
                     for (const finishPawn of playerPawns) {
@@ -418,7 +448,7 @@ export default class Ludo extends Game {
         return false;
     }
 
-    _finishTurn() {
+    _finishTurn(skip) {
         this.printGameState(true);
         this.log(
             "--------------------------END----------------------------------",
@@ -426,7 +456,7 @@ export default class Ludo extends Game {
         this.gameData.currentAction = "Rzut kością";
         this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} ponownie rzuca kością.`;
 
-        if (this.gameData.diceThrowResult !== 6) {
+        if (this.gameData.diceThrowResult !== 6 || skip) {
             this.nextTurn();
             this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością.`;
         }
@@ -517,7 +547,7 @@ export default class Ludo extends Game {
                     });
                 // this.log("Wszedłeś pionkiem na pole startowe");
 
-                return this._finishTurn();
+                return this._finishTurn(true);
             }
             // gdy pionek znajduje sie na pozycji startowej
             else {
@@ -531,10 +561,16 @@ export default class Ludo extends Game {
                 );
                 this.gameData.gameMap[currentPlayerMapStartPoint] =
                     this._copyPawn(currentPawn);
-                // this.log(
-                //     "Zbiłeś czyjś pionek, który był na Twoim polu startowym",
-                // );
-                const returnedTarget = this._finishTurn();
+
+                this.gameData.startingPositionArea =
+                    this.gameData.startingPositionArea.filter((pawn) => {
+                        return (
+                            pawn[0] !== currentPawn[0] ||
+                            pawn[1] !== currentPawn[1]
+                        );
+                    });
+
+                const returnedTarget = this._finishTurn(true);
                 return returnedTarget;
             }
         } else if (currentPawnPosition === "map") {
@@ -542,10 +578,10 @@ export default class Ludo extends Game {
                 return pawn[0] === currentPawn[0] && pawn[1] === currentPawn[1];
             });
 
-            this.log(`Aktualna pozycja pionka: ${currentPosition}`);
+            // this.log(`Aktualna pozycja pionka: ${currentPosition}`);
 
             let newPosition = this.gameData.diceThrowResult + currentPosition;
-            this.log(`Nowa pozycja pionka: ${newPosition}`);
+            // this.log(`Nowa pozycja pionka: ${newPosition}`);
             let lapDone =
                 currentPosition < currentPlayerMapStartPoint &&
                 newPosition >= currentPlayerMapStartPoint;
@@ -559,7 +595,7 @@ export default class Ludo extends Game {
             // this.log("Sprawdzanie okrążenia");
 
             if (lapDone) {
-                this.log("Okrążenie się wykonało");
+                // this.log("Okrążenie się wykonało");
                 // @TO-DO sprawdzić czy napewno dobrze obliczamy finiszowe pozycje
                 let finishPosition =
                     newPosition - currentPlayerMapStartPoint + 1;
@@ -567,8 +603,8 @@ export default class Ludo extends Game {
                 if (currentPlayerMapStartPoint === 0) {
                     finishPosition = (newPosition % 10) + 1;
 
-                    this.log("Finiszowa pozycja");
-                    this.log(finishPosition);
+                    // this.log("Finiszowa pozycja");
+                    // this.log(finishPosition);
                 }
 
                 for (const playerPawns of this.gameData.finishPositions) {
