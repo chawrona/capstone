@@ -107,4 +107,17 @@ export default class EventHelper {
             throw new InvalidUsernameCharactersError();
         }
     }
+
+    checkIfLobbyActive(lobbyOrLobbyId) {
+        let lobby;
+        if (typeof lobbyOrLobbyId === "string") {
+            lobby = this.lobbyManager.getLobby(lobbyOrLobbyId);
+        } else {
+            lobby = lobbyOrLobbyId;
+        }
+        if (lobby.isActive) {
+            throw new Error("Gra wystartowała");
+        }
+        return;
+    }
 }
