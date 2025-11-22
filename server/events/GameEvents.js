@@ -20,6 +20,9 @@ export default class GameEvents {
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
+            if (!lobby.game) throw new Error("Gra nie istnieje");
+
             const targets = lobby.game.processGameData({
                 ...data,
                 publicId: user.publicId,

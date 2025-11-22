@@ -177,24 +177,29 @@ export default class UserEvents {
                     this.eventEmmiter.toLobby(lobby.id, "pause");
                     const timeoutId = setTimeout(
                         () => {
-                            lobby.isActive = false;
-                            lobby.game = null;
-
                             if (user.isAdmin) {
                                 lobby.admin = [...lobby.users][0];
                                 this.eventHelper.sendLobbyData(lobby.id);
                             }
 
-                            this.eventEmmiter.toLobby(
-                                lobby.id,
-                                "lobby",
-                                lobby.id,
-                            );
+                            if (lobby.isActive) {
+                                this.eventEmmiter.toLobby(
+                                    lobby.id,
+                                    "lobby",
+                                    lobby.id,
+                                );
 
-                            this.eventEmmiter.toLobbyError(
-                                lobby.id,
-                                new GameAbortedPlayerLeftError(),
-                            );
+                                setTimeout(() => {
+                                    this.eventEmmiter.toLobbyError(
+                                        lobby.id,
+                                        new GameAbortedPlayerLeftError(),
+                                    );
+                                }, 2000);
+                            }
+
+                            lobby.isActive = false;
+                            lobby.game = null;
+                            lobby.removeUser(user.id);
 
                             this.userManager.deleteUser(userId);
                         },
