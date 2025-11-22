@@ -23,7 +23,7 @@ export default defineConfig([
                     type: "alphabetical",
                 },
             ],
-            "max-len": ["error", { code: 100 }],
+            "max-len": ["error", { code: 150 }],
         },
         extends: ["js/recommended"],
     },

@@ -1,3 +1,4 @@
+import Logger from "../services/Logger.js";
 import Player from "./Player.js";
 
 export default class Game {
@@ -6,17 +7,22 @@ export default class Game {
         this.players = new Map();
         this.playersQueue = [];
         this.currentPlayerIndex = 0;
-        this.data = {};
+        this.gameData = {};
         this.createPlayers(players);
         this.createTurnOrder();
         this.setPlayersData();
         this.initializeGameData();
+        this.logger = new Logger();
         this.disconnectedPlayers = new Set();
         this.paused = false;
     }
 
+    log(message) {
+        this.logger.log(message);
+    }
+
     initializeGameData() {
-        this.data.addedWood = 0;
+        this.gameData.addedWood = 0;
     }
 
     createTurnOrder() {
@@ -84,14 +90,14 @@ export default class Game {
         return {
             target: "lobby",
             eventName: "gameData",
-            data: this.data,
+            data: this.gameData,
         };
     }
 
     addWood(data) {
         const player = this.players.get(data.publicId);
         player.setData("wood", (oldWood) => oldWood + 5);
-        this.data.addedWood++;
+        this.gameData.addedWood++;
         return [
             this.dataWithTarget(),
             {
@@ -116,7 +122,7 @@ export default class Game {
         return {
             target: publicId,
             eventName: "gameData",
-            data: this.data,
+            data: this.gameData,
         };
     }
 
