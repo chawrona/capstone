@@ -61,7 +61,9 @@ export default class LobbyEvents {
     onJoinLobby({ userId, data: { lobbyId } }) {
         try {
             const lobby = this.lobbyManager.getLobby(lobbyId);
+
             this.eventHelper.checkIfLobbyActive(lobby);
+            
             const user = this.userManager.getUser(userId);
 
             if (user.lobbyId) throw new UserInLobbyError();
@@ -88,7 +90,9 @@ export default class LobbyEvents {
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
             this.eventHelper.checkIfLobbyActive(lobby);
+
             lobby.removeUser(userId);
 
             if (!lobby.getPlayerCount()) {
@@ -112,7 +116,9 @@ export default class LobbyEvents {
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
             this.eventHelper.checkIfLobbyActive(lobby);
+
             const { minPlayers, maxPlayers } = lobby.gameInfo;
             const userCount = lobby.users.size;
 
@@ -192,7 +198,9 @@ export default class LobbyEvents {
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
             this.eventHelper.checkIfLobbyActive(lobby);
+
             if (userId != lobby.admin) {
                 throw new UserNotAdminError();
             }
@@ -217,6 +225,7 @@ export default class LobbyEvents {
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
             this.eventHelper.checkIfLobbyActive(lobby);
 
             const gameInfo = games.find((game) => game.title === gameTitle);

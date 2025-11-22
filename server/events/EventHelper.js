@@ -109,19 +109,15 @@ export default class EventHelper {
     }
 
     checkIfLobbyActive(lobbyOrLobbyId) {
-        try {
-            let lobby;
-            if (typeof lobbyOrLobbyId === "string") {
-                lobby = this.lobbyManager.getLobby(lobbyOrLobbyId);
-            } else {
-                lobby = lobbyOrLobbyId;
-            }
-            if (lobby.isActive) {
-                throw new Error("Gra wystartowała");
-            }
-            return;
-        } catch {
+        let lobby;
+        if (typeof lobbyOrLobbyId === "string") {
+            lobby = this.lobbyManager.getLobby(lobbyOrLobbyId);
+        } else {
+            lobby = lobbyOrLobbyId;
+        }
+        if (lobby.isActive) {
             throw new Error("Gra wystartowała");
         }
+        return;
     }
 }

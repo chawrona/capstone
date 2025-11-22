@@ -106,6 +106,7 @@ export default class UserEvents {
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
             this.eventHelper.checkIfLobbyActive(lobby);
 
             const isColorTaken = [...lobby.users]
@@ -131,6 +132,7 @@ export default class UserEvents {
             this.eventHelper.validateUsername(newUsername);
 
             const user = this.userManager.getUser(userId);
+
             this.eventHelper.checkIfLobbyActive(user.lobbyId);
 
             user.name = newUsername.trim();
@@ -144,7 +146,9 @@ export default class UserEvents {
     onToggleReady({ userId }) {
         try {
             const user = this.userManager.getUser(userId);
+
             this.eventHelper.checkIfLobbyActive(user.lobbyId);
+            
             user.isReady = !user.isReady;
             this.eventHelper.sendLobbyData(user.lobbyId);
         } catch (error) {
