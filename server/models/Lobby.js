@@ -1,6 +1,6 @@
 import games from "../config/games.json" with { type: "json" };
 import generateShortId from "../utils/generateShortId.js";
-import Game from "./Game.js";
+import Eurobusiness from "./games/eurobusiness/Eurobusiness.js";
 import Ludo from "./games/Ludo.js";
 
 export default class Lobby {
@@ -16,11 +16,11 @@ export default class Lobby {
 
     start(players) {
         switch (this.gameInfo.title) {
-            case "game":
-                this.game = new Game(players, () => this.endGame());
-                break;
             case "ludo":
                 this.game = new Ludo(players, () => this.endGame());
+                break;
+            case "eurobusiness":
+                this.game = new Eurobusiness(players, () => this.endGame());
                 break;
         }
         this.isActive = true;
