@@ -1,3 +1,1 @@
-import Eurobusiness from "../Eurobusiness.js";
-
-export default class EurobusinessMap extends Eurobusiness {}
+export default class EurobusinessMap {}
