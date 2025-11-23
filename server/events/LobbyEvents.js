@@ -63,7 +63,7 @@ export default class LobbyEvents {
             const lobby = this.lobbyManager.getLobby(lobbyId);
 
             this.eventHelper.checkIfLobbyActive(lobby);
-            
+
             const user = this.userManager.getUser(userId);
 
             if (user.lobbyId) throw new UserInLobbyError();

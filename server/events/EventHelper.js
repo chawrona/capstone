@@ -118,6 +118,5 @@ export default class EventHelper {
         if (lobby.isActive) {
             throw new Error("Gra wystartowała");
         }
-        return;
     }
 }

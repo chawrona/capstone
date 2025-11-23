@@ -148,7 +148,7 @@ export default class UserEvents {
             const user = this.userManager.getUser(userId);
 
             this.eventHelper.checkIfLobbyActive(user.lobbyId);
-            
+
             user.isReady = !user.isReady;
             this.eventHelper.sendLobbyData(user.lobbyId);
         } catch (error) {
