@@ -1,23 +1,20 @@
 import Game from "../../Game.js";
-import gameMap from "../eurobusiness/config/gameMap.json" with { type: "json" };
 import actions from "../eurobusiness/interfaces/actions.js";
 
 export default class Eurobusiness extends Game {
     constructor(players, endGame) {
         super(players, endGame);
-        this.actions = actions;
-        this.gameMap = gameMap;
     }
 
     initializeGameData() {
-        this.gameData.availableActions = [actions.rollDice, actions.endTurn];
+        this.gameData.availableActions = [actions.rollDice];
     }
 
     getPlayersPositions() {
         const playersPositions = {};
 
-        for (const player of this.players) {
-            playersPositions[player.publicId] = player.getData("position");
+        for (const [publicId, player] of this.players) {
+            playersPositions[publicId] = player.getData("position");
         }
 
         return playersPositions;
@@ -25,21 +22,6 @@ export default class Eurobusiness extends Game {
 
     getAvailableActions() {
         return this.gameData.availableActions;
-    }
-
-    getPlayersData() {
-        const playersData = [];
-
-        for (const player of this.players) {
-            playersData.push(player.getPlayerData());
-        }
-
-        return playersData;
-    }
-
-    getDiceThrowResult() {
-        // zamiast tego dodać do initialize game data? idk
-        return Math.floor(Math.random() * 6) + 1;
     }
 
     gameDataRequest(data) {
@@ -56,9 +38,9 @@ export default class Eurobusiness extends Game {
                     playersPosition: this.getPlayersPositions(),
                     gameMap: this.gameMap,
                     availableActions: this.getAvailableActions(),
-                    rollResult: this.getDiceThrowResult(),
+                    rollResult: this.gameData.rollResult,
                     yourPublicId: data.publicId,
-                    currentMessage: "???????????????????????",
+                    currentMessage: this.gameData.currentMessage,
                 },
             },
         ];

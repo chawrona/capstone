@@ -61,6 +61,21 @@ export default class Game {
         player.setData("wood", () => 5);
     }
 
+    getPlayersData() {
+        const playersData = [];
+
+        for (const [, player] of this.players) {
+            playersData.push(player.getPlayerData());
+        }
+
+        return playersData.sort((a, b) => {
+            return (
+                this.playersQueue.indexOf(a.publicId) -
+                this.playersQueue.indexOf(b.publicId)
+            );
+        });
+    }
+
     nextTurn() {
         this.currentPlayerIndex++;
         if (this.currentPlayerIndex === this.playersQueue.length) {
