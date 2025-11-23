@@ -1,3 +1,4 @@
+import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
@@ -36,6 +37,7 @@ export default class GameEvents {
             }
         } catch (error) {
             if (error instanceof UserDoesNotExistError) return;
+            if (error instanceof LobbyDoesNotExistError) return;
             this.eventEmmiter.toUserError(userId, error);
         }
     }
