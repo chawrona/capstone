@@ -10,7 +10,7 @@ export default class Eurobusiness extends Game {
 
     initializeGameData() {
         this.gameData.availableActions = [actions.rollDice];
-        this.map = new EurobusinessMap();
+        this.gameMap = new EurobusinessMap();
     }
 
     setPlayerData(player) {
@@ -52,6 +52,7 @@ export default class Eurobusiness extends Game {
             },
         ];
     }
+    
     getCurrentPlayerPublicId() {
         return this.playersQueue[this.currentPlayerIndex];
     }
@@ -120,6 +121,7 @@ export default class Eurobusiness extends Game {
             },
         ];
     }
+    
     checkIfActionPossible(publicId, checkedAction) {
         if (publicId !== this.currentPlayerPublicId()) {
             throw new Error("Poczekaj na swoją turę.");
