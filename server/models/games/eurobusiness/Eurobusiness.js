@@ -43,7 +43,7 @@ export default class Eurobusiness extends Game {
                         this.playersQueue[this.currentPlayerIndex],
                     playersData: this.getPlayersData(),
                     playersPosition: this.getPlayersPositions(),
-                    gameMap: this.gameMap,
+                    gameMap: this.gameMap.fields,
                     availableActions: this.getAvailableActions(),
                     rollResult: this.gameData.rollResult,
                     yourPublicId: data.publicId,
@@ -89,6 +89,7 @@ export default class Eurobusiness extends Game {
             },
         ];
     }
+    
     endTurn(data) {
         this.checkIfActionPossible(data.publicId, actions.endTurn);
 
@@ -123,8 +124,9 @@ export default class Eurobusiness extends Game {
         if (publicId !== this.currentPlayerPublicId()) {
             throw new Error("Poczekaj na swoją turę.");
         }
+        
         if (
-            this.gameData.availableActions.some(
+            !this.gameData.availableActions.some(
                 (action) => action === checkedAction,
             )
         ) {
