@@ -128,7 +128,7 @@ export default class LobbyEvents {
                 throw new UserCountMismatchError();
             }
 
-            const users = [...lobby.users].map((userId) =>
+            const users = lobby.users.map((userId) =>
                 this.userManager.getUser(userId),
             );
 
@@ -232,6 +232,11 @@ export default class LobbyEvents {
 
             if (!gameInfo) {
                 throw new GameDoesNotExistError();
+            }
+
+            for (const userId of lobby.users) {
+                const user = this.userManager.getUser(userId);
+                user.isReady = false;
             }
 
             lobby.gameInfo = gameInfo;
