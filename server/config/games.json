@@ -1,5 +1,14 @@
 [
   {
+    "title": "eurobusiness",
+    "polishTitle": "Eurobiznes",
+    "maxPlayers": 5,
+    "minPlayers": 1,
+    "description": "Klasyczna gra planszowa, w której gracze kupują nieruchomości, pobierają czynsze i inwestują w zabudowę, aby doprowadzić przeciwników do bankructwa.",
+    "time": "45-75 min.",
+    "difficulty": "średni"
+  },
+  {
     "title": "ludo",
     "polishTitle": "Chińczyk",
     "maxPlayers": 4,
@@ -8,13 +17,4 @@
     "time": "10-25 min.",
     "difficulty": "łatwy"
   },
-  {
-    "title": "eurobusiness",
-    "polishTitle": "Eurobiznes",
-    "maxPlayers": 5,
-    "minPlayers": 2,
-    "description": "Klasyczna gra planszowa, w której gracze kupują nieruchomości, pobierają czynsze i inwestują w zabudowę, aby doprowadzić przeciwników do bankructwa.",
-    "time": "45-75 min.",
-    "difficulty": "średni"
-  }
 ]

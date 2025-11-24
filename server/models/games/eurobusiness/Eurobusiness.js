@@ -33,7 +33,6 @@ export default class Eurobusiness extends Game {
 
     gameDataRequest(data) {
         return [
-            this._dataWithPlayerTarget(data.publicId),
             {
                 target: data.publicId,
                 eventName: "gameDataRequest",

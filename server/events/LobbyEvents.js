@@ -128,7 +128,7 @@ export default class LobbyEvents {
                 throw new UserCountMismatchError();
             }
 
-            const users = lobby.users.map((userId) =>
+            const users = [...lobby.users].map((userId) =>
                 this.userManager.getUser(userId),
             );
 
