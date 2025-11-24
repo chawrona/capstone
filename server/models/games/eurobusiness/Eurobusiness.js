@@ -52,7 +52,7 @@ export default class Eurobusiness extends Game {
             },
         ];
     }
-    
+
     getCurrentPlayerPublicId() {
         return this.playersQueue[this.currentPlayerIndex];
     }
@@ -90,7 +90,7 @@ export default class Eurobusiness extends Game {
             },
         ];
     }
-    
+
     endTurn(data) {
         this.checkIfActionPossible(data.publicId, actions.endTurn);
 
@@ -121,12 +121,12 @@ export default class Eurobusiness extends Game {
             },
         ];
     }
-    
+
     checkIfActionPossible(publicId, checkedAction) {
         if (publicId !== this.currentPlayerPublicId()) {
             throw new Error("Poczekaj na swoją turę.");
         }
-        
+
         if (
             !this.gameData.availableActions.some(
                 (action) => action === checkedAction,
