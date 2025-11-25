@@ -1,6 +1,7 @@
 import getRandomNumber from "../../../utils/getRandomNumber.js";
 import Game from "../../Game.js";
 import actions from "../eurobusiness/interfaces/actions.js";
+import tileTypes from "../eurobusiness/interfaces/tileTypes.js";
 import EurobusinessMap from "../eurobusiness/modules/EurobusinessMap.js";
 
 export default class Eurobusiness extends Game {
@@ -60,6 +61,15 @@ export default class Eurobusiness extends Game {
         return this.players.get(this.playersQueue[this.currentPlayerIndex]);
     }
 
+    executeTileAction(tile) {
+        switch (tile.name) {
+            case tileTypes.default:
+            case tileTypes.start:
+            case tileTypes.parking:
+                break;
+        }
+    }
+
     rollDice(data) {
         this.checkIfActionPossible(data.publicId, actions.rollDice);
         const diceResult = getRandomNumber(1, 6);
@@ -71,6 +81,10 @@ export default class Eurobusiness extends Game {
         }
 
         this.gameData.rollResult = diceResult;
+
+        const tile = this.gameMap.getCurrentPlayerTile(player);
+        this.executeTileAction(tile);
+
         return [
             {
                 target: "lobby",
