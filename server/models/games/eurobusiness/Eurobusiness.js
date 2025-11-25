@@ -12,6 +12,7 @@ export default class Eurobusiness extends Game {
 
     initializeGameData() {
         this.gameData.availableActions = [actions.rollDice];
+        this.gameData.dublets = 0;
         this.gameData.rollResult = [3, 5];
         this.gameData.currentMessage = "Start";
         this.gameMap = new EurobusinessMap();
@@ -19,6 +20,8 @@ export default class Eurobusiness extends Game {
 
     setPlayerData(player) {
         player.setData("position", () => 0);
+        player.setData("inJail", () => false);
+        player.setData("outOfJailCard", () => 0);
     }
 
     getPlayersPositions() {
@@ -69,15 +72,39 @@ export default class Eurobusiness extends Game {
             case tileTypes.default:
             case tileTypes.start:
             case tileTypes.parking:
+            case tileTypes.jail:
+                break;
+            case tileTypes.goToJail:
+                this.playerToJail(this.getCurrentPlayer());
                 break;
         }
     }
 
     rollDice(data) {
         this.checkIfActionPossible(data.publicId, actions.rollDice);
-        const diceResult = getRandomNumber(1, 6);
+        const diceResult = [getRandomNumber(1, 6), getRandomNumber(1, 6)];
         const player = this.getCurrentPlayer();
-        const hasCompletedLap = this.gameMap.movePlayer(player, diceResult);
+
+        if (this.gameData.dublets === 2 && diceResult[0] === diceResult[1]) {
+            this.playerToJail(player);
+            return [
+                {
+                    target: "lobby",
+                    eventName: "currentMessage",
+                    data: this.gameData.currentMessage,
+                },
+                {
+                    target: this.getCurrentPlayerPublicId(),
+                    eventName: "availableActions",
+                    data: this.getAvailableActions(),
+                },
+            ];
+        }
+
+        const hasCompletedLap = this.gameMap.movePlayer(
+            player,
+            diceResult[0] + diceResult[1],
+        );
 
         if (hasCompletedLap) {
             console.log("Okrążył");
@@ -109,9 +136,22 @@ export default class Eurobusiness extends Game {
 
     endTurn(data) {
         this.checkIfActionPossible(data.publicId, actions.endTurn);
+        this.gameData.availableActions = [actions.rollDice];
 
-        if (this.gameData.rollResult !== 6) {
+        const currentPlayer = this.getCurrentPlayer();
+
+        if (this.gameData.rollResult[0] === this.gameData.rollResult[1]) {
+            this.gameData.dublets += 1;
+
             this.nextTurn();
+
+            if (currentPlayer.getData("inJail")) {
+                this.gameData.availableActions = [
+                    actions.rollDice,
+                    actions.payJail,
+                    actions.useOutOfJailCard,
+                ];
+            }
         }
 
         return [
@@ -150,5 +190,73 @@ export default class Eurobusiness extends Game {
         ) {
             throw new Error("Nie możesz wykonać tej akcji");
         }
+    }
+
+    playerToJail(player) {
+        player.setData("inJail", () => true);
+        player.setData("position", () => 10);
+
+        this.gameData.availableActions = [actions.endTurn];
+    }
+
+    payJail(data) {
+        const currentPlayer = this.getCurrentPlayer();
+
+        if (currentPlayer.getData("money") < 50) {
+            return {
+                target: data.publicId,
+                eventName: "info",
+                data: "Nie masz wystarczająco pieniędzy",
+            };
+        }
+
+        currentPlayer.setData("money", (money) => money - 50);
+
+        this.gameData.availableActions = [actions.rollDice];
+
+        return [
+            {
+                target: "lobby",
+                eventName: "currentMessage",
+                data: this.gameData.currentMessage,
+            },
+            {
+                target: this.getCurrentPlayerPublicId(),
+                eventName: "availableActions",
+                data: this.getAvailableActions(),
+            },
+        ];
+    }
+
+    useOutOfJailCard(data) {
+        const currentPlayer = this.getCurrentPlayer();
+
+        if (currentPlayer.getData("outOfJailCard") < 1) {
+            return {
+                target: data.publicId,
+                eventName: "info",
+                data: "Nie masz karty wyjścia z więzienia",
+            };
+        }
+
+        currentPlayer.setData(
+            "outOfJailCard",
+            (outOfJailCard) => outOfJailCard - 1,
+        );
+
+        this.gameData.availableActions = [actions.rollDice];
+
+        return [
+            {
+                target: "lobby",
+                eventName: "currentMessage",
+                data: this.gameData.currentMessage,
+            },
+            {
+                target: this.getCurrentPlayerPublicId(),
+                eventName: "availableActions",
+                data: this.getAvailableActions(),
+            },
+        ];
     }
 }
