@@ -3,11 +3,12 @@ import Game from "../../Game.js";
 import actions from "../eurobusiness/interfaces/actions.js";
 import tileTypes from "../eurobusiness/interfaces/tileTypes.js";
 import EurobusinessMap from "../eurobusiness/modules/EurobusinessMap.js";
-import tiles from "./config/tiles.json" with { type: "json" };
+import EurobusinessEventFactory from "./modules/EurobusinessEventFactory.js";
 
 export default class Eurobusiness extends Game {
     constructor(players, endGame) {
         super(players, endGame);
+        this.events = new EurobusinessEventFactory(this);
     }
 
     initializeGameData() {
@@ -39,33 +40,16 @@ export default class Eurobusiness extends Game {
         return this.gameData.availableActions;
     }
 
-    gameDataRequest(data) {
-        return [
-            {
-                target: data.publicId,
-                eventName: "gameDataRequest",
-                data: {
-                    yourTurn:
-                        data.publicId ===
-                        this.playersQueue[this.currentPlayerIndex],
-                    playersData: this.getPlayersData(),
-                    playersPosition: this.getPlayersPositions(),
-                    gameMap: tiles,
-                    availableActions: this.getAvailableActions(),
-                    rollResult: this.gameData.rollResult,
-                    yourPublicId: data.publicId,
-                    currentMessage: this.gameData.currentMessage,
-                },
-            },
-        ];
-    }
-
     getCurrentPlayerPublicId() {
         return this.playersQueue[this.currentPlayerIndex];
     }
 
     getCurrentPlayer() {
         return this.players.get(this.playersQueue[this.currentPlayerIndex]);
+    }
+
+    gameDataRequest(data) {
+        return [this.events.gameDataRequest(data.publicId)];
     }
 
     executeTileAction(tile) {
@@ -95,16 +79,8 @@ export default class Eurobusiness extends Game {
         if (this.gameData.dublets === 2 && diceResult[0] === diceResult[1]) {
             this.playerToJail(player);
             return [
-                {
-                    target: "lobby",
-                    eventName: "currentMessage",
-                    data: this.gameData.currentMessage,
-                },
-                {
-                    target: this.getCurrentPlayerPublicId(),
-                    eventName: "availableActions",
-                    data: this.getAvailableActions(),
-                },
+                this.events.currentMessage(),
+                this.events.availableActions(),
             ];
         }
 
@@ -123,26 +99,10 @@ export default class Eurobusiness extends Game {
         this.executeTileAction(tile);
 
         return [
-            {
-                target: "lobby",
-                eventName: "currentMessage",
-                data: this.gameData.currentMessage,
-            },
-            {
-                target: "lobby",
-                eventName: "rollResult",
-                data: this.gameData.rollResult,
-            },
-            {
-                target: data.publicId,
-                eventName: "availableActions",
-                data: this.getAvailableActions(),
-            },
-            {
-                target: "lobby",
-                eventName: "playersPosition",
-                data: this.getPlayersPositions(),
-            },
+            this.events.currentMessage(),
+            this.events.rollResult(this.gameData.rollResult),
+            this.events.availableActions(),
+            this.events.playersPosition(),
         ];
     }
 
@@ -167,31 +127,15 @@ export default class Eurobusiness extends Game {
         }
 
         return [
-            {
-                target: "lobby",
-                eventName: "currentMessage",
-                data: this.gameData.currentMessage,
-            },
-            {
-                target: data.publicId,
-                eventName: "yourTurn",
-                data: false,
-            },
-            {
-                target: this.getCurrentPlayerPublicId(),
-                eventName: "yourTurn",
-                data: true,
-            },
-            {
-                target: this.getCurrentPlayerPublicId(),
-                eventName: "availableActions",
-                data: this.getAvailableActions(),
-            },
+            this.events.currentMessage(),
+            this.events.yourTurn(data.publicId, false),
+            this.events.yourTurn(this.getCurrentPlayerPublicId(), true),
+            this.events.availableActions(),
         ];
     }
 
     checkIfActionPossible(publicId, checkedAction) {
-        if (publicId !== this.currentPlayerPublicId()) {
+        if (publicId !== this.getCurrentPlayerPublicId()) {
             throw new Error("Poczekaj na swoją turę.");
         }
 
@@ -216,29 +160,14 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("money") < 50) {
-            return {
-                target: data.publicId,
-                eventName: "info",
-                data: "Nie masz wystarczająco pieniędzy",
-            };
+            return [this.events.info("Nie masz wystarczająco pieniędzy")];
         }
 
         currentPlayer.setData("money", (money) => money - 50);
 
         this.gameData.availableActions = [actions.rollDice];
 
-        return [
-            {
-                target: "lobby",
-                eventName: "currentMessage",
-                data: this.gameData.currentMessage,
-            },
-            {
-                target: this.getCurrentPlayerPublicId(),
-                eventName: "availableActions",
-                data: this.getAvailableActions(),
-            },
-        ];
+        return [this.events.currentMessage(), this.events.availableActions()];
     }
 
     useOutOfJailCard(data) {
@@ -246,11 +175,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("outOfJailCard") < 1) {
-            return {
-                target: data.publicId,
-                eventName: "info",
-                data: "Nie masz karty wyjścia z więzienia",
-            };
+            return [this.events.info("Nie masz karty wyjścia z więzienia")];
         }
 
         currentPlayer.setData(
@@ -260,18 +185,7 @@ export default class Eurobusiness extends Game {
 
         this.gameData.availableActions = [actions.rollDice];
 
-        return [
-            {
-                target: "lobby",
-                eventName: "currentMessage",
-                data: this.gameData.currentMessage,
-            },
-            {
-                target: this.getCurrentPlayerPublicId(),
-                eventName: "availableActions",
-                data: this.getAvailableActions(),
-            },
-        ];
+        return [this.events.currentMessage(), this.events.availableActions()];
     }
 
     payTax(data) {
@@ -279,29 +193,14 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("money") < 100) {
-            return {
-                target: data.publicId,
-                eventName: "info",
-                data: "Nie masz wystarczająco pieniędzy",
-            };
+            return [this.events.info("Nie masz wystarczająco pieniędzy")];
         }
 
         currentPlayer.setData("money", (money) => money - 100);
 
         this.gameData.availableActions = [actions.endTurn];
 
-        return [
-            {
-                target: "lobby",
-                eventName: "currentMessage",
-                data: this.gameData.currentMessage,
-            },
-            {
-                target: this.getCurrentPlayerPublicId(),
-                eventName: "availableActions",
-                data: this.getAvailableActions(),
-            },
-        ];
+        return [this.events.currentMessage(), this.events.availableActions()];
     }
 
     payIncomeTax(data) {
@@ -309,28 +208,13 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("money") < 150) {
-            return {
-                target: data.publicId,
-                eventName: "info",
-                data: "Nie masz wystarczająco pieniędzy",
-            };
+            return [this.events.info("Nie masz wystarczająco pieniędzy")];
         }
 
         currentPlayer.setData("money", (money) => money - 150);
 
         this.gameData.availableActions = [actions.endTurn];
 
-        return [
-            {
-                target: "lobby",
-                eventName: "currentMessage",
-                data: this.gameData.currentMessage,
-            },
-            {
-                target: this.getCurrentPlayerPublicId(),
-                eventName: "availableActions",
-                data: this.getAvailableActions(),
-            },
-        ];
+        return [this.events.currentMessage(), this.events.availableActions()];
     }
 }
