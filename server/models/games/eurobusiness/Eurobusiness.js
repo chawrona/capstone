@@ -48,6 +48,10 @@ export default class Eurobusiness extends Game {
         return this.players.get(this.playersQueue[this.currentPlayerIndex]);
     }
 
+    gameDataRequest(data) {
+        return [this.events.gameDataRequest(data.publicId)];
+    }
+
     executeTileAction(tile) {
         switch (tile.name) {
             case tileTypes.default:
