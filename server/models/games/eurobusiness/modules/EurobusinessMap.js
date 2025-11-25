@@ -2,7 +2,7 @@ import mapData from "../config/gameMap.json" with { type: "json" };
 
 export default class EurobusinessMap {
     constructor() {
-        this.fields = mapData;
+        this.tiles = mapData;
     }
 
     movePlayer(player, number) {

@@ -42,7 +42,7 @@ export default class Eurobusiness extends Game {
                         this.playersQueue[this.currentPlayerIndex],
                     playersData: this.getPlayersData(),
                     playersPosition: this.getPlayersPositions(),
-                    gameMap: this.gameMap.fields,
+                    gameMap: this.gameMap.tiles
                     availableActions: this.getAvailableActions(),
                     rollResult: this.gameData.rollResult,
                     yourPublicId: data.publicId,
