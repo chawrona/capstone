@@ -3,6 +3,7 @@ import Game from "../../Game.js";
 import actions from "../eurobusiness/interfaces/actions.js";
 import tileTypes from "../eurobusiness/interfaces/tileTypes.js";
 import EurobusinessMap from "../eurobusiness/modules/EurobusinessMap.js";
+import tiles from "./config/tiles.json" with { type: "json" };
 
 export default class Eurobusiness extends Game {
     constructor(players, endGame) {
@@ -11,6 +12,8 @@ export default class Eurobusiness extends Game {
 
     initializeGameData() {
         this.gameData.availableActions = [actions.rollDice];
+        this.gameData.rollResult = [3, 5];
+        this.gameData.currentMessage = "Start";
         this.gameMap = new EurobusinessMap();
     }
 
@@ -43,7 +46,7 @@ export default class Eurobusiness extends Game {
                         this.playersQueue[this.currentPlayerIndex],
                     playersData: this.getPlayersData(),
                     playersPosition: this.getPlayersPositions(),
-                    gameMap: this.gameMap.tiles,
+                    gameMap: tiles,
                     availableActions: this.getAvailableActions(),
                     rollResult: this.gameData.rollResult,
                     yourPublicId: data.publicId,
