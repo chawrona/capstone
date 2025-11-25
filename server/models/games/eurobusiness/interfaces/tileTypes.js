@@ -4,6 +4,8 @@ const tileTypes = {
     parking: "Parking",
     jail: "Więzienie",
     goToJail: "Idź do więzienia",
+    tax: "",
+    incomeTax: "",
 };
 
 export default tileTypes;

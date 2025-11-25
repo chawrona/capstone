@@ -22,6 +22,7 @@ export default class Eurobusiness extends Game {
         player.setData("position", () => 0);
         player.setData("inJail", () => false);
         player.setData("outOfJailCard", () => 0);
+        player.setData("money", () => 1500);
     }
 
     getPlayersPositions() {
@@ -77,6 +78,12 @@ export default class Eurobusiness extends Game {
             case tileTypes.goToJail:
                 this.playerToJail(this.getCurrentPlayer());
                 break;
+            case tileTypes.tax:
+                this.gameData.availableActions = [actions.payTax];
+                break;
+            case tileTypes.incomeTax:
+                this.gameData.availableActions = [actions.payIncomeTax];
+                break;
         }
     }
 
@@ -116,6 +123,11 @@ export default class Eurobusiness extends Game {
         this.executeTileAction(tile);
 
         return [
+            {
+                target: "lobby",
+                eventName: "currentMessage",
+                data: this.gameData.currentMessage,
+            },
             {
                 target: "lobby",
                 eventName: "rollResult",
@@ -200,6 +212,7 @@ export default class Eurobusiness extends Game {
     }
 
     payJail(data) {
+        this.checkIfActionPossible(data.publicId, actions.payJail);
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("money") < 50) {
@@ -229,6 +242,7 @@ export default class Eurobusiness extends Game {
     }
 
     useOutOfJailCard(data) {
+        this.checkIfActionPossible(data.publicId, actions.useOutOfJailCard);
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("outOfJailCard") < 1) {
@@ -245,6 +259,66 @@ export default class Eurobusiness extends Game {
         );
 
         this.gameData.availableActions = [actions.rollDice];
+
+        return [
+            {
+                target: "lobby",
+                eventName: "currentMessage",
+                data: this.gameData.currentMessage,
+            },
+            {
+                target: this.getCurrentPlayerPublicId(),
+                eventName: "availableActions",
+                data: this.getAvailableActions(),
+            },
+        ];
+    }
+
+    payTax(data) {
+        this.checkIfActionPossible(data.publicId, actions.payTax);
+        const currentPlayer = this.getCurrentPlayer();
+
+        if (currentPlayer.getData("money") < 100) {
+            return {
+                target: data.publicId,
+                eventName: "info",
+                data: "Nie masz wystarczająco pieniędzy",
+            };
+        }
+
+        currentPlayer.setData("money", (money) => money - 100);
+
+        this.gameData.availableActions = [actions.endTurn];
+
+        return [
+            {
+                target: "lobby",
+                eventName: "currentMessage",
+                data: this.gameData.currentMessage,
+            },
+            {
+                target: this.getCurrentPlayerPublicId(),
+                eventName: "availableActions",
+                data: this.getAvailableActions(),
+            },
+        ];
+    }
+
+    payIncomeTax(data) {
+        this.checkIfActionPossible(data.publicId, actions.payIncomeTax);
+        const currentPlayer = this.getCurrentPlayer();
+
+        if (currentPlayer.getData("money") < 150) {
+            return {
+                target: data.publicId,
+                eventName: "info",
+                data: "Nie masz wystarczająco pieniędzy",
+            };
+        }
+
+        currentPlayer.setData("money", (money) => money - 150);
+
+        this.gameData.availableActions = [actions.endTurn];
 
         return [
             {
