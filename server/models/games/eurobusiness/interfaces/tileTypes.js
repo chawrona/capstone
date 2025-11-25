@@ -1,6 +1,6 @@
-const fieldTypes = {
+const tileTypes = {
     default: "Domyślne",
     start: "Start",
 };
 
-export default fieldTypes;
+export default tileTypes;
