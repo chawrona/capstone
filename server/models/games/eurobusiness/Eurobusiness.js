@@ -1,6 +1,7 @@
 import getRandomNumber from "../../../utils/getRandomNumber.js";
 import Game from "../../Game.js";
 import actions from "../eurobusiness/interfaces/actions.js";
+import tileTypes from "../eurobusiness/interfaces/tileTypes.js";
 import EurobusinessMap from "../eurobusiness/modules/EurobusinessMap.js";
 
 export default class Eurobusiness extends Game {
@@ -62,11 +63,9 @@ export default class Eurobusiness extends Game {
 
     executeTileAction(tile) {
         switch (tile.name) {
-            case this.tileTypes.default:
-                break;
-            case this.tileTypes.start:
-                break;
-            case this.tileTypes.parking:
+            case tileTypes.default:
+            case tileTypes.start:
+            case tileTypes.parking:
                 break;
         }
     }
