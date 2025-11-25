@@ -45,6 +45,14 @@ export default class LobbyEvents {
             user.color = null;
 
             user.lobbyId = lobbyId;
+
+            if (process.env.DEVELOPMENT === "true") {
+                user.color = {
+                    name: "crimson",
+                    hex: "#d72638",
+                };
+            }
+
             this.socket.join(lobbyId);
             lobby.joinUser(userId);
             lobby.admin = userId;
