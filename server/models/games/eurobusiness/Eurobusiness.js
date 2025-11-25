@@ -60,6 +60,17 @@ export default class Eurobusiness extends Game {
         return this.players.get(this.playersQueue[this.currentPlayerIndex]);
     }
 
+    executeTileAction(tile) {
+        switch (tile.name) {
+            case this.tileTypes.default:
+                break;
+            case this.tileTypes.start:
+                break;
+            case this.tileTypes.parking:
+                break;
+        }
+    }
+
     rollDice(data) {
         this.checkIfActionPossible(data.publicId, actions.rollDice);
         const diceResult = getRandomNumber(1, 6);
@@ -71,6 +82,10 @@ export default class Eurobusiness extends Game {
         }
 
         this.gameData.rollResult = diceResult;
+
+        const tile = this.gameMap.getCurrentPlayerTile(player);
+        this.executeTileAction(tile);
+
         return [
             {
                 target: "lobby",

@@ -16,4 +16,9 @@ export default class EurobusinessMap {
 
         return false;
     }
+
+    getCurrentPlayerTile(player) {
+        const position = player.getData("position");
+        return this.tiles[position];
+    }
 }
