@@ -1,8 +1,8 @@
-import mapData from "../config/gameMap.json" with { type: "json" };
+import tiles from "../config/tiles.json" with { type: "json" };
 
 export default class EurobusinessMap {
     constructor() {
-        this.tiles = mapData;
+        this.tiles = tiles;
     }
 
     movePlayer(player, number) {
