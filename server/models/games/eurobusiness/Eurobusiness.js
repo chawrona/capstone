@@ -72,10 +72,10 @@ export default class Eurobusiness extends Game {
             case tileTypes.default:
             case tileTypes.start:
             case tileTypes.parking:
+            case tileTypes.jail:
+                break;
             case tileTypes.goToJail:
                 this.playerToJail(this.getCurrentPlayer());
-                break;
-            case tileTypes.jail:
                 break;
         }
     }
@@ -138,12 +138,14 @@ export default class Eurobusiness extends Game {
         this.checkIfActionPossible(data.publicId, actions.endTurn);
         this.gameData.availableActions = [actions.rollDice];
 
+        const currentPlayer = this.getCurrentPlayer();
+
         if (this.gameData.rollResult[0] === this.gameData.rollResult[1]) {
             this.gameData.dublets += 1;
 
             this.nextTurn();
 
-            if (this.getCurrentPlayer().inJail) {
+            if (currentPlayer.getData("inJail")) {
                 this.gameData.availableActions = [
                     actions.rollDice,
                     actions.payJail,
@@ -191,8 +193,8 @@ export default class Eurobusiness extends Game {
     }
 
     playerToJail(player) {
-        player.inJail = true;
-        player.position = 10;
+        player.setData("inJail", () => true);
+        player.setData("position", () => 10);
 
         this.gameData.availableActions = [actions.endTurn];
     }
@@ -200,7 +202,7 @@ export default class Eurobusiness extends Game {
     payJail(data) {
         const currentPlayer = this.getCurrentPlayer();
 
-        if (currentPlayer.money < 50) {
+        if (currentPlayer.getData("money") < 50) {
             return {
                 target: data.publicId,
                 eventName: "info",
@@ -208,7 +210,7 @@ export default class Eurobusiness extends Game {
             };
         }
 
-        currentPlayer.money = currentPlayer.money - 50;
+        currentPlayer.setData("money", (money) => money - 50);
 
         this.gameData.availableActions = [actions.rollDice];
 
@@ -229,7 +231,7 @@ export default class Eurobusiness extends Game {
     useOutOfJailCard(data) {
         const currentPlayer = this.getCurrentPlayer();
 
-        if (currentPlayer.outOfJailCard < 1) {
+        if (currentPlayer.getData("outOfJailCard") < 1) {
             return {
                 target: data.publicId,
                 eventName: "info",
@@ -237,7 +239,10 @@ export default class Eurobusiness extends Game {
             };
         }
 
-        currentPlayer.outOfJailCard = currentPlayer.outOfJailCard - 1;
+        currentPlayer.setData(
+            "outOfJailCard",
+            (outOfJailCard) => outOfJailCard - 1,
+        );
 
         this.gameData.availableActions = [actions.rollDice];
 
