@@ -1,0 +1,22 @@
+[
+  {
+    "type": "moneyGain",
+    "name": "Pobierz piniądze z banku"
+  },
+  {
+    "type": "moneyLoss",
+    "name": "Zapłać pieniądze banku"
+  },
+  {
+    "type": "goToJail",
+    "name": "Idź do więzienia"
+  },
+  {
+    "type": "getOutOfJail",
+    "name": "Wyjdź z więzienia"
+  },
+  {
+    "type": "payTaxes",
+    "name": "Opłata podatków"
+  }
+]
