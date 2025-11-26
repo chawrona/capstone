@@ -1,6 +1,10 @@
 import getRandomNumber from "../../../utils/getRandomNumber.js";
 import Game from "../../Game.js";
+import chanceCards from "../eurobusiness/config/chanceCards.json" with { type: "json" };
+import communityCards from "../eurobusiness/config/communityCards.json" with { type: "json" };
 import actions from "../eurobusiness/interfaces/actions.js";
+import chanceCardTypes from "../eurobusiness/interfaces/chanceCardTypes.js";
+import communityCardTypes from "../eurobusiness/interfaces/communityCardTypes.js";
 import tileTypes from "../eurobusiness/interfaces/tileTypes.js";
 import EurobusinessMap from "../eurobusiness/modules/EurobusinessMap.js";
 import EurobusinessEventFactory from "./modules/EurobusinessEventFactory.js";
@@ -216,5 +220,76 @@ export default class Eurobusiness extends Game {
         this.gameData.availableActions = [actions.endTurn];
 
         return [this.events.currentMessage(), this.events.availableActions()];
+    }
+    pickChanceCard() {
+        const currentPlayer = this.getCurrentPlayer();
+        const randomIndex = getRandomNumber(0, chanceCards.length);
+        const card = chanceCards[randomIndex];
+        switch (card.type) {
+            case chanceCardTypes.goToStart:
+                currentPlayer.setData("position", () => 0);
+                break;
+            case chanceCardTypes.goToTile:
+                currentPlayer.setData("position", () => getRandomNumber(0, 40));
+                this.executeTileAction(
+                    this.gameMap.getCurrentPlayerTile(currentPlayer),
+                );
+                break;
+            case chanceCardTypes.goToJail:
+                this.playerToJail(currentPlayer);
+                break;
+            case chanceCardTypes.payTaxes:
+                this.gameData.availableActions = [actions.payTax];
+                break;
+            case chanceCardTypes.withdrawCashFromBank:
+                currentPlayer.setData("money", (money) => money + 50);
+                break;
+            case chanceCardTypes.getOutOfJail:
+                currentPlayer.setData(
+                    "outOfJailCard",
+                    (outOfJailCard) => outOfJailCard + 1,
+                );
+                break;
+            case chanceCardTypes.payForBuildingProperties:
+                break;
+            case chanceCardTypes.takeMoneyFromPlayer:
+                break;
+        }
+
+        return [
+            this.events.playersPosition(),
+            this.events.currentMessage(),
+            this.events.availableActions(),
+            this.events.chanceCard(card),
+        ];
+    }
+    pickCommunityCard() {
+        const currentPlayer = this.getCurrentPlayer();
+        const randomIndex = getRandomNumber(0, communityCards.length);
+        const card = communityCards[randomIndex];
+        switch (card.type) {
+            case communityCardTypes.withdrawCashFromBank:
+                currentPlayer.setData("money", (money) => money + 50);
+                break;
+            case communityCardTypes.goToJail:
+                this.playerToJail(currentPlayer);
+                break;
+            case communityCardTypes.getOutOfJail:
+                currentPlayer.setData(
+                    "outOfJailCard",
+                    (outOfJailCard) => outOfJailCard + 1,
+                );
+                break;
+            case communityCardTypes.payTaxes:
+                this.gameData.availableActions = [actions.payTax];
+                break;
+        }
+
+        return [
+            this.events.playersPosition(),
+            this.events.currentMessage(),
+            this.events.availableActions(),
+            this.events.communityCard(card),
+        ];
     }
 }

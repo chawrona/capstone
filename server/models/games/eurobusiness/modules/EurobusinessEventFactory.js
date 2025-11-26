@@ -71,4 +71,18 @@ export default class EurobusinessEventFactory {
             },
         };
     }
+    communityCard(card) {
+        return {
+            target: this.game.getCurrentPlayerPublicId(),
+            eventName: "pickedCommunityCard",
+            data: card,
+        };
+    }
+    chanceCard(card) {
+        return {
+            target: this.game.getCurrentPlayerPublicId(),
+            eventName: "pickedChanceCard",
+            data: card,
+        };
+    }
 }

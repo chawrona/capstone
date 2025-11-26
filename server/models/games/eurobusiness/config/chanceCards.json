@@ -1,0 +1,34 @@
+[
+  {
+    "type": "moveToStart",
+    "name": "Idź na pole start"
+  },
+  {
+    "type": "goToTile",
+    "name": "Idź na wskazane pole"
+  },
+  {
+    "type": "goToJail",
+    "name": "Idź do więzienia"
+  },
+  {
+    "type": "moneyLoss",
+    "name": "Zapłać pieniądze banku"
+  },
+  {
+    "type": "moneyGain",
+    "name": "Pobierz piniądze z banku"
+  },
+  {
+    "type": "getOutOfJail",
+    "name": "Wyjdź z więzienia"
+  },
+  {
+    "type": "payForBuildingProperties",
+    "name": "Opłać budowę"
+  },
+  {
+    "type": "gainFromPlayers",
+    "name": "Pobierz pieniądze od gracza"
+  }
+]
