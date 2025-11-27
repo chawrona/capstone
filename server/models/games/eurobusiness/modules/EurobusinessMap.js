@@ -1,16 +1,15 @@
 import tiles from "../config/tiles.json" with { type: "json" };
 
 export default class EurobusinessMap {
-    movePlayer(player, number) {
-        const position = player.getData("position");
-        let newPosition = position + number;
+    movePlayer(player, rollResult) {
+        let hasCompletedLap = false;
 
-        if (newPosition > 39) {
-            newPosition -= 40;
-            return true;
-        }
+        player.setData((position) => {
+            if (position + rollResult > 39) hasCompletedLap = true;
+            return (position + rollResult) % 40;
+        });
 
-        return false;
+        return hasCompletedLap;
     }
 
     getCurrentPlayerTile(player) {
