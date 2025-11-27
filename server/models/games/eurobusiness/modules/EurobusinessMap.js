@@ -4,9 +4,9 @@ export default class EurobusinessMap {
     movePlayer(player, rollResult) {
         let hasCompletedLap = false;
 
-        player.setData((position) => {
-            if (position + rollResult > 39) hasCompletedLap = true;
-            return (position + rollResult) % 40;
+        player.setData("position", (oldPosition) => {
+            if (oldPosition + rollResult > 39) hasCompletedLap = true;
+            return (oldPosition + rollResult) % 40;
         });
 
         return hasCompletedLap;
