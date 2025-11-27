@@ -109,7 +109,9 @@ export default class Eurobusiness extends Game {
 
         const tile = this.gameMap.getCurrentPlayerTile(player);
         this.executeTileAction(tile);
-        this.addLog(`${player.username} wyrzucił ${diceResult}`);
+        this.addLog(
+            `${player.username} wyrzucił ${diceResult[0] + diceResult[1]}.`,
+        );
         return [
             this.events.logs(),
             this.events.currentMessage(),
@@ -164,7 +166,7 @@ export default class Eurobusiness extends Game {
     playerToJail(player) {
         player.setData("inJail", () => true);
         player.setData("position", () => 10);
-        this.addLog(`${player.username} idzie do więznia.`);
+        this.addLog(`${player.username} idzie do więzienia.`);
         this.gameData.availableActions = [actions.endTurn];
 
         return [this.events.logs()];
@@ -175,7 +177,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("money") < 50) {
-            return [this.events.info("Nie masz wystarczająco pieniędzy")];
+            return [this.events.info("Nie masz wystarczająco pieniędzy.")];
         }
 
         currentPlayer.setData("money", (money) => money - 50);
@@ -206,7 +208,9 @@ export default class Eurobusiness extends Game {
             (outOfJailCard) => outOfJailCard - 1,
         );
 
-        this.addLog(`${currentPlayer.username} użył karty wyjścia z więzienia`);
+        this.addLog(
+            `${currentPlayer.username} użył karty wyjścia z więzienia.`,
+        );
 
         this.gameData.availableActions = [actions.rollDice];
 
@@ -227,7 +231,7 @@ export default class Eurobusiness extends Game {
 
         currentPlayer.setData("money", (money) => money - 100);
 
-        this.addLog(`${currentPlayer.username} płaci 100$.`);
+        this.addLog(`${currentPlayer.username} płaci podatek (100$).`);
 
         this.gameData.availableActions = [actions.endTurn];
 
@@ -258,15 +262,16 @@ export default class Eurobusiness extends Game {
             this.events.logs(),
         ];
     }
+
     pickChanceCard() {
         const currentPlayer = this.getCurrentPlayer();
         const randomIndex = getRandomNumber(0, chanceCards.length);
         const card = chanceCards[randomIndex];
-        this.addLog(`${currentPlayer.username} wylosował karte: ${card.name}.`);
+        this.addLog(`${currentPlayer.username} wylosował kartę ${card.name}.`);
         switch (card.type) {
             case chanceCardTypes.goToStart:
                 currentPlayer.setData("position", () => 0);
-                this.addLog(`${currentPlayer.username} idzie na start`);
+                this.addLog(`${currentPlayer.username} idzie na start.`);
                 break;
             case chanceCardTypes.goToTile:
                 currentPlayer.setData("position", () => getRandomNumber(0, 40));
@@ -274,7 +279,7 @@ export default class Eurobusiness extends Game {
                     this.gameMap.getCurrentPlayerTile(currentPlayer),
                 );
                 this.addLog(
-                    `${currentPlayer.username} stanął na polu ${this.gameMap.getCurrentPlayerTile(currentPlayer).name}`,
+                    `${currentPlayer.username} stanął na polu ${this.gameMap.getCurrentPlayerTile(currentPlayer).name}.`,
                 );
                 break;
             case chanceCardTypes.goToJail:
@@ -307,11 +312,12 @@ export default class Eurobusiness extends Game {
             this.events.chanceCard(card),
         ];
     }
+
     pickCommunityCard() {
         const currentPlayer = this.getCurrentPlayer();
         const randomIndex = getRandomNumber(0, communityCards.length);
         const card = communityCards[randomIndex];
-        this.addLog(`${currentPlayer.username} wylosował karte: ${card.name}.`);
+        this.addLog(`${currentPlayer.username} wylosował kartę ${card.name}.`);
         switch (card.type) {
             case communityCardTypes.withdrawCashFromBank:
                 currentPlayer.setData("money", (money) => money + 50);
