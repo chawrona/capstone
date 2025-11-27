@@ -27,7 +27,7 @@ export default class Eurobusiness extends Game {
         this.gameData.availableActions = [actions.rollDice];
         this.gameData.dublets = 0;
         this.gameData.rollResult = [3, 5];
-        this.gameData.currentMessage = "Start";
+        this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
         this.gameMap = new EurobusinessMap();
     }
 
@@ -42,7 +42,13 @@ export default class Eurobusiness extends Game {
         const playersPositions = {};
 
         for (const [publicId, player] of this.players) {
-            playersPositions[publicId] = player.getData("position");
+            const position = player.getData("position");
+
+            if (!playersPositions[position]) {
+                playersPositions[position] = [];
+            }
+
+            playersPositions[position].push(publicId);
         }
 
         return playersPositions;
@@ -70,6 +76,8 @@ export default class Eurobusiness extends Game {
             case tileTypes.start:
             case tileTypes.parking:
             case tileTypes.jail:
+                this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
+                this.gameData.availableActions = [actions.endTurn];
                 break;
             case tileTypes.goToJail:
                 this.playerToJail(this.getCurrentPlayer());
@@ -88,12 +96,38 @@ export default class Eurobusiness extends Game {
         const diceResult = [getRandomNumber(1, 6), getRandomNumber(1, 6)];
         const player = this.getCurrentPlayer();
 
-        if (this.gameData.dublets === 2 && diceResult[0] === diceResult[1]) {
+        const isDublet = diceResult[0] === diceResult[1];
+
+        if (this.gameData.dublets === 2 && isDublet) {
             this.playerToJail(player);
-            return [
-                this.events.currentMessage(),
-                this.events.availableActions(),
-            ];
+            return this.events.rollPackage();
+        }
+
+        let wasPlayerInJail = false;
+        if (player.getData("inJail")) {
+            this.gameData.availableActions = ["rollDice"];
+            if (isDublet) {
+                this.addLog(
+                    `${player.username} wyrzucił dublet (${diceResult[0]}, ${diceResult[1]}). Wychodzi z więzienia.`,
+                );
+                player.setData("outOfJailAttempts", () => 1);
+                player.setData("inJail", () => false);
+                wasPlayerInJail = true;
+            } else {
+                player.setData("outOfJailAttempts", (attempts) => attempts + 1);
+
+                this.addLog(
+                    `${player.username} wyrzucił ${diceResult[0]} oraz ${diceResult[1]}. Nie wychodzi z więzienia.`,
+                );
+
+                if (player.getData("outOfJailAttempts") === 3) {
+                    this.gameData.availableActions = ["endTurn"];
+                    this.gameData.currentMessage = `${this.getCurrentPlayer().username} nie wychodzi z więzienia. Oczekiwanie na koniec tury.`;
+                } else {
+                    this.gameData.currentMessage = `${this.getCurrentPlayer().username} wychodzi z więzienia. Próba (${player.getData("outOfJailAttempts")}/3)`;
+                }
+                return this.events.rollPackage();
+            }
         }
 
         const hasCompletedLap = this.gameMap.movePlayer(
@@ -102,23 +136,30 @@ export default class Eurobusiness extends Game {
         );
 
         if (hasCompletedLap) {
-            console.log("Okrążył");
+            player.setData("money", (money) => money + 200);
+            this.addLog(
+                `${player.username} otrzymał 200$ za przejście przez start.`,
+            );
         }
 
         this.gameData.rollResult = diceResult;
 
         const tile = this.gameMap.getCurrentPlayerTile(player);
         this.executeTileAction(tile);
-        this.addLog(
-            `${player.username} wyrzucił ${diceResult[0] + diceResult[1]}. Idzie na pole ${tile.name}.`,
-        );
-        return [
-            this.events.logs(),
-            this.events.currentMessage(),
-            this.events.rollResult(),
-            this.events.availableActions(),
-            this.events.playersPosition(),
-        ];
+
+        if (isDublet && !wasPlayerInJail) {
+            this.addLog(
+                `${player.username} wyrzucił dublet (${diceResult[0]}, ${diceResult[1]}). Idzie na pole ${tile.name}.`,
+            );
+        } else if (!isDublet && !wasPlayerInJail) {
+            this.addLog(
+                `${player.username} wyrzucił ${diceResult[0] + diceResult[1]}. Idzie na pole ${tile.name}.`,
+            );
+        } else if (wasPlayerInJail) {
+            this.addLog(`Idzie na pole ${tile.name}.`);
+        }
+
+        return this.events.rollPackage();
     }
 
     endTurn(data) {
@@ -129,23 +170,29 @@ export default class Eurobusiness extends Game {
 
         if (this.gameData.rollResult[0] === this.gameData.rollResult[1]) {
             this.gameData.dublets += 1;
-
+            this.gameData.currentMessage = `${this.getCurrentPlayer().username} ponownie rzuca kośćmi`;
+        } else {
             this.nextTurn();
-
-            if (currentPlayer.getData("inJail")) {
-                this.gameData.availableActions = [
-                    actions.rollDice,
-                    actions.payJail,
-                    actions.useOutOfJailCard,
-                ];
-            }
+            this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
         }
 
+        if (currentPlayer.getData("inJail")) {
+            this.gameData.currentMessage = `${this.getCurrentPlayer().username} wychodzi z więzienia`;
+            this.gameData.availableActions = [
+                actions.rollDice,
+                actions.payJail,
+                actions.useOutOfJailCard,
+            ];
+        }
+
+        this.addLog(`${this.getCurrentPlayer().username} zakończył turę.`);
+        this.addLog("hr");
         return [
             this.events.currentMessage(),
             this.events.yourTurn(data.publicId, false),
             this.events.yourTurn(this.getCurrentPlayerPublicId(), true),
             this.events.availableActions(),
+            this.events.logs(),
         ];
     }
 

@@ -68,6 +68,7 @@ export default class EurobusinessEventFactory {
                 rollResult: this.game.gameData.rollResult,
                 yourPublicId: publicId,
                 currentMessage: this.game.gameData.currentMessage,
+                logs: this.game.logs,
             },
         };
     }
@@ -91,5 +92,15 @@ export default class EurobusinessEventFactory {
             eventName: "logs",
             data: this.game.logs,
         };
+    }
+
+    rollPackage() {
+        return [
+            this.currentMessage(),
+            this.availableActions(),
+            this.logs(),
+            this.rollResult(),
+            this.playersPosition(),
+        ];
     }
 }
