@@ -13,6 +13,14 @@ export default class Eurobusiness extends Game {
     constructor(players, endGame) {
         super(players, endGame);
         this.events = new EurobusinessEventFactory(this);
+        this.logs = [];
+    }
+
+    addLog(message) {
+        this.logs.push(message);
+        if (this.logs.length > 19) {
+            this.logs.shift();
+        }
     }
 
     initializeGameData() {
@@ -101,8 +109,9 @@ export default class Eurobusiness extends Game {
 
         const tile = this.gameMap.getCurrentPlayerTile(player);
         this.executeTileAction(tile);
-
+        this.addLog(`${player.username} wyrzucił ${diceResult}`);
         return [
+            this.events.logs(),
             this.events.currentMessage(),
             this.events.rollResult(this.gameData.rollResult),
             this.events.availableActions(),
@@ -155,8 +164,10 @@ export default class Eurobusiness extends Game {
     playerToJail(player) {
         player.setData("inJail", () => true);
         player.setData("position", () => 10);
-
+        this.addLog(`${player.username} idzie do więznia.`);
         this.gameData.availableActions = [actions.endTurn];
+
+        return [this.events.logs()];
     }
 
     payJail(data) {
@@ -169,9 +180,17 @@ export default class Eurobusiness extends Game {
 
         currentPlayer.setData("money", (money) => money - 50);
 
+        this.addLog(
+            `${currentPlayer.username} płaci 50$ za wyjście z więzienia.`,
+        );
+
         this.gameData.availableActions = [actions.rollDice];
 
-        return [this.events.currentMessage(), this.events.availableActions()];
+        return [
+            this.events.currentMessage(),
+            this.events.availableActions(),
+            this.events.logs(),
+        ];
     }
 
     useOutOfJailCard(data) {
@@ -187,9 +206,15 @@ export default class Eurobusiness extends Game {
             (outOfJailCard) => outOfJailCard - 1,
         );
 
+        this.addLog(`${currentPlayer.username} użył karty wyjścia z więzienia`);
+
         this.gameData.availableActions = [actions.rollDice];
 
-        return [this.events.currentMessage(), this.events.availableActions()];
+        return [
+            this.events.currentMessage(),
+            this.events.availableActions(),
+            this.events.logs(),
+        ];
     }
 
     payTax(data) {
@@ -202,9 +227,15 @@ export default class Eurobusiness extends Game {
 
         currentPlayer.setData("money", (money) => money - 100);
 
+        this.addLog(`${currentPlayer.username} płaci 100$.`);
+
         this.gameData.availableActions = [actions.endTurn];
 
-        return [this.events.currentMessage(), this.events.availableActions()];
+        return [
+            this.events.currentMessage(),
+            this.events.availableActions(),
+            this.events.logs(),
+        ];
     }
 
     payIncomeTax(data) {
@@ -217,22 +248,33 @@ export default class Eurobusiness extends Game {
 
         currentPlayer.setData("money", (money) => money - 150);
 
+        this.addLog(`${currentPlayer.username} płaci 150$ podatku`);
+
         this.gameData.availableActions = [actions.endTurn];
 
-        return [this.events.currentMessage(), this.events.availableActions()];
+        return [
+            this.events.currentMessage(),
+            this.events.availableActions(),
+            this.events.logs(),
+        ];
     }
     pickChanceCard() {
         const currentPlayer = this.getCurrentPlayer();
         const randomIndex = getRandomNumber(0, chanceCards.length);
         const card = chanceCards[randomIndex];
+        this.addLog(`${currentPlayer.username} wylosował karte: ${card.name}.`);
         switch (card.type) {
             case chanceCardTypes.goToStart:
                 currentPlayer.setData("position", () => 0);
+                this.addLog(`${currentPlayer.username} idzie na start`);
                 break;
             case chanceCardTypes.goToTile:
                 currentPlayer.setData("position", () => getRandomNumber(0, 40));
                 this.executeTileAction(
                     this.gameMap.getCurrentPlayerTile(currentPlayer),
+                );
+                this.addLog(
+                    `${currentPlayer.username} stanął na polu ${this.gameMap.getCurrentPlayerTile(currentPlayer).name}`,
                 );
                 break;
             case chanceCardTypes.goToJail:
@@ -243,6 +285,7 @@ export default class Eurobusiness extends Game {
                 break;
             case chanceCardTypes.withdrawCashFromBank:
                 currentPlayer.setData("money", (money) => money + 50);
+                this.addLog(`${currentPlayer.username} pobiera z banku 50$.`);
                 break;
             case chanceCardTypes.getOutOfJail:
                 currentPlayer.setData(
@@ -257,6 +300,7 @@ export default class Eurobusiness extends Game {
         }
 
         return [
+            this.events.logs(),
             this.events.playersPosition(),
             this.events.currentMessage(),
             this.events.availableActions(),
@@ -267,9 +311,11 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
         const randomIndex = getRandomNumber(0, communityCards.length);
         const card = communityCards[randomIndex];
+        this.addLog(`${currentPlayer.username} wylosował karte: ${card.name}.`);
         switch (card.type) {
             case communityCardTypes.withdrawCashFromBank:
                 currentPlayer.setData("money", (money) => money + 50);
+                this.addLog(`${currentPlayer.username} pobiera z banku 50$.`);
                 break;
             case communityCardTypes.goToJail:
                 this.playerToJail(currentPlayer);
@@ -286,6 +332,7 @@ export default class Eurobusiness extends Game {
         }
 
         return [
+            this.events.logs(),
             this.events.playersPosition(),
             this.events.currentMessage(),
             this.events.availableActions(),
