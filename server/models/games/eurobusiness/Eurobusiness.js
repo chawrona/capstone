@@ -110,12 +110,12 @@ export default class Eurobusiness extends Game {
         const tile = this.gameMap.getCurrentPlayerTile(player);
         this.executeTileAction(tile);
         this.addLog(
-            `${player.username} wyrzucił ${diceResult[0] + diceResult[1]}.`,
+            `${player.username} wyrzucił ${diceResult[0] + diceResult[1]}. Idzie na pole ${tile.name}.`,
         );
         return [
             this.events.logs(),
             this.events.currentMessage(),
-            this.events.rollResult(this.gameData.rollResult),
+            this.events.rollResult(),
             this.events.availableActions(),
             this.events.playersPosition(),
         ];

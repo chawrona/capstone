@@ -37,11 +37,11 @@ export default class EurobusinessEventFactory {
         };
     }
 
-    rollResult(result) {
+    rollResult() {
         return {
             target: "lobby",
             eventName: "rollResult",
-            data: result,
+            data: this.game.gameData.rollResult,
         };
     }
 
