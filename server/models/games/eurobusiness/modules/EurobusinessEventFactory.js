@@ -85,4 +85,11 @@ export default class EurobusinessEventFactory {
             data: card,
         };
     }
+    logs() {
+        return {
+            target: "lobby",
+            eventName: "logs",
+            data: this.game.logs,
+        };
+    }
 }
