@@ -1,162 +1,162 @@
 [
   {
-    "type": "start",
+    "type": "Start",
     "name": "Start"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "communityCard",
+    "type": "Karta społeczności",
     "name": "Karta społeczności"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "incomeTax",
+    "type": "Podatek dochodowy",
     "name": "Podatek dochodowy"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "chanceCard",
+    "type": "Karta szansy",
     "name": "Karta szansy"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "jail",
+    "type": "Więzienie",
     "name": "Więzienie"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "communityCard",
+    "type": "Karta społeczności",
     "name": "Karta społeczności"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "parking",
+    "type": "Parking",
     "name": "Parking"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "chanceCard",
+    "type": "Karta szansy",
     "name": "Karta szansy"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "goToJail",
+    "type": "Idź do więzienia",
     "name": "Idź do więzienia"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "communityCard",
+    "type": "Karta społeczności",
     "name": "Karta społeczności"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "chanceCard",
+    "type": "Karta szansy",
     "name": "Karta szansy"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "tax",
+    "type": "Podatek",
     "name": "Podatek"
   },
   {
-    "type": "default",
+    "type": "Domyślne",
     "name": "Domyślne"
   }
 ]
