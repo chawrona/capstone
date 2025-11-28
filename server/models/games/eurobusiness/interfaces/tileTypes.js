@@ -6,6 +6,8 @@ const tileTypes = {
     goToJail: "Idź do więzienia",
     tax: "Podatek",
     incomeTax: "Podatek dochodowy",
+    chanceCard: "Karta szansy",
+    communityCard: "Karta społeczności",
 };
 
 export default tileTypes;

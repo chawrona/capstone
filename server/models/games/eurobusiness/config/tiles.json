@@ -1,7 +1,95 @@
 [
   {
     "type": "Start",
-    "name": "Pole startowe"
+    "name": "Start"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Karta społeczności",
+    "name": "Karta społeczności"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Podatek dochodowy",
+    "name": "Podatek dochodowy"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Karta szansy",
+    "name": "Karta szansy"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Więzienie",
+    "name": "Więzienie"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Karta społeczności",
+    "name": "Karta społeczności"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Parking",
+    "name": "Parking"
+  },
+  {
+    "type": "Domyślne",
+    "name": "Domyślne"
+  },
+  {
+    "type": "Karta szansy",
+    "name": "Karta szansy"
   },
   {
     "type": "Domyślne",
@@ -32,8 +120,8 @@
     "name": "Domyślne"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Idź do więzienia",
+    "name": "Idź do więzienia"
   },
   {
     "type": "Domyślne",
@@ -44,8 +132,8 @@
     "name": "Domyślne"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Karta społeczności",
+    "name": "Karta społeczności"
   },
   {
     "type": "Domyślne",
@@ -56,104 +144,16 @@
     "name": "Domyślne"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Karta szansy",
+    "name": "Karta szansy"
   },
   {
     "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Podatek",
+    "name": "Podatek"
   },
   {
     "type": "Domyślne",

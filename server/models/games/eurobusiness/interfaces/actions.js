@@ -5,6 +5,8 @@ const actions = {
     useOutOfJailCard: "Użyj karty wyjścia z więzienia",
     payTax: "Zapłać podatek",
     payIncomeTax: "Zapłać podatek dochodowy",
+    pickChanceCard: "Wylosuj kartę szansy",
+    pickCommunityCard: "Wylosuj kartę społeczności"
 };
 
 export default actions;
