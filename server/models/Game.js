@@ -1,8 +1,9 @@
+import eventEmmiter from "../services/EventEmmiter.js";
 import Logger from "../services/Logger.js";
 import Player from "./Player.js";
 
 export default class Game {
-    constructor(players, endGame) {
+    constructor(players, endGame, lobbyId) {
         this.endGame = endGame;
         this.players = new Map();
         this.playersQueue = [];
@@ -15,6 +16,24 @@ export default class Game {
         this.logger = new Logger();
         this.disconnectedPlayers = new Set();
         this.paused = false;
+        this.lobbyId = lobbyId;
+        this.eventEmmiter = new eventEmmiter();
+    }
+
+    useEventEmmiter(targets) {
+        try {
+            for (const { target, eventName, data } of targets) {
+                if (target === "lobby") {
+                    this.eventEmmiter.toLobby(this.lobbyId, eventName, data);
+                } else if (eventName === "error") {
+                    this.eventEmmiter.toPublicUserError(target, data);
+                } else {
+                    this.eventEmmiter.toPublicUser(target, eventName, data);
+                }
+            }
+        } catch (error) {
+            this.eventEmmiter.toLobbyError(this.lobbyId, error);
+        }
     }
 
     log(message) {
