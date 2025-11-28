@@ -88,6 +88,12 @@ export default class Eurobusiness extends Game {
             case tileTypes.incomeTax:
                 this.gameData.availableActions = [actions.payIncomeTax];
                 break;
+            case tileTypes.chanceCard:
+                this.gameData.availableActions = [actions.pickChanceCard];
+                break;
+            case tileTypes.communityCard:
+                this.gameData.availableActions = [actions.pickCommunityCard];
+                break;
         }
     }
 
