@@ -1,6 +1,10 @@
 import tiles from "../config/tiles.json" with { type: "json" };
 
 export default class EurobusinessMap {
+    constructor() {
+        this.ownerships = new Map();
+    }
+
     movePlayer(player, rollResult) {
         let hasCompletedLap = false;
 
@@ -12,8 +16,7 @@ export default class EurobusinessMap {
         return hasCompletedLap;
     }
 
-    getCurrentPlayerTile(player) {
-        const position = player.getData("position");
+    getTile(position) {
         return tiles[position];
     }
 }

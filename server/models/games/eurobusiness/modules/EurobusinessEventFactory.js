@@ -48,7 +48,7 @@ export default class EurobusinessEventFactory {
     info(message) {
         return {
             target: this.game.getCurrentPlayerPublicId(),
-            eventName: "info",
+            eventName: "gameInfo",
             data: message,
         };
     }
@@ -93,6 +93,13 @@ export default class EurobusinessEventFactory {
             data: this.game.logs,
         };
     }
+    playersData() {
+        return {
+            target: "lobby",
+            eventName: "playersData",
+            data: this.game.getPlayersData(),
+        };
+    }
 
     rollPackage() {
         return [
@@ -101,6 +108,7 @@ export default class EurobusinessEventFactory {
             this.logs(),
             this.rollResult(),
             this.playersPosition(),
+            this.playersData(),
         ];
     }
 }
