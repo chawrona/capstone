@@ -93,6 +93,13 @@ export default class EurobusinessEventFactory {
             data: this.game.logs,
         };
     }
+    playersData() {
+        return {
+            target: "lobby",
+            eventName: "playersData",
+            data: this.game.getPlayersData(),
+        };
+    }
 
     rollPackage() {
         return [
@@ -101,6 +108,7 @@ export default class EurobusinessEventFactory {
             this.logs(),
             this.rollResult(),
             this.playersPosition(),
+            this.playersData(),
         ];
     }
 }

@@ -6,7 +6,10 @@ const actions = {
     payTax: "Zapłać podatek",
     payIncomeTax: "Zapłać podatek dochodowy",
     pickChanceCard: "Wylosuj kartę szansy",
-    pickCommunityCard: "Wylosuj kartę społeczności"
+    pickCommunityCard: "Wylosuj kartę społeczności",
+    buyBuilding: "Kup nieruchomość",
+    refuseToBuyBuilding: "Odmów kupna nieruchomości",
+    payRent: "Zapłać czynsz",
 };
 
 export default actions;

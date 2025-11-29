@@ -8,6 +8,7 @@ const tileTypes = {
     incomeTax: "Podatek dochodowy",
     chanceCard: "Karta szansy",
     communityCard: "Karta społeczności",
+    building: "Budynek",
 };
 
 export default tileTypes;
