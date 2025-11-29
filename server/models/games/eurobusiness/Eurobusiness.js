@@ -40,27 +40,24 @@ export default class Eurobusiness extends Game {
         player.setData("outOfJailAttempts", () => 0);
     }
 
-    setOwnership(player) {
-        const tileId = player.getData("position");
-        this.gameMap.ownerships.set(tileId, player.publicId);
+    setOwnership(player, position) {
+        this.gameMap.ownerships.set(position, player.publicId);
         player.setData("ownerships", (set) => {
-            set.add(tileId);
+            set.add(position);
             return set;
         });
     }
 
-    removeOwnership(player) {
-        const tileId = player.getData("position");
-        this.gameMap.ownerships.delete(tileId);
+    removeOwnership(player, position) {
+        this.gameMap.ownerships.delete(position);
         player.setData("ownerships", (set) => {
-            set.delete(tileId);
+            set.delete(position);
             return set;
         });
     }
 
-    getOwnerId(player) {
-        const tileId = player.getData("position");
-        return this.gameMap.ownerships.get(tileId);
+    getOwnerId(position) {
+        return this.gameMap.ownerships.get(position);
     }
 
     getPlayersPositions() {
@@ -96,8 +93,6 @@ export default class Eurobusiness extends Game {
     }
 
     executeTileAction(tile) {
-        const player = this.getCurrentPlayer();
-        const currentTileOwnerId = this.getOwnerId(player);
         switch (tile.name) {
             case tileTypes.default:
             case tileTypes.start:
@@ -107,6 +102,7 @@ export default class Eurobusiness extends Game {
                 this.gameData.availableActions = [actions.endTurn];
                 break;
             case tileTypes.goToJail:
+                this.gameData.currentMessage = `${this.getCurrentPlayer().username} trafia do więzienia`;
                 this.playerToJail(this.getCurrentPlayer());
                 break;
             case tileTypes.tax:
@@ -126,25 +122,30 @@ export default class Eurobusiness extends Game {
                 this.gameData.availableActions = [actions.pickCommunityCard];
                 break;
             case tileTypes.building:
-                if (!currentTileOwnerId) {
-                    this.gameData.availableActions = [
-                        actions.buyBuilding,
-                        actions.refuseToBuyBuilding,
-                    ];
-                    break;
-                } else if (currentTileOwnerId === player.publicId) {
-                    this.gameData.availableActions = [actions.endTurn];
-                    break;
-                } else {
-                    this.gameData.currentMessage = `${this.getCurrentPlayer().username} płaci czynsz graczowi ${this.players[currentTileOwnerId]} 
-                    w wysokości ${tile.rent}.`;
-                    this.addLog(
-                        `${this.getCurrentPlayer().username} płaci czynsz graczowi ${this.players[currentTileOwnerId]} w wysokości ${tile.price}
-                        za stanięcie na polu ${tile.name}.`,
-                    );
-                    this.gameData.availableActions = [actions.payRent];
-                    break;
-                }
+                this.buildingAction();
+                break;
+        }
+    }
+
+    buildingAction() {
+        const player = this.getCurrentPlayer();
+        const position = player.getData("position");
+        const currentTileOwnerId = this.getOwnerId(position);
+        if (!currentTileOwnerId) {
+            this.gameData.currentMessage = `${this.getCurrentPlayer().username} zastanawia się nad zakupem nieruchomości`;
+            this.gameData.availableActions = [
+                actions.buyBuilding,
+                actions.refuseToBuyBuilding,
+            ];
+        } else if (currentTileOwnerId === player.publicId) {
+            this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
+            this.gameData.availableActions = [actions.endTurn];
+        } else {
+            this.gameData.currentMessage = `${this.getCurrentPlayer().username} płaci czynsz.`;
+            this.addLog(
+                `${this.getCurrentPlayer().username} stanął na polu gracza ${this.players[currentTileOwnerId]}`,
+            );
+            this.gameData.availableActions = [actions.payRent];
         }
     }
 
@@ -202,8 +203,8 @@ export default class Eurobusiness extends Game {
 
         this.gameData.rollResult = diceResult;
 
-        const tile = this.gameMap.getCurrentPlayerTile(player);
-        this.executeTileAction(tile);
+        const position = player.getData("position");
+        const tile = this.gameMap.getTile(position);
 
         if (isDublet && !wasPlayerInJail) {
             this.addLog(
@@ -216,6 +217,8 @@ export default class Eurobusiness extends Game {
         } else if (wasPlayerInJail) {
             this.addLog(`Idzie na pole ${tile.name}.`);
         }
+
+        this.executeTileAction(tile);
 
         return this.events.rollPackage();
     }
@@ -282,7 +285,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("money") < 50) {
-            return [this.events.info("Nie masz wystarczająco pieniędzy.")];
+            return [this.events.gameInfo("Nie masz wystarczająco pieniędzy.")];
         }
 
         currentPlayer.setData("money", (money) => money - 50);
@@ -305,7 +308,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("outOfJailCard") < 1) {
-            return [this.events.info("Nie masz karty wyjścia z więzienia")];
+            return [this.events.gameInfo("Nie masz karty wyjścia z więzienia")];
         }
 
         currentPlayer.setData(
@@ -331,7 +334,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("money") < 100) {
-            return [this.events.info("Nie masz wystarczająco pieniędzy")];
+            return [this.events.gameInfo("Nie masz wystarczająco pieniędzy")];
         }
 
         currentPlayer.setData("money", (money) => money - 100);
@@ -352,7 +355,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("money") < 150) {
-            return [this.events.info("Nie masz wystarczająco pieniędzy")];
+            return [this.events.gameInfo("Nie masz wystarczająco pieniędzy")];
         }
 
         currentPlayer.setData("money", (money) => money - 150);
@@ -371,17 +374,18 @@ export default class Eurobusiness extends Game {
     payRent(data) {
         this.checkIfActionPossible(data.publicId, actions.payRent);
         const player = this.getCurrentPlayer();
-        const tile = this.gameMap.getCurrentPlayerTile(player);
-        const owner = this.players.get(this.getOwnerId(player));
+        const position = player.getData("position");
+        const tile = this.gameMap.getTile(position);
+        const owner = this.players.get(this.getOwnerId(position));
 
         if (player.getData("money") < tile.rent) {
-            return [this.events.info("Nie masz wystarczająco pieniędzy")];
+            return [this.events.gameInfo("Nie masz wystarczająco pieniędzy")];
         }
 
         player.setData("money", (money) => money - tile.rent);
         owner.setData("money", (money) => money + tile.rent);
         this.addLog(
-            `${player.username} płaci ${tile.rent} graczowi ${owner.username}.`,
+            `${player.username} płaci ${tile.rent}$ graczowi ${owner.username}.`,
         );
         this.gameData.availableActions = [actions.endTurn];
         return [this.events.availableActions(), this.events.logs()];
@@ -390,14 +394,15 @@ export default class Eurobusiness extends Game {
     buyBuilding(data) {
         this.checkIfActionPossible(data.publicId, actions.buyBuilding);
         const player = this.getCurrentPlayer();
-        const tile = this.gameMap.getCurrentPlayerTile(player);
+        const position = player.getData("position");
+        const tile = this.gameMap.getTile(position);
 
         if (player.getData("money") < tile.price) {
-            return [this.events.info("Nie masz wystarczająco pieniędzy")];
+            return [this.events.gameInfo("Nie masz wystarczająco pieniędzy")];
         }
 
         player.setData("money", (money) => money - tile.price);
-        this.setOwnership(player);
+        this.setOwnership(player, position);
         this.addLog(`${player.username} kupił ${tile.name} za ${tile.price}.`);
         this.gameData.availableActions = [actions.endTurn];
         return [this.events.availableActions(), this.events.logs()];
@@ -406,7 +411,8 @@ export default class Eurobusiness extends Game {
     refuseToBuyBuilding(data) {
         this.checkIfActionPossible(data.publicId, actions.refuseToBuyBuilding);
         const player = this.getCurrentPlayer();
-        const tile = this.gameMap.getCurrentPlayerTile(player);
+        const position = player.getData("position");
+        const tile = this.gameMap.getTile(position);
         this.addLog(
             `${player.username} nie kupił nieruchomości na polu ${tile.name}.`,
         );
@@ -416,6 +422,7 @@ export default class Eurobusiness extends Game {
 
     pickChanceCard() {
         const currentPlayer = this.getCurrentPlayer();
+        const position = currentPlayer.getData("position");
         const randomIndex = getRandomNumber(0, chanceCards.length);
         const card = chanceCards[randomIndex];
         this.addLog(`${currentPlayer.username} wylosował kartę ${card.name}.`);
@@ -426,11 +433,9 @@ export default class Eurobusiness extends Game {
                 break;
             case chanceCardTypes.goToTile:
                 currentPlayer.setData("position", () => getRandomNumber(0, 40));
-                this.executeTileAction(
-                    this.gameMap.getCurrentPlayerTile(currentPlayer),
-                );
+                this.executeTileAction(this.gameMap.getTile(position));
                 this.addLog(
-                    `${currentPlayer.username} stanął na polu ${this.gameMap.getCurrentPlayerTile(currentPlayer).name}.`,
+                    `${currentPlayer.username} stanął na polu ${this.gameMap.getTile(position).name}.`,
                 );
                 break;
             case chanceCardTypes.goToJail:

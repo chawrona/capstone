@@ -16,8 +16,7 @@ export default class EurobusinessMap {
         return hasCompletedLap;
     }
 
-    getCurrentPlayerTile(player) {
-        const position = player.getData("position");
+    getTile(position) {
         return tiles[position];
     }
 }
