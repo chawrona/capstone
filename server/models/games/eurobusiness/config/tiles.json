@@ -4,16 +4,28 @@
     "name": "Start"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 1",
+    "color": "Brązowy",
+    "price": 60,
+    "setCount": 2,
+    "setId": 1,
+    "rent": 2,
+    "mortgage": 30
   },
   {
     "type": "Karta społeczności",
     "name": "Karta społeczności"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 2",
+    "color": "Brązowy",
+    "price": 60,
+    "setCount": 2,
+    "setId": 1,
+    "rent": 4,
+    "mortgage": 30
   },
   {
     "type": "Podatek dochodowy",
@@ -24,120 +36,228 @@
     "name": "Domyślne"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 3",
+    "color": "Błękitny",
+    "price": 100,
+    "setCount": 3,
+    "setId": 2,
+    "rent": 6,
+    "mortgage": 50
   },
   {
     "type": "Karta szansy",
     "name": "Karta szansy"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 4",
+    "color": "Błękitny",
+    "price": 100,
+    "setCount": 3,
+    "setId": 2,
+    "rent": 6,
+    "mortgage": 50
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 5",
+    "color": "Błękitny",
+    "price": 120,
+    "setCount": 3,
+    "setId": 2,
+    "rent": 8,
+    "mortgage": 60
   },
   {
     "type": "Więzienie",
     "name": "Więzienie"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 6",
+    "color": "Różowy",
+    "price": 140,
+    "setCount": 3,
+    "setId": 3,
+    "rent": 10,
+    "mortgage": 70
   },
   {
     "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 7",
+    "color": "Różowy",
+    "price": 140,
+    "setCount": 3,
+    "setId": 3,
+    "rent": 10,
+    "mortgage": 70
+  },
+  {
+    "type": "Budynek",
+    "name": "Budynek 8",
+    "color": "Różowy",
+    "price": 160,
+    "setCount": 3,
+    "setId": 3,
+    "rent": 12,
+    "mortgage": 80
   },
   {
     "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 9",
+    "color": "Pomarańczowy",
+    "price": 180,
+    "setCount": 3,
+    "setId": 4,
+    "rent": 14,
+    "mortgage": 90
   },
   {
     "type": "Karta społeczności",
     "name": "Karta społeczności"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 10",
+    "color": "Pomarańczowy",
+    "price": 180,
+    "setCount": 3,
+    "setId": 4,
+    "rent": 14,
+    "mortgage": 90
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 11",
+    "color": "Pomarańczowy",
+    "price": 200,
+    "setCount": 3,
+    "setId": 4,
+    "rent": 16,
+    "mortgage": 100
   },
   {
     "type": "Parking",
     "name": "Parking"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 12",
+    "color": "Czerwony",
+    "price": 220,
+    "setCount": 3,
+    "setId": 5,
+    "rent": 18,
+    "mortgage": 110
   },
   {
     "type": "Karta szansy",
     "name": "Karta szansy"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 13",
+    "color": "Czerwony",
+    "price": 220,
+    "setCount": 3,
+    "setId": 5,
+    "rent": 18,
+    "mortgage": 110
+  },
+  {
+    "type": "Budynek",
+    "name": "Budynek 14",
+    "color": "Czerwony",
+    "price": 240,
+    "setCount": 3,
+    "setId": 5,
+    "rent": 20,
+    "mortgage": 120
   },
   {
     "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 15",
+    "color": "Żółty",
+    "price": 260,
+    "setCount": 3,
+    "setId": 6,
+    "rent": 22,
+    "mortgage": 130
+  },
+  {
+    "type": "Budynek",
+    "name": "Budynek 16",
+    "color": "Żółty",
+    "price": 260,
+    "setCount": 3,
+    "setId": 6,
+    "rent": 22,
+    "mortgage": 130
   },
   {
     "type": "Domyślne",
     "name": "Domyślne"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
-  },
-  {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 17",
+    "color": "Żółty",
+    "price": 280,
+    "setCount": 3,
+    "setId": 6,
+    "rent": 24,
+    "mortgage": 140
   },
   {
     "type": "Idź do więzienia",
     "name": "Idź do więzienia"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 18",
+    "color": "Zielony",
+    "price": 300,
+    "setCount": 3,
+    "setId": 7,
+    "rent": 26,
+    "mortgage": 150
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 19",
+    "color": "Zielony",
+    "price": 300,
+    "setCount": 3,
+    "setId": 7,
+    "rent": 26,
+    "mortgage": 150
   },
   {
     "type": "Karta społeczności",
     "name": "Karta społeczności"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 20",
+    "color": "Zielony",
+    "price": 320,
+    "setCount": 3,
+    "setId": 7,
+    "rent": 28,
+    "mortgage": 160
   },
   {
     "type": "Domyślne",
@@ -148,15 +268,27 @@
     "name": "Karta szansy"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 21",
+    "color": "Niebieski",
+    "price": 350,
+    "setCount": 2,
+    "setId": 8,
+    "rent": 35,
+    "mortgage": 175
   },
   {
     "type": "Podatek",
     "name": "Podatek"
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne"
+    "type": "Budynek",
+    "name": "Budynek 22",
+    "color": "Niebieski",
+    "price": 400,
+    "setCount": 2,
+    "setId": 8,
+    "rent": 50,
+    "mortgage": 200
   }
 ]
