@@ -102,7 +102,6 @@ export default class Eurobusiness extends Game {
                 this.gameData.availableActions = [actions.endTurn];
                 break;
             case tileTypes.goToJail:
-                this.gameData.currentMessage = `${this.getCurrentPlayer().username} trafia do więzienia`;
                 this.playerToJail(this.getCurrentPlayer());
                 break;
             case tileTypes.tax:
@@ -285,7 +284,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("money") < 50) {
-            return [this.events.gameInfo("Nie masz wystarczająco pieniędzy.")];
+            return [this.events.info("Nie masz wystarczająco pieniędzy.")];
         }
 
         currentPlayer.setData("money", (money) => money - 50);
@@ -308,7 +307,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("outOfJailCard") < 1) {
-            return [this.events.gameInfo("Nie masz karty wyjścia z więzienia")];
+            return [this.events.info("Nie masz karty wyjścia z więzienia")];
         }
 
         currentPlayer.setData(
@@ -334,7 +333,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("money") < 100) {
-            return [this.events.gameInfo("Nie masz wystarczająco pieniędzy")];
+            return [this.events.info("Nie masz wystarczająco pieniędzy")];
         }
 
         currentPlayer.setData("money", (money) => money - 100);
@@ -355,7 +354,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
 
         if (currentPlayer.getData("money") < 150) {
-            return [this.events.gameInfo("Nie masz wystarczająco pieniędzy")];
+            return [this.events.info("Nie masz wystarczająco pieniędzy")];
         }
 
         currentPlayer.setData("money", (money) => money - 150);
@@ -379,7 +378,7 @@ export default class Eurobusiness extends Game {
         const owner = this.players.get(this.getOwnerId(position));
 
         if (player.getData("money") < tile.rent) {
-            return [this.events.gameInfo("Nie masz wystarczająco pieniędzy")];
+            return [this.events.info("Nie masz wystarczająco pieniędzy")];
         }
 
         player.setData("money", (money) => money - tile.rent);
@@ -398,7 +397,7 @@ export default class Eurobusiness extends Game {
         const tile = this.gameMap.getTile(position);
 
         if (player.getData("money") < tile.price) {
-            return [this.events.gameInfo("Nie masz wystarczająco pieniędzy")];
+            return [this.events.info("Nie masz wystarczająco pieniędzy")];
         }
 
         player.setData("money", (money) => money - tile.price);

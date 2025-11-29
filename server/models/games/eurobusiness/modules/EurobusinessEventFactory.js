@@ -45,10 +45,10 @@ export default class EurobusinessEventFactory {
         };
     }
 
-    gameInfo(message) {
+    info(message) {
         return {
             target: this.game.getCurrentPlayerPublicId(),
-            eventName: "info",
+            eventName: "gameInfo",
             data: message,
         };
     }
