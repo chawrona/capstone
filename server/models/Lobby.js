@@ -17,10 +17,14 @@ export default class Lobby {
     start(players) {
         switch (this.gameInfo.title) {
             case "ludo":
-                this.game = new Ludo(players, () => this.endGame());
+                this.game = new Ludo(players, () => this.endGame(), this.id);
                 break;
             case "eurobusiness":
-                this.game = new Eurobusiness(players, () => this.endGame());
+                this.game = new Eurobusiness(
+                    players,
+                    () => this.endGame(),
+                    this.id,
+                );
                 break;
         }
         this.isActive = true;

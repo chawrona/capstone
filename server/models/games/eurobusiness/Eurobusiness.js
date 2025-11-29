@@ -14,6 +14,21 @@ export default class Eurobusiness extends Game {
         super(players, endGame);
         this.events = new EurobusinessEventFactory(this);
         this.logs = [];
+        this.timer = 60;
+
+        this.startTimer();
+    }
+
+    startTimer() {
+        setTimeout(() => {
+            if (this.timer > 0) {
+                this.timer -= 1;
+            }
+        }, 1000);
+    }
+
+    setTimer(nowyCzas) {
+        this.timer = nowyCzas;
     }
 
     addLog(message) {
@@ -29,6 +44,7 @@ export default class Eurobusiness extends Game {
         this.gameData.rollResult = [3, 5];
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
         this.gameMap = new EurobusinessMap();
+        this.setTimer(60);
     }
 
     setPlayerData(player) {
@@ -108,7 +124,9 @@ export default class Eurobusiness extends Game {
             this.playerToJail(player);
             return this.events.rollPackage();
         }
-
+        if (this.timer < 30) {
+            this.setTimer(30);
+        }
         let wasPlayerInJail = false;
         if (player.getData("inJail")) {
             this.gameData.availableActions = ["rollDice"];
@@ -181,7 +199,7 @@ export default class Eurobusiness extends Game {
             this.nextTurn();
             this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
         }
-
+        this.setTimer(60);
         if (currentPlayer.getData("inJail")) {
             this.gameData.currentMessage = `${this.getCurrentPlayer().username} wychodzi z więzienia`;
             this.gameData.availableActions = [
@@ -219,6 +237,7 @@ export default class Eurobusiness extends Game {
     playerToJail(player) {
         player.setData("inJail", () => true);
         player.setData("position", () => 10);
+        this.setTimer(this.timer + 30);
         this.addLog(`${player.username} idzie do więzienia.`);
         this.gameData.availableActions = [actions.endTurn];
 
@@ -228,6 +247,7 @@ export default class Eurobusiness extends Game {
     payJail(data) {
         this.checkIfActionPossible(data.publicId, actions.payJail);
         const currentPlayer = this.getCurrentPlayer();
+        this.setTimer(this.timer + 30);
 
         if (currentPlayer.getData("money") < 50) {
             return [this.events.info("Nie masz wystarczająco pieniędzy.")];
@@ -251,6 +271,7 @@ export default class Eurobusiness extends Game {
     useOutOfJailCard(data) {
         this.checkIfActionPossible(data.publicId, actions.useOutOfJailCard);
         const currentPlayer = this.getCurrentPlayer();
+        this.setTimer(this.timer + 30);
 
         if (currentPlayer.getData("outOfJailCard") < 1) {
             return [this.events.info("Nie masz karty wyjścia z więzienia")];
@@ -277,6 +298,7 @@ export default class Eurobusiness extends Game {
     payTax(data) {
         this.checkIfActionPossible(data.publicId, actions.payTax);
         const currentPlayer = this.getCurrentPlayer();
+        this.setTimer(this.timer + 30);
 
         if (currentPlayer.getData("money") < 100) {
             return [this.events.info("Nie masz wystarczająco pieniędzy")];
@@ -298,6 +320,7 @@ export default class Eurobusiness extends Game {
     payIncomeTax(data) {
         this.checkIfActionPossible(data.publicId, actions.payIncomeTax);
         const currentPlayer = this.getCurrentPlayer();
+        this.setTimer(this.timer + 30);
 
         if (currentPlayer.getData("money") < 150) {
             return [this.events.info("Nie masz wystarczająco pieniędzy")];
@@ -320,6 +343,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
         const randomIndex = getRandomNumber(0, chanceCards.length);
         const card = chanceCards[randomIndex];
+        this.setTimer(this.timer + 30);
         this.addLog(`${currentPlayer.username} wylosował kartę ${card.name}.`);
         switch (card.type) {
             case chanceCardTypes.goToStart:
@@ -370,6 +394,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
         const randomIndex = getRandomNumber(0, communityCards.length);
         const card = communityCards[randomIndex];
+        this.setTimer(this.timer + 30);
         this.addLog(`${currentPlayer.username} wylosował kartę ${card.name}.`);
         switch (card.type) {
             case communityCardTypes.withdrawCashFromBank:
