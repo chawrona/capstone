@@ -45,9 +45,9 @@ export default class EurobusinessEventFactory {
         };
     }
 
-    info(message) {
+    info(message, publicId) {
         return {
-            target: this.game.getCurrentPlayerPublicId(),
+            target: publicId ? publicId : this.game.getCurrentPlayerPublicId(),
             eventName: "gameInfo",
             data: message,
         };
@@ -98,6 +98,21 @@ export default class EurobusinessEventFactory {
             target: "lobby",
             eventName: "playersData",
             data: this.game.getPlayersData(),
+        };
+    }
+
+    auction() {
+        return {
+            target: "lobby",
+            eventName: "auction",
+            data: this.game.gameData.auction,
+        };
+    }
+
+    closeDialogs() {
+        return {
+            target: "lobby",
+            eventName: "closeDialogs",
         };
     }
 

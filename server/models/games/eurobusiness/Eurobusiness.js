@@ -24,7 +24,35 @@ export default class Eurobusiness extends Game {
             if (this.timer > 0) {
                 this.timer -= 1;
             }
+            if (
+                this.timer === 0 &&
+                this.gameData.availableActions.includes(actions.auction)
+            ) {
+                this.endAuction();
+            }
         }, 1000);
+    }
+
+    endAuction() {
+        this.setTimer(30);
+        const player = this.getCurrentPlayerPublicId(
+            this.gameData.auction.winningPlayer,
+        );
+        const tile = this.gameMap.getTile(this.gameData.auction.tileIndex);
+
+        player.setData("money", (money) => money - this.gameData.auction.price);
+        this.setOwnership(player, this.gameData.auction.tileIndex);
+        this.addLog(
+            `${player.username} wylicytował ${tile.name} za ${tile.price}$.`,
+        );
+        this.gameData.availableActions = [actions.endTurn];
+        this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
+
+        this.useEventEmmiter([
+            this.events.availableActions(),
+            this.events.logs(),
+            this.events.currentMessage(),
+        ]);
     }
 
     setTimer(nowyCzas) {
@@ -45,6 +73,12 @@ export default class Eurobusiness extends Game {
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
         this.gameMap = new EurobusinessMap();
         this.setTimer(60);
+        this.gameData.auction = {
+            price: 0,
+            winningPlayer: null,
+            tileIndex: 0,
+            cannotBid: null,
+        };
     }
 
     setPlayerData(player) {
@@ -102,6 +136,10 @@ export default class Eurobusiness extends Game {
 
     getCurrentPlayer() {
         return this.players.get(this.playersQueue[this.currentPlayerIndex]);
+    }
+
+    getPlayer(publicId) {
+        return this.players.get(publicId);
     }
 
     gameDataRequest(data) {
@@ -427,7 +465,12 @@ export default class Eurobusiness extends Game {
         this.setOwnership(player, position);
         this.addLog(`${player.username} kupił ${tile.name} za ${tile.price}.`);
         this.gameData.availableActions = [actions.endTurn];
-        return [this.events.availableActions(), this.events.logs()];
+        this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
+        return [
+            this.events.availableActions(),
+            this.events.logs(),
+            this.events.currentMessage(),
+        ];
     }
 
     refuseToBuyBuilding(data) {
@@ -438,8 +481,42 @@ export default class Eurobusiness extends Game {
         this.addLog(
             `${player.username} nie kupił nieruchomości na polu ${tile.name}.`,
         );
-        this.gameData.availableActions = [actions.endTurn];
-        return [this.events.availableActions(), this.events.logs()];
+        this.gameData.availableActions = [actions.auction];
+        this.gameData.currentMessage = "Licytacja";
+        this.gameData.auction = {
+            price: tile.price / 2,
+            winningPlayer: null,
+            tileIndex: position,
+            cannotBid: player.publicId,
+        };
+        this.setTimer(20);
+
+        return [
+            this.events.availableActions(),
+            this.events.logs(),
+            this.events.currentMessage(),
+            this.events.auction(),
+        ];
+    }
+
+    auction(data) {
+        if (data.publicId === this.gameData.auction.cannotBid) {
+            return [this.events.info("Nie możesz licytować", data.publicId)];
+        }
+        const bidIncrement = data.bidIncrement;
+        const player = this.getPlayer(data.publicId);
+        if (
+            player.getData("money") <
+            this.gameData.auction.price + bidIncrement
+        ) {
+            return [this.events.info("Nie masz wystarczająco pieniędzy")];
+        }
+        this.gameData.auction.price =
+            this.gameData.auction.price + bidIncrement;
+        this.gameData.auction.winningPlayer = data.publicId;
+        if (this.timer < 10) this.setTimer(this.timer + 5);
+        if (this.timer > 10) this.setTimer(10);
+        return [this.events.logs(), this.events.auction()];
     }
 
     pickChanceCard() {

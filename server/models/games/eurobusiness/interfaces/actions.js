@@ -10,6 +10,7 @@ const actions = {
     buyBuilding: "Kup nieruchomość",
     refuseToBuyBuilding: "Odmów kupna nieruchomości",
     payRent: "Zapłać czynsz",
+    auction: "Licytacja",
 };
 
 export default actions;
