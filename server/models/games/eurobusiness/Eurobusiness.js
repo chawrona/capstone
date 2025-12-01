@@ -52,6 +52,7 @@ export default class Eurobusiness extends Game {
             this.events.availableActions(),
             this.events.logs(),
             this.events.currentMessage(),
+            this.events.playersData(),
         ]);
     }
 
@@ -185,13 +186,16 @@ export default class Eurobusiness extends Game {
         const position = player.getData("position");
         const currentTileOwnerId = this.getOwnerId(position);
         if (!currentTileOwnerId) {
-            this.gameData.currentMessage = `${this.getCurrentPlayer().username} zastanawia się nad zakupem nieruchomości`;
+            this.gameData.currentMessage = `${this.getCurrentPlayer().username} zastanawia się nad zakupem`;
             this.gameData.availableActions = [
                 actions.buyBuilding,
                 actions.refuseToBuyBuilding,
             ];
         } else if (currentTileOwnerId === player.publicId) {
             this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
+            this.addLog(
+                `${this.getCurrentPlayer().username} stanął na swoim polu`,
+            );
             this.gameData.availableActions = [actions.endTurn];
         } else {
             this.gameData.currentMessage = `${this.getCurrentPlayer().username} płaci czynsz.`;
@@ -235,7 +239,7 @@ export default class Eurobusiness extends Game {
 
                 if (player.getData("outOfJailAttempts") === 3) {
                     this.gameData.availableActions = [actions.endTurn];
-                    this.gameData.currentMessage = `${this.getCurrentPlayer().username} nie wychodzi z więzienia. Oczekiwanie na koniec tury.`;
+                    this.gameData.currentMessage = `${this.getCurrentPlayer().username} nie wychodzi z więzienia.`;
                     player.setData("outOfJailAttempts", () => 0);
                 } else {
                     this.gameData.currentMessage = `${this.getCurrentPlayer().username} wychodzi z więzienia. Próba (${player.getData("outOfJailAttempts")}/3)`;
@@ -332,6 +336,7 @@ export default class Eurobusiness extends Game {
         this.setTimer(this.timer + 30);
         this.addLog(`${player.username} idzie do więzienia.`);
         this.gameData.availableActions = [actions.endTurn];
+        this.gameData.dublets = 0;
 
         return [this.events.logs()];
     }
@@ -357,6 +362,7 @@ export default class Eurobusiness extends Game {
             this.events.currentMessage(),
             this.events.availableActions(),
             this.events.logs(),
+            this.events.playersData(),
         ];
     }
 
@@ -406,6 +412,7 @@ export default class Eurobusiness extends Game {
             this.events.currentMessage(),
             this.events.availableActions(),
             this.events.logs(),
+            this.events.playersData(),
         ];
     }
 
@@ -428,6 +435,7 @@ export default class Eurobusiness extends Game {
             this.events.currentMessage(),
             this.events.availableActions(),
             this.events.logs(),
+            this.events.playersData(),
         ];
     }
 
@@ -448,7 +456,11 @@ export default class Eurobusiness extends Game {
             `${player.username} płaci ${tile.rent}$ graczowi ${owner.username}.`,
         );
         this.gameData.availableActions = [actions.endTurn];
-        return [this.events.availableActions(), this.events.logs()];
+        return [
+            this.events.availableActions(),
+            this.events.logs(),
+            this.events.playersData(),
+        ];
     }
 
     buyBuilding(data) {
@@ -470,6 +482,7 @@ export default class Eurobusiness extends Game {
             this.events.availableActions(),
             this.events.logs(),
             this.events.currentMessage(),
+            this.events.playersData(),
         ];
     }
 
@@ -522,14 +535,18 @@ export default class Eurobusiness extends Game {
     pickChanceCard() {
         const currentPlayer = this.getCurrentPlayer();
         const position = currentPlayer.getData("position");
-        const randomIndex = getRandomNumber(0, chanceCards.length);
+        const randomIndex = getRandomNumber(0, chanceCards.length - 1);
         const card = chanceCards[randomIndex];
         this.setTimer(this.timer + 30);
         this.addLog(`${currentPlayer.username} wylosował kartę ${card.name}.`);
         switch (card.type) {
             case chanceCardTypes.goToStart:
                 currentPlayer.setData("position", () => 0);
+                currentPlayer.setData("money", (money) => money + 200);
                 this.addLog(`${currentPlayer.username} idzie na start.`);
+                this.addLog(
+                    `${currentPlayer.username} otrzymał 200$ za przejście przez start.`,
+                );
                 break;
             case chanceCardTypes.goToTile:
                 currentPlayer.setData("position", () => getRandomNumber(0, 40));
@@ -571,7 +588,7 @@ export default class Eurobusiness extends Game {
 
     pickCommunityCard() {
         const currentPlayer = this.getCurrentPlayer();
-        const randomIndex = getRandomNumber(0, communityCards.length);
+        const randomIndex = getRandomNumber(0, communityCards.length - 1);
         const card = communityCards[randomIndex];
         this.setTimer(this.timer + 30);
         this.addLog(`${currentPlayer.username} wylosował kartę ${card.name}.`);

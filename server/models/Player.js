@@ -17,11 +17,26 @@ export default class Player {
     }
 
     getPlayerData() {
+        const convert = (value) => {
+            if (value instanceof Set) {
+                return Array.from(value);
+            }
+            if (value instanceof Map) {
+                return Object.fromEntries(value);
+            }
+            return value;
+        };
+
+        const convertedData = {};
+        for (const key in this.data) {
+            convertedData[key] = convert(this.data[key]);
+        }
+
         return {
             username: this.username,
             color: this.color,
             publicId: this.publicId,
-            ...this.data,
+            ...convertedData,
         };
     }
 }

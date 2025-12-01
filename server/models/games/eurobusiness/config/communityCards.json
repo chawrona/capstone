@@ -1,7 +1,7 @@
 [
   {
     "type": "moneyGain",
-    "name": "Pobierz piniądze z banku"
+    "name": "Pobierz pieniądze z banku"
   },
   {
     "type": "moneyLoss",
@@ -13,7 +13,7 @@
   },
   {
     "type": "getOutOfJail",
-    "name": "Wyjdź z więzienia"
+    "name": "Karta wyjścia z więzienia"
   },
   {
     "type": "payTaxes",
