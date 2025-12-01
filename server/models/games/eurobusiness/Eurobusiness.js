@@ -543,6 +543,8 @@ export default class Eurobusiness extends Game {
         this.addLog(
             `${currentPlayer.username} wylosował kartę <b>${card.name}</b>.`,
         );
+        this.gameData.availableActions = [actions.endTurn];
+        this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
         switch (card.type) {
             case chanceCardTypes.goToStart:
                 currentPlayer.setData("position", () => 0);
@@ -563,6 +565,7 @@ export default class Eurobusiness extends Game {
                 this.playerToJail(currentPlayer);
                 break;
             case chanceCardTypes.payTaxes:
+                this.gameData.currentMessage = `${currentPlayer.username} płaci podatek <b>50$</b>`;
                 this.gameData.availableActions = [actions.payTax];
                 break;
             case chanceCardTypes.withdrawCashFromBank:
@@ -602,6 +605,8 @@ export default class Eurobusiness extends Game {
         this.addLog(
             `${currentPlayer.username} wylosował kartę <b>${card.name}</b>.`,
         );
+        this.gameData.availableActions = [actions.endTurn];
+        this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
         switch (card.type) {
             case communityCardTypes.withdrawCashFromBank:
                 currentPlayer.setData("money", (money) => money + 50);
