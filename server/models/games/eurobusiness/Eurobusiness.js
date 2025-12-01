@@ -464,7 +464,7 @@ export default class Eurobusiness extends Game {
         player.setData("money", (money) => money - tile.price);
         this.setOwnership(player, position);
         this.addLog(
-            `${player.username} kupił <b>${tile.name}</b> za ${tile.price}.`,
+            `${player.username} kupił <b>${tile.name}</b> za <b>${tile.price}$</b>.`,
         );
         this.gameData.availableActions = [actions.endTurn];
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
