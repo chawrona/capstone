@@ -43,7 +43,7 @@ export default class Eurobusiness extends Game {
         player.setData("money", (money) => money - this.gameData.auction.price);
         this.setOwnership(player, this.gameData.auction.tileIndex);
         this.addLog(
-            `${player.username} wylicytował ${tile.name} za ${tile.price}$.`,
+            `${player.username} wylicytował <b>${tile.name}</b> za <b>${tile.price}$</b>.`,
         );
         this.gameData.availableActions = [actions.endTurn];
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
@@ -85,7 +85,7 @@ export default class Eurobusiness extends Game {
         player.setData("position", () => 0);
         player.setData("inJail", () => false);
         player.setData("outOfJailCard", () => 0);
-        player.setData("money", () => 1500);
+        player.setData("money", () => 9999);
         player.setData("ownerships", () => new Set());
         player.setData("outOfJailAttempts", () => 0);
     }
@@ -147,7 +147,7 @@ export default class Eurobusiness extends Game {
     }
 
     executeTileAction(tile) {
-        switch (tile.name) {
+        switch (tile.type) {
             case tileTypes.default:
             case tileTypes.start:
             case tileTypes.parking:
@@ -221,7 +221,7 @@ export default class Eurobusiness extends Game {
             this.gameData.availableActions = [actions.rollDice];
             if (isDublet) {
                 this.addLog(
-                    `${player.username} wyrzucił dublet (${diceResult[0]}, ${diceResult[1]}). Wychodzi z więzienia.`,
+                    `${player.username} wyrzucił dublet <b>(${diceResult[0]}, ${diceResult[1]})</b>. Wychodzi z więzienia.`,
                 );
                 player.setData("outOfJailAttempts", () => 0);
                 player.setData("inJail", () => false);
@@ -230,7 +230,7 @@ export default class Eurobusiness extends Game {
                 player.setData("outOfJailAttempts", (attempts) => attempts + 1);
 
                 this.addLog(
-                    `${player.username} wyrzucił ${diceResult[0]} oraz ${diceResult[1]}. Nie wychodzi z więzienia.`,
+                    `${player.username} wyrzucił <b>${diceResult[0]}</b> oraz <b>${diceResult[1]}</b>. Nie wychodzi z więzienia.`,
                 );
 
                 if (player.getData("outOfJailAttempts") === 3) {
@@ -252,7 +252,7 @@ export default class Eurobusiness extends Game {
         if (hasCompletedLap) {
             player.setData("money", (money) => money + 200);
             this.addLog(
-                `${player.username} otrzymał 200$ za przejście przez start.`,
+                `${player.username} otrzymał <b>200$</b> za przejście przez <b>Start</b>.`,
             );
         }
 
@@ -263,14 +263,14 @@ export default class Eurobusiness extends Game {
 
         if (isDublet && !wasPlayerInJail) {
             this.addLog(
-                `${player.username} wyrzucił dublet (${diceResult[0]}, ${diceResult[1]}). Idzie na pole ${tile.name}.`,
+                `${player.username} wyrzucił dublet <b>(${diceResult[0]}, ${diceResult[1]})</b>. Idzie na pole <b>${tile.name}</b>.`,
             );
         } else if (!isDublet && !wasPlayerInJail) {
             this.addLog(
-                `${player.username} wyrzucił ${diceResult[0] + diceResult[1]}. Idzie na pole ${tile.name}.`,
+                `${player.username} wyrzucił <b>${diceResult[0] + diceResult[1]}</b>. Idzie na pole <b>${tile.name}</b>.`,
             );
         } else if (wasPlayerInJail) {
-            this.addLog(`Idzie na pole ${tile.name}.`);
+            this.addLog(`Idzie na pole <b>${tile.name}</b>.`);
         }
 
         this.executeTileAction(tile);
@@ -330,7 +330,7 @@ export default class Eurobusiness extends Game {
         player.setData("inJail", () => true);
         player.setData("position", () => 10);
         this.setTimer(this.timer + 30);
-        this.addLog(`${player.username} idzie do więzienia.`);
+        this.addLog(`${player.username} idzie do <b>więzienia</b>.`);
         this.gameData.availableActions = [actions.endTurn];
 
         return [this.events.logs()];
@@ -348,7 +348,7 @@ export default class Eurobusiness extends Game {
         currentPlayer.setData("money", (money) => money - 50);
 
         this.addLog(
-            `${currentPlayer.username} płaci 50$ za wyjście z więzienia.`,
+            `${currentPlayer.username} płaci <b>50$</b> za wyjście z <b>więzienia</b>.`,
         );
 
         this.gameData.availableActions = [actions.rollDice];
@@ -375,7 +375,7 @@ export default class Eurobusiness extends Game {
         );
 
         this.addLog(
-            `${currentPlayer.username} użył karty wyjścia z więzienia.`,
+            `${currentPlayer.username} użył karty <b>Wyjście z Więzienia</b>.`,
         );
 
         this.gameData.availableActions = [actions.rollDice];
@@ -398,7 +398,7 @@ export default class Eurobusiness extends Game {
 
         currentPlayer.setData("money", (money) => money - 100);
 
-        this.addLog(`${currentPlayer.username} płaci podatek (100$).`);
+        this.addLog(`${currentPlayer.username} płaci podatek <b>100$</b>.`);
 
         this.gameData.availableActions = [actions.endTurn];
 
@@ -420,7 +420,7 @@ export default class Eurobusiness extends Game {
 
         currentPlayer.setData("money", (money) => money - 150);
 
-        this.addLog(`${currentPlayer.username} płaci 150$ podatku`);
+        this.addLog(`${currentPlayer.username} płaci <b>150$</b> podatku`);
 
         this.gameData.availableActions = [actions.endTurn];
 
@@ -445,7 +445,7 @@ export default class Eurobusiness extends Game {
         player.setData("money", (money) => money - tile.rent);
         owner.setData("money", (money) => money + tile.rent);
         this.addLog(
-            `${player.username} płaci ${tile.rent}$ graczowi ${owner.username}.`,
+            `${player.username} płaci <b>${tile.rent}$</b> graczowi ${owner.username}.`,
         );
         this.gameData.availableActions = [actions.endTurn];
         return [this.events.availableActions(), this.events.logs()];
@@ -463,7 +463,9 @@ export default class Eurobusiness extends Game {
 
         player.setData("money", (money) => money - tile.price);
         this.setOwnership(player, position);
-        this.addLog(`${player.username} kupił ${tile.name} za ${tile.price}.`);
+        this.addLog(
+            `${player.username} kupił <b>${tile.name}</b> za ${tile.price}.`,
+        );
         this.gameData.availableActions = [actions.endTurn];
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
         return [
@@ -479,7 +481,7 @@ export default class Eurobusiness extends Game {
         const position = player.getData("position");
         const tile = this.gameMap.getTile(position);
         this.addLog(
-            `${player.username} nie kupił nieruchomości na polu ${tile.name}.`,
+            `${player.username} rozpoczął licytację pola <b>${tile.name}</b>.`,
         );
         this.gameData.availableActions = [actions.auction];
         this.gameData.currentMessage = "Licytacja";
@@ -522,20 +524,26 @@ export default class Eurobusiness extends Game {
     pickChanceCard() {
         const currentPlayer = this.getCurrentPlayer();
         const position = currentPlayer.getData("position");
-        const randomIndex = getRandomNumber(0, chanceCards.length);
+        const randomIndex = getRandomNumber(0, chanceCards.length - 1);
         const card = chanceCards[randomIndex];
         this.setTimer(this.timer + 30);
-        this.addLog(`${currentPlayer.username} wylosował kartę ${card.name}.`);
+        this.addLog(
+            `${currentPlayer.username} wylosował kartę <b>${card.name}</b>.`,
+        );
         switch (card.type) {
             case chanceCardTypes.goToStart:
                 currentPlayer.setData("position", () => 0);
-                this.addLog(`${currentPlayer.username} idzie na start.`);
+                currentPlayer.setData("money", (m) => m + 200);
+                this.addLog(`${currentPlayer.username} idzie na <b>Start.</b>`);
+                this.addLog(
+                    `${currentPlayer.username} otrzymał <b>200$</b> za przejście przez <b>Start</b>.`,
+                );
                 break;
             case chanceCardTypes.goToTile:
                 currentPlayer.setData("position", () => getRandomNumber(0, 40));
                 this.executeTileAction(this.gameMap.getTile(position));
                 this.addLog(
-                    `${currentPlayer.username} stanął na polu ${this.gameMap.getTile(position).name}.`,
+                    `${currentPlayer.username} idzie na pole <b>${this.gameMap.getTile(position).name}</b>.`,
                 );
                 break;
             case chanceCardTypes.goToJail:
@@ -546,7 +554,9 @@ export default class Eurobusiness extends Game {
                 break;
             case chanceCardTypes.withdrawCashFromBank:
                 currentPlayer.setData("money", (money) => money + 50);
-                this.addLog(`${currentPlayer.username} pobiera z banku 50$.`);
+                this.addLog(
+                    `${currentPlayer.username} pobiera z banku <b>50$</b>.`,
+                );
                 break;
             case chanceCardTypes.getOutOfJail:
                 currentPlayer.setData(
@@ -571,10 +581,14 @@ export default class Eurobusiness extends Game {
 
     pickCommunityCard() {
         const currentPlayer = this.getCurrentPlayer();
-        const randomIndex = getRandomNumber(0, communityCards.length);
+        const randomIndex = getRandomNumber(0, communityCards.length - 1);
         const card = communityCards[randomIndex];
         this.setTimer(this.timer + 30);
-        this.addLog(`${currentPlayer.username} wylosował kartę ${card.name}.`);
+        this.log(JSON.stringify({ card, randomIndex, communityCards }));
+
+        this.addLog(
+            `${currentPlayer.username} wylosował kartę <b>${card.name}</b>.`,
+        );
         switch (card.type) {
             case communityCardTypes.withdrawCashFromBank:
                 currentPlayer.setData("money", (money) => money + 50);
@@ -590,6 +604,7 @@ export default class Eurobusiness extends Game {
                 );
                 break;
             case communityCardTypes.payTaxes:
+                this.gameData.currentMessage = `${currentPlayer.username} płaci podatek <b>50$</b>`;
                 this.gameData.availableActions = [actions.payTax];
                 break;
         }
