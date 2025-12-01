@@ -43,7 +43,7 @@ export default class Eurobusiness extends Game {
         player.setData("money", (money) => money - this.gameData.auction.price);
         this.setOwnership(player, this.gameData.auction.tileIndex);
         this.addLog(
-            `${player.username} wylicytował <b>${tile.name}</b> za <b>${tile.price}$</b>.`,
+            `${player.username} wylicytował <i>${tile.name}</i> za <b>${tile.price}$</b>.`,
         );
         this.gameData.availableActions = [actions.endTurn];
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
@@ -263,14 +263,14 @@ export default class Eurobusiness extends Game {
 
         if (isDublet && !wasPlayerInJail) {
             this.addLog(
-                `${player.username} wyrzucił dublet <b>(${diceResult[0]}, ${diceResult[1]})</b>. Idzie na pole <b>${tile.name}</b>.`,
+                `${player.username} wyrzucił dublet <b>(${diceResult[0]}, ${diceResult[1]})</b>. Idzie na pole <i>${tile.name}</i>.`,
             );
         } else if (!isDublet && !wasPlayerInJail) {
             this.addLog(
-                `${player.username} wyrzucił <b>${diceResult[0] + diceResult[1]}</b>. Idzie na pole <b>${tile.name}</b>.`,
+                `${player.username} wyrzucił <b>${diceResult[0] + diceResult[1]}</b>. Idzie na pole <i>${tile.name}</i>.`,
             );
         } else if (wasPlayerInJail) {
-            this.addLog(`Idzie na pole <b>${tile.name}</b>.`);
+            this.addLog(`Idzie na pole <i>${tile.name}</i>.`);
         }
 
         this.executeTileAction(tile);
@@ -464,7 +464,7 @@ export default class Eurobusiness extends Game {
         player.setData("money", (money) => money - tile.price);
         this.setOwnership(player, position);
         this.addLog(
-            `${player.username} kupił <b>${tile.name}</b> za <b>${tile.price}$</b>.`,
+            `${player.username} kupił <i>${tile.name}</i> za <b>${tile.price}$</b>.`,
         );
         this.gameData.availableActions = [actions.endTurn];
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
@@ -481,7 +481,7 @@ export default class Eurobusiness extends Game {
         const position = player.getData("position");
         const tile = this.gameMap.getTile(position);
         this.addLog(
-            `${player.username} rozpoczął licytację pola <b>${tile.name}</b>.`,
+            `${player.username} rozpoczął licytację pola <i>${tile.name}</i>.`,
         );
         this.gameData.availableActions = [actions.auction];
         this.gameData.currentMessage = "Licytacja";
