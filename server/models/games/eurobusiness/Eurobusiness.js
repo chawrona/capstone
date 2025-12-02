@@ -2,6 +2,7 @@ import getRandomNumber from "../../../utils/getRandomNumber.js";
 import Game from "../../Game.js";
 import chanceCards from "../eurobusiness/config/chanceCards.json" with { type: "json" };
 import communityCards from "../eurobusiness/config/communityCards.json" with { type: "json" };
+import tile from "../eurobusiness/config/tiles.json" with { type: "json" };
 import actions from "../eurobusiness/interfaces/actions.js";
 import chanceCardTypes from "../eurobusiness/interfaces/chanceCardTypes.js";
 import communityCardTypes from "../eurobusiness/interfaces/communityCardTypes.js";
@@ -15,6 +16,7 @@ export default class Eurobusiness extends Game {
         this.events = new EurobusinessEventFactory(this);
         this.logs = [];
         this.timer = 60;
+        this.gameMap = new EurobusinessMap();
 
         this.startTimer();
     }
@@ -75,7 +77,6 @@ export default class Eurobusiness extends Game {
         this.gameData.dublets = 0;
         this.gameData.rollResult = [3, 5];
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
-        this.gameMap = new EurobusinessMap();
         this.setTimer(60);
         this.gameData.auction = {
             price: 0,
@@ -97,17 +98,17 @@ export default class Eurobusiness extends Game {
 
     setOwnership(player, position) {
         this.gameMap.ownerships.set(position, player.publicId);
-        player.setData("ownerships", (set) => {
-            set.add(position);
-            return set;
+        player.setData("ownerships", (ownerships) => {
+            ownerships.add(position);
+            return ownerships;
         });
     }
 
     removeOwnership(player, position) {
         this.gameMap.ownerships.delete(position);
-        player.setData("ownerships", (set) => {
-            set.delete(position);
-            return set;
+        player.setData("ownerships", (ownerships) => {
+            ownerships.delete(position);
+            return ownerships;
         });
     }
 
@@ -209,7 +210,7 @@ export default class Eurobusiness extends Game {
                 actions.redeemPropertyCard,
             ];
         } else if (mortgagedCards.has(position)) {
-            this.gameData.currentMessage = `${player.username} stanął na zastawionym polu przez gracza ${tileOwner.username}, więc nie płaci czynszu.`;
+            this.gameData.currentMessage = `${player.username} stanął na zastawionym polu przez gracza ${tileOwner.username}.`;
             this.addLog(
                 `${player.username} stanął na zastawionym polu gracza ${tileOwner.username}`,
             );
@@ -499,19 +500,24 @@ export default class Eurobusiness extends Game {
             return [this.events.info("To pole nie należy do Ciebie.")];
         }
 
-        player.setData("mortgagedCards", (set) => set.add(data.cardIndex));
-        const money = this.tiles[data.cardIndex].mortgage;
-        player.money += money;
-        this.gameData.currentMessage = `${player.username} zastawia karte: ${this.tiles[data.cardIndex].name}`;
+        player.setData("mortgagedCards", (mortgagedCards) =>
+            mortgagedCards.add(data.cardIndex),
+        );
+        player.setData(
+            "money",
+            (money) => money + tile[data.cardIndex].mortgage,
+        );
+
+        this.gameData.currentMessage = `${player.username} zastawia kartę: ${this.tile[data.cardIndex].name}`;
         this.timer.addTime(10);
         return [this.events.logs(), this.events.currentMessage()];
     }
 
     redeemPropertyCard(data) {
         const player = this.getPlayer(data.publicId);
-        const mortgagePrice = this.tiles[data.cardIndex].mortgage;
+        const mortgagePrice = this.tile[data.cardIndex].mortgage;
 
-        if (player.money < mortgagePrice) {
+        if (player.getData("money") < mortgagePrice) {
             return [
                 this.events.info(
                     `Nie masz wystarczająco pieniędzy aby odkupić kartę: ${this.tiles[data.cardIndex].name}.`,
@@ -519,8 +525,13 @@ export default class Eurobusiness extends Game {
             ];
         }
 
-        player.money -= mortgagePrice;
-        player.setData("mortgagedCards", (set) => set.delete(data.cardIndex));
+        player.setData(
+            "money",
+            (money) => money - tile[data.cardIndex].mortgage,
+        );
+        player.setData("mortgagedCards", (mortgagedCards) =>
+            mortgagedCards.delete(data.cardIndex),
+        );
         this.gameData.currentMessage = `${player.username} odkupił kartę: ${this.tiles[data.cardIndex].name}`;
 
         this.timer.addTime(10);
