@@ -10,8 +10,8 @@ import EurobusinessMap from "../eurobusiness/modules/EurobusinessMap.js";
 import EurobusinessEventFactory from "./modules/EurobusinessEventFactory.js";
 
 export default class Eurobusiness extends Game {
-    constructor(players, endGame) {
-        super(players, endGame);
+    constructor(players, endGame, lobbyId) {
+        super(players, endGame, lobbyId);
         this.events = new EurobusinessEventFactory(this);
         this.logs = [];
         this.timer = 60;
@@ -53,6 +53,7 @@ export default class Eurobusiness extends Game {
             this.events.logs(),
             this.events.currentMessage(),
             this.events.playersData(),
+            this.events.time(),
         ]);
     }
 
@@ -62,7 +63,7 @@ export default class Eurobusiness extends Game {
 
     addLog(message) {
         this.logs.push(message);
-        if (this.logs.length > 19) {
+        if (this.logs.length > 25) {
             this.logs.shift();
         }
     }
@@ -313,6 +314,7 @@ export default class Eurobusiness extends Game {
             this.events.yourTurn(this.getCurrentPlayerPublicId(), true),
             this.events.availableActions(),
             this.events.logs(),
+            this.events.time(),
         ];
     }
 
@@ -338,7 +340,7 @@ export default class Eurobusiness extends Game {
         this.gameData.availableActions = [actions.endTurn];
         this.gameData.dublets = 0;
 
-        return [this.events.logs()];
+        return [this.events.logs(), this.events.time()];
     }
 
     payJail(data) {
@@ -363,6 +365,7 @@ export default class Eurobusiness extends Game {
             this.events.availableActions(),
             this.events.logs(),
             this.events.playersData(),
+            this.events.time(),
         ];
     }
 
@@ -390,6 +393,7 @@ export default class Eurobusiness extends Game {
             this.events.currentMessage(),
             this.events.availableActions(),
             this.events.logs(),
+            this.events.time(),
         ];
     }
 
@@ -413,6 +417,7 @@ export default class Eurobusiness extends Game {
             this.events.availableActions(),
             this.events.logs(),
             this.events.playersData(),
+            this.events.time(),
         ];
     }
 
@@ -436,6 +441,7 @@ export default class Eurobusiness extends Game {
             this.events.availableActions(),
             this.events.logs(),
             this.events.playersData(),
+            this.events.time(),
         ];
     }
 
@@ -511,6 +517,7 @@ export default class Eurobusiness extends Game {
             this.events.logs(),
             this.events.currentMessage(),
             this.events.auction(),
+            this.events.time(),
         ];
     }
 
@@ -531,7 +538,7 @@ export default class Eurobusiness extends Game {
         this.gameData.auction.winningPlayer = data.publicId;
         if (this.timer < 10) this.setTimer(this.timer + 5);
         if (this.timer > 10) this.setTimer(10);
-        return [this.events.logs(), this.events.auction()];
+        return [this.events.logs(), this.events.auction(), this.events.time()];
     }
 
     pickChanceCard() {
@@ -592,6 +599,8 @@ export default class Eurobusiness extends Game {
             this.events.currentMessage(),
             this.events.availableActions(),
             this.events.chanceCard(card),
+            this.events.playersData(),
+            this.events.time(),
         ];
     }
 
@@ -633,6 +642,8 @@ export default class Eurobusiness extends Game {
             this.events.currentMessage(),
             this.events.availableActions(),
             this.events.communityCard(card),
+            this.events.playersData(),
+            this.events.time(),
         ];
     }
 }
