@@ -124,6 +124,14 @@ export default class EurobusinessEventFactory {
             this.rollResult(),
             this.playersPosition(),
             this.playersData(),
+            this.time(),
         ];
+    }
+    time() {
+        return {
+            target: "lobby",
+            eventName: "time",
+            data: this.game.timer,
+        };
     }
 }
