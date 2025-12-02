@@ -508,7 +508,7 @@ export default class Eurobusiness extends Game {
             (money) => money + tile[data.cardIndex].mortgage,
         );
 
-        this.gameData.currentMessage = `${player.username} zastawia kartę: ${this.tile[data.cardIndex].name}`;
+        this.gameData.currentMessage = `${player.username} zastawia kartę: ${tile[data.cardIndex].name}`;
         this.timer.addTime(10);
         return [this.events.logs(), this.events.currentMessage()];
     }
@@ -520,7 +520,7 @@ export default class Eurobusiness extends Game {
         if (player.getData("money") < mortgagePrice) {
             return [
                 this.events.info(
-                    `Nie masz wystarczająco pieniędzy aby odkupić kartę: ${this.tiles[data.cardIndex].name}.`,
+                    `Nie masz wystarczająco pieniędzy aby odkupić kartę: ${tile[data.cardIndex].name}.`,
                 ),
             ];
         }
@@ -532,7 +532,7 @@ export default class Eurobusiness extends Game {
         player.setData("mortgagedCards", (mortgagedCards) =>
             mortgagedCards.delete(data.cardIndex),
         );
-        this.gameData.currentMessage = `${player.username} odkupił kartę: ${this.tiles[data.cardIndex].name}`;
+        this.gameData.currentMessage = `${player.username} odkupił kartę: ${tile[data.cardIndex].name}`;
 
         this.timer.addTime(10);
         return [this.events.currentMessage(), this.events.logs()];
