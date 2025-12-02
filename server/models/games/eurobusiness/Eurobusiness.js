@@ -7,6 +7,7 @@ import chanceCardTypes from "../eurobusiness/interfaces/chanceCardTypes.js";
 import communityCardTypes from "../eurobusiness/interfaces/communityCardTypes.js";
 import tileTypes from "../eurobusiness/interfaces/tileTypes.js";
 import EurobusinessMap from "../eurobusiness/modules/EurobusinessMap.js";
+import Timer from "../eurobusiness/modules/Timer.js";
 import EurobusinessEventFactory from "./modules/EurobusinessEventFactory.js";
 
 export default class Eurobusiness extends Game {
@@ -14,27 +15,53 @@ export default class Eurobusiness extends Game {
         super(players, endGame);
         this.events = new EurobusinessEventFactory(this);
         this.logs = [];
-        this.timer = 60;
-
+        this.timer = new Timer();
         this.startTimer();
+        this.leaderboard = [];
+        this.gameEnded = false;
     }
 
-    startTimer() {
-        setTimeout(() => {
-            if (this.timer > 0) {
-                this.timer -= 1;
-            }
-            if (
-                this.timer === 0 &&
-                this.gameData.availableActions.includes(actions.auction)
-            ) {
-                this.endAuction();
-            }
+    startTimer(data) {
+        setInterval(() => {
+            this.timer.subtract(1);
+            this.endTimerConsequences(data);
         }, 1000);
     }
 
+    endTimerConsequences(data) {
+        if (this.timer.isTimerZero()) {
+            if (this.gameData.availableActions.includes(actions.auction)) {
+                this.endAuction();
+            } else if (
+                this.gameData.availableActions.includes(actions.endTurn)
+            ) {
+                this.endTurn(data);
+            } else if (
+                this.gameData.availableActions.includes(actions.rollDice)
+            ) {
+                this.rollDice(data);
+            } else if (
+                this.gameData.availableActions.includes(actions.payTax)
+            ) {
+                this.payTax(data);
+            } else if (
+                this.gameData.availableActions.includes(actions.payIncomeTax)
+            ) {
+                this.payIncomeTax(data);
+            } else if (
+                this.gameData.availableActions.includes(actions.payRent)
+            ) {
+                this.payRent(data);
+            } else if (
+                this.gameData.availableActions.includes(actions.payJail)
+            ) {
+                this.payJail(data);
+            }
+        }
+    }
+
     endAuction() {
-        this.setTimer(30);
+        this.timer.setTimer(30);
         const player = this.getCurrentPlayerPublicId(
             this.gameData.auction.winningPlayer,
         );
@@ -56,10 +83,6 @@ export default class Eurobusiness extends Game {
         ]);
     }
 
-    setTimer(nowyCzas) {
-        this.timer = nowyCzas;
-    }
-
     addLog(message) {
         this.logs.push(message);
         if (this.logs.length > 19) {
@@ -73,7 +96,7 @@ export default class Eurobusiness extends Game {
         this.gameData.rollResult = [3, 5];
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
         this.gameMap = new EurobusinessMap();
-        this.setTimer(60);
+        this.timer.setTimer(60);
         this.gameData.auction = {
             price: 0,
             winningPlayer: null,
@@ -89,6 +112,7 @@ export default class Eurobusiness extends Game {
         player.setData("money", () => 9999);
         player.setData("ownerships", () => new Set());
         player.setData("outOfJailAttempts", () => 0);
+        player.setData("lost", () => false);
     }
 
     setOwnership(player, position) {
@@ -217,9 +241,7 @@ export default class Eurobusiness extends Game {
             this.playerToJail(player);
             return this.events.rollPackage();
         }
-        if (this.timer < 30) {
-            this.setTimer(30);
-        }
+        this.timer.addTimeIfLessThan(30, 30);
         let wasPlayerInJail = false;
         if (player.getData("inJail")) {
             this.gameData.availableActions = [actions.rollDice];
@@ -295,7 +317,7 @@ export default class Eurobusiness extends Game {
             this.nextTurn();
             this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
         }
-        this.setTimer(60);
+        this.timer.setTimer(60);
         if (currentPlayer.getData("inJail")) {
             this.gameData.currentMessage = `${this.getCurrentPlayer().username} wychodzi z więzienia`;
             this.gameData.availableActions = [
@@ -317,6 +339,10 @@ export default class Eurobusiness extends Game {
     }
 
     checkIfActionPossible(publicId, checkedAction) {
+        if (this.getCurrentPlayer().getData("lost")) {
+            throw new Error("Przegrałeś, brak dostępnych akcji");
+        }
+
         if (publicId !== this.getCurrentPlayerPublicId()) {
             throw new Error("Poczekaj na swoją turę.");
         }
@@ -333,7 +359,7 @@ export default class Eurobusiness extends Game {
     playerToJail(player) {
         player.setData("inJail", () => true);
         player.setData("position", () => 10);
-        this.setTimer(this.timer + 30);
+        this.timer.addTime(30);
         this.addLog(`${player.username} idzie do <b>więzienia</b>.`);
         this.gameData.availableActions = [actions.endTurn];
         this.gameData.dublets = 0;
@@ -344,10 +370,13 @@ export default class Eurobusiness extends Game {
     payJail(data) {
         this.checkIfActionPossible(data.publicId, actions.payJail);
         const currentPlayer = this.getCurrentPlayer();
-        this.setTimer(this.timer + 30);
+        this.timer.addTime(30);
 
         if (currentPlayer.getData("money") < 50) {
-            return [this.events.info("Nie masz wystarczająco pieniędzy.")];
+            return [
+                this.events.info("Nie masz wystarczająco pieniędzy."),
+                this.gameOver(currentPlayer),
+            ];
         }
 
         currentPlayer.setData("money", (money) => money - 50);
@@ -369,7 +398,7 @@ export default class Eurobusiness extends Game {
     useOutOfJailCard(data) {
         this.checkIfActionPossible(data.publicId, actions.useOutOfJailCard);
         const currentPlayer = this.getCurrentPlayer();
-        this.setTimer(this.timer + 30);
+        this.timer.addTime(30);
 
         if (currentPlayer.getData("outOfJailCard") < 1) {
             return [this.events.info("Nie masz karty wyjścia z więzienia")];
@@ -396,10 +425,13 @@ export default class Eurobusiness extends Game {
     payTax(data) {
         this.checkIfActionPossible(data.publicId, actions.payTax);
         const currentPlayer = this.getCurrentPlayer();
-        this.setTimer(this.timer + 30);
+        this.timer.addTime(30);
 
         if (currentPlayer.getData("money") < 100) {
-            return [this.events.info("Nie masz wystarczająco pieniędzy")];
+            return [
+                this.events.info("Nie masz wystarczająco pieniędzy"),
+                this.gameOver(currentPlayer),
+            ];
         }
 
         currentPlayer.setData("money", (money) => money - 100);
@@ -419,10 +451,13 @@ export default class Eurobusiness extends Game {
     payIncomeTax(data) {
         this.checkIfActionPossible(data.publicId, actions.payIncomeTax);
         const currentPlayer = this.getCurrentPlayer();
-        this.setTimer(this.timer + 30);
+        this.timer.addTime(30);
 
         if (currentPlayer.getData("money") < 150) {
-            return [this.events.info("Nie masz wystarczająco pieniędzy")];
+            return [
+                this.events.info("Nie masz wystarczająco pieniędzy"),
+                this.gameOver(currentPlayer),
+            ];
         }
 
         currentPlayer.setData("money", (money) => money - 150);
@@ -447,7 +482,10 @@ export default class Eurobusiness extends Game {
         const owner = this.players.get(this.getOwnerId(position));
 
         if (player.getData("money") < tile.rent) {
-            return [this.events.info("Nie masz wystarczająco pieniędzy")];
+            return [
+                this.events.info("Nie masz wystarczająco pieniędzy"),
+                this.gameOver(player, owner),
+            ];
         }
 
         player.setData("money", (money) => money - tile.rent);
@@ -504,7 +542,7 @@ export default class Eurobusiness extends Game {
             tileIndex: position,
             cannotBid: player.publicId,
         };
-        this.setTimer(20);
+        this.timer.setTimer(20);
 
         return [
             this.events.availableActions(),
@@ -529,8 +567,8 @@ export default class Eurobusiness extends Game {
         this.gameData.auction.price =
             this.gameData.auction.price + bidIncrement;
         this.gameData.auction.winningPlayer = data.publicId;
-        if (this.timer < 10) this.setTimer(this.timer + 5);
-        if (this.timer > 10) this.setTimer(10);
+        this.timer.addTimeIfLessThan(5, 10);
+        if (this.timer.getTimer() > 10) this.timer.setTimer(10);
         return [this.events.logs(), this.events.auction()];
     }
 
@@ -539,7 +577,7 @@ export default class Eurobusiness extends Game {
         const position = currentPlayer.getData("position");
         const randomIndex = getRandomNumber(0, chanceCards.length - 1);
         const card = chanceCards[randomIndex];
-        this.setTimer(this.timer + 30);
+        this.timer.addTime(30);
         this.addLog(
             `${currentPlayer.username} wylosował kartę <b>${card.name}</b>.`,
         );
@@ -596,7 +634,7 @@ export default class Eurobusiness extends Game {
         const currentPlayer = this.getCurrentPlayer();
         const randomIndex = getRandomNumber(0, communityCards.length - 1);
         const card = communityCards[randomIndex];
-        this.setTimer(this.timer + 30);
+        this.timer.addTime(30);
         this.log(JSON.stringify({ card, randomIndex, communityCards }));
 
         this.addLog(
@@ -628,6 +666,77 @@ export default class Eurobusiness extends Game {
             this.events.currentMessage(),
             this.events.availableActions(),
             this.events.communityCard(card),
+        ];
+    }
+
+    gameOver(loser, opponent) {
+        const currentPlayer = this.getCurrentPlayer();
+        currentPlayer.setData("lost", () => true);
+
+        const possesions = currentPlayer.getData("ownerships");
+
+        if (opponent !== undefined) {
+            for (const position of possesions) {
+                this.removeOwnership(currentPlayer, position);
+                this.setOwnership(opponent, position);
+            }
+
+            const outOfJailCards = currentPlayer.getData("outOfJailCard");
+            currentPlayer.setData("outOfJailCard", () => 0);
+            opponent.setData(
+                "outOfJailCard",
+                (outOfJailCard) => outOfJailCard + outOfJailCards,
+            );
+
+            const cash = currentPlayer.getData("money");
+            currentPlayer.setData("money", () => 0);
+            opponent.setData("money", (money) => money + cash);
+            this.addLog(
+                `${currentPlayer.username} zbankrutował na rzecz gracza ${opponent.username}.`,
+            );
+        } else {
+            for (const position of possesions) {
+                this.removeOwnership(currentPlayer, position);
+            }
+
+            currentPlayer.setData("outOfJailCard", () => 0);
+
+            currentPlayer.setData("money", () => 0);
+            this.addLog(`${currentPlayer.username} zbankrutował`);
+        }
+
+        this.leaderboard.unshift(currentPlayer.publicId);
+
+        let playersLeft = 0;
+
+        for (const [, player] of this.players) {
+            if (!player.getData("lost")) {
+                playersLeft += 1;
+            }
+        }
+
+        if (playersLeft === 1) {
+            this.gameData.currentMessage = this.leaderboard;
+            this.events.currentMessage();
+            this.gameEnded = true;
+            // Tutaj powinno się całe lobby zafreezować czy coś takiego
+        }
+
+        this.gameData.availableActions = [actions.rollDice];
+        this.timer.setTimer(60);
+        this.nextTurn();
+
+        while (this.getCurrentPlayer().getData("lost")) {
+            this.nextTurn();
+        }
+
+        return [
+            this.events.currentMessage(),
+            this.events.yourTurn(loser.publicId, false),
+            this.events.yourTurn(this.getCurrentPlayerPublicId(), true),
+            this.events.availableActions(),
+            this.events.logs(),
+            this.events.playersData(),
         ];
     }
 }
