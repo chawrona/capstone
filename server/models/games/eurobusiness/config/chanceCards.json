@@ -1,6 +1,6 @@
 [
   {
-    "type": "moveToStart",
+    "type": "goToStart",
     "name": "Idź na pole start"
   },
   {
@@ -12,11 +12,11 @@
     "name": "Idź do więzienia"
   },
   {
-    "type": "moneyLoss",
+    "type": "payTaxes",
     "name": "Zapłać pieniądze banku"
   },
   {
-    "type": "moneyGain",
+    "type": "withdrawCashFromBank",
     "name": "Pobierz pieniądze z banku"
   },
   {
@@ -28,7 +28,7 @@
     "name": "Opłać budowę"
   },
   {
-    "type": "gainFromPlayers",
+    "type": "takeMoneyFromPlayer",
     "name": "Pobierz 50$ od wszystkich graczy"
   }
 ]

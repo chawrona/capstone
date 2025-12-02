@@ -1,10 +1,10 @@
 [
   {
-    "type": "moneyGain",
+    "type": "withdrawCashFromBank",
     "name": "Pobierz pieniądze z banku"
   },
   {
-    "type": "moneyLoss",
+    "type": "payCashToBank",
     "name": "Zapłać pieniądze banku"
   },
   {

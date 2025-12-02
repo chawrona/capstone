@@ -6,10 +6,11 @@
   {
     "type": "Budynek",
     "name": "Budynek 1",
-    "color": "Brązowy",
+    "color": "#8B4513",
     "price": 60,
     "setCount": 2,
     "setId": 1,
+    "setPosition": 1,
     "rent": 2,
     "mortgage": 30
   },
@@ -20,10 +21,11 @@
   {
     "type": "Budynek",
     "name": "Budynek 2",
-    "color": "Brązowy",
+    "color": "#8B4513",
     "price": 60,
     "setCount": 2,
     "setId": 1,
+    "setPosition": 2,
     "rent": 4,
     "mortgage": 30
   },
@@ -38,10 +40,11 @@
   {
     "type": "Budynek",
     "name": "Budynek 3",
-    "color": "Błękitny",
+    "color": "#87CEEB",
     "price": 100,
     "setCount": 3,
     "setId": 2,
+    "setPosition": 1,
     "rent": 6,
     "mortgage": 50
   },
@@ -52,20 +55,22 @@
   {
     "type": "Budynek",
     "name": "Budynek 4",
-    "color": "Błękitny",
+    "color": "#87CEEB",
     "price": 100,
     "setCount": 3,
     "setId": 2,
+    "setPosition": 2,
     "rent": 6,
     "mortgage": 50
   },
   {
     "type": "Budynek",
     "name": "Budynek 5",
-    "color": "Błękitny",
+    "color": "#87CEEB",
     "price": 120,
     "setCount": 3,
     "setId": 2,
+    "setPosition": 3,
     "rent": 8,
     "mortgage": 60
   },
@@ -76,10 +81,11 @@
   {
     "type": "Budynek",
     "name": "Budynek 6",
-    "color": "Różowy",
+    "color": "#FFC0CB",
     "price": 140,
     "setCount": 3,
     "setId": 3,
+    "setPosition": 1,
     "rent": 10,
     "mortgage": 70
   },
@@ -90,20 +96,22 @@
   {
     "type": "Budynek",
     "name": "Budynek 7",
-    "color": "Różowy",
+    "color": "#FFC0CB",
     "price": 140,
     "setCount": 3,
     "setId": 3,
+    "setPosition": 2,
     "rent": 10,
     "mortgage": 70
   },
   {
     "type": "Budynek",
     "name": "Budynek 8",
-    "color": "Różowy",
+    "color": "#FFC0CB",
     "price": 160,
     "setCount": 3,
     "setId": 3,
+    "setPosition": 3,
     "rent": 12,
     "mortgage": 80
   },
@@ -114,10 +122,11 @@
   {
     "type": "Budynek",
     "name": "Budynek 9",
-    "color": "Pomarańczowy",
+    "color": "#FFA500",
     "price": 180,
     "setCount": 3,
     "setId": 4,
+    "setPosition": 1,
     "rent": 14,
     "mortgage": 90
   },
@@ -128,20 +137,22 @@
   {
     "type": "Budynek",
     "name": "Budynek 10",
-    "color": "Pomarańczowy",
+    "color": "#FFA500",
     "price": 180,
     "setCount": 3,
     "setId": 4,
+    "setPosition": 2,
     "rent": 14,
     "mortgage": 90
   },
   {
     "type": "Budynek",
     "name": "Budynek 11",
-    "color": "Pomarańczowy",
+    "color": "#FFA500",
     "price": 200,
     "setCount": 3,
     "setId": 4,
+    "setPosition": 3,
     "rent": 16,
     "mortgage": 100
   },
@@ -152,10 +163,11 @@
   {
     "type": "Budynek",
     "name": "Budynek 12",
-    "color": "Czerwony",
+    "color": "#FF0000",
     "price": 220,
     "setCount": 3,
     "setId": 5,
+    "setPosition": 1,
     "rent": 18,
     "mortgage": 110
   },
@@ -166,20 +178,22 @@
   {
     "type": "Budynek",
     "name": "Budynek 13",
-    "color": "Czerwony",
+    "color": "#FF0000",
     "price": 220,
     "setCount": 3,
     "setId": 5,
+    "setPosition": 2,
     "rent": 18,
     "mortgage": 110
   },
   {
     "type": "Budynek",
     "name": "Budynek 14",
-    "color": "Czerwony",
+    "color": "#FF0000",
     "price": 240,
     "setCount": 3,
     "setId": 5,
+    "setPosition": 3,
     "rent": 20,
     "mortgage": 120
   },
@@ -190,20 +204,22 @@
   {
     "type": "Budynek",
     "name": "Budynek 15",
-    "color": "Żółty",
+    "color": "#FFFF00",
     "price": 260,
     "setCount": 3,
     "setId": 6,
+    "setPosition": 1,
     "rent": 22,
     "mortgage": 130
   },
   {
     "type": "Budynek",
     "name": "Budynek 16",
-    "color": "Żółty",
+    "color": "#FFFF00",
     "price": 260,
     "setCount": 3,
     "setId": 6,
+    "setPosition": 2,
     "rent": 22,
     "mortgage": 130
   },
@@ -214,10 +230,11 @@
   {
     "type": "Budynek",
     "name": "Budynek 17",
-    "color": "Żółty",
+    "color": "#FFFF00",
     "price": 280,
     "setCount": 3,
     "setId": 6,
+    "setPosition": 3,
     "rent": 24,
     "mortgage": 140
   },
@@ -228,20 +245,22 @@
   {
     "type": "Budynek",
     "name": "Budynek 18",
-    "color": "Zielony",
+    "color": "#00FF00",
     "price": 300,
     "setCount": 3,
     "setId": 7,
+    "setPosition": 1,
     "rent": 26,
     "mortgage": 150
   },
   {
     "type": "Budynek",
     "name": "Budynek 19",
-    "color": "Zielony",
+    "color": "#00FF00",
     "price": 300,
     "setCount": 3,
     "setId": 7,
+    "setPosition": 2,
     "rent": 26,
     "mortgage": 150
   },
@@ -252,10 +271,11 @@
   {
     "type": "Budynek",
     "name": "Budynek 20",
-    "color": "Zielony",
+    "color": "#00FF00",
     "price": 320,
     "setCount": 3,
     "setId": 7,
+    "setPosition": 3,
     "rent": 28,
     "mortgage": 160
   },
@@ -270,10 +290,11 @@
   {
     "type": "Budynek",
     "name": "Budynek 21",
-    "color": "Niebieski",
+    "color": "#0000FF",
     "price": 350,
     "setCount": 2,
     "setId": 8,
+    "setPosition": 1,
     "rent": 35,
     "mortgage": 175
   },
@@ -284,10 +305,11 @@
   {
     "type": "Budynek",
     "name": "Budynek 22",
-    "color": "Niebieski",
+    "color": "#0000FF",
     "price": 400,
     "setCount": 2,
     "setId": 8,
+    "setPosition": 2,
     "rent": 50,
     "mortgage": 200
   }
