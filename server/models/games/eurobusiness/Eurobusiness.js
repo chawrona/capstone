@@ -2,7 +2,6 @@ import getRandomNumber from "../../../utils/getRandomNumber.js";
 import Game from "../../Game.js";
 import chanceCards from "../eurobusiness/config/chanceCards.json" with { type: "json" };
 import communityCards from "../eurobusiness/config/communityCards.json" with { type: "json" };
-import tile from "../eurobusiness/config/tiles.json" with { type: "json" };
 import actions from "../eurobusiness/interfaces/actions.js";
 import chanceCardTypes from "../eurobusiness/interfaces/chanceCardTypes.js";
 import communityCardTypes from "../eurobusiness/interfaces/communityCardTypes.js";
@@ -223,10 +222,6 @@ export default class Eurobusiness extends Game {
                 actions.mortgagePropertyCard,
                 actions.redeemPropertyCard,
             ];
-
-            
-        
-
         } else {
             this.gameData.currentMessage = `${this.getCurrentPlayer().username} płaci czynsz.`;
             this.addLog(
@@ -503,7 +498,11 @@ export default class Eurobusiness extends Game {
             actions.mortgagePropertyCard,
             actions.redeemPropertyCard,
         ];
-        return [this.events.availableActions(), this.events.logs(), this.events.playersData()];
+        return [
+            this.events.availableActions(),
+            this.events.logs(),
+            this.events.playersData(),
+        ];
     }
     mortgagePropertyCard(data) {
         const player = this.getPlayer(data.publicId);
@@ -517,34 +516,34 @@ export default class Eurobusiness extends Game {
         );
         player.setData(
             "money",
-            (money) => money + tile[data.cardIndex].mortgage,
+            (money) => money + this.gameMap.getTile(data.cardIndex).mortgage,
         );
 
-        this.gameData.currentMessage = `${player.username} zastawia kartę: ${tile[data.cardIndex].name}`;
+        this.gameData.currentMessage = `${player.username} zastawia kartę: ${this.gameMap.getTile(data.cardIndex).name}`;
         this.timer.addTime(10);
         return [this.events.logs(), this.events.currentMessage()];
     }
 
     redeemPropertyCard(data) {
         const player = this.getPlayer(data.publicId);
-        const mortgagePrice = this.tile[data.cardIndex].mortgage;
+        const mortgagePrice = this.gameMap.getTile(data.cardIndex).mortgage;
 
         if (player.getData("money") < mortgagePrice) {
             return [
                 this.events.info(
-                    `Nie masz wystarczająco pieniędzy aby odkupić kartę: ${tile[data.cardIndex].name}.`,
+                    `Nie masz wystarczająco pieniędzy aby odkupić kartę: ${this.gameMap.getTile(data.cardIndex).name}.`,
                 ),
             ];
         }
 
         player.setData(
             "money",
-            (money) => money - tile[data.cardIndex].mortgage,
+            (money) => money - this.gameMap.getTile(data.cardIndex).mortgage,
         );
         player.setData("mortgagedCards", (mortgagedCards) =>
             mortgagedCards.delete(data.cardIndex),
         );
-        this.gameData.currentMessage = `${player.username} odkupił kartę: ${tile[data.cardIndex].name}`;
+        this.gameData.currentMessage = `${player.username} odkupił kartę: ${this.gameMap.getTile(data.cardIndex).name}`;
 
         this.timer.addTime(10);
         return [this.events.currentMessage(), this.events.logs()];
