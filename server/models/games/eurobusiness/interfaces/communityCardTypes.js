@@ -1,6 +1,6 @@
 const communityCardTypes = {
-    withdrawCashFromBank: "Pobierz z banku pieniądze",
-    payCashToBank: "Zapłac bankowi",
+    withdrawCashFromBank: "Pobierz pieniądze z banku",
+    payCashToBank: "Zapłać bankowi",
     goToJail: "Idź do więzienia",
     getOutOfJail: "Wyjdź z więzenia",
     payTaxes: "Zapłać bankowi podatki",

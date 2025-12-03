@@ -604,7 +604,7 @@ export default class Eurobusiness extends Game {
                 break;
             case chanceCardTypes.payForBuildingProperties:
                 break;
-            case chanceCardTypes.takeMoneyFromPlayer:
+            case chanceCardTypes.takeMoneyFromPlayers:
                 break;
         }
 

@@ -1,22 +1,22 @@
 [
   {
-    "type": "withdrawCashFromBank",
+    "type": "Pobierz pieniądze z banku",
     "name": "Pobierz pieniądze z banku"
   },
   {
-    "type": "payCashToBank",
+    "type": "Zapłać bankowi",
     "name": "Zapłać pieniądze banku"
   },
   {
-    "type": "goToJail",
+    "type": "Idź do więzienia",
     "name": "Idź do więzienia"
   },
   {
-    "type": "getOutOfJail",
+    "type": "Wyjdź z więzenia",
     "name": "Karta wyjścia z więzienia"
   },
   {
-    "type": "payTaxes",
+    "type": "Zapłać bankowi podatki",
     "name": "Opłata podatków"
   }
 ]
