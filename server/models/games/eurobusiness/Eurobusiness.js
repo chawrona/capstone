@@ -329,7 +329,7 @@ export default class Eurobusiness extends Game {
             this.gameData.currentMessage = `${currentPlayer.username} ponownie rzuca kośćmi`;
         } else {
             this.nextTurn();
-            this.gameData.currentMessage = `${currentPlayer.username} rzuca kośćmi`;
+            this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
         }
         this.setTimer(60);
         const newPlayer = this.getCurrentPlayer();
