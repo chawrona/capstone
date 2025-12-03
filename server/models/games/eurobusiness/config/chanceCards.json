@@ -17,11 +17,11 @@
   },
   {
     "type": "moneyGain",
-    "name": "Pobierz piniądze z banku"
+    "name": "Pobierz pieniądze z banku"
   },
   {
     "type": "getOutOfJail",
-    "name": "Wyjdź z więzienia"
+    "name": "Karta wyjścia z więzienia"
   },
   {
     "type": "payForBuildingProperties",
@@ -29,6 +29,6 @@
   },
   {
     "type": "gainFromPlayers",
-    "name": "Pobierz pieniądze od gracza"
+    "name": "Pobierz 50$ od wszystkich graczy"
   }
 ]
