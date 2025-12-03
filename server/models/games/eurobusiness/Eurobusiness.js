@@ -19,54 +19,174 @@ export default class Eurobusiness extends Game {
         this.gameMap = new EurobusinessMap();
         this.startTimer();
         this.leaderboard = [];
-        this.gameEnded = false;
     }
 
+    initializeGameData() {
+        this.gameData.availableActions = [actions.rollDice];
+        this.gameData.dublets = 0;
+        this.gameData.rollResult = [3, 5];
+        this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
+        this.timer.setTimer(60);
+        this.gameData.auction = {
+            price: 0,
+            winningPlayer: null,
+            tileIndex: 0,
+            cannotBid: null,
+        };
+    }
 
-    startTimer(data) {
-        setInterval(() => {
+    setPlayerData(player) {
+        player.setData("position", () => 0);
+        player.setData("inJail", () => false);
+        player.setData("outOfJailCard", () => 0);
+        player.setData("money", () => 9999);
+        player.setData("ownerships", () => new Set());
+        player.setData("mortgagedCards", () => new Set());
+        player.setData("outOfJailAttempts", () => 0);
+        player.setData("wasInJail", () => false);
+        player.setData("lost", () => false);
+    }
+
+    startTimer() {
+        this.intervalId = setInterval(() => {
             this.timer.subtract(1);
-            this.endTimerConsequences(data);
+            const targets = this.endTimerConsequences();
+            if (targets) {
+                this.useEventEmmiter(targets);
+            }
         }, 1000);
     }
 
-    endTimerConsequences(data) {
-        if (this.timer.isTimerZero()) {
-            if (this.gameData.availableActions.includes(actions.auction)) {
-                this.endAuction();
-            } else if (
-                this.gameData.availableActions.includes(actions.endTurn)
-            ) {
-                this.endTurn(data);
-            } else if (
-                this.gameData.availableActions.includes(actions.rollDice)
-            ) {
-                this.rollDice(data);
-            } else if (
-                this.gameData.availableActions.includes(actions.payTax)
-            ) {
-                this.payTax(data);
-            } else if (
-                this.gameData.availableActions.includes(actions.payIncomeTax)
-            ) {
-                this.payIncomeTax(data);
-            } else if (
-                this.gameData.availableActions.includes(actions.payRent)
-            ) {
-                this.payRent(data);
-            } else if (
-                this.gameData.availableActions.includes(actions.payJail)
-            ) {
-                this.payJail(data);
-            }
+    endTimerConsequences() {
+        if (!this.timer.isTimerZero()) return;
+
+        const actions = new Set(this.getData.availableActions);
+        const data = {
+            publicId: this.getCurrentPlayerPublicId(),
+        };
+        const player = this.getCurrentPlayer();
+
+        if (actions.has(actions.endTurn)) {
+            return this.endTurn(data);
+        }
+        if (actions.has(actions.rollDice)) {
+            return this.rollDice(data);
+        }
+        if (actions.has(actions.payTax)) {
+            let targets;
+            let hasNotEnoughMoney;
+            do {
+                targets = this.payTax(data);
+                hasNotEnoughMoney = targets.some(
+                    (target) => target.eventName === "info",
+                );
+                if (
+                    player.ownerships.size !== player.mortgagedCards.size &&
+                    hasNotEnoughMoney
+                ) {
+                    const ownerships = [...player.ownerships];
+                    const mortgageCards = player.getData("mortgageCards");
+                    let firstCardIndex = ownerships.find((cardIndex) => {
+                        return !mortgageCards.has(cardIndex);
+                    });
+                    const firstCard = this.gameMap.getTile(firstCardIndex);
+
+                    player.setData(
+                        "money",
+                        (money) => money + firstCard.mortgage,
+                    );
+                    player.setData("mortgageCards", (mortgagedCards) =>
+                        mortgagedCards.add(firstCardIndex),
+                    );
+                } else if (hasNotEnoughMoney) {
+                    return this.gameOver(player);
+                }
+            } while (hasNotEnoughMoney);
+            return targets;
+        }
+
+        if (actions.has(actions.payIncomeTax)) {
+            let targets;
+            let hasNotEnoughMoney;
+            do {
+                targets = this.payIncomeTax(data);
+                hasNotEnoughMoney = targets.some(
+                    (target) => target.eventName === "info",
+                );
+                if (
+                    player.ownerships.size !== player.mortgagedCards.size &&
+                    hasNotEnoughMoney
+                ) {
+                    const ownerships = [...player.ownerships];
+                    const mortgageCards = player.getData("mortgageCards");
+                    let firstCardIndex = ownerships.find((cardIndex) => {
+                        return !mortgageCards.has(cardIndex);
+                    });
+                    const firstCard = this.gameMap.getTile(firstCardIndex);
+
+                    player.setData(
+                        "money",
+                        (money) => money + firstCard.mortgage,
+                    );
+                    player.setData("mortgageCards", (mortgagedCards) =>
+                        mortgagedCards.add(firstCardIndex),
+                    );
+                } else if (hasNotEnoughMoney) {
+                    return this.gameOver(player);
+                }
+            } while (hasNotEnoughMoney);
+            return targets;
+        }
+
+        if (actions.has(actions.payRent)) {
+            let targets;
+            let hasNotEnoughMoney;
+            do {
+                targets = this.payRent(data);
+                hasNotEnoughMoney = targets.some(
+                    (target) => target.eventName === "info",
+                );
+                if (
+                    player.ownerships.size !== player.mortgagedCards.size &&
+                    hasNotEnoughMoney
+                ) {
+                    const ownerships = [...player.ownerships];
+                    const mortgageCards = player.getData("mortgageCards");
+                    let firstCardIndex = ownerships.find((cardIndex) => {
+                        return !mortgageCards.has(cardIndex);
+                    });
+                    const firstCard = this.gameMap.getTile(firstCardIndex);
+
+                    player.setData(
+                        "money",
+                        (money) => money + firstCard.mortgage,
+                    );
+                    player.setData("mortgageCards", (mortgagedCards) =>
+                        mortgagedCards.add(firstCardIndex),
+                    );
+                } else if (hasNotEnoughMoney) {
+                    return this.gameOver(
+                        player,
+                        this.getTileOwner(player.getData("position")),
+                    );
+                }
+            } while (hasNotEnoughMoney);
+            return targets;
+        }
+        if (actions.has(actions.pickChanceCard)) {
+            return this.pickChanceCard(data);
+        }
+        if (actions.has(actions.pickCommunityCard)) {
+            return this.pickCommunityCard(data);
+        }
+        if (actions.has(actions.refuseToBuyBuilding)) {
+            return this.refuseToBuyBuilding(data);
         }
     }
 
     endAuction() {
         this.timer.setTimer(30);
-        const player = this.getCurrentPlayerPublicId(
-            this.gameData.auction.winningPlayer,
-        );
+        const player = this.players.get(this.gameData.auction.winningPlayer);
         const tile = this.gameMap.getTile(this.gameData.auction.tileIndex);
 
         player.setData("money", (money) => money - this.gameData.auction.price);
@@ -97,32 +217,6 @@ export default class Eurobusiness extends Game {
         }
     }
 
-    initializeGameData() {
-        this.gameData.availableActions = [actions.rollDice];
-        this.gameData.dublets = 0;
-        this.gameData.rollResult = [3, 5];
-        this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
-        this.timer.setTimer(60);
-        this.gameData.auction = {
-            price: 0,
-            winningPlayer: null,
-            tileIndex: 0,
-            cannotBid: null,
-        };
-    }
-
-    setPlayerData(player) {
-        player.setData("position", () => 0);
-        player.setData("inJail", () => false);
-        player.setData("outOfJailCard", () => 0);
-        player.setData("money", () => 9999);
-        player.setData("ownerships", () => new Set());
-        player.setData("mortgagedCards", () => new Set());
-        player.setData("outOfJailAttempts", () => 0);
-        player.setData("wasInJail", () => false);
-        player.setData("lost", () => false);
-    }
-
     setOwnership(player, position) {
         this.gameMap.ownerships.set(position, player.publicId);
         player.setData("ownerships", (ownerships) => {
@@ -141,6 +235,10 @@ export default class Eurobusiness extends Game {
 
     getOwnerId(position) {
         return this.gameMap.ownerships.get(position);
+    }
+
+    getTileOwner(position) {
+        return this.players.get(this.getOwnerId(position));
     }
 
     getPlayersPositions() {
@@ -351,7 +449,9 @@ export default class Eurobusiness extends Game {
             this.gameData.dublets += 1;
             this.gameData.currentMessage = `${currentPlayer.username} ponownie rzuca kośćmi`;
         } else {
-            this.nextTurn();
+            do {
+                this.nextTurn();
+            } while (this.getCurrentPlayer().getData("lost"));
             this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
         }
         this.timer.setTimer(60);
@@ -384,7 +484,10 @@ export default class Eurobusiness extends Game {
     }
 
     checkIfActionPossible(publicId, checkedAction) {
-        if (this.getCurrentPlayer().getData("lost")) {
+        if (
+            this.getCurrentPlayer().getData("lost") &&
+            checkedAction !== actions.endTurn
+        ) {
             throw new Error("Przegrałeś, brak dostępnych akcji");
         }
 
@@ -483,10 +586,7 @@ export default class Eurobusiness extends Game {
         this.timer.addTime(30);
 
         if (currentPlayer.getData("money") < 100) {
-            return [
-                this.events.info("Nie masz wystarczająco pieniędzy"),
-                this.gameOver(currentPlayer),
-            ];
+            return [this.events.info("Nie masz wystarczająco pieniędzy")];
         }
 
         currentPlayer.setData("money", (money) => money - 100);
@@ -515,10 +615,7 @@ export default class Eurobusiness extends Game {
         this.timer.addTime(30);
 
         if (currentPlayer.getData("money") < 150) {
-            return [
-                this.events.info("Nie masz wystarczająco pieniędzy"),
-                this.gameOver(currentPlayer),
-            ];
+            return [this.events.info("Nie masz wystarczająco pieniędzy")];
         }
 
         currentPlayer.setData("money", (money) => money - 150);
@@ -548,10 +645,7 @@ export default class Eurobusiness extends Game {
         const owner = this.players.get(this.getOwnerId(position));
 
         if (player.getData("money") < tile.rent) {
-            return [
-                this.events.info("Nie masz wystarczająco pieniędzy"),
-                this.gameOver(player, owner),
-            ];
+            return [this.events.info("Nie masz wystarczająco pieniędzy")];
         }
 
         player.setData("money", (money) => money - tile.rent);
@@ -570,6 +664,7 @@ export default class Eurobusiness extends Game {
             this.events.playersData(),
         ];
     }
+
     mortgagePropertyCard(data) {
         const player = this.getPlayer(data.publicId);
 
@@ -691,7 +786,8 @@ export default class Eurobusiness extends Game {
         return [this.events.logs(), this.events.auction(), this.events.time()];
     }
 
-    pickChanceCard() {
+    pickChanceCard(data) {
+        this.checkIfActionPossible(data.publicId, actions.pickChanceCard);
         const currentPlayer = this.getCurrentPlayer();
         const position = currentPlayer.getData("position");
         const randomIndex = getRandomNumber(0, chanceCards.length - 1);
@@ -763,7 +859,8 @@ export default class Eurobusiness extends Game {
         ];
     }
 
-    pickCommunityCard() {
+    pickCommunityCard(data) {
+        this.checkIfActionPossible(data.publicId, actions.pickChanceCard);
         const currentPlayer = this.getCurrentPlayer();
         const randomIndex = getRandomNumber(0, communityCards.length - 1);
         const card = communityCards[randomIndex];
@@ -809,73 +906,57 @@ export default class Eurobusiness extends Game {
     }
 
     gameOver(loser, opponent) {
-        const currentPlayer = this.getCurrentPlayer();
-        currentPlayer.setData("lost", () => true);
+        loser.setData("lost", () => true);
 
-        const possesions = currentPlayer.getData("ownerships");
+        const possesions = [...loser.getData("ownerships")];
 
         if (opponent !== undefined) {
             for (const position of possesions) {
-                this.removeOwnership(currentPlayer, position);
+                this.removeOwnership(loser, position);
                 this.setOwnership(opponent, position);
             }
 
-            const outOfJailCards = currentPlayer.getData("outOfJailCard");
-            currentPlayer.setData("outOfJailCard", () => 0);
+            const loserOutOfJailCards = loser.getData("outOfJailCard");
+            loser.setData("outOfJailCard", () => 0);
             opponent.setData(
                 "outOfJailCard",
-                (outOfJailCard) => outOfJailCard + outOfJailCards,
+                (outOfJailCard) => outOfJailCard + loserOutOfJailCards,
             );
 
-            const cash = currentPlayer.getData("money");
-            currentPlayer.setData("money", () => 0);
-            opponent.setData("money", (money) => money + cash);
+            const loserMoney = loser.getData("money");
+            loser.setData("money", () => 0);
+            opponent.setData("money", (money) => money + loserMoney);
             this.addLog(
-                `${currentPlayer.username} zbankrutował na rzecz gracza ${opponent.username}.`,
+                `${loser.username} zbankrutował na rzecz gracza ${opponent.username}.`,
             );
         } else {
             for (const position of possesions) {
-                this.removeOwnership(currentPlayer, position);
+                this.removeOwnership(loser, position);
             }
 
-            currentPlayer.setData("outOfJailCard", () => 0);
+            loser.setData("outOfJailCard", () => 0);
+            loser.setData("position", () => null);
+            loser.setData("money", () => 0);
 
-            currentPlayer.setData("money", () => 0);
-            this.addLog(`${currentPlayer.username} zbankrutował`);
+            this.addLog(`${loser.username} zbankrutował`);
         }
 
-        this.leaderboard.unshift(currentPlayer.publicId);
+        this.leaderboard.unshift(loser.publicId);
 
         let playersLeft = 0;
 
-        for (const [, player] of this.players) {
-            if (!player.getData("lost")) {
-                playersLeft += 1;
-            }
-        }
+        this.players.forEach((publicId, player) => {
+            if (!player.getData("lost")) playersLeft += 1;
+        });
 
         if (playersLeft === 1) {
-            this.gameData.currentMessage = this.leaderboard;
-            this.events.currentMessage();
-            this.gameEnded = true;
+            this.nextTurn();
+            this.leaderboard.unshift(this.getCurrentPlayerPublicId());
+            this.gameData.currentMessage = `Wygrał ${this.getCurrentPlayer().username}`;
+            clearInterval(this.intervalId);
             // Tutaj powinno się całe lobby zafreezować czy coś takiego
         }
 
-        this.gameData.availableActions = [actions.rollDice];
-        this.timer.setTimer(60);
-        this.nextTurn();
-
-        while (this.getCurrentPlayer().getData("lost")) {
-            this.nextTurn();
-        }
-
-        return [
-            this.events.currentMessage(),
-            this.events.yourTurn(loser.publicId, false),
-            this.events.yourTurn(this.getCurrentPlayerPublicId(), true),
-            this.events.availableActions(),
-            this.events.logs(),
-            this.events.playersData(),
-        ];
+        return this.endTurn({ publicId: loser.publicId });
     }
 }
