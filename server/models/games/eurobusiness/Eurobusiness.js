@@ -119,6 +119,7 @@ export default class Eurobusiness extends Game {
         player.setData("ownerships", () => new Set());
         player.setData("mortgagedCards", () => new Set());
         player.setData("outOfJailAttempts", () => 0);
+        player.setData("wasInJail", () => false);
         player.setData("lost", () => false);
     }
 
@@ -341,25 +342,34 @@ export default class Eurobusiness extends Game {
 
         const currentPlayer = this.getCurrentPlayer();
 
-        this.addLog(`${this.getCurrentPlayer().username} zakończył turę.`);
+        this.addLog(`${currentPlayer.username} zakończył turę.`);
 
-        if (this.gameData.rollResult[0] === this.gameData.rollResult[1]) {
+        if (
+            currentPlayer.getData("wasInJail") &&
+            this.gameData.rollResult[0] === this.gameData.rollResult[1]
+        ) {
             this.gameData.dublets += 1;
-            this.gameData.currentMessage = `${this.getCurrentPlayer().username} ponownie rzuca kośćmi`;
+            this.gameData.currentMessage = `${currentPlayer.username} ponownie rzuca kośćmi`;
         } else {
             this.nextTurn();
             this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
         }
         this.timer.setTimer(60);
-        if (currentPlayer.getData("inJail")) {
-            this.gameData.currentMessage = `${this.getCurrentPlayer().username} wychodzi z więzienia`;
+        const newPlayer = this.getCurrentPlayer();
+
+        if (newPlayer.getData("inJail")) {
+            this.gameData.currentMessage = `${newPlayer.username} wychodzi z więzienia`;
             this.gameData.availableActions = [
                 actions.rollDice,
                 actions.payJail,
             ];
-            if (currentPlayer.getData("outOfJailCard") > 0) {
+            if (newPlayer.getData("outOfJailCard") > 0) {
                 this.gameData.availableActions.push(actions.useOutOfJailCard);
             }
+        }
+
+        if (currentPlayer.getData("wasInJail")) {
+            currentPlayer.setData("wasInJail", () => false);
         }
 
         this.addLog("hr");
@@ -393,6 +403,7 @@ export default class Eurobusiness extends Game {
 
     playerToJail(player) {
         player.setData("inJail", () => true);
+        player.setData("wasInJail", () => true);
         player.setData("position", () => 10);
         this.timer.addTime(30);
         this.addLog(`${player.username} idzie do <b>więzienia</b>.`);
