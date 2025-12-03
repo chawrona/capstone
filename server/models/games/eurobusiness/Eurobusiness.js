@@ -954,7 +954,12 @@ export default class Eurobusiness extends Game {
             this.leaderboard.unshift(this.getCurrentPlayerPublicId());
             this.gameData.currentMessage = `Wygrał ${this.getCurrentPlayer().username}`;
             clearInterval(this.intervalId);
-            // Tutaj powinno się całe lobby zafreezować czy coś takiego
+            return [
+                this.events.endGame(),
+                this.events.currentMessage(),
+                this.events.logs(),
+                this.events.time(),
+            ];
         }
 
         return this.endTurn({ publicId: loser.publicId });

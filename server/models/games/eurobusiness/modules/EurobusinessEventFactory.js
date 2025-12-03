@@ -127,11 +127,20 @@ export default class EurobusinessEventFactory {
             this.time(),
         ];
     }
+
     time() {
         return {
             target: "lobby",
             eventName: "time",
             data: this.game.timer,
+        };
+    }
+
+    endGame(){
+        return {
+            target: "lobby",
+            eventName: "endGame",
+            data: this.game.leaderboard,
         };
     }
 }
