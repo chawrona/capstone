@@ -6,7 +6,7 @@ const chanceCardTypes = {
     withdrawCashFromBank: "Pobierz z banku pieniądze",
     getOutOfJail: "Wyjdź z więzenia",
     payForBuildingProperties: "Zapłać za budowe domu lub hotelu",
-    takeMoneyFromPlayer: "Pobierz pieniądze od gracza X",
+    takeMoneyFromPlayers: "Pobierz pieniądze od graczy",
 };
 
 export default chanceCardTypes;

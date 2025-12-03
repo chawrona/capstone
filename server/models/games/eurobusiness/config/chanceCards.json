@@ -1,34 +1,34 @@
 [
   {
-    "type": "moveToStart",
+    "type": "Idź na start",
     "name": "Idź na pole start"
   },
   {
-    "type": "goToTile",
+    "type": "Idź na pole X",
     "name": "Idź na wskazane pole"
   },
   {
-    "type": "goToJail",
+    "type": "Idź do więzienia",
     "name": "Idź do więzienia"
   },
   {
-    "type": "moneyLoss",
+    "type": "Zapłac bankowi",
     "name": "Zapłać pieniądze banku"
   },
   {
-    "type": "moneyGain",
+    "type": "Pobierz z banku pieniądze",
     "name": "Pobierz pieniądze z banku"
   },
   {
-    "type": "getOutOfJail",
+    "type": "Wyjdź z więzenia",
     "name": "Karta wyjścia z więzienia"
   },
   {
-    "type": "payForBuildingProperties",
+    "type": "Zapłać za budowe domu lub hotelu",
     "name": "Opłać budowę"
   },
   {
-    "type": "gainFromPlayers",
+    "type": "Pobierz pieniądze od graczy",
     "name": "Pobierz 50$ od wszystkich graczy"
   }
 ]
