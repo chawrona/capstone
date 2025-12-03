@@ -11,6 +11,8 @@ const actions = {
     refuseToBuyBuilding: "Odmów kupna nieruchomości",
     payRent: "Zapłać czynsz",
     auction: "Licytacja",
+    mortgagePropertyCard: "Zastawienie karty",
+    redeemPropertyCard: "Zwrócenie pieniędzy za zastawioną kartę",
 };
 
 export default actions;

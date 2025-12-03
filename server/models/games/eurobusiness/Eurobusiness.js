@@ -16,6 +16,7 @@ export default class Eurobusiness extends Game {
         this.events = new EurobusinessEventFactory(this);
         this.logs = [];
         this.timer = new Timer();
+        this.gameMap = new EurobusinessMap();
         this.startTimer();
         this.leaderboard = [];
         this.gameEnded = false;
@@ -73,7 +74,11 @@ export default class Eurobusiness extends Game {
         this.addLog(
             `${player.username} wylicytował <i>${tile.name}</i> za <b>${tile.price}$</b>.`,
         );
-        this.gameData.availableActions = [actions.endTurn];
+        this.gameData.availableActions = [
+            actions.endTurn,
+            actions.mortgagePropertyCard,
+            actions.redeemPropertyCard,
+        ];
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
 
         this.useEventEmmiter([
@@ -97,7 +102,6 @@ export default class Eurobusiness extends Game {
         this.gameData.dublets = 0;
         this.gameData.rollResult = [3, 5];
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} rzuca kośćmi`;
-        this.gameMap = new EurobusinessMap();
         this.timer.setTimer(60);
         this.gameData.auction = {
             price: 0,
@@ -113,23 +117,24 @@ export default class Eurobusiness extends Game {
         player.setData("outOfJailCard", () => 0);
         player.setData("money", () => 9999);
         player.setData("ownerships", () => new Set());
+        player.setData("mortgagedCards", () => new Set());
         player.setData("outOfJailAttempts", () => 0);
         player.setData("lost", () => false);
     }
 
     setOwnership(player, position) {
         this.gameMap.ownerships.set(position, player.publicId);
-        player.setData("ownerships", (set) => {
-            set.add(position);
-            return set;
+        player.setData("ownerships", (ownerships) => {
+            ownerships.add(position);
+            return ownerships;
         });
     }
 
     removeOwnership(player, position) {
         this.gameMap.ownerships.delete(position);
-        player.setData("ownerships", (set) => {
-            set.delete(position);
-            return set;
+        player.setData("ownerships", (ownerships) => {
+            ownerships.delete(position);
+            return ownerships;
         });
     }
 
@@ -180,7 +185,11 @@ export default class Eurobusiness extends Game {
             case tileTypes.parking:
             case tileTypes.jail:
                 this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
-                this.gameData.availableActions = [actions.endTurn];
+                this.gameData.availableActions = [
+                    actions.endTurn,
+                    actions.mortgagePropertyCard,
+                    actions.redeemPropertyCard,
+                ];
                 break;
             case tileTypes.goToJail:
                 this.playerToJail(this.getCurrentPlayer());
@@ -211,6 +220,8 @@ export default class Eurobusiness extends Game {
         const player = this.getCurrentPlayer();
         const position = player.getData("position");
         const currentTileOwnerId = this.getOwnerId(position);
+        const tileOwner = this.getPlayer(currentTileOwnerId);
+        const mortgagedCards = tileOwner.getData("mortgagedCards");
         if (!currentTileOwnerId) {
             this.gameData.currentMessage = `${this.getCurrentPlayer().username} zastanawia się nad zakupem`;
             this.gameData.availableActions = [
@@ -218,11 +229,25 @@ export default class Eurobusiness extends Game {
                 actions.refuseToBuyBuilding,
             ];
         } else if (currentTileOwnerId === player.publicId) {
-            this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
             this.addLog(
                 `${this.getCurrentPlayer().username} stanął na swoim polu`,
             );
-            this.gameData.availableActions = [actions.endTurn];
+
+            this.gameData.availableActions = [
+                actions.endTurn,
+                actions.mortgagePropertyCard,
+                actions.redeemPropertyCard,
+            ];
+        } else if (mortgagedCards.has(position)) {
+            this.gameData.currentMessage = `${player.username} stanął na zastawionym polu przez gracza ${tileOwner.username}.`;
+            this.addLog(
+                `${player.username} stanął na zastawionym polu gracza ${tileOwner.username}`,
+            );
+            this.gameData.availableActions = [
+                actions.endTurn,
+                actions.mortgagePropertyCard,
+                actions.redeemPropertyCard,
+            ];
         } else {
             this.gameData.currentMessage = `${this.getCurrentPlayer().username} płaci czynsz.`;
             this.addLog(
@@ -262,7 +287,11 @@ export default class Eurobusiness extends Game {
                 );
 
                 if (player.getData("outOfJailAttempts") === 3) {
-                    this.gameData.availableActions = [actions.endTurn];
+                    this.gameData.availableActions = [
+                        actions.endTurn,
+                        actions.mortgagePropertyCard,
+                        actions.redeemPropertyCard,
+                    ];
                     this.gameData.currentMessage = `${this.getCurrentPlayer().username} nie wychodzi z więzienia.`;
                     player.setData("outOfJailAttempts", () => 0);
                 } else {
@@ -453,7 +482,12 @@ export default class Eurobusiness extends Game {
 
         this.addLog(`${currentPlayer.username} płaci podatek <b>100$</b>.`);
 
-        this.gameData.availableActions = [actions.endTurn];
+        this.gameData.availableActions = [
+            actions.endTurn,
+            actions.mortgagePropertyCard,
+            actions.redeemPropertyCard,
+        ];
+        this.gameData.currentMessage = `${currentPlayer.username} musi zapłacić podatek w wysokości 100$.`;
 
         return [
             this.events.currentMessage(),
@@ -480,7 +514,11 @@ export default class Eurobusiness extends Game {
 
         this.addLog(`${currentPlayer.username} płaci <b>150$</b> podatku`);
 
-        this.gameData.availableActions = [actions.endTurn];
+        this.gameData.availableActions = [
+            actions.endTurn,
+            actions.mortgagePropertyCard,
+            actions.redeemPropertyCard,
+        ];
 
         return [
             this.events.currentMessage(),
@@ -510,12 +548,60 @@ export default class Eurobusiness extends Game {
         this.addLog(
             `${player.username} płaci <b>${tile.rent}$</b> graczowi ${owner.username}.`,
         );
-        this.gameData.availableActions = [actions.endTurn];
+        this.gameData.availableActions = [
+            actions.endTurn,
+            actions.mortgagePropertyCard,
+            actions.redeemPropertyCard,
+        ];
         return [
             this.events.availableActions(),
             this.events.logs(),
             this.events.playersData(),
         ];
+    }
+    mortgagePropertyCard(data) {
+        const player = this.getPlayer(data.publicId);
+
+        if (this.getOwnerId(data.cardIndex) !== player.publicId) {
+            return [this.events.info("To pole nie należy do Ciebie.")];
+        }
+
+        player.setData("mortgagedCards", (mortgagedCards) =>
+            mortgagedCards.add(data.cardIndex),
+        );
+        player.setData(
+            "money",
+            (money) => money + this.gameMap.getTile(data.cardIndex).mortgage,
+        );
+
+        this.gameData.currentMessage = `${player.username} zastawia kartę: ${this.gameMap.getTile(data.cardIndex).name}`;
+        this.timer.addTime(10);
+        return [this.events.logs(), this.events.currentMessage()];
+    }
+
+    redeemPropertyCard(data) {
+        const player = this.getPlayer(data.publicId);
+        const mortgagePrice = this.gameMap.getTile(data.cardIndex).mortgage;
+
+        if (player.getData("money") < mortgagePrice) {
+            return [
+                this.events.info(
+                    `Nie masz wystarczająco pieniędzy aby odkupić kartę: ${this.gameMap.getTile(data.cardIndex).name}.`,
+                ),
+            ];
+        }
+
+        player.setData(
+            "money",
+            (money) => money - this.gameMap.getTile(data.cardIndex).mortgage,
+        );
+        player.setData("mortgagedCards", (mortgagedCards) =>
+            mortgagedCards.delete(data.cardIndex),
+        );
+        this.gameData.currentMessage = `${player.username} odkupił kartę: ${this.gameMap.getTile(data.cardIndex).name}`;
+
+        this.timer.addTime(10);
+        return [this.events.currentMessage(), this.events.logs()];
     }
 
     buyBuilding(data) {
@@ -533,7 +619,11 @@ export default class Eurobusiness extends Game {
         this.addLog(
             `${player.username} kupił <i>${tile.name}</i> za <b>${tile.price}$</b>.`,
         );
-        this.gameData.availableActions = [actions.endTurn];
+        this.gameData.availableActions = [
+            actions.endTurn,
+            actions.mortgagePropertyCard,
+            actions.redeemPropertyCard,
+        ];
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
         return [
             this.events.availableActions(),
@@ -600,8 +690,12 @@ export default class Eurobusiness extends Game {
         this.addLog(
             `${currentPlayer.username} wylosował kartę <b>${card.name}</b>.`,
         );
-        this.gameData.availableActions = [actions.endTurn];
-        this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
+        this.gameData.currentMessage = `${currentPlayer.username} kończy turę`;
+        this.gameData.availableActions = [
+            actions.endTurn,
+            actions.mortgagePropertyCard,
+            actions.redeemPropertyCard,
+        ];
         switch (card.type) {
             case chanceCardTypes.goToStart:
                 currentPlayer.setData("position", () => 0);
@@ -663,13 +757,15 @@ export default class Eurobusiness extends Game {
         const randomIndex = getRandomNumber(0, communityCards.length - 1);
         const card = communityCards[randomIndex];
         this.timer.addTime(30);
-        this.log(JSON.stringify({ card, randomIndex, communityCards }));
-
         this.addLog(
             `${currentPlayer.username} wylosował kartę <b>${card.name}</b>.`,
         );
-        this.gameData.availableActions = [actions.endTurn];
-        this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
+        this.gameData.currentMessage = `${currentPlayer.username} kończy turę`;
+        this.gameData.availableActions = [
+            actions.endTurn,
+            actions.mortgagePropertyCard,
+            actions.redeemPropertyCard,
+        ];
         switch (card.type) {
             case communityCardTypes.withdrawCashFromBank:
                 currentPlayer.setData("money", (money) => money + 50);
