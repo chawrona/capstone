@@ -136,7 +136,7 @@ export default class EurobusinessEventFactory {
         };
     }
 
-    endGame(){
+    endGame() {
         return {
             target: "lobby",
             eventName: "endGame",
