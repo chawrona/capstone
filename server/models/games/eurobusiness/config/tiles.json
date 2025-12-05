@@ -1,7 +1,8 @@
 [
   {
     "type": "Start",
-    "name": "Start"
+    "name": "Start",
+    "position": 0
   },
   {
     "type": "Budynek",
@@ -12,11 +13,13 @@
     "setId": 1,
     "setPosition": 1,
     "rent": 2,
-    "mortgage": 30
+    "mortgage": 30,
+    "position": 1
   },
   {
     "type": "Karta społeczności",
-    "name": "Karta społeczności"
+    "name": "Karta społeczności",
+    "position": 2
   },
   {
     "type": "Budynek",
@@ -27,15 +30,18 @@
     "setId": 1,
     "setPosition": 2,
     "rent": 4,
-    "mortgage": 30
+    "mortgage": 30,
+    "position": 3
   },
   {
     "type": "Podatek dochodowy",
-    "name": "Podatek dochodowy"
+    "name": "Podatek dochodowy",
+    "position": 4
   },
   {
     "type": "Domyślne",
-    "name": "Domyślne"
+    "name": "Domyślne",
+    "position": 5
   },
   {
     "type": "Budynek",
@@ -46,11 +52,13 @@
     "setId": 2,
     "setPosition": 1,
     "rent": 6,
-    "mortgage": 50
+    "mortgage": 50,
+    "position": 6
   },
   {
     "type": "Karta szansy",
-    "name": "Karta szansy"
+    "name": "Karta szansy",
+    "position": 7
   },
   {
     "type": "Budynek",
@@ -61,7 +69,8 @@
     "setId": 2,
     "setPosition": 2,
     "rent": 6,
-    "mortgage": 50
+    "mortgage": 50,
+    "position": 8
   },
   {
     "type": "Budynek",
@@ -72,11 +81,13 @@
     "setId": 2,
     "setPosition": 3,
     "rent": 8,
-    "mortgage": 60
+    "mortgage": 60,
+    "position": 9
   },
   {
     "type": "Więzienie",
-    "name": "Więzienie"
+    "name": "Więzienie",
+    "position": 10
   },
   {
     "type": "Budynek",
@@ -87,11 +98,13 @@
     "setId": 3,
     "setPosition": 1,
     "rent": 10,
-    "mortgage": 70
+    "mortgage": 70,
+    "position": 11
   },
   {
     "type": "Domyślne",
-    "name": "Domyślne"
+    "name": "Domyślne",
+    "position": 12
   },
   {
     "type": "Budynek",
@@ -102,7 +115,8 @@
     "setId": 3,
     "setPosition": 2,
     "rent": 10,
-    "mortgage": 70
+    "mortgage": 70,
+    "position": 13
   },
   {
     "type": "Budynek",
@@ -113,11 +127,13 @@
     "setId": 3,
     "setPosition": 3,
     "rent": 12,
-    "mortgage": 80
+    "mortgage": 80,
+    "position": 14
   },
   {
     "type": "Domyślne",
-    "name": "Domyślne"
+    "name": "Domyślne",
+    "position": 15
   },
   {
     "type": "Budynek",
@@ -128,11 +144,13 @@
     "setId": 4,
     "setPosition": 1,
     "rent": 14,
-    "mortgage": 90
+    "mortgage": 90,
+    "position": 16
   },
   {
     "type": "Karta społeczności",
-    "name": "Karta społeczności"
+    "name": "Karta społeczności",
+    "position": 17
   },
   {
     "type": "Budynek",
@@ -143,7 +161,8 @@
     "setId": 4,
     "setPosition": 2,
     "rent": 14,
-    "mortgage": 90
+    "mortgage": 90,
+    "position": 18
   },
   {
     "type": "Budynek",
@@ -154,11 +173,13 @@
     "setId": 4,
     "setPosition": 3,
     "rent": 16,
-    "mortgage": 100
+    "mortgage": 100,
+    "position": 19
   },
   {
     "type": "Parking",
-    "name": "Parking"
+    "name": "Parking",
+    "position": 20
   },
   {
     "type": "Budynek",
@@ -169,11 +190,13 @@
     "setId": 5,
     "setPosition": 1,
     "rent": 18,
-    "mortgage": 110
+    "mortgage": 110,
+    "position": 21
   },
   {
     "type": "Karta szansy",
-    "name": "Karta szansy"
+    "name": "Karta szansy",
+    "position": 22
   },
   {
     "type": "Budynek",
@@ -184,7 +207,8 @@
     "setId": 5,
     "setPosition": 2,
     "rent": 18,
-    "mortgage": 110
+    "mortgage": 110,
+    "position": 23
   },
   {
     "type": "Budynek",
@@ -195,11 +219,13 @@
     "setId": 5,
     "setPosition": 3,
     "rent": 20,
-    "mortgage": 120
+    "mortgage": 120,
+    "position": 24
   },
   {
     "type": "Domyślne",
-    "name": "Domyślne"
+    "name": "Domyślne",
+    "position": 25
   },
   {
     "type": "Budynek",
@@ -210,7 +236,8 @@
     "setId": 6,
     "setPosition": 1,
     "rent": 22,
-    "mortgage": 130
+    "mortgage": 130,
+    "position": 26
   },
   {
     "type": "Budynek",
@@ -221,11 +248,13 @@
     "setId": 6,
     "setPosition": 2,
     "rent": 22,
-    "mortgage": 130
+    "mortgage": 130,
+    "position": 27
   },
   {
     "type": "Domyślne",
-    "name": "Domyślne"
+    "name": "Domyślne",
+    "position": 28
   },
   {
     "type": "Budynek",
@@ -236,11 +265,13 @@
     "setId": 6,
     "setPosition": 3,
     "rent": 24,
-    "mortgage": 140
+    "mortgage": 140,
+    "position": 29
   },
   {
     "type": "Idź do więzienia",
-    "name": "Idź do więzienia"
+    "name": "Idź do więzienia",
+    "position": 30
   },
   {
     "type": "Budynek",
@@ -251,7 +282,8 @@
     "setId": 7,
     "setPosition": 1,
     "rent": 26,
-    "mortgage": 150
+    "mortgage": 150,
+    "position": 31
   },
   {
     "type": "Budynek",
@@ -262,11 +294,13 @@
     "setId": 7,
     "setPosition": 2,
     "rent": 26,
-    "mortgage": 150
+    "mortgage": 150,
+    "position": 32
   },
   {
     "type": "Karta społeczności",
-    "name": "Karta społeczności"
+    "name": "Karta społeczności",
+    "position": 33
   },
   {
     "type": "Budynek",
@@ -277,15 +311,18 @@
     "setId": 7,
     "setPosition": 3,
     "rent": 28,
-    "mortgage": 160
+    "mortgage": 160,
+    "position": 34
   },
   {
     "type": "Domyślne",
-    "name": "Domyślne"
+    "name": "Domyślne",
+    "position": 35
   },
   {
     "type": "Karta szansy",
-    "name": "Karta szansy"
+    "name": "Karta szansy",
+    "position": 36
   },
   {
     "type": "Budynek",
@@ -296,11 +333,13 @@
     "setId": 8,
     "setPosition": 1,
     "rent": 35,
-    "mortgage": 175
+    "mortgage": 175,
+    "position": 37
   },
   {
     "type": "Podatek",
-    "name": "Podatek"
+    "name": "Podatek",
+    "position": 38
   },
   {
     "type": "Budynek",
@@ -311,6 +350,7 @@
     "setId": 8,
     "setPosition": 2,
     "rent": 50,
-    "mortgage": 200
+    "mortgage": 200,
+    "position": 39
   }
 ]

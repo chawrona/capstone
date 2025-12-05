@@ -1,6 +1,6 @@
 export default class Timer {
-    constructor() {
-        this.timer = 60;
+    constructor(initialTime) {
+        this.timer = initialTime;
     }
 
     setTimer(newTime) {
@@ -9,9 +9,10 @@ export default class Timer {
 
     addTime(time) {
         this.timer += time;
+        if (this.timer > 60) this.timer = 60;
     }
 
-    addTimeIfLessThan(timeToBeAdded, time) {
+    addTimeIfLessThan(timeToBeAdded, time = 60) {
         if (this.timer <= time || time === undefined) {
             this.timer += timeToBeAdded;
         }

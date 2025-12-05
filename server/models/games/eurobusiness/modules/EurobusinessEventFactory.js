@@ -69,6 +69,7 @@ export default class EurobusinessEventFactory {
                 yourPublicId: publicId,
                 currentMessage: this.game.gameData.currentMessage,
                 logs: this.game.logs,
+                time: this.game.timer.getTimer(),
             },
         };
     }
@@ -132,7 +133,7 @@ export default class EurobusinessEventFactory {
         return {
             target: "lobby",
             eventName: "time",
-            data: this.game.timer,
+            data: this.game.timer.getTimer(),
         };
     }
 
