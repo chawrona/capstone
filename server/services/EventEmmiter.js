@@ -24,7 +24,6 @@ export default class EventEmmiter {
                 error: error.message,
             });
         }
-        console.log(error);
         this.logger.error(error.message);
     }
 

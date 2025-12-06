@@ -1,4 +1,5 @@
 import tiles from "../config/tiles.json" with { type: "json" };
+import actions from "../interfaces/actions.js";
 
 export default class EurobusinessEventFactory {
     constructor(game) {
@@ -54,24 +55,32 @@ export default class EurobusinessEventFactory {
     }
 
     gameDataRequest(publicId) {
-        return {
-            target: publicId,
-            eventName: "gameDataRequest",
-            data: {
-                yourTurn:
-                    publicId ===
-                    this.game.playersQueue[this.game.currentPlayerIndex],
-                playersData: this.game.getPlayersData(),
-                playersPosition: this.game.getPlayersPositions(),
-                gameMap: tiles,
-                availableActions: this.game.getAvailableActions(),
-                rollResult: this.game.gameData.rollResult,
-                yourPublicId: publicId,
-                currentMessage: this.game.gameData.currentMessage,
-                logs: this.game.logs,
-                time: this.game.timer.getTimer(),
+        const objectsToSend = [
+            {
+                target: publicId,
+                eventName: "gameDataRequest",
+                data: {
+                    yourTurn:
+                        publicId ===
+                        this.game.playersQueue[this.game.currentPlayerIndex],
+                    playersData: this.game.getPlayersData(),
+                    playersPosition: this.game.getPlayersPositions(),
+                    gameMap: tiles,
+                    availableActions: this.game.getAvailableActions(),
+                    rollResult: this.game.gameData.rollResult,
+                    yourPublicId: publicId,
+                    currentMessage: this.game.gameData.currentMessage,
+                    logs: this.game.logs,
+                    time: this.game.timer.getTimer(),
+                },
             },
-        };
+        ];
+
+        if (this.game.gameData.availableActions.includes(actions.auction)) {
+            objectsToSend.push(this.auction());
+        }
+
+        return objectsToSend;
     }
     communityCard(card) {
         return {
