@@ -5,7 +5,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 1",
+    "name": "INMwO",
     "color": "#8B4513",
     "price": 60,
     "setCount": 2,
@@ -20,7 +20,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 2",
+    "name": "INoI",
     "color": "#8B4513",
     "price": 60,
     "setCount": 2,
@@ -39,7 +39,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 3",
+    "name": "IHiA",
     "color": "#87CEEB",
     "price": 100,
     "setCount": 3,
@@ -54,7 +54,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 4",
+    "name": "IPs",
     "color": "#87CEEB",
     "price": 100,
     "setCount": 3,
@@ -65,7 +65,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 5",
+    "name": "IPe",
     "color": "#87CEEB",
     "price": 120,
     "setCount": 3,
@@ -80,7 +80,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 6",
+    "name": "IPEiA",
     "color": "#FFC0CB",
     "price": 140,
     "setCount": 3,
@@ -95,7 +95,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 7",
+    "name": "ISKiF",
     "color": "#FFC0CB",
     "price": 140,
     "setCount": 3,
@@ -106,7 +106,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 8",
+    "name": "IZiSS",
     "color": "#FFC0CB",
     "price": 160,
     "setCount": 3,
@@ -121,7 +121,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 9",
+    "name": "INT",
     "color": "#FFA500",
     "price": 180,
     "setCount": 3,
@@ -136,7 +136,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 10",
+    "name": "ISiD",
     "color": "#FFA500",
     "price": 180,
     "setCount": 3,
@@ -147,7 +147,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 11",
+    "name": "IMiEA",
     "color": "#FFA500",
     "price": 200,
     "setCount": 3,
@@ -162,7 +162,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 12",
+    "name": "IDiSM",
     "color": "#FF0000",
     "price": 220,
     "setCount": 3,
@@ -177,7 +177,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 13",
+    "name": "IFA",
     "color": "#FF0000",
     "price": 220,
     "setCount": 3,
@@ -188,7 +188,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 14",
+    "name": "IFP",
     "color": "#FF0000",
     "price": 240,
     "setCount": 3,
@@ -203,7 +203,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 15",
+    "name": "IM",
     "color": "#FFFF00",
     "price": 260,
     "setCount": 3,
@@ -214,7 +214,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 16",
+    "name": "INoZ",
     "color": "#FFFF00",
     "price": 260,
     "setCount": 3,
@@ -229,7 +229,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 17",
+    "name": "IN",
     "color": "#FFFF00",
     "price": 280,
     "setCount": 3,
@@ -244,7 +244,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 18",
+    "name": "SS",
     "color": "#00FF00",
     "price": 300,
     "setCount": 3,
@@ -255,7 +255,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 19",
+    "name": "Gabinet Rektora",
     "color": "#00FF00",
     "price": 300,
     "setCount": 3,
@@ -270,7 +270,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 20",
+    "name": "Aula A1",
     "color": "#00FF00",
     "price": 320,
     "setCount": 3,
@@ -289,7 +289,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 21",
+    "name": "IBiNoZ",
     "color": "#0000FF",
     "price": 350,
     "setCount": 2,
@@ -304,7 +304,7 @@
   },
   {
     "type": "Budynek",
-    "name": "Budynek 22",
+    "name": "IBiI",
     "color": "#0000FF",
     "price": 400,
     "setCount": 2,
