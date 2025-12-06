@@ -31,20 +31,12 @@ export default class Lobby {
         return this.gameInfo.title;
     }
 
-    lobbyInformation() {
-        console.log("Information about lobby");
-    }
-
-    endGameJoinLobby() {
-        console.log("Thanks for playing, redirecting to lobby...");
-    }
-
     joinUser(userId) {
         if (this.users.size >= this.maxPlayers) {
             throw new Error("Pokój jest pełny.");
         }
         this.users.add(userId);
-        console.log("Dołączył do pokoju");
+        ("Dołączył do pokoju");
     }
 
     getPlayerCount() {

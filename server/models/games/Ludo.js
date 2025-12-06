@@ -436,8 +436,6 @@ export default class Ludo extends Game {
             }
         }
 
-        console.log(possibleMoves);
-
         if (
             possibleMoves[0].length ||
             possibleMoves[1].length ||

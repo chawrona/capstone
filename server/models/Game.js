@@ -21,11 +21,6 @@ export default class Game {
     }
 
     useEventEmmiter(targets) {
-        let now = new Date();
-        console.log(
-            "START ODSYŁANIA",
-            `${now.getMinutes()}:${now.getSeconds()}`,
-        );
         try {
             for (const { target, eventName, data } of targets) {
                 if (target === "lobby") {
@@ -39,11 +34,6 @@ export default class Game {
         } catch (error) {
             this.eventEmmiter.toLobbyError(this.lobbyId, error);
         }
-        now = new Date();
-        console.log(
-            "KONIEC ODSYŁANIA",
-            `${now.getMinutes()}:${now.getSeconds()}`,
-        );
     }
 
     log(message) {

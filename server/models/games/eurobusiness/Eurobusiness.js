@@ -29,8 +29,9 @@ export default class Eurobusiness extends Game {
         this.gameData.auction = {
             price: 0,
             winningPlayer: null,
-            tileIndex: 0,
+            tile: null,
             cannotBid: null,
+            cannotBidPlayerName: "",
         };
     }
 
@@ -49,10 +50,8 @@ export default class Eurobusiness extends Game {
     startTimer() {
         this.intervalId = setInterval(() => {
             this.timer.subtract(1);
-            console.log("Time: ", this.timer.getTimer());
             const targets = this.endTimerConsequences();
             if (targets) {
-                console.log(targets);
                 this.useEventEmmiter(targets);
             }
         }, 1000);
@@ -65,7 +64,7 @@ export default class Eurobusiness extends Game {
         const data = {
             publicId: this.getCurrentPlayerPublicId(),
         };
-        const player = this.getCurrentPlayer();
+        // const player = this.getCurrentPlayer();
 
         if (availableActions.has(actions.endTurn)) {
             return this.endTurn(data);
@@ -180,35 +179,47 @@ export default class Eurobusiness extends Game {
         if (availableActions.has(actions.pickCommunityCard)) {
             return this.pickCommunityCard(data);
         }
-        // if (actions.has(actions.refuseToBuyBuilding)) {
-        //     return this.refuseToBuyBuilding(data);
-        // }
+        if (availableActions.has(actions.refuseToBuyBuilding)) {
+            return this.refuseToBuyBuilding(data);
+        }
+        if (availableActions.has(actions.auction)) {
+            return this.endAuction();
+        }
     }
 
+    // @event - special case - wywoływany nie przez gracza tylko metodę z timerem
     endAuction() {
         this.timer.setTimer(30);
         const player = this.players.get(this.gameData.auction.winningPlayer);
-        const tile = this.gameMap.getTile(this.gameData.auction.tileIndex);
+        const tile = this.gameMap.getTile(this.gameData.auction.tile.position);
 
-        player.setData("money", (money) => money - this.gameData.auction.price);
-        this.setOwnership(player, this.gameData.auction.tileIndex);
-        this.addLog(
-            `${player.username} wylicytował <i>${tile.name}</i> za <b>${tile.price}$</b>.`,
-        );
+        if (this.gameData.auction.winningPlayer) {
+            player.setData(
+                "money",
+                (money) => money - this.gameData.auction.price,
+            );
+            this.setOwnership(player, this.gameData.auction.tile.position);
+            this.addLog(
+                `${player.username} wylicytował <i>${tile.name}</i> za <b>${tile.price}$</b>.`,
+            );
+        } else {
+            this.addLog(`Nikt nie wylicytował <i>${tile.name}</i>.`);
+        }
+        this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
         this.gameData.availableActions = [
             actions.endTurn,
             actions.mortgagePropertyCard,
             actions.redeemPropertyCard,
         ];
-        this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
 
-        this.useEventEmmiter([
+        return [
+            this.events.closeDialogs(),
             this.events.availableActions(),
             this.events.logs(),
             this.events.currentMessage(),
             this.events.playersData(),
             this.events.time(),
-        ]);
+        ];
     }
 
     addLog(message) {
@@ -275,7 +286,7 @@ export default class Eurobusiness extends Game {
     }
 
     gameDataRequest(data) {
-        return [this.events.gameDataRequest(data.publicId)];
+        return this.events.gameDataRequest(data.publicId);
     }
 
     executeTileAction(tile) {
@@ -366,6 +377,7 @@ export default class Eurobusiness extends Game {
         }
     }
 
+    // @event
     rollDice(data) {
         this.checkIfActionPossible(data.publicId, actions.rollDice);
         const diceResult = [getRandomNumber(1, 6), getRandomNumber(1, 6)];
@@ -444,6 +456,7 @@ export default class Eurobusiness extends Game {
         return this.events.rollPackage();
     }
 
+    // @event
     endTurn(data) {
         this.checkIfActionPossible(data.publicId, actions.endTurn);
         this.gameData.availableActions = [actions.rollDice];
@@ -490,6 +503,8 @@ export default class Eurobusiness extends Game {
             this.events.availableActions(),
             this.events.logs(),
             this.events.time(),
+
+            this.events.closeDialogs(),
         ];
     }
 
@@ -522,10 +537,9 @@ export default class Eurobusiness extends Game {
         this.addLog(`${player.username} idzie do <b>więzienia</b>.`);
         this.gameData.availableActions = [actions.endTurn];
         this.gameData.dublets = 0;
-
-        return [this.events.logs(), this.events.time()];
     }
 
+    // @event
     payJail(data) {
         this.checkIfActionPossible(data.publicId, actions.payJail);
         const currentPlayer = this.getCurrentPlayer();
@@ -556,9 +570,11 @@ export default class Eurobusiness extends Game {
             this.events.logs(),
             this.events.playersData(),
             this.events.time(),
+            this.events.closeDialogs(),
         ];
     }
 
+    // @event
     useOutOfJailCard(data) {
         this.checkIfActionPossible(data.publicId, actions.useOutOfJailCard);
         const currentPlayer = this.getCurrentPlayer();
@@ -588,9 +604,11 @@ export default class Eurobusiness extends Game {
             this.events.logs(),
             this.events.playersData(),
             this.events.time(),
+            this.events.closeDialogs(),
         ];
     }
 
+    // @event
     payTax(data) {
         this.checkIfActionPossible(data.publicId, actions.payTax);
         const currentPlayer = this.getCurrentPlayer();
@@ -609,7 +627,6 @@ export default class Eurobusiness extends Game {
             actions.mortgagePropertyCard,
             actions.redeemPropertyCard,
         ];
-        this.gameData.currentMessage = `${currentPlayer.username} musi zapłacić podatek w wysokości 100$.`;
 
         return [
             this.events.currentMessage(),
@@ -617,9 +634,11 @@ export default class Eurobusiness extends Game {
             this.events.logs(),
             this.events.playersData(),
             this.events.time(),
+            this.events.closeDialogs(),
         ];
     }
 
+    // @event
     payIncomeTax(data) {
         this.checkIfActionPossible(data.publicId, actions.payIncomeTax);
         const currentPlayer = this.getCurrentPlayer();
@@ -643,11 +662,13 @@ export default class Eurobusiness extends Game {
             this.events.currentMessage(),
             this.events.availableActions(),
             this.events.logs(),
+            this.events.closeDialogs(),
             this.events.playersData(),
             this.events.time(),
         ];
     }
 
+    // @event
     payRent(data) {
         this.checkIfActionPossible(data.publicId, actions.payRent);
         const player = this.getCurrentPlayer();
@@ -679,6 +700,7 @@ export default class Eurobusiness extends Game {
         ];
     }
 
+    // @event
     mortgagePropertyCard({ publicId, data: card }) {
         const player = this.getPlayer(publicId);
 
@@ -706,6 +728,7 @@ export default class Eurobusiness extends Game {
         ];
     }
 
+    // @event
     redeemPropertyCard({ publicId, data: card }) {
         const player = this.getPlayer(publicId);
         const mortgagePrice = (
@@ -733,6 +756,7 @@ export default class Eurobusiness extends Game {
         ];
     }
 
+    // @event
     buyBuilding(data) {
         this.checkIfActionPossible(data.publicId, actions.buyBuilding);
         const player = this.getCurrentPlayer();
@@ -756,6 +780,7 @@ export default class Eurobusiness extends Game {
         this.timer.addTime(10);
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
         return [
+            this.events.closeDialogs(),
             this.events.availableActions(),
             this.events.logs(),
             this.events.currentMessage(),
@@ -764,6 +789,7 @@ export default class Eurobusiness extends Game {
         ];
     }
 
+    // @event
     refuseToBuyBuilding(data) {
         this.checkIfActionPossible(data.publicId, actions.refuseToBuyBuilding);
         const player = this.getCurrentPlayer();
@@ -777,12 +803,14 @@ export default class Eurobusiness extends Game {
         this.gameData.auction = {
             price: tile.price / 2,
             winningPlayer: null,
-            tileIndex: position,
+            tile,
             cannotBid: player.publicId,
+            cannotBidPlayerName: player.username,
         };
         this.timer.setTimer(20);
 
         return [
+            this.events.closeDialogs(),
             this.events.availableActions(),
             this.events.logs(),
             this.events.currentMessage(),
@@ -791,12 +819,13 @@ export default class Eurobusiness extends Game {
         ];
     }
 
-    auction(data) {
-        if (data.publicId === this.gameData.auction.cannotBid) {
-            return [this.events.info("Nie możesz licytować", data.publicId)];
+    // @event
+    auction({ publicId, data: bidIncrement }) {
+        if (publicId === this.gameData.auction.cannotBid) {
+            return [this.events.info("Nie możesz licytować", publicId)];
         }
-        const bidIncrement = data.bidIncrement;
-        const player = this.getPlayer(data.publicId);
+
+        const player = this.getPlayer(publicId);
         if (
             player.getData("money") <
             this.gameData.auction.price + bidIncrement
@@ -805,12 +834,14 @@ export default class Eurobusiness extends Game {
         }
         this.gameData.auction.price =
             this.gameData.auction.price + bidIncrement;
-        this.gameData.auction.winningPlayer = data.publicId;
+
+        this.gameData.auction.winningPlayer = player.getPlayerData();
+
         this.timer.addTimeIfLessThan(5, 10);
-        if (this.timer.getTimer() > 10) this.timer.setTimer(10);
         return [this.events.logs(), this.events.auction(), this.events.time()];
     }
 
+    // @event
     pickChanceCard(data) {
         this.checkIfActionPossible(data.publicId, actions.pickChanceCard);
         const currentPlayer = this.getCurrentPlayer();
@@ -878,6 +909,7 @@ export default class Eurobusiness extends Game {
         }
 
         return [
+            this.events.closeDialogs(),
             this.events.logs(),
             this.events.playersPosition(),
             this.events.currentMessage(),
@@ -888,6 +920,7 @@ export default class Eurobusiness extends Game {
         ];
     }
 
+    // @event
     pickCommunityCard(data) {
         this.checkIfActionPossible(data.publicId, actions.pickCommunityCard);
         const currentPlayer = this.getCurrentPlayer();
@@ -928,6 +961,7 @@ export default class Eurobusiness extends Game {
         }
 
         return [
+            this.events.closeDialogs(),
             this.events.logs(),
             this.events.playersPosition(),
             this.events.currentMessage(),
@@ -988,6 +1022,7 @@ export default class Eurobusiness extends Game {
             this.gameData.currentMessage = `Wygrał ${this.getCurrentPlayer().username}`;
             clearInterval(this.intervalId);
             return [
+                this.events.closeDialogs(),
                 this.events.endGame(),
                 this.events.currentMessage(),
                 this.events.logs(),
