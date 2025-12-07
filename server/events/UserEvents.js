@@ -185,6 +185,10 @@ export default class UserEvents {
                     this.eventEmmiter.toLobby(lobby.id, "pause");
                     const timeoutId = setTimeout(
                         () => {
+                            for (const lobbyUserId of [...lobby.game.disconnectedUsers]) {
+                                this.userManager.clearTimeout(lobbyUserId);
+                            }
+
                             lobby.isActive = false;
                             lobby.game = null;
 
