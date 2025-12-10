@@ -13,7 +13,8 @@ const actions = {
     auction: "Licytacja",
     mortgagePropertyCard: "Zastawienie karty",
     redeemPropertyCard: "Zwrócenie pieniędzy za zastawioną kartę",
-    buildHouses: "Budowanie budynku",
+    buildHouse: "Budowanie budynku",
+    sellHouse: "Sprzedaż budynku",
 };
 
 export default actions;
