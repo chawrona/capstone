@@ -111,28 +111,30 @@ export default class Eurobusiness extends Game {
                 const ownerships = [...player.getData("ownerships")];
                 const mortgageCards = player.getData("mortgagedCards");
 
-                let mostExpensiveTileToMortgage;
+                let mostExpensiveTileIndex;
                 for (const cardIndex of ownerships) {
                     if (!mortgageCards.has(cardIndex)) {
                         if (
-                            mostExpensiveTileToMortgage === undefined ||
+                            mostExpensiveTileIndex === undefined ||
                             this.gameMap.getTile(cardIndex).position >
-                                this.gameMap.getTile(
-                                    mostExpensiveTileToMortgage,
-                                ).position
+                                this.gameMap.getTile(mostExpensiveTileIndex)
+                                    .position
                         ) {
-                            mostExpensiveTileToMortgage = cardIndex;
+                            mostExpensiveTileIndex = cardIndex;
                         }
                     }
                 }
 
-                const firstCard = this.gameMap.getTile(
-                    mostExpensiveTileToMortgage,
+                const tileToMortgage = this.gameMap.getTile(
+                    mostExpensiveTileIndex,
                 );
 
-                player.setData("money", (money) => money + firstCard.mortgage);
+                player.setData(
+                    "money",
+                    (money) => money + tileToMortgage.mortgage,
+                );
                 player.setData("mortgagedCards", (mortgagedCards) =>
-                    mortgagedCards.add(mostExpensiveTileToMortgage),
+                    mortgagedCards.add(mostExpensiveTileIndex),
                 );
             } else if (hasNotEnoughMoney) {
                 const opponent =
