@@ -110,14 +110,29 @@ export default class Eurobusiness extends Game {
             ) {
                 const ownerships = [...player.getData("ownerships")];
                 const mortgageCards = player.getData("mortgagedCards");
-                const firstCardIndex = ownerships.find((cardIndex) => {
-                    return !mortgageCards.has(cardIndex);
-                });
-                const firstCard = this.gameMap.getTile(firstCardIndex);
+
+                let mostExpensiveTileToMortgage;
+                for (const cardIndex of ownerships) {
+                    if (!mortgageCards.has(cardIndex)) {
+                        if (
+                            mostExpensiveTileToMortgage === undefined ||
+                            this.gameMap.getTile(cardIndex).position >
+                                this.gameMap.getTile(
+                                    mostExpensiveTileToMortgage,
+                                ).position
+                        ) {
+                            mostExpensiveTileToMortgage = cardIndex;
+                        }
+                    }
+                }
+
+                const firstCard = this.gameMap.getTile(
+                    mostExpensiveTileToMortgage,
+                );
 
                 player.setData("money", (money) => money + firstCard.mortgage);
                 player.setData("mortgagedCards", (mortgagedCards) =>
-                    mortgagedCards.add(firstCardIndex),
+                    mortgagedCards.add(mostExpensiveTileToMortgage),
                 );
             } else if (hasNotEnoughMoney) {
                 const opponent =
@@ -849,6 +864,7 @@ export default class Eurobusiness extends Game {
             case chanceCardTypes.payForBuildingProperties:
                 break;
             case chanceCardTypes.takeMoneyFromPlayers:
+                this.takeMoneyFromPlayers(currentPlayer);
                 break;
         }
 
@@ -862,6 +878,33 @@ export default class Eurobusiness extends Game {
             this.events.playersData(),
             this.events.time(),
         ];
+    }
+
+    takeMoneyFromPlayers(taker) {
+        let payersCount = 0;
+
+        for (const [, player] of Object.entries(this.players)) {
+            if (player.publicId === taker.publicId) {
+                continue;
+            }
+
+            if (player.getData("money") >= 50) {
+                player.setData("money", (money) => money - 50);
+                payersCount = payersCount + 1;
+                this.addLog(`${player.username} zapłacił 50$`);
+            } else {
+                this.addLog(
+                    `${player.username} nie ma wystarczająco pieniędzy.`,
+                );
+            }
+        }
+
+        if (payersCount > 0) {
+            taker.setData("money", (money) => money + payersCount * 50);
+            this.addLog(`${taker.username} pobiera po 50$ od każdego gracza`);
+        } else {
+            this.addLog(`${taker.username} nie otrzymał żadnych pieniędzy.`);
+        }
     }
 
     // @event
