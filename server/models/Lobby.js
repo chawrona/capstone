@@ -50,6 +50,7 @@ export default class Lobby {
     isAdmin(userId) {
         return userId === this.admin;
     }
+
     endGame() {
         this.isActive = false;
     }

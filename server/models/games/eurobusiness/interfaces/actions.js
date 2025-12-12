@@ -15,6 +15,7 @@ const actions = {
     redeemPropertyCard: "Zwrócenie pieniędzy za zastawioną kartę",
     buildHouse: "Budowanie budynku",
     sellHouse: "Sprzedaż budynku",
+    exit: "Wyjście z gry",
 };
 
 export default actions;

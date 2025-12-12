@@ -1189,23 +1189,28 @@ export default class Eurobusiness extends Game {
         });
 
         if (playersLeft < 2) {
-            this.nextTurn();
-            this.leaderboard.unshift(this.getCurrentPlayerPublicId());
-            this.gameData.currentMessage = `Wygrał ${this.getCurrentPlayer().username}`;
-            clearInterval(this.intervalId);
-            return [
-                this.events.closeDialogs(),
-                this.events.currentMessage(),
-                this.events.playersData(),
-                this.events.logs(),
-                this.events.time(),
-                this.events.endGame(),
-            ];
+            this.theGameIsOver();
         }
 
-        this.gameData.availableActions = ["endTurn"];
+        this.gameData.availableActions = [actions.endTurn];
         const targets = this.endTurn({ publicId: loser.publicId });
-        this.gameData.availableActions = ["exit"];
+        this.gameData.availableActions = [actions.exit];
         return targets;
+    }
+
+    theGameIsOver() {
+        this.endGame();
+        this.nextTurn();
+        this.leaderboard.unshift(this.getCurrentPlayerPublicId());
+        this.gameData.currentMessage = `Wygrał ${this.getCurrentPlayer().username}`;
+        clearInterval(this.intervalId);
+        return [
+            this.events.closeDialogs(),
+            this.events.currentMessage(),
+            this.events.playersData(),
+            this.events.logs(),
+            this.events.time(),
+            this.events.endGame(),
+        ];
     }
 }
