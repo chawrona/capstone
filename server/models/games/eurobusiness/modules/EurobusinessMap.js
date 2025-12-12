@@ -1,22 +1,22 @@
 import tiles from "../config/tiles.json" with { type: "json" };
 
 export default class EurobusinessMap {
-  constructor() {
-    this.ownerships = new Map();
-  }
+    constructor() {
+        this.ownerships = new Map();
+    }
 
-  movePlayer(player, rollResult) {
-    let hasCompletedLap = false;
+    movePlayer(player, rollResult) {
+        let hasCompletedLap = false;
 
-    player.setData("position", (oldPosition) => {
-      if (oldPosition + rollResult > 39) hasCompletedLap = true;
-      return (oldPosition + rollResult) % 40;
-    });
+        player.setData("position", (oldPosition) => {
+            if (oldPosition + rollResult > 39) hasCompletedLap = true;
+            return (oldPosition + rollResult) % 40;
+        });
 
-    return hasCompletedLap;
-  }
+        return hasCompletedLap;
+    }
 
-  getTile(position) {
-    return tiles[position];
-  }
+    getTile(position) {
+        return tiles[position];
+    }
 }

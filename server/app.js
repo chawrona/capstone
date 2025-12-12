@@ -12,10 +12,10 @@ import EventEmmiter from "./services/EventEmmiter.js";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-  },
+    cors: {
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"],
+    },
 });
 const clientRoutes = new ClientRoutes();
 
@@ -28,11 +28,11 @@ app.use("/", clientRoutes.getRouter());
 // Tutaj ustawiamy w na jakie event w komunikacji socket-io będziemy nasłuchiwać i reagować
 new EventEmmiter(io);
 io.on("connection", (socket) => {
-  new UserEvents(socket);
-  new LobbyEvents(socket);
-  new GameEvents(socket);
+    new UserEvents(socket);
+    new LobbyEvents(socket);
+    new GameEvents(socket);
 });
 
 server.listen(process.env.PORT, () =>
-  console.log(`Server running on http://localhost:${process.env.PORT}`),
+    console.log(`Server running on http://localhost:${process.env.PORT}`),
 );
