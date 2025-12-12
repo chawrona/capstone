@@ -45,6 +45,7 @@ export default class Eurobusiness extends Game {
         player.setData("outOfJailAttempts", () => 0);
         player.setData("wasInJail", () => false);
         player.setData("lost", () => false);
+        player.setData("properties", () => new Map());
     }
 
     startTimer() {
@@ -171,6 +172,8 @@ export default class Eurobusiness extends Game {
             actions.endTurn,
             actions.mortgagePropertyCard,
             actions.redeemPropertyCard,
+            actions.buildHouse,
+            actions.sellHouse,
         ];
 
         return [
@@ -261,6 +264,8 @@ export default class Eurobusiness extends Game {
                     actions.endTurn,
                     actions.mortgagePropertyCard,
                     actions.redeemPropertyCard,
+                    actions.buildHouse,
+                    actions.sellHouse,
                 ];
                 break;
             case tileTypes.goToJail:
@@ -272,6 +277,8 @@ export default class Eurobusiness extends Game {
                     actions.payTax,
                     actions.redeemPropertyCard,
                     actions.mortgagePropertyCard,
+                    actions.buildHouse,
+                    actions.sellHouse,
                 ];
                 break;
             case tileTypes.incomeTax:
@@ -310,11 +317,23 @@ export default class Eurobusiness extends Game {
                 `${this.getCurrentPlayer().username} stanął na swoim polu`,
             );
 
-            this.gameData.availableActions = [
-                actions.endTurn,
-                actions.mortgagePropertyCard,
-                actions.redeemPropertyCard,
-            ];
+            if (!this.ownAllOneColorTiles()) {
+                this.gameData.availableActions = [
+                    actions.endTurn,
+                    actions.mortgagePropertyCard,
+                    actions.buildHouse,
+                    actions.sellHouse,
+                    actions.redeemPropertyCard,
+                ];
+            } else {
+                this.gameData.availableActions = [
+                    actions.endTurn,
+                    actions.mortgagePropertyCard,
+                    actions.buildHouse,
+                    actions.sellHouse,
+                    actions.redeemPropertyCard,
+                ];
+            }
         } else if (mortgagedCards && mortgagedCards.has(position)) {
             this.gameData.currentMessage = `${player.username} stanął na zastawionym polu przez gracza ${tileOwner.username}.`;
             this.addLog(
@@ -323,6 +342,8 @@ export default class Eurobusiness extends Game {
             this.gameData.availableActions = [
                 actions.endTurn,
                 actions.mortgagePropertyCard,
+                actions.buildHouse,
+                actions.sellHouse,
                 actions.redeemPropertyCard,
             ];
         } else {
@@ -334,8 +355,134 @@ export default class Eurobusiness extends Game {
                 actions.payRent,
                 actions.redeemPropertyCard,
                 actions.mortgagePropertyCard,
+                actions.buildHouse,
+                actions.sellHouse,
             ];
         }
+    }
+
+    // @event
+    buildHouse({ publicId, data: tileIndex }) {
+        this.checkIfActionPossible(publicId, actions.buildHouse);
+        const player = this.getCurrentPlayer();
+        const tile = this.gameMap.getTile(tileIndex);
+        const properties = player.getData("properties");
+        const currentHouses = properties.get(tileIndex);
+
+        if (!this.ownAllOneColorTiles()) {
+            return [this.events.info("Wykup wszystkie pola tego koloru")];
+        }
+
+        if (!this.canSellOrBuyHouse(tileIndex, true)) {
+            return [this.events.info("Nie można zbudować budynku")];
+        }
+
+        if (player.getData("money") < tile.housePrice) {
+            return [this.events.info("Nie masz wystarczająco pieniędzy")];
+        }
+
+        player.setData("money", (money) => money - tile.housePrice);
+        properties.set(tileIndex, currentHouses + 1);
+        this.addLog(`${player.username} zbudował dom na <i>${tile.name}</i>`);
+
+        return [
+            this.events.closeDialogs(),
+            this.events.logs(),
+            this.events.playersData(),
+            this.events.time(),
+        ];
+    }
+
+    ownAllOneColorTiles() {
+        const player = this.getCurrentPlayer();
+        const position = player.getData("position");
+        const currentTile = this.gameMap.getTile(position);
+        if (!currentTile.set) return false;
+
+        const [setID, setCount] = currentTile.set;
+        const ownerships = player.getData("ownerships");
+
+        let buildings = 0;
+
+        for (const tilePosition of ownerships) {
+            const tile = this.gameMap.getTile(tilePosition);
+            if (tile.set !== undefined && tile.set[0] === setID) {
+                buildings++;
+            }
+        }
+
+        if (buildings === setCount) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    sellHouse({ publicId, data: tileIndex }) {
+        this.checkIfActionPossible(publicId, actions.sellHouse);
+        const player = this.getCurrentPlayer();
+        const tile = this.gameMap.getTile(tileIndex);
+        const properties = player.getData("properties");
+        const currentHouses = properties.get(tileIndex);
+
+        if (!this.canSellOrBuyHouse(tileIndex, false)) {
+            return [this.events.info("Nie można sprzedać tego domu")];
+        }
+
+        const refund = tile.housePrice / 2;
+        properties.set(tileIndex, currentHouses - 1);
+        player.setData("money", (money) => money + refund);
+
+        this.addLog(
+            `${player.username} sprzedał budynek na <i>${tile.name}</i> za <b>${refund}$</b>`,
+        );
+
+        return [
+            this.events.closeDialogs(),
+            this.events.logs(),
+            this.events.playersData(),
+            this.events.time(),
+        ];
+    }
+
+    canSellOrBuyHouse(tileIndex, buy) {
+        const player = this.getCurrentPlayer();
+        const currentTile = this.gameMap.getTile(tileIndex);
+        const [setID] = currentTile.set;
+        const ownerships = player.getData("ownerships");
+        const properties = player.getData("properties");
+
+        let currentHouses = 0;
+        if (properties.get(tileIndex) !== undefined) {
+            currentHouses = properties.get(tileIndex);
+        }
+
+        if (!buy) {
+            if (currentHouses === 0) return false;
+        } else {
+            if (currentHouses >= 5) return false;
+        }
+
+        for (const tilePosition of ownerships) {
+            const tile = this.gameMap.getTile(tilePosition);
+
+            if (tile.set[0] === setID) {
+                if (tilePosition === tileIndex) {
+                    continue;
+                }
+
+                let otherHouses = properties.get(tilePosition);
+                if (otherHouses === undefined) {
+                    otherHouses = 0;
+                }
+                if (!buy && otherHouses > currentHouses) {
+                    return false;
+                } else if (buy && otherHouses < currentHouses) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     // @event
@@ -372,6 +519,8 @@ export default class Eurobusiness extends Game {
                     this.gameData.availableActions = [
                         actions.endTurn,
                         actions.mortgagePropertyCard,
+                        actions.buildHouse,
+                        actions.sellHouse,
                         actions.redeemPropertyCard,
                     ];
                     this.gameData.currentMessage = `${this.getCurrentPlayer().username} nie wychodzi z więzienia.`;
@@ -585,6 +734,8 @@ export default class Eurobusiness extends Game {
         this.gameData.availableActions = [
             actions.endTurn,
             actions.mortgagePropertyCard,
+            actions.buildHouse,
+            actions.sellHouse,
             actions.redeemPropertyCard,
         ];
 
@@ -615,6 +766,8 @@ export default class Eurobusiness extends Game {
         this.gameData.availableActions = [
             actions.endTurn,
             actions.mortgagePropertyCard,
+            actions.buildHouse,
+            actions.sellHouse,
             actions.redeemPropertyCard,
         ];
 
@@ -635,19 +788,23 @@ export default class Eurobusiness extends Game {
         const position = player.getData("position");
         const tile = this.gameMap.getTile(position);
         const owner = this.players.get(this.getOwnerId(position));
+        const properties = owner.getData("properties");
+        const rent = tile.rent[properties.get(position) ?? 0];
 
-        if (player.getData("money") < tile.rent) {
+        if (player.getData("money") < rent) {
             return [this.events.info("Nie masz wystarczająco pieniędzy")];
         }
 
-        player.setData("money", (money) => money - tile.rent);
-        owner.setData("money", (money) => money + tile.rent);
+        player.setData("money", (money) => money - rent);
+        owner.setData("money", (money) => money + rent);
         this.addLog(
-            `${player.username} płaci <b>${tile.rent}$</b> graczowi ${owner.username}.`,
+            `${player.username} płaci <b>${rent}$</b> graczowi ${owner.username}.`,
         );
         this.gameData.availableActions = [
             actions.endTurn,
             actions.mortgagePropertyCard,
+            actions.buildHouse,
+            actions.sellHouse,
             actions.redeemPropertyCard,
         ];
         this.gameData.currentMessage = `${this.getCurrentPlayer().username} kończy turę`;
@@ -736,6 +893,8 @@ export default class Eurobusiness extends Game {
         this.gameData.availableActions = [
             actions.endTurn,
             actions.mortgagePropertyCard,
+            actions.buildHouse,
+            actions.sellHouse,
             actions.redeemPropertyCard,
         ];
         this.timer.addTime(10);
@@ -818,6 +977,8 @@ export default class Eurobusiness extends Game {
         this.gameData.availableActions = [
             actions.endTurn,
             actions.mortgagePropertyCard,
+            actions.buildHouse,
+            actions.sellHouse,
             actions.redeemPropertyCard,
         ];
         switch (card.type) {
@@ -849,6 +1010,8 @@ export default class Eurobusiness extends Game {
                     actions.payTax,
                     actions.redeemPropertyCard,
                     actions.mortgagePropertyCard,
+                    actions.buildHouse,
+                    actions.sellHouse,
                 ];
                 break;
             case chanceCardTypes.withdrawCashFromBank:
@@ -923,6 +1086,8 @@ export default class Eurobusiness extends Game {
         this.gameData.availableActions = [
             actions.endTurn,
             actions.mortgagePropertyCard,
+            actions.buildHouse,
+            actions.sellHouse,
             actions.redeemPropertyCard,
         ];
         switch (card.type) {
@@ -945,6 +1110,8 @@ export default class Eurobusiness extends Game {
                     actions.payTax,
                     actions.redeemPropertyCard,
                     actions.mortgagePropertyCard,
+                    actions.buildHouse,
+                    actions.sellHouse,
                 ];
                 break;
         }
@@ -986,6 +1153,14 @@ export default class Eurobusiness extends Game {
                 (outOfJailCard) => outOfJailCard + loserOutOfJailCards,
             );
 
+            const loserProperties = loser.getData("properties");
+            loser.setData("properties", () => new Map());
+            opponent.setData("properties", (properties) => {
+                for (const [position, count] of loserProperties) {
+                    properties.set(position, count);
+                }
+            });
+
             const loserMoney = loser.getData("money");
             loser.setData("money", () => 0);
             opponent.setData("money", (money) => money + loserMoney);
@@ -997,6 +1172,7 @@ export default class Eurobusiness extends Game {
                 this.removeOwnership(loser, position);
             }
 
+            loser.setData("properties", () => new Map());
             loser.setData("outOfJailCard", () => 0);
             loser.setData("position", () => null);
             loser.setData("money", () => 0);
