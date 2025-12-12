@@ -10,113 +10,113 @@ import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
 
 export default class EventHelper {
-    constructor() {
-        this.lobbyManager = new LobbyManager();
-        this.userManager = new UserManager();
-        this.eventEmmiter = new EventEmmiter();
+  constructor() {
+    this.lobbyManager = new LobbyManager();
+    this.userManager = new UserManager();
+    this.eventEmmiter = new EventEmmiter();
+  }
+
+  createLobbyData(lobbyId) {
+    try {
+      const lobby = this.lobbyManager.getLobby(lobbyId);
+
+      const lobbyUsers = [];
+      for (const lobbyUserId of lobby.users) {
+        const { name, isReady, publicId, color } =
+          this.userManager.getUser(lobbyUserId);
+        lobbyUsers.push({
+          username: name,
+          isReady,
+          publicId,
+          isAdmin: lobby.isAdmin(lobbyUserId),
+          color,
+        });
+      }
+
+      return {
+        lobbyUsers,
+        availableColors: colors,
+        currentGame: lobby.gameInfo,
+        availableGames: games,
+      };
+    } catch (error) {
+      // to-do: jak macie czas to zbadajcie
+      // czy return przy tym pierwszym erroru jest potrzebny
+      if (error instanceof UserDoesNotExistError) return;
+      if (error instanceof LobbyDoesNotExistError) return error;
+      this.eventEmmiter.toUserError(lobbyId, error);
+    }
+  }
+
+  sendLobbyData(lobbyId) {
+    try {
+      const lobby = this.lobbyManager.getLobby(lobbyId);
+      const lobbyData = this.createLobbyData(lobbyId);
+
+      for (const lobbyUserId of lobby.users) {
+        const user = this.userManager.getUser(lobbyUserId);
+        this.eventEmmiter.toUser(lobbyUserId, "lobbyData", {
+          ...lobbyData,
+          currentUser: user.publicId,
+        });
+      }
+    } catch (error) {
+      if (error instanceof UserDoesNotExistError) return;
+      if (error instanceof LobbyDoesNotExistError) return;
+      this.eventEmmiter.toUserError(lobbyId, error);
+    }
+  }
+
+  isLobbyIdGiven(userId, lobbyId) {
+    try {
+      if (!lobbyId) {
+        return this.eventEmmiter.toUser(userId, "homepage");
+      }
+
+      const lobby = this.lobbyManager.getLobby(lobbyId);
+
+      lobby.joinUser(userId);
+      const user = this.userManager.getUser(userId);
+      user.lobbyId = lobbyId;
+      this.eventEmmiter.toUser(userId, "lobby", lobbyId);
+      this.sendLobbyData(lobbyId);
+
+      return true;
+    } catch (error) {
+      if (error instanceof LobbyDoesNotExistError) {
+        this.eventEmmiter.toUser(userId, "homepage", {
+          error: `Pokój #${lobbyId} nie istnieje.`,
+        });
+      } else {
+        this.eventEmmiter.toUserError(userId, error);
+      }
+    }
+  }
+
+  validateUsername(username) {
+    if (!username || typeof username !== "string") {
+      throw new InvalidUsernameError();
     }
 
-    createLobbyData(lobbyId) {
-        try {
-            const lobby = this.lobbyManager.getLobby(lobbyId);
-
-            const lobbyUsers = [];
-            for (const lobbyUserId of lobby.users) {
-                const { name, isReady, publicId, color } =
-                    this.userManager.getUser(lobbyUserId);
-                lobbyUsers.push({
-                    username: name,
-                    isReady,
-                    publicId,
-                    isAdmin: lobby.isAdmin(lobbyUserId),
-                    color,
-                });
-            }
-
-            return {
-                lobbyUsers,
-                availableColors: colors,
-                currentGame: lobby.gameInfo,
-                availableGames: games,
-            };
-        } catch (error) {
-            // to-do: jak macie czas to zbadajcie
-            // czy return przy tym pierwszym erroru jest potrzebny
-            if (error instanceof UserDoesNotExistError) return;
-            if (error instanceof LobbyDoesNotExistError) return error;
-            this.eventEmmiter.toUserError(lobbyId, error);
-        }
+    if (username.length < 3 || username.length > 20) {
+      throw new InvalidUsernameLengthError();
     }
 
-    sendLobbyData(lobbyId) {
-        try {
-            const lobby = this.lobbyManager.getLobby(lobbyId);
-            const lobbyData = this.createLobbyData(lobbyId);
-
-            for (const lobbyUserId of lobby.users) {
-                const user = this.userManager.getUser(lobbyUserId);
-                this.eventEmmiter.toUser(lobbyUserId, "lobbyData", {
-                    ...lobbyData,
-                    currentUser: user.publicId,
-                });
-            }
-        } catch (error) {
-            if (error instanceof UserDoesNotExistError) return;
-            if (error instanceof LobbyDoesNotExistError) return;
-            this.eventEmmiter.toUserError(lobbyId, error);
-        }
+    const regex = /^(?!.* {2})[A-Za-z0-9 ]+$/;
+    if (!regex.test(username)) {
+      throw new InvalidUsernameCharactersError();
     }
+  }
 
-    isLobbyIdGiven(userId, lobbyId) {
-        try {
-            if (!lobbyId) {
-                return this.eventEmmiter.toUser(userId, "homepage");
-            }
-
-            const lobby = this.lobbyManager.getLobby(lobbyId);
-
-            lobby.joinUser(userId);
-            const user = this.userManager.getUser(userId);
-            user.lobbyId = lobbyId;
-            this.eventEmmiter.toUser(userId, "lobby", lobbyId);
-            this.sendLobbyData(lobbyId);
-
-            return true;
-        } catch (error) {
-            if (error instanceof LobbyDoesNotExistError) {
-                this.eventEmmiter.toUser(userId, "homepage", {
-                    error: `Pokój #${lobbyId} nie istnieje.`,
-                });
-            } else {
-                this.eventEmmiter.toUserError(userId, error);
-            }
-        }
+  checkIfLobbyActive(lobbyOrLobbyId) {
+    let lobby;
+    if (typeof lobbyOrLobbyId === "string") {
+      lobby = this.lobbyManager.getLobby(lobbyOrLobbyId);
+    } else {
+      lobby = lobbyOrLobbyId;
     }
-
-    validateUsername(username) {
-        if (!username || typeof username !== "string") {
-            throw new InvalidUsernameError();
-        }
-
-        if (username.length < 3 || username.length > 20) {
-            throw new InvalidUsernameLengthError();
-        }
-
-        const regex = /^(?!.* {2})[A-Za-z0-9 ]+$/;
-        if (!regex.test(username)) {
-            throw new InvalidUsernameCharactersError();
-        }
+    if (lobby.isActive) {
+      throw new Error("Gra wystartowała");
     }
-
-    checkIfLobbyActive(lobbyOrLobbyId) {
-        let lobby;
-        if (typeof lobbyOrLobbyId === "string") {
-            lobby = this.lobbyManager.getLobby(lobbyOrLobbyId);
-        } else {
-            lobby = lobbyOrLobbyId;
-        }
-        if (lobby.isActive) {
-            throw new Error("Gra wystartowała");
-        }
-    }
+  }
 }

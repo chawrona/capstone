@@ -1,36 +1,34 @@
 import fs from "fs/promises";
 
 export default class Logger {
-    constructor() {
-        if (Logger.instance) {
-            return Logger.instance;
-        }
-
-        this.queue = Promise.resolve();
-
-        Logger.instance = this;
+  constructor() {
+    if (Logger.instance) {
+      return Logger.instance;
     }
 
-    enqueueWrite(logLine) {
-        this.queue = this.queue
-            .then(() =>
-                fs.appendFile("./server/storage/logs.txt", logLine + "\n"),
-            )
-            .catch((err) => console.error("Logger error:", err));
+    this.queue = Promise.resolve();
 
-        return this.queue;
-    }
+    Logger.instance = this;
+  }
 
-    log(message) {
-        const timestamp = new Date().toISOString();
-        const logLine = `[${timestamp}] ${message}`;
-        console.log(logLine);
-        return this.enqueueWrite(logLine);
-    }
+  enqueueWrite(logLine) {
+    this.queue = this.queue
+      .then(() => fs.appendFile("./server/storage/logs.txt", logLine + "\n"))
+      .catch((err) => console.error("Logger error:", err));
 
-    error(message) {
-        const timestamp = new Date().toISOString();
-        const logLine = `[ERROR] [${timestamp}] ${message}`;
-        return this.enqueueWrite(logLine);
-    }
+    return this.queue;
+  }
+
+  log(message) {
+    const timestamp = new Date().toISOString();
+    const logLine = `[${timestamp}] ${message}`;
+    console.log(logLine);
+    return this.enqueueWrite(logLine);
+  }
+
+  error(message) {
+    const timestamp = new Date().toISOString();
+    const logLine = `[ERROR] [${timestamp}] ${message}`;
+    return this.enqueueWrite(logLine);
+  }
 }

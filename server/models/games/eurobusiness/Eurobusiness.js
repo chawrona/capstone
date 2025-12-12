@@ -351,27 +351,22 @@ export default class Eurobusiness extends Game {
         const tile = this.gameMap.getTile(tileIndex);
         const properties = player.getData("properties");
         const currentHouses = properties.get(tileIndex);
-        const housePrice = tile.price[1] - tile.price[0];
 
         if (!this.ownAllOneColorTiles()) {
-            return [
-                this.events.info(
-                    "Nie możesz budować budynków jeżeli nie masz wszystkich pól tego koloru",
-                ),
-            ];
+            return [this.events.info("Wykup wszystkie pola tego koloru")];
         }
 
         if (!this.canSellOrBuyHouse(tileIndex, true)) {
-            return [this.events.info("Nie można zbudować budynku na tym polu")];
+            return [this.events.info("Nie można zbudować budynku")];
         }
 
-        if (player.getData("money") < housePrice) {
+        if (player.getData("money") < tile.housePrice) {
             return [this.events.info("Nie masz wystarczająco pieniędzy")];
         }
 
-        player.setData("money", (money) => money - housePrice);
+        player.setData("money", (money) => money - tile.housePrice);
         properties.set(tileIndex, currentHouses + 1);
-        this.addLog(`${player.username} zbudował dom na ${tile.name}`);
+        this.addLog(`${player.username} zbudował dom na <i>${tile.name}</i>`);
 
         return [
             this.events.closeDialogs(),
@@ -408,22 +403,21 @@ export default class Eurobusiness extends Game {
 
     sellHouse({ publicId, data: tileIndex }) {
         this.checkIfActionPossible(publicId, actions.sellHouse);
-        const player = this.getPlayer(publicId);
+        const player = this.getCurrentPlayer();
         const tile = this.gameMap.getTile(tileIndex);
         const properties = player.getData("properties");
         const currentHouses = properties.get(tileIndex);
-        const housePrice = tile.price[1] - tile.price[0];
 
         if (!this.canSellOrBuyHouse(tileIndex, false)) {
-            return [this.events.info("Nie można sprzedać budynku na tym polu")];
+            return [this.events.info("Nie można sprzedać tego domu")];
         }
 
-        const refund = housePrice / 2;
+        const refund = tile.housePrice / 2;
         properties.set(tileIndex, currentHouses - 1);
         player.setData("money", (money) => money + refund);
 
         this.addLog(
-            `${player.username} sprzedał budynek na ${tile.name} za ${refund}$`,
+            `${player.username} sprzedał budynek na <i>${tile.name}</i> za <b>${refund}$</b>`,
         );
 
         return [
@@ -454,10 +448,12 @@ export default class Eurobusiness extends Game {
 
         for (const tilePosition of ownerships) {
             const tile = this.gameMap.getTile(tilePosition);
-            if (tile.set !== undefined && tile.set[0] === setID) {
+
+            if (tile.set[0] === setID) {
                 if (tilePosition === tileIndex) {
                     continue;
                 }
+
                 let otherHouses = properties.get(tilePosition);
                 if (otherHouses === undefined) {
                     otherHouses = 0;

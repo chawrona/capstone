@@ -2,55 +2,55 @@ import UserManager from "../managers/UserManager.js";
 import Logger from "./Logger.js";
 
 export default class EventEmmiter {
-    constructor(io) {
-        if (EventEmmiter.instance) {
-            return EventEmmiter.instance;
-        }
-        this.io = io;
-        EventEmmiter.instance = this;
-
-        this.userManager = new UserManager();
-        this.logger = new Logger();
+  constructor(io) {
+    if (EventEmmiter.instance) {
+      return EventEmmiter.instance;
     }
+    this.io = io;
+    EventEmmiter.instance = this;
 
-    toUser(userId, eventName, data) {
-        const socketId = this.userManager.getUserSocketId(userId);
-        this.io.to(socketId).emit(eventName, data);
-    }
+    this.userManager = new UserManager();
+    this.logger = new Logger();
+  }
 
-    toUserError(userId, error) {
-        if (userId) {
-            this.toUser(userId, "error", {
-                error: error.message,
-            });
-        }
-        this.logger.error(error.message);
-    }
+  toUser(userId, eventName, data) {
+    const socketId = this.userManager.getUserSocketId(userId);
+    this.io.to(socketId).emit(eventName, data);
+  }
 
-    toLobby(lobbyId, eventName, data) {
-        this.io.to(lobbyId).emit(eventName, data);
+  toUserError(userId, error) {
+    if (userId) {
+      this.toUser(userId, "error", {
+        error: error.message,
+      });
     }
+    this.logger.error(error.message);
+  }
 
-    toLobbyError(lobbyId, error) {
-        if (lobbyId) {
-            this.toLobby(lobbyId, "error", {
-                error: error.message,
-            });
-        }
-        this.logger.error(error.message);
-    }
+  toLobby(lobbyId, eventName, data) {
+    this.io.to(lobbyId).emit(eventName, data);
+  }
 
-    toAll(eventName, data) {
-        this.io.emit(eventName, data);
+  toLobbyError(lobbyId, error) {
+    if (lobbyId) {
+      this.toLobby(lobbyId, "error", {
+        error: error.message,
+      });
     }
+    this.logger.error(error.message);
+  }
 
-    toPublicUser(publicId, eventName, data) {
-        const userId = this.userManager.getUserIdByPublicId(publicId);
-        this.toUser(userId, eventName, data);
-    }
+  toAll(eventName, data) {
+    this.io.emit(eventName, data);
+  }
 
-    toPublicUserError(publicId, error) {
-        const userId = this.userManager.getUserIdByPublicId(publicId);
-        this.toUserError(userId, error);
-    }
+  toPublicUser(publicId, eventName, data) {
+    const userId = this.userManager.getUserIdByPublicId(publicId);
+    this.toUser(userId, eventName, data);
+  }
+
+  toPublicUserError(publicId, error) {
+    const userId = this.userManager.getUserIdByPublicId(publicId);
+    this.toUserError(userId, error);
+  }
 }
