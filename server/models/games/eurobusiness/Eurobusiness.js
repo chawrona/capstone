@@ -50,10 +50,12 @@ export default class Eurobusiness extends Game {
 
     startTimer() {
         this.intervalId = setInterval(() => {
-            this.timer.subtract(1);
-            const targets = this.endTimerConsequences();
-            if (targets) {
-                this.useEventEmmiter(targets);
+            if (!this.paused) {
+                this.timer.subtract(1);
+                const targets = this.endTimerConsequences();
+                if (targets) {
+                    this.useEventEmmiter(targets);
+                }
             }
         }, 1000);
     }
@@ -1212,5 +1214,11 @@ export default class Eurobusiness extends Game {
             this.events.time(),
             this.events.endGame(),
         ];
+    }
+
+    pause(userId) {
+        console.log("Gra zapauzowana");
+        this.disconnectedPlayers.add(userId);
+        this.paused = true;
     }
 }

@@ -72,6 +72,7 @@ export default class EurobusinessEventFactory {
                     currentMessage: this.game.gameData.currentMessage,
                     logs: this.game.logs,
                     time: this.game.timer.getTimer(),
+                    paused: this.game.paused,
                 },
             },
         ];
