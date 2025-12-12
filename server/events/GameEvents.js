@@ -21,6 +21,11 @@ export default class GameEvents {
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
+            if (!lobby.isActive) {
+                return this.eventEmmiter.toLobby(lobby.id, "lobby", lobby.id);
+            }
+
             const targets = lobby.game.processGameData({
                 ...data,
                 publicId: user.publicId,
