@@ -75,6 +75,9 @@ export default class Eurobusiness extends Game {
         if (availableActions.has(actions.payTax)) {
             return this.handleAutoPayment(this.payTax, data);
         }
+        if (availableActions.has(actions.payHouseTax)) {
+            return this.handleAutoPayment(this.payHouseTax, data);
+        }
         if (availableActions.has(actions.payIncomeTax)) {
             return this.handleAutoPayment(this.payIncomeTax, data);
         }
@@ -1012,7 +1015,6 @@ export default class Eurobusiness extends Game {
                     actions.payTax,
                     actions.redeemPropertyCard,
                     actions.mortgagePropertyCard,
-                    actions.buildHouse,
                     actions.sellHouse,
                 ];
                 break;
@@ -1029,6 +1031,13 @@ export default class Eurobusiness extends Game {
                 );
                 break;
             case chanceCardTypes.payForBuildingProperties:
+                this.gameData.currentMessage = `${currentPlayer.username} płaci ${this.calculateBuildingTax()}$ za domy.`;
+                this.gameData.availableActions = [
+                    actions.payHouseTax,
+                    actions.redeemPropertyCard,
+                    actions.mortgagePropertyCard,
+                    actions.sellHouse,
+                ];
                 break;
             case chanceCardTypes.takeMoneyFromPlayers:
                 this.takeMoneyFromPlayers(currentPlayer);
@@ -1044,6 +1053,63 @@ export default class Eurobusiness extends Game {
             this.events.chanceCard(newCard),
             this.events.playersData(),
             this.events.time(),
+        ];
+    }
+
+    calculateBuildingTax() {
+        let totalHouses = 0;
+        for (const houseCount of Object.values(
+            this.getCurrentPlayer().getData("properties"),
+        )) {
+            totalHouses += houseCount;
+        }
+
+        const houseTax = 50;
+        return totalHouses * houseTax;
+    }
+
+    payHouseTax(data) {
+        this.checkIfActionPossible(data.publicId, actions.payHouseTax);
+        const player = this.getCurrentPlayer();
+        this.timer.addTime(10);
+
+        const amountToPay = this.calculateBuildingTax();
+
+        if (amountToPay === 0) {
+            return [
+                this.events.info("Nie masz postawionych domów — (podatek: 0$)"),
+            ];
+        }
+
+        if (player.getData("money") < amountToPay) {
+            return [
+                this.events.info(
+                    `Nie masz wystarczająco pieniędzy na opłacenie podatku - (podatek: ${amountToPay}$)`,
+                ),
+            ];
+        }
+
+        player.setData("money", (money) => money - amountToPay);
+
+        this.addLog(
+            `${player.username} zapłacił podatek za domy - (podatek: <b>${amountToPay}</b>)`,
+        );
+
+        this.gameData.availableActions = [
+            actions.endTurn,
+            actions.mortgagePropertyCard,
+            actions.buildHouse,
+            actions.sellHouse,
+            actions.redeemPropertyCard,
+        ];
+
+        return [
+            this.events.currentMessage(),
+            this.events.availableActions(),
+            this.events.logs(),
+            this.events.playersData(),
+            this.events.time(),
+            this.events.closeDialogs(),
         ];
     }
 

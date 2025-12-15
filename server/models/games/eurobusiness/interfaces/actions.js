@@ -16,6 +16,7 @@ const actions = {
     buildHouse: "Budowanie budynku",
     sellHouse: "Sprzedaż budynku",
     exit: "Wyjście z gry",
+    payHouseTax: "Płacenie podatku za wejście na pole z budynkiem",
 };
 
 export default actions;
