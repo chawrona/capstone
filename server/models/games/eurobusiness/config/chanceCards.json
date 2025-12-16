@@ -9,19 +9,19 @@
   },
   {
     "type": "Idź do więzienia",
-    "name": "Idź do więzienia"
+    "name": "Sesja egzaminacyjna"
   },
   {
     "type": "Zapłac bankowi",
-    "name": "Zapłać pieniądze banku"
+    "name": "Opłać czesne"
   },
   {
     "type": "Pobierz z banku pieniądze",
-    "name": "Pobierz pieniądze z banku"
+    "name": "Pobierz pieniądze od Rektora"
   },
   {
     "type": "Wyjdź z więzenia",
-    "name": "Karta wyjścia z więzienia"
+    "name": "Karta Zdania Sesji"
   },
   {
     "type": "Zapłać za budowe domu lub hotelu",
