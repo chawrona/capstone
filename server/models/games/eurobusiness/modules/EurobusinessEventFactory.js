@@ -79,6 +79,7 @@ export default class EurobusinessEventFactory {
 
         if (this.game.gameData.availableActions.includes(actions.auction)) {
             objectsToSend.push(this.auction());
+            console.log("Aukcja wysłana, odświeżenie");
         }
 
         return objectsToSend;

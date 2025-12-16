@@ -18,7 +18,7 @@
   },
   {
     "type": "Karta społeczności",
-    "name": "Karta społeczności",
+    "name": "Karta Stypendium",
     "position": 2
   },
   {
@@ -39,8 +39,15 @@
     "position": 4
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne",
+    "type": "Budynek",
+    "subtype": "winda",
+    "name": "Winda 1",
+    "price": 200,
+    "housePrice": 0,
+    "set": [5, 15, 25, 35],
+    "setPosition": 4,
+    "rent": [25, 50, 100, 200],
+    "mortgage": 100,
     "position": 5
   },
   {
@@ -57,7 +64,7 @@
   },
   {
     "type": "Karta szansy",
-    "name": "Karta szansy",
+    "name": "Karta Samorządu",
     "position": 7
   },
   {
@@ -86,7 +93,7 @@
   },
   {
     "type": "Więzienie",
-    "name": "Więzienie",
+    "name": "Sesja",
     "position": 10
   },
   {
@@ -102,8 +109,15 @@
     "position": 11
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne",
+    "type": "Budynek",
+    "name": "Automat Kawowy",
+    "subtype": "utility",
+    "price": 150,
+    "mortgage": 75,
+    "housePrice": 0,
+    "set": [12, 28],
+    "setPosition": 1,
+    "rent": 0,
     "position": 12
   },
   {
@@ -131,8 +145,15 @@
     "position": 14
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne",
+    "type": "Budynek",
+    "subtype": "winda",
+    "name": "Winda 2",
+    "price": 200,
+    "housePrice": 0,
+    "set": [5, 15, 25, 35],
+    "setPosition": 4,
+    "rent": [25, 50, 100, 200],
+    "mortgage": 100,
     "position": 15
   },
   {
@@ -149,7 +170,7 @@
   },
   {
     "type": "Karta społeczności",
-    "name": "Karta społeczności",
+    "name": "Karta Stypendium",
     "position": 17
   },
   {
@@ -178,7 +199,7 @@
   },
   {
     "type": "Parking",
-    "name": "Parking",
+    "name": "Strefa Studenta",
     "position": 20
   },
   {
@@ -195,7 +216,7 @@
   },
   {
     "type": "Karta szansy",
-    "name": "Karta szansy",
+    "name": "Karta Samorządu",
     "position": 22
   },
   {
@@ -223,8 +244,15 @@
     "position": 24
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne",
+    "type": "Budynek",
+    "subtype": "winda",
+    "name": "Winda 3",
+    "price": 200,
+    "housePrice": 0,
+    "set": [5, 15, 25, 35],
+    "setPosition": 3,
+    "rent": [25, 50, 100, 200],
+    "mortgage": 100,
     "position": 25
   },
   {
@@ -252,9 +280,16 @@
     "position": 27
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne",
-    "position": 28
+    "type": "Budynek",
+    "name": "Sklepik",
+    "subtype": "utility",
+    "price": 150,
+    "mortgage": 75,
+    "housePrice": 0,
+    "set": [12, 28],
+    "setPosition": 2,
+    "position": 28,
+    "rent": 0
   },
   {
     "type": "Budynek",
@@ -270,7 +305,7 @@
   },
   {
     "type": "Idź do więzienia",
-    "name": "Idź do więzienia",
+    "name": "Sesja",
     "position": 30
   },
   {
@@ -299,7 +334,7 @@
   },
   {
     "type": "Karta społeczności",
-    "name": "Karta społeczności",
+    "name": "Karta Stypendium",
     "position": 33
   },
   {
@@ -315,13 +350,20 @@
     "position": 34
   },
   {
-    "type": "Domyślne",
-    "name": "Domyślne",
+    "type": "Budynek",
+    "subtype": "winda",
+    "name": "Winda 4",
+    "price": 200,
+    "housePrice": 0,
+    "set": [5, 15, 25, 35],
+    "setPosition": 4,
+    "rent": [25, 50, 100, 200],
+    "mortgage": 100,
     "position": 35
   },
   {
     "type": "Karta szansy",
-    "name": "Karta szansy",
+    "name": "Karta Samorządu",
     "position": 36
   },
   {

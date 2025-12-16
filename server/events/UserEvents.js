@@ -138,8 +138,10 @@ export default class UserEvents {
             user.name = newUsername.trim();
 
             this.eventHelper.sendLobbyData(user.lobbyId);
+            this.eventEmmiter.toUser(userId, "usernameChanged", user.name);
         } catch (error) {
             this.eventEmmiter.toUserError(userId, error);
+            this.eventEmmiter.toUser(userId, "usernameChangedError");
         }
     }
 
