@@ -22,7 +22,7 @@ const clientRoutes = new ClientRoutes();
 dotenv.config();
 
 // Tutaj ustawiamy jakie pliki strony internetowej będzie wysyłał nasz serwer
-app.use(express.static("clients"));
+app.use(express.static("public"));
 app.use("/", clientRoutes.getRouter());
 
 // Tutaj ustawiamy w na jakie event w komunikacji socket-io będziemy nasłuchiwać i reagować

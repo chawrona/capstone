@@ -1,0 +1,98 @@
+// Ogólne
+
+.v-toast {
+    z-index: 999999;
+  padding: 1rem;
+}
+
+.v-toast__item .v-toast__text {
+  padding: 0.75em 2em;
+  padding-left: 1.25em;
+  user-select: none;
+}
+
+.v-toast__item {
+  animation-duration: 0.75s;
+
+  min-height: 3.5rem;
+}
+
+// SUKCES
+
+.v-toast__item--success {
+  border: 1px solid #ffffff;
+  background-color: #055719;
+    background-image: url("../assets/successBg.png");
+  border-radius: 4px;
+  color: #ffffff;
+  font-family: "Cinzel";
+
+  font-family: sans-serif;
+  font-size: 1rem;
+
+  letter-spacing: 0.05em;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+
+.v-toast__item--success .v-toast__icon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+}
+
+// Błąd
+
+.v-toast__item--error {
+  border: 1px solid #ffffff;
+  background-color: #470303;
+  background-image: url("../assets/errorBg.png");
+  background-size: cover;
+  border-radius: 4px;
+  color: #ffffff;
+  font-family: "Cinzel";
+
+  font-family: sans-serif;
+  font-size: 1rem;
+
+  letter-spacing: 0.05em;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+
+.v-toast__item--error .v-toast__icon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+}
+
+// INFO
+
+.v-toast__item--info {
+  border: 1px solid #ffffff;
+  background-color: #064b70; /* ciemny niebieski */
+  background-image: url("../assets/infoBg.png");
+  background-size: cover;
+  border-radius: 4px;
+  color: #ffffff;
+  font-family: "Cinzel";
+
+  font-family: sans-serif;
+  font-size: 1rem;
+
+  letter-spacing: 0.05em;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+
+.v-toast__item--info .v-toast__icon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+}

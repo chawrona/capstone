@@ -1,12 +1,18 @@
 # Instalacja projektu
+Wymagania:
+Node w wersji v22.13.0
 
 ```bash
 git clone https://github.com/chawrona/capstone.git
 cd capstone
 npm install
 cp .env.example .env
+cd client
+npm install
+cd ..
 npm run test
-npm run dev
+npm run build-front 
+node server/app.js
 ````
 
 # Nowe zmiany (workflow developerski)

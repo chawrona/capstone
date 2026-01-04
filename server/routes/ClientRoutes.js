@@ -8,10 +8,10 @@ export default class ClientRoutes {
 
     initRoutes() {
         const sendIndex = (req, res) => {
-            res.sendFile("index.html", { root: "client" });
+            res.sendFile("index.html", { root: "public" });
         };
 
-        this.router.get("/", sendIndex);
+        this.router.get(/.*/, sendIndex);
     }
 
     getRouter() {
