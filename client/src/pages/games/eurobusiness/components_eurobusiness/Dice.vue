@@ -97,7 +97,7 @@ watch(
                     height: `${size}px`,
                     borderRadius: `${styles.sideRadius}px`,
                     backgroundColor: colorBackground,
-                    borderColor: colorBackground
+                    borderColor: colorBackground,
                 }"
             >
                 <div

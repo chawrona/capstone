@@ -1,6 +1,8 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
+import PlaySoundtrack from "../../components/common/PlaySoundtrack.vue";
+import { usePageSounds } from "../../composables/usePageSounds";
 import { useAppStore } from "../../store/useAppStore";
 import BottomLeftPanel from "./components/panels/BottomLeftPanel.vue";
 import BottomRightPanel from "./components/panels/BottomRightPanel.vue";
@@ -8,17 +10,12 @@ import CenterPanel from "./components/panels/CenterPanel.vue";
 import TopCenterPanel from "./components/panels/TopCenterPanel.vue";
 import TopLeftPanel from "./components/panels/TopLeftPanel.vue";
 import TopRightPanel from "./components/panels/TopRightPanel.vue";
-import { usePageSounds } from "../../composables/usePageSounds";
-import PlaySoundtrack from "../../components/common/PlaySoundtrack.vue";
 
 const store = useAppStore();
 
 usePageSounds({
-    effects: [
-        { name: "click", url: "/sounds/click.mp3", poolSize: 5 },
-    ],
+    effects: [{ name: "click", poolSize: 5, url: "/sounds/click.mp3" }],
 });
-
 
 const data = ref(null);
 

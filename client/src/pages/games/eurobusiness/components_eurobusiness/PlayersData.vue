@@ -15,8 +15,8 @@ const props = defineProps([
     "yourTurn",
 ]);
 
-const group1 = [5, 15, 25, 35]
-const group2 = [12, 28]
+const group1 = [5, 15, 25, 35];
+const group2 = [12, 28];
 
 const players = computed(() => {
     if (props.playersData.length === 4) return props.playersData;
@@ -35,12 +35,10 @@ const players = computed(() => {
 const getTilePrice = (number) => {
     const tile = props.gameMap[number];
     if (tile?.subtype === "utility") {
-        return tile.name === "Automat Kawowy" ?
-        "☕" : "🥪"
-        
+        return tile.name === "Automat Kawowy" ? "☕" : "🥪";
     } else if (tile?.subtype === "winda") {
         let rent = 25;
-        props.playersData.forEach(player => {
+        props.playersData.forEach((player) => {
             if (player.ownerships.includes(number)) {
                 rent = 0;
                 if (player.ownerships.includes(5)) rent += 25;
@@ -50,16 +48,17 @@ const getTilePrice = (number) => {
             }
         });
 
-        return `${rent}$`
-    }
-    else if (tile.type === "Budynek") {
-        return props.gameMap[number].rent[getTileRentIndex(number, props.playersData)] + "$"
+        return `${rent}$`;
+    } else if (tile.type === "Budynek") {
+        return (
+            props.gameMap[number].rent[
+                getTileRentIndex(number, props.playersData)
+            ] + "$"
+        );
     }
 
     return "";
 };
-
-
 </script>
 
 <template>
@@ -124,38 +123,37 @@ const getTilePrice = (number) => {
                         }"
                     >
                         <div
-                            v-for="index in player.ownerships.sort(
-                                (a, b) => {
-                                       const aGroup1 = group1.includes(a)
-                                        const bGroup1 = group1.includes(b)
-                                        const aGroup2 = group2.includes(a)
-                                        const bGroup2 = group2.includes(b)
+                            v-for="index in player.ownerships.sort((a, b) => {
+                                const aGroup1 = group1.includes(a);
+                                const bGroup1 = group1.includes(b);
+                                const aGroup2 = group2.includes(a);
+                                const bGroup2 = group2.includes(b);
 
-                                        // jeśli oba w tej samej grupie → sort rosnąco w grupie
-                                        if (aGroup1 && bGroup1) return a - b
-                                        if (aGroup2 && bGroup2) return a - b
+                                // jeśli oba w tej samej grupie → sort rosnąco w grupie
+                                if (aGroup1 && bGroup1) return a - b;
+                                if (aGroup2 && bGroup2) return a - b;
 
-                                        // jeśli jeden w grupie 1 → trzymaj razem
-                                        if (aGroup1) return 1
-                                        if (bGroup1) return -1
+                                // jeśli jeden w grupie 1 → trzymaj razem
+                                if (aGroup1) return 1;
+                                if (bGroup1) return -1;
 
-                                        // jeśli jeden w grupie 2 → trzymaj razem
-                                        if (aGroup2) return 1
-                                        if (bGroup2) return -1
+                                // jeśli jeden w grupie 2 → trzymaj razem
+                                if (aGroup2) return 1;
+                                if (bGroup2) return -1;
 
-                                        // reszta normalnie
-                                        return a - b
-                                }
-                            )"
+                                // reszta normalnie
+                                return a - b;
+                            })"
                             :key="index"
                             class="tileCard"
                             :style="`--bg: ${props.gameMap[index].color}`"
                             :class="{
                                 mortgaged:
                                     player.mortgagedCards.includes(index),
-                                    coffee: gameMap[index]?.name === 'Automat Kawowy',
-                                    shop: gameMap[index]?.name === 'Sklepik',
-                                    elevator: gameMap[index]?.subtype === 'winda',
+                                coffee:
+                                    gameMap[index]?.name === 'Automat Kawowy',
+                                shop: gameMap[index]?.name === 'Sklepik',
+                                elevator: gameMap[index]?.subtype === 'winda',
                             }"
                             @click="
                                 () => {
@@ -178,7 +176,7 @@ const getTilePrice = (number) => {
                                     Z
                                 </span>
                                 <span v-else>
-                                    {{ getTilePrice(index)}}
+                                    {{ getTilePrice(index) }}
                                 </span>
                             </div>
                         </div>
@@ -455,30 +453,29 @@ const getTilePrice = (number) => {
         }
     }
 
-    .coffee, .shop {
+    .coffee,
+    .shop {
         .top {
             display: none;
         }
 
-        border: none!important;
+        border: none !important;
         .bottom {
             background-color: #531607;
             color: white;
-            width: 100%!important;
-            height: 100%!important;
+            width: 100% !important;
+            height: 100% !important;
         }
     }
 
     .elevator {
         .top {
-
             background-color: #666666;
         }
 
         .bottom {
             color: 666666;
             border: none;
-     
         }
     }
 }

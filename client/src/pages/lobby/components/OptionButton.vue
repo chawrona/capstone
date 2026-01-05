@@ -4,7 +4,11 @@ import { soundBus } from "../../../audio/soundBus";
 </script>
 
 <template>
-    <button :disabled="props.disabled" class="theme-button option-button" @click="() => soundBus.playEffect('click')">
+    <button
+        :disabled="props.disabled"
+        class="theme-button option-button"
+        @click="() => soundBus.playEffect('click')"
+    >
         <img :src="props.icon" alt="" class="icon" />
         {{ content }}
     </button>

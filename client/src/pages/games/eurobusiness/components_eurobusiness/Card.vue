@@ -1,37 +1,38 @@
 <script setup>
 const props = defineProps(["propertyCard", "playersData"]);
-import getTileRentIndex from '../composables_eurobusiness/getTileRentIndex';
-
+import getTileRentIndex from "../composables_eurobusiness/getTileRentIndex";
 
 const getElevatorPrice = (position) => {
-        let rent = 25;
-        props.playersData.forEach(player => {
-            if (player.ownerships.includes(position)) {
-                rent = 0;
-                if (player.ownerships.includes(5)) rent += 25;
-                if (player.ownerships.includes(15)) rent += 25;
-                if (player.ownerships.includes(25)) rent += 25;
-                if (player.ownerships.includes(35)) rent += 25;
-            }
-        });
+    let rent = 25;
+    props.playersData.forEach((player) => {
+        if (player.ownerships.includes(position)) {
+            rent = 0;
+            if (player.ownerships.includes(5)) rent += 25;
+            if (player.ownerships.includes(15)) rent += 25;
+            if (player.ownerships.includes(25)) rent += 25;
+            if (player.ownerships.includes(35)) rent += 25;
+        }
+    });
 
-        return `${rent}$`
+    return `${rent}$`;
 };
 </script>
 
 <template>
-    <div class="card" :style="`--color: ${propertyCard.color}`""
-      :class="{
-        coffee: propertyCard.name === 'Automat Kawowy',
-        shop: propertyCard.name === 'Sklepik',
-        elevator: propertyCard?.subtype === 'winda'}"
-    
+    <div
+        class="card"
+        :style="`--color: ${propertyCard.color}`"
+        :class="{
+            coffee: propertyCard.name === 'Automat Kawowy',
+            shop: propertyCard.name === 'Sklepik',
+            elevator: propertyCard?.subtype === 'winda',
+        }"
     >
         <div class="top"></div>
 
         <div class="bottom">
             <span class="name">{{ propertyCard.name }}</span>
-          
+
             <div class="mortgage">
                 <div>Cena:</div>
                 <div class="price">
@@ -41,21 +42,32 @@ const getElevatorPrice = (position) => {
                 </div>
                 <div>Czynsz:</div>
                 <div class="price">
-                    <div v-if="propertyCard.name === 'Automat Kawowy' || propertyCard.name === 'Sklepik'" class="smaller">
-                     🎲🎲
+                    <div
+                        v-if="
+                            propertyCard.name === 'Automat Kawowy' ||
+                            propertyCard.name === 'Sklepik'
+                        "
+                        class="smaller"
+                    >
+                        🎲🎲
                     </div>
                     <div v-else-if="propertyCard?.subtype === 'winda'">
                         {{ getElevatorPrice(propertyCard.position) }}
                     </div>
                     <div v-else>
-                        {{ propertyCard.rent[getTileRentIndex(propertyCard.position, playersData)] }}$
+                        {{
+                            propertyCard.rent[
+                                getTileRentIndex(
+                                    propertyCard.position,
+                                    playersData,
+                                )
+                            ]
+                        }}$
                     </div>
                 </div>
                 <div>Zastaw:</div>
                 <div class="price">
-                    <div>
-                        {{ propertyCard.mortgage }}$
-                    </div>
+                    <div>{{ propertyCard.mortgage }}$</div>
                 </div>
                 <div>Odkupienie:</div>
                 <div class="price">
@@ -120,27 +132,26 @@ const getElevatorPrice = (position) => {
     }
 }
 
-.coffee, .shop {
+.coffee,
+.shop {
     .top {
         display: none;
     }
-        background-color: #531607;
-            color: white;
-            .smaller {
-                font-size: 0.94rem;
-            }
+    background-color: #531607;
+    color: white;
+    .smaller {
+        font-size: 0.94rem;
+    }
 }
 
 .elevator {
-        .top {
-
-            background-color: #666666;
-        }
-
-        .bottom {
-            color: 666666;
-            border: none;
-     
-        }
+    .top {
+        background-color: #666666;
     }
+
+    .bottom {
+        color: 666666;
+        border: none;
+    }
+}
 </style>

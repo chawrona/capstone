@@ -14,8 +14,6 @@ export default function useGameInfo() {
             console.log("Message: ", message);
 
             toast.success(message, {
-                dismissible: false,
-                duration: 0,
                 position: "top",
                 type: "info",
             });

@@ -78,6 +78,8 @@ export function useGameDialogs(availableActions) {
         });
 
         store.socket.on("auction", (auctionData) => {
+            console.log("Auction tile", auctionData.tile);
+
             auction.value = auctionData;
             auctionCardDialogOpen.value = true;
         });

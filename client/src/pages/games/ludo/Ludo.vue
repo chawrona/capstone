@@ -4,10 +4,12 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import Start from "@/assets/start_white.svg";
 import { useAppStore } from "@/store/useAppStore.js";
 
-import Dice from "../eurobusiness/components_eurobusiness/Dice.vue";
-import { usePageSounds } from "../../../composables/usePageSounds";
-import PlaySoundtrack from "../../../components/common/PlaySoundtrack.vue";
 import { soundBus } from "../../../audio/soundBus";
+import PauseScreen from "../../../components/common/PauseScreen.vue";
+import PlaySoundtrack from "../../../components/common/PlaySoundtrack.vue";
+import { usePageSounds } from "../../../composables/usePageSounds";
+import { useGameResize } from "../composables_games/useGameResize";
+import Dice from "../eurobusiness/components_eurobusiness/Dice.vue";
 
 const store = useAppStore();
 
@@ -15,11 +17,11 @@ const gameData = ref(null);
 const players = ref(null);
 const SOUNDTRACK_URL = "/sounds/eurobusiness_soundtrack.mp3";
 usePageSounds({
-    music: [{ name: "soundtrack", url: SOUNDTRACK_URL }],
     effects: [
         { name: "roll", url: "/sounds/roll.mp3" },
         { name: "click", url: "/sounds/click.mp3" },
     ],
+    music: [{ name: "soundtrack", url: SOUNDTRACK_URL }],
 });
 
 const mapBases = computed(() => {
@@ -72,13 +74,7 @@ const mapBases = computed(() => {
 
 const BASE_WIDTH = 1920;
 const BASE_HEIGHT = 950;
-const scale = ref(1);
-
-const resizeGame = () => {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    scale.value = Math.min(vw / BASE_WIDTH, vh / BASE_HEIGHT);
-};
+const { scale } = useGameResize();
 
 const playersFields = computed(() => {
     const player1Color =
@@ -217,15 +213,11 @@ onMounted(() => {
             });
         }, 500);
     }
-
-    window.addEventListener("resize", resizeGame);
-    resizeGame();
 });
 
 onBeforeUnmount(() => {
     store.socket.off("gameData");
     store.socket.off("pause");
-    window.removeEventListener("resize", resizeGame);
 });
 
 const rollDice = () => {
@@ -290,7 +282,7 @@ const getPublicIdFromFieldFinish = (field) => {
 
 <template>
     <div class="background">
-        <div v-if="gameData && isPaused" class="paused"></div>
+        <PauseScreen v-if="gameData && isPaused" />
         <PlaySoundtrack :url="SOUNDTRACK_URL" />
         <div
             v-if="gameData && players"
@@ -413,7 +405,6 @@ const getPublicIdFromFieldFinish = (field) => {
             </div>
 
             <div class="gameInfo" :class="{ myTurn: gameData.yourTurn }">
-                
                 <h2 class="whos-turn" :class="{ 'opacity-0': hideRolled }">
                     {{ gameData.actionMessage }}
                 </h2>
@@ -433,14 +424,14 @@ const getPublicIdFromFieldFinish = (field) => {
                     Rzuć kością
                 </div> -->
 
-                 <Dice
-                  class="dice"
+                <Dice
+                    class="dice"
                     :trigger="trigger"
                     :new-value="gameData.diceThrowResult"
                     color="#ffffff"
-                    colorBackground="#2063f3"
-                     @click="rollDice"
-                     :size="80"
+                    color-background="#2063f3"
+                    :size="80"
+                    @click="rollDice"
                 />
             </div>
         </div>
@@ -451,7 +442,7 @@ const getPublicIdFromFieldFinish = (field) => {
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
 
 .background {
-     display: grid;
+    display: grid;
     place-items: center;
     width: 100%;
     height: 100vh;
@@ -481,7 +472,7 @@ const getPublicIdFromFieldFinish = (field) => {
 // Game Map
 
 .map {
-      border-radius: 0.5rem;
+    border-radius: 0.5rem;
     --map-padding: 3rem;
     position: relative;
     width: 900px;
@@ -654,7 +645,7 @@ const getPublicIdFromFieldFinish = (field) => {
 
 .gameInfo {
     width: 500px;
-   font-family: "Open sans";
+    font-family: "Open sans";
     height: 900px;
     display: flex;
     flex-direction: column;
@@ -674,27 +665,7 @@ const getPublicIdFromFieldFinish = (field) => {
         );
     }
 
-  border-radius: 0.5rem;
-}
-
-.paused {
-    position: absolute;
-    z-index: 9998;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.745);
-    display: grid;
-    color: white;
-    font-family: sans-serif;
-    place-items: center;
-    h1 {
-        max-width: 700px;
-        text-align: center;
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
-    }
-    h2 {
-        font-size: 1.5rem;
-    }
+    border-radius: 0.5rem;
 }
 
 .rolled {

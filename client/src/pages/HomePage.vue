@@ -1,18 +1,15 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from "vue";
 
-
 import { soundBus } from "../audio/soundBus";
-import { useAppStore } from "../store/useAppStore";
-import { usePageSounds } from "../composables/usePageSounds";
 import PlaySoundtrack from "../components/common/PlaySoundtrack.vue";
+import { usePageSounds } from "../composables/usePageSounds";
+import { useAppStore } from "../store/useAppStore";
 
 const store = useAppStore();
 
 usePageSounds({
-    effects: [
-        { name: "click", url: "/sounds/click.mp3", poolSize: 5 },
-    ],
+    effects: [{ name: "click", poolSize: 5, url: "/sounds/click.mp3" }],
 });
 
 const lobbyId = ref("");
@@ -86,7 +83,6 @@ const joinLobby = () => {
                 </form>
             </div>
         </main>
-        
     </div>
 </template>
 

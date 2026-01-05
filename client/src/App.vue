@@ -2,9 +2,9 @@
 import { storeToRefs } from "pinia";
 
 import LoadingScreen from "./components/common/LoadingScreen.vue";
+import { usePageSounds } from "./composables/usePageSounds";
 import useSocket from "./composables/useSocket";
 import { useAppStore } from "./store/useAppStore";
-import { usePageSounds } from "./composables/usePageSounds";
 
 const store = useAppStore();
 const { socket } = storeToRefs(store);

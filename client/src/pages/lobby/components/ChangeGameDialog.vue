@@ -6,10 +6,10 @@ import BorderImage from "@/assets/corner-decoration.png";
 import Target from "@/assets/target.svg";
 import Players from "@/assets/users.svg";
 
+import { soundBus } from "../../../audio/soundBus";
 import VintageBorderContainer from "../../../components/common/VintageBorderContainer.vue";
 import { useAppStore } from "../../../store/useAppStore";
 import DialogHeader from "./panels/DialogHeader.vue";
-import { soundBus } from "../../../audio/soundBus";
 
 const props = defineProps(["isAdmin", "availableGames", "currentGame"]);
 

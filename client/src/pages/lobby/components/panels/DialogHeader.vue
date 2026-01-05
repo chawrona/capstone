@@ -9,7 +9,12 @@ import { soundBus } from "../../../../audio/soundBus";
         <h1 class="dialog-title">{{ props.title }}</h1>
         <button
             class="theme-button close-dialog"
-            @click="() => {closeDialogCallback(); soundBus.playEffect('click')}"
+            @click="
+                () => {
+                    closeDialogCallback();
+                    soundBus.playEffect('click');
+                }
+            "
         >
             <img :src="X" alt="" class="close-icon" />
         </button>

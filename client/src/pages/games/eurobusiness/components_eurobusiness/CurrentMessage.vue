@@ -20,7 +20,7 @@ const props = defineProps([
 
 usePageSounds({
     effects: [
-        { name: "endTurn", url: "/sounds/endTurn.mp3", poolSize: 3 },
+        { name: "endTurn", poolSize: 3, url: "/sounds/endTurn.mp3" },
         { name: "pay", url: "/sounds/pay.mp3" },
         { name: "turn", url: "/sounds/turn.mp3" },
     ],

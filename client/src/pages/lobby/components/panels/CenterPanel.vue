@@ -5,7 +5,6 @@ import BoardGame from "@/assets/boardGame.svg";
 import BorderImage from "@/assets/corner-decoration.png";
 
 import { soundBus } from "../../../../audio/soundBus";
-
 import VintageBorderContainer from "../../../../components/common/VintageBorderContainer.vue";
 import ChangeGameDialog from "../ChangeGameDialog.vue";
 import OptionButton from "../OptionButton.vue";
@@ -23,7 +22,12 @@ const changeGameDialogRef = ref(null);
                 :icon="BoardGame"
                 content="Inne gry"
                 class="games-button"
-                @click="() => {changeGameDialogRef?.openDialog(); soundBus.playEffect('click')}"
+                @click="
+                    () => {
+                        changeGameDialogRef?.openDialog();
+                        soundBus.playEffect('click');
+                    }
+                "
             />
         </div>
         <VintageBorderContainer

@@ -10,9 +10,14 @@ const auctioneerColor = computed(() => {
     console.log(props.playersData);
     console.log(props.auction);
 
-    return props.playersData.find(
-        (player) => player.publicId === props.auction.cannotBid,
-    )?.color.hex;
+    const player = props.playersData.find(
+        (player) => player.publicId === props.auction?.cannotBid,
+    );
+
+    // ✅ Zwróć domyślny kolor jeśli nie znajdzie gracza
+    console.log(player);
+
+    return player?.color?.hex || "#000000";
 });
 </script>
 
@@ -35,9 +40,9 @@ const auctioneerColor = computed(() => {
                         Obecny lider:
                         <span
                             class="winningPlayer"
-                            :style="`color: ${auction.winningPlayer.color.hex}`"
+                            :style="`color: ${auction.winningPlayer?.color.hex}`"
                         >
-                            {{ auction.winningPlayer.username }}
+                            {{ auction.winningPlayer?.username }}
                         </span>
                     </span>
                     <span v-else>Nikt jeszcze nie licytował</span>
@@ -50,7 +55,7 @@ const auctioneerColor = computed(() => {
                 </p>
             </div>
 
-            <Card :property-card="auction.tile" :playersData="playersData"/>
+            <Card :property-card="auction.tile" :players-data="playersData" />
         </div>
 
         <div class="bids">

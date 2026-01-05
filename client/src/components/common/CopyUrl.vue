@@ -1,6 +1,7 @@
 <script setup>
 import { useRoute } from "vue-router";
 import { useToast } from "vue-toast-notification";
+
 import { soundBus } from "../../audio/soundBus";
 
 const route = useRoute();

@@ -1,6 +1,7 @@
 <script setup>
 import { storeToRefs } from "pinia";
-import Logo from "@/assets/logo.png"
+
+import Logo from "@/assets/logo.png";
 import { useAppStore } from "@/store/useAppStore";
 
 const store = useAppStore();

@@ -11,7 +11,7 @@ const route = useRoute();
 
 const goToLobby = () => {
     store.setLoading(true);
-    soundBus.playMusic("soundtrack")
+    soundBus.playMusic("soundtrack");
     setTimeout(() => {
         router.push(`/${route.params.id}`);
     }, 1000);

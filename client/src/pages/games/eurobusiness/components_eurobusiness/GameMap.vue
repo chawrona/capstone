@@ -21,7 +21,7 @@ const props = defineProps([
     "useOutOfJailCard",
     "gameMap",
     "tilesOwnedBySomeone",
-    "openHouseDialog"
+    "openHouseDialog",
 ]);
 
 usePageSounds({
@@ -72,9 +72,11 @@ const isTileOwned = (position) => {
 
 const isTileOwnedByYou = (position) => {
     if (!isTileOwned(position)) return false;
-    const player = props.playersData.find(player => player.publicId === props.yourPublicId);
+    const player = props.playersData.find(
+        (player) => player.publicId === props.yourPublicId,
+    );
     return player.ownerships.includes(position);
-}
+};
 
 const getCellPrice = (number) => {
     const tile = props.gameMap[number - 1];
@@ -82,7 +84,7 @@ const getCellPrice = (number) => {
         return "x4 / x10";
     } else if (tile?.subtype === "winda") {
         let rent = 25;
-        props.playersData.forEach(player => {
+        props.playersData.forEach((player) => {
             if (player.ownerships.includes(number - 1)) {
                 rent = 0;
                 if (player.ownerships.includes(5)) rent += 25;
@@ -92,9 +94,8 @@ const getCellPrice = (number) => {
             }
         });
 
-        return `${rent}$`
-    }
-    else if (tile.type === "Budynek") {
+        return `${rent}$`;
+    } else if (tile.type === "Budynek") {
         return (isTileOwned(number - 1) ? tile.rent[0] : tile.price) + "$";
     }
 
@@ -102,14 +103,13 @@ const getCellPrice = (number) => {
 };
 
 const getHouseNumber = (position) => {
-    props.playersData.forEach(player => {
+    props.playersData.forEach((player) => {
         if (player.ownerships.includes(position)) {
             return player.properties[position] ?? 0;
         }
     });
     return 0;
-}
-
+};
 </script>
 
 <template>
@@ -190,10 +190,15 @@ const getHouseNumber = (position) => {
                 elevator: gameMap[number - 1]?.subtype === 'winda',
                 utility: number === 13 || number === 29,
                 isTileOwned: isTileOwned(number - 1),
-                isYourTile: isTileOwnedByYou(number - 1)
+                isYourTile: isTileOwnedByYou(number - 1),
             }"
-            @click="() => { if(isTileOwnedByYou(number - 1)) openHouseDialog(number - 1) }"
             :style="`grid-area: cell${number - 1}; ${getBuildingColor(number)}; --backgroundIfOwned: ${tilesOwnedBySomeone[number - 1]}`"
+            @click="
+                () => {
+                    if (isTileOwnedByYou(number - 1))
+                        openHouseDialog(number - 1);
+                }
+            "
         >
             <p class="cell-name">{{ getCellName(number) }}</p>
             <p class="cell-price">{{ getCellPrice(number) }}</p>
@@ -273,9 +278,11 @@ const getHouseNumber = (position) => {
     min-width: 0;
     min-height: 0;
 
-    &.cell2, &.cell17, &.cell33 {
+    &.cell2,
+    &.cell17,
+    &.cell33 {
         background-color: #e47440;
-      
+
         &::after {
             content: "";
             position: absolute;
@@ -408,9 +415,8 @@ const getHouseNumber = (position) => {
         flex-direction: column;
         justify-content: space-between;
 
-       .cell-name {
+        .cell-name {
             font-size: 1rem;
-           
         }
 
         .cell-price {
@@ -418,19 +424,21 @@ const getHouseNumber = (position) => {
         }
     }
 
-    &.building.elevator::after, &.building.cell12:after, &.building.cell28:after  {
-        border: none!important;
-        inset: 0!important;
+    &.building.elevator::after,
+    &.building.cell12:after,
+    &.building.cell28:after {
+        border: none !important;
+        inset: 0 !important;
         background-image: url("games/gameAssets/eurobusiness/elevator.svg");
-        width: 100%!important;
-        height: 100%!important;
+        width: 100% !important;
+        height: 100% !important;
         background-repeat: no-repeat;
     }
-    
+
     &.building.cell5.elevator {
         .cell-name {
             transform: translateX(1.6rem);
-             font-weight: bold;
+            font-weight: bold;
         }
 
         .cell-price {
@@ -443,15 +451,14 @@ const getHouseNumber = (position) => {
         }
     }
 
-
     &.building.cell15.elevator {
         .cell-price {
             margin-bottom: auto;
         }
-         .cell-name {
+        .cell-name {
             transform: translateY(-1.6rem);
             rotate: 180deg;
-             font-weight: bold;
+            font-weight: bold;
         }
         &::after {
             background-size: 75%;
@@ -464,11 +471,11 @@ const getHouseNumber = (position) => {
         .cell-price {
             margin-bottom: auto;
         }
-         .cell-name {
+        .cell-name {
             transform: translateY(-1.6rem);
             rotate: 180deg;
             line-height: 1;
-             font-weight: bold;
+            font-weight: bold;
         }
         &::after {
             background-size: 50%;
@@ -481,12 +488,12 @@ const getHouseNumber = (position) => {
         .cell-price {
             margin-left: auto;
         }
-         .cell-name {
+        .cell-name {
             transform: translateX(1.6rem);
-             font-weight: bold;
-             rotate: 180deg;
+            font-weight: bold;
+            rotate: 180deg;
         }
-         &::after {
+        &::after {
             background-size: 52.5%;
             background-position: center 45%;
             rotate: -90deg;
@@ -496,12 +503,12 @@ const getHouseNumber = (position) => {
         .cell-price {
             margin-left: auto;
         }
-         .cell-name {
+        .cell-name {
             transform: translateX(1.6rem);
-             font-weight: bold;
-             rotate: 180deg;
+            font-weight: bold;
+            rotate: 180deg;
         }
-         &::after {
+        &::after {
             background-size: 52.5%;
             background-position: center 45%;
             rotate: -90deg;
@@ -514,8 +521,8 @@ const getHouseNumber = (position) => {
         }
         .cell-name {
             transform: translateY(-1.6rem);
-         
-             font-weight: bold;
+
+            font-weight: bold;
         }
 
         &::after {
@@ -540,7 +547,8 @@ const getHouseNumber = (position) => {
         }
     }
 
-    &.isTileOwned.building.cell39::after, &.building.cell37::after{
+    &.isTileOwned.building.cell39::after,
+    &.building.cell37::after {
         color: rgb(226, 226, 226);
     }
 

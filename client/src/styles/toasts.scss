@@ -1,7 +1,7 @@
 // Ogólne
 
 .v-toast {
-    z-index: 999999;
+  z-index: 999999;
   padding: 1rem;
 }
 
@@ -22,7 +22,7 @@
 .v-toast__item--success {
   border: 1px solid #ffffff;
   background-color: #055719;
-    background-image: url("../assets/successBg.png");
+  background-image: url("../assets/successBg.png");
   border-radius: 4px;
   color: #ffffff;
   font-family: "Cinzel";

@@ -5,6 +5,7 @@ import { useAppStore } from "@/store/useAppStore.js";
 
 import { soundBus } from "../../../audio/soundBus";
 import PauseScreen from "../../../components/common/PauseScreen.vue";
+import PlaySoundtrack from "../../../components/common/PlaySoundtrack.vue";
 import { usePageSounds } from "../../../composables/usePageSounds";
 import { useGamePause } from "../composables_games/useGamePause";
 import { useGameResize } from "../composables_games/useGameResize";
@@ -15,14 +16,13 @@ import CommunityCardDialog from "./components_eurobusiness/CommunityCardDialog.v
 import CurrentMessage from "./components_eurobusiness/CurrentMessage.vue";
 import EndGame from "./components_eurobusiness/EndGame.vue";
 import GameMap from "./components_eurobusiness/GameMap.vue";
+import HouseDialog from "./components_eurobusiness/HouseDialog.vue";
 import Logs from "./components_eurobusiness/Logs.vue";
 import MortgagePropertyCardDialog from "./components_eurobusiness/MortgagePropertyCardDialog.vue";
 import PlayersData from "./components_eurobusiness/PlayersData.vue";
 import { useGameData } from "./composables_eurobusiness/useGameData";
 import { useGameDialogs } from "./composables_eurobusiness/useGameDialogs";
 import useGameInfo from "./composables_eurobusiness/useGameInfo";
-import PlaySoundtrack from "../../../components/common/PlaySoundtrack.vue";
-import HouseDialog from "./components_eurobusiness/HouseDialog.vue";
 
 const store = useAppStore();
 const SOUNDTRACK_URL = "/sounds/eurobusiness_soundtrack.mp3";
@@ -71,17 +71,18 @@ const {
     communityCard,
     communityCardDialogOpen,
     dialogsOpen,
+    houseIndex,
+    housesDialogOpen,
     mortgagePropertyCardDialogOpen,
+    openHouseDialog,
     openMortgagePropertyCardDialog,
     propertyCard,
-    housesDialogOpen,
-    openHouseDialog,
-    houseIndex
 } = useGameDialogs(availableActions);
 
 const {
     bid,
     buyBuilding,
+    buyHouse,
     end,
     endTurn,
     mortgagePropertyCard,
@@ -94,15 +95,13 @@ const {
     redeemPropertyCard,
     refuseToBuyBuilding,
     rollDice,
-    useOutOfJailCard,
     sellHouse,
-    buyHouse
+    useOutOfJailCard,
 } = useGameActions(availableActions, dialogsOpen);
 
 usePageSounds({
     music: [{ name: "soundtrack", url: SOUNDTRACK_URL }],
 });
-
 </script>
 
 <template>

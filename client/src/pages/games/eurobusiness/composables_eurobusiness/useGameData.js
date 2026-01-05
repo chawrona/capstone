@@ -64,6 +64,7 @@ export function useGameData(isPaused) {
             if (actions.includes(actions.auction)) {
                 soundBus.playEffect("bell");
             }
+            console.log("ACTIONS: ", actions);
         });
 
         store.socket.on("rollResult", () => {

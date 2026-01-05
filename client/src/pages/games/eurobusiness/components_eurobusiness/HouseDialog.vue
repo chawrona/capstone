@@ -10,66 +10,62 @@ const props = defineProps([
     "currentPlayer",
     "playersData",
     "sellHouse",
-    "buyHouse"
+    "buyHouse",
 ]);
 
-
 const houseAmount = computed(() => {
-    return props.currentPlayer.properties[props.houseIndex] ?? 0
-})
+    return props.currentPlayer.properties[props.houseIndex] ?? 0;
+});
 
 const canBuyHouse = computed(() => {
-    if (houseAmount.value <= 5) return false
+    if (houseAmount.value <= 5) return false;
 
-    props.currentPlayer.ownerships
+    props.currentPlayer.ownerships;
 
     const setAmount = props.propertyCard.set[1];
     let currentAmount = 0;
 
     for (const tile of currentPlayer.ownerships) {
-        if(tile.set[0] === props.propertyCard.set[0]) {
+        if (tile.set[0] === props.propertyCard.set[0]) {
             currentAmount++;
         }
     }
 
     if (setAmount !== currentAmount) {
-        return false
+        return false;
     }
 
-    return true
-})
+    return true;
+});
 
 const canSellHouse = computed(() => {
     return houseAmount.value > 0;
-})
-
+});
 </script>
 
 <template>
     <div class="dialog">
-       
-        <h2 class="question">
-            Rezerwacje sal
-        </h2>
-        <p>Aktualna liczba rezerwacji: {{houseAmount}}</p>
+        <h2 class="question">Rezerwacje sal</h2>
+        <p>Aktualna liczba rezerwacji: {{ houseAmount }}</p>
         <div class="wrapper">
-            <Card :property-card="propertyCard" :players-data="playersData"/>
+            <Card :property-card="propertyCard" :players-data="playersData" />
 
             <div class="buttons">
-
                 <button
                     class="eurobusiness-button reservation-button"
-                    @click="() => buyHouse(houseIndex)"
                     :disabled="!canBuyHouse"
+                    @click="() => buyHouse(houseIndex)"
                 >
                     Zarezerwuj salę -{{ propertyCard.housePrice }}$
                 </button>
                 <button
                     class="eurobusiness-button cancel-button"
-                    @click="() => sellHouse(houseIndex)"
                     :disabled="!canSellHouse"
+                    @click="() => sellHouse(houseIndex)"
                 >
-                    Odwołaj rezerwację +{{ (propertyCard.housePrice / 2).toFixed(0) }}$
+                    Odwołaj rezerwację +{{
+                        (propertyCard.housePrice / 2).toFixed(0)
+                    }}$
                 </button>
                 <button
                     class="eurobusiness-button close-button"
@@ -79,7 +75,6 @@ const canSellHouse = computed(() => {
                 </button>
             </div>
         </div>
-        
     </div>
 </template>
 
@@ -116,22 +111,21 @@ const canSellHouse = computed(() => {
         rgba(0, 0, 0, 0.35) 0px 20px 40px,
         rgba(0, 0, 0, 0.32) 0px 12px 12px;
 
-h2 {
-    margin-bottom: 0rem;
-}
+    h2 {
+        margin-bottom: 0rem;
+    }
     .buttons {
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
-       
     }
 
     .cancel-button {
         margin-bottom: auto;
         background-color: rgb(211, 107, 38);
         padding-block: 0.85rem;
-         &:hover {
-               background-color: rgb(233, 135, 70);
+        &:hover {
+            background-color: rgb(233, 135, 70);
         }
 
         &[disabled] {
@@ -140,12 +134,12 @@ h2 {
             background-color: rgb(141, 141, 141);
         }
     }
-    
+
     .reservation-button {
         padding-block: 0.85rem;
         background-color: #1f3d6b;
         &:hover {
-               background-color: #2456a0;
+            background-color: #2456a0;
         }
 
         &[disabled] {
@@ -155,8 +149,6 @@ h2 {
         }
     }
 
-
-    
     .close-button {
         background-color: rgb(211, 38, 38);
         padding-block: 0.85rem;
@@ -170,5 +162,6 @@ h2 {
 .wrapper {
     display: flex;
     gap: 1rem;
-    margin-top: 1.5rem;}
+    margin-top: 1.5rem;
+}
 </style>

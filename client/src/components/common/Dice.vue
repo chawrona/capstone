@@ -77,7 +77,6 @@ watch(
     transform-style: preserve-3d;
     transition: transform 1s;
     font-size: 20px;
-   
 }
 
 .dot {

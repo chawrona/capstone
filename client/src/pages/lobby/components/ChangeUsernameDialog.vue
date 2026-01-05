@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from "vue";
 
+import { soundBus } from "../../../audio/soundBus";
 import { useAppStore } from "../../../store/useAppStore";
 import DialogHeader from "./panels/DialogHeader.vue";
-import { soundBus } from "../../../audio/soundBus";
 
 const props = defineProps(["username"]);
 
@@ -25,7 +25,6 @@ const changeUsername = () => {
     store.emit("changeUsername", {
         newUsername: changeUsernameInput.value,
     });
-  
 };
 
 onMounted(() => {
@@ -33,17 +32,17 @@ onMounted(() => {
         localStorage.setItem("username", changeUsernameInput.value);
         changeUsernameInput.value = "";
         closeDialog();
-    })
+    });
     store.socket.on("usernameChangedError", () => {
         changeUsernameInput.value = "";
         closeDialog();
-    })
-})
+    });
+});
 
 onUnmounted(() => {
-     store.socket.off("usernameChanged")
-     store.socket.off("usernameChangedError")
-})
+    store.socket.off("usernameChanged");
+    store.socket.off("usernameChangedError");
+});
 </script>
 
 <template>
