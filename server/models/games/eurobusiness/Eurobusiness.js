@@ -156,10 +156,14 @@ export default class Eurobusiness extends Game {
     // @event - special case - wywoływany nie przez gracza tylko metodę z timerem
     endAuction() {
         this.timer.setTimer(30);
-        const player = this.players.get(this.gameData.auction.winningPlayer);
         const tile = this.gameMap.getTile(this.gameData.auction.tile.position);
 
         if (this.gameData.auction.winningPlayer) {
+            const player = this.players.get(
+                this.gameData.auction.winningPlayer.publicId,
+            );
+            console.log("TUTAJ: ", player);
+
             player.setData(
                 "money",
                 (money) => money - this.gameData.auction.price,
@@ -238,6 +242,7 @@ export default class Eurobusiness extends Game {
     }
 
     getAvailableActions() {
+        console.log("AKCJE: ", this.gameData.availableActions);
         return this.gameData.availableActions;
     }
 
@@ -1020,14 +1025,27 @@ export default class Eurobusiness extends Game {
         return [this.events.logs(), this.events.auction(), this.events.time()];
     }
 
+    getRandomField() {
+        let field;
+
+        do {
+            field = getRandomNumber(0, 40);
+        } while (
+            // Pola z innymi kartami szans
+            [2, 7, 17, 22, 33, 36].includes(field)
+        );
+
+        return field;
+    }
+
     // @event
     pickChanceCard(data) {
         this.checkIfActionPossible(data.publicId, actions.pickChanceCard);
         const currentPlayer = this.getCurrentPlayer();
-        const position = currentPlayer.getData("position");
         const randomIndex = getRandomNumber(0, chanceCards.length - 1);
         const card = chanceCards[randomIndex];
         let newCard = card;
+        let newPosition;
         this.timer.addTime(5);
         this.addLog(
             `${currentPlayer.username} wylosował kartę <b>${card.name}</b>.`,
@@ -1050,8 +1068,11 @@ export default class Eurobusiness extends Game {
                 );
                 break;
             case chanceCardTypes.goToTile:
-                currentPlayer.setData("position", () => getRandomNumber(0, 40));
-                this.executeTileAction(this.gameMap.getTile(position));
+                currentPlayer.setData(
+                    "position",
+                    () => (newPosition = this.getRandomField()),
+                );
+                this.executeTileAction(this.gameMap.getTile(newPosition));
                 this.addLog(
                     `${currentPlayer.username} idzie na pole <b>${this.gameMap.getTile(currentPlayer.getData("position")).name}</b>.`,
                 );
@@ -1112,6 +1133,8 @@ export default class Eurobusiness extends Game {
                 this.takeMoneyFromPlayers(currentPlayer);
                 break;
         }
+
+        console.log(this.gameData.availableActions);
 
         return [
             this.events.closeDialogs(),
@@ -1245,7 +1268,6 @@ export default class Eurobusiness extends Game {
                     actions.payIncomeTax,
                     actions.redeemPropertyCard,
                     actions.mortgagePropertyCard,
-                    actions.buildHouse,
                     actions.sellHouse,
                 ];
                 break;
