@@ -188,30 +188,19 @@ export default class UserEvents {
                     const timeoutId = setTimeout(
                         () => {
                             for (const lobbyUserId of [
-                                ...lobby.game.disconnectedUsers,
+                                ...lobby.game.disconnectedPlayers,
                             ]) {
                                 this.userManager.clearTimeout(lobbyUserId);
                             }
 
-                            lobby.isActive = false;
-                            lobby.game = null;
-
-                            if (user.isAdmin) {
-                                lobby.admin = [...lobby.users][0];
-                                this.eventHelper.sendLobbyData(lobby.id);
-                            }
-
-                            this.eventEmmiter.toLobby(
-                                lobby.id,
-                                "lobby",
-                                lobby.id,
-                            );
+                            this.eventEmmiter.toLobby(lobby.id, "homepage");
 
                             this.eventEmmiter.toLobbyError(
                                 lobby.id,
                                 new GameAbortedPlayerLeftError(),
                             );
 
+                            this.lobbyManager.deleteLobby(lobby.id);
                             this.userManager.deleteUser(userId);
                         },
                         3 * 60 * 1000,
