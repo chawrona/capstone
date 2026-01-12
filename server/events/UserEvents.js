@@ -193,12 +193,20 @@ export default class UserEvents {
                                 this.userManager.clearTimeout(lobbyUserId);
                             }
 
+                            for (const userId of lobby.users) {
+                                const user = this.userManager.getUser(userId)
+                                user.lobbyId = null;
+                                user.isReady = false;
+                            }
+
                             this.eventEmmiter.toLobby(lobby.id, "homepage");
 
                             this.eventEmmiter.toLobbyError(
                                 lobby.id,
                                 new GameAbortedPlayerLeftError(),
                             );
+
+                            this.eventEmmiter.closeRoom(lobby.id)
 
                             this.lobbyManager.deleteLobby(lobby.id);
                             this.userManager.deleteUser(userId);
