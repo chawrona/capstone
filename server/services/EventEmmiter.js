@@ -53,4 +53,8 @@ export default class EventEmmiter {
         const userId = this.userManager.getUserIdByPublicId(publicId);
         this.toUserError(userId, error);
     }
+
+    closeRoom(roomId) {
+        this.io.in(roomId).socketsLeave(roomId);
+    }
 }
