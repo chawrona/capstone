@@ -618,7 +618,7 @@ export default class Eurobusiness extends Game {
         this.addLog(`${currentPlayer.username} zakończył turę.`);
 
         if (
-            currentPlayer.getData("wasInJail") &&
+            !currentPlayer.getData("wasInJail") &&
             this.gameData.rollResult[0] === this.gameData.rollResult[1]
         ) {
             this.gameData.dublets += 1;
@@ -695,7 +695,6 @@ export default class Eurobusiness extends Game {
     payJail(data) {
         this.checkIfActionPossible(data.publicId, actions.payJail);
         const currentPlayer = this.getCurrentPlayer();
-        this.timer.addTime(30);
 
         if (currentPlayer.getData("money") < 200) {
             return [
@@ -703,6 +702,8 @@ export default class Eurobusiness extends Game {
                 this.events.time(),
             ];
         }
+
+        this.timer.addTime(30);
 
         currentPlayer.setData("money", (money) => money - 200);
         currentPlayer.setData("inJail", () => false);
@@ -1204,7 +1205,7 @@ export default class Eurobusiness extends Game {
     takeMoneyFromPlayers(taker) {
         let payersCount = 0;
 
-        for (const [, player] of Object.entries(this.players)) {
+        for (const [, player] of this.players) {
             if (player.publicId === taker.publicId) {
                 continue;
             }
