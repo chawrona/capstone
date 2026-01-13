@@ -194,6 +194,7 @@ usePageSounds({
                 :current-player="currentPlayer"
                 :players-data="playersData"
                 :buy-house="buyHouse"
+                :game-map="gameMap"
                 :sell-house="sellHouse"
             />
 

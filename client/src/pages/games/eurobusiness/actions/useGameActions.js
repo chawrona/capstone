@@ -39,7 +39,7 @@ export function useGameActions(availableActions, dialogsOpen) {
     const sellHouse = (tileIndex) => {
         if (!canEmit(actions.rollDice)) return;
         store.emit("gameData", { data: tileIndex, eventName: "sellHouse" });
-        soundBus.playEffect("roll");
+        soundBus.playEffect("pay");
     };
 
     const endTurn = () => {

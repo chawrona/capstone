@@ -11,6 +11,7 @@ const props = defineProps([
     "playersData",
     "sellHouse",
     "buyHouse",
+    "gameMap",
 ]);
 
 const houseAmount = computed(() => {
@@ -18,14 +19,16 @@ const houseAmount = computed(() => {
 });
 
 const canBuyHouse = computed(() => {
-    if (houseAmount.value <= 5) return false;
+    if (houseAmount.value >= 5) return false;
 
     props.currentPlayer.ownerships;
 
     const setAmount = props.propertyCard.set[1];
     let currentAmount = 0;
 
-    for (const tile of currentPlayer.ownerships) {
+    for (const tileIndex of props.currentPlayer.ownerships) {
+        const tile = props.gameMap[tileIndex];
+
         if (tile.set[0] === props.propertyCard.set[0]) {
             currentAmount++;
         }
@@ -34,7 +37,6 @@ const canBuyHouse = computed(() => {
     if (setAmount !== currentAmount) {
         return false;
     }
-
     return true;
 });
 
