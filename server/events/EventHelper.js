@@ -1,5 +1,6 @@
 import colors from "../config/colors.json" with { type: "json" };
 import games from "../config/games.json" with { type: "json" };
+import GameAlreadyStartedError from "../errors/GameAlreadyStartedError.js";
 import InvalidUsernameCharactersError from "../errors/InvalidUsernameCharactersError.js";
 import InvalidUsernameError from "../errors/InvalidUsernameError.js";
 import InvalidUsernameLengthError from "../errors/InvalidUsernameLengthError.js";
@@ -75,6 +76,8 @@ export default class EventHelper {
 
             const lobby = this.lobbyManager.getLobby(lobbyId);
 
+            this.checkIfLobbyActive(lobby);
+
             lobby.joinUser(userId);
             const user = this.userManager.getUser(userId);
             user.lobbyId = lobbyId;
@@ -86,6 +89,10 @@ export default class EventHelper {
             if (error instanceof LobbyDoesNotExistError) {
                 this.eventEmmiter.toUser(userId, "homepage", {
                     error: `Pokój #${lobbyId} nie istnieje.`,
+                });
+            } else if (error instanceof GameAlreadyStartedError) {
+                this.eventEmmiter.toUser(userId, "homepage", {
+                    error: `Gra wystartowała.`,
                 });
             } else {
                 this.eventEmmiter.toUserError(userId, error);
@@ -116,7 +123,7 @@ export default class EventHelper {
             lobby = lobbyOrLobbyId;
         }
         if (lobby.isActive) {
-            throw new Error("Gra wystartowała");
+            throw new GameAlreadyStartedError();
         }
     }
 }
