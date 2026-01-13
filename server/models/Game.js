@@ -111,7 +111,6 @@ export default class Game {
             return this[data.eventName](data);
         } catch (error) {
             const errorMessage = error ? error.message : "Nieprawidłowa akcja";
-            this.log(errorMessage);
             return [
                 {
                     target: data.publicId,

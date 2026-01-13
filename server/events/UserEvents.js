@@ -194,7 +194,7 @@ export default class UserEvents {
                             }
 
                             for (const userId of lobby.users) {
-                                const user = this.userManager.getUser(userId)
+                                const user = this.userManager.getUser(userId);
                                 user.lobbyId = null;
                                 user.isReady = false;
                             }
@@ -206,7 +206,7 @@ export default class UserEvents {
                                 new GameAbortedPlayerLeftError(),
                             );
 
-                            this.eventEmmiter.closeRoom(lobby.id)
+                            this.eventEmmiter.closeRoom(lobby.id);
 
                             this.lobbyManager.deleteLobby(lobby.id);
                             this.userManager.deleteUser(userId);
