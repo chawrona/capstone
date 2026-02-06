@@ -19,6 +19,11 @@ const routes = [
         path: "/:id/eurobusiness",
     },
     {
+        component: () => import("@/pages/games/brianboru/BrianBoru.vue"),
+        name: "brianboru",
+        path: "/:id/brianboru",
+    },
+    {
         component: () => import("@/pages/lobby/LobbyPage.vue"),
         name: "lobby",
         path: "/:id",

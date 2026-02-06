@@ -285,13 +285,10 @@ export default class Eurobusiness extends Game {
     }
 
     getCurrentPlayer() {
-        console.log("3");
-
         return this.players.get(this.playersQueue[this.currentPlayerIndex]);
     }
 
     getPlayer(publicId) {
-        this.logger.log("4");
         return this.players.get(publicId);
     }
 

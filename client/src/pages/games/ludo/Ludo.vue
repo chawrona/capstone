@@ -552,9 +552,9 @@ const getPublicIdFromFieldFinish = (field) => {
     transition:
         scale 0.2s,
         box-shadow 0.2s;
-    background-color: hsl(from var(--background) h s calc(l * 1.2));
-    border-radius: 50%;
-    position: relative;
+        border-radius: 50%;
+        position: relative;
+        background-color: hsl(from var(--background) h s calc(l * 1.2));
     border: 1px solid rgba(0, 0, 0, 0.349);
     box-shadow:
         inset 0 6px 8px rgba(255, 255, 255, 0.76),

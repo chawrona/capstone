@@ -179,4 +179,16 @@ export default class Game {
         }
         return false;
     }
+
+    getCurrentPlayerPublicId() {
+        return this.playersQueue[this.currentPlayerIndex];
+    }
+
+    getCurrentPlayer() {
+        return this.players.get(this.playersQueue[this.currentPlayerIndex]);
+    }
+
+    getPlayer(publicId) {
+        return this.players.get(publicId);
+    }
 }

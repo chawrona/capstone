@@ -16,7 +16,7 @@ usePageSounds({
 </script>
 
 <template>
-    <LoadingScreen :show="isLoading || !socket" />
+    <LoadingScreen />
     <router-view v-if="socket" />
 </template>
 
