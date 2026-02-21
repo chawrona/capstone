@@ -31,6 +31,8 @@ export default class GameEvents {
                 publicId: user.publicId,
             });
 
+            if (!targets) return;
+
             for (const { target, eventName, data } of targets) {
                 if (target === "lobby") {
                     this.eventEmmiter.toLobby(user.lobbyId, eventName, data);

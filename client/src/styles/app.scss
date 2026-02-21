@@ -179,9 +179,16 @@
 }
 
 pre {
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 99999;
   padding: 1rem;
   background-color: black;
+  border-radius: 0.5rem;
   color: white;
+  font-family: sans-serif;
   font-size: 1rem;
+  max-height: 90vh;
+  overflow-y: scroll;
 }

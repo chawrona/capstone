@@ -1,63 +1,57 @@
 <script setup>
-import { onMounted } from "vue";
-
 import PauseScreen from "../../../components/common/PauseScreen.vue";
 import { usePageSounds } from "../../../composables/usePageSounds";
-import { useAppStore } from "../../../store/useAppStore";
 import { useGamePause } from "../composables_games/useGamePause";
 import { useGameResize } from "../composables_games/useGameResize";
+import Dialogs from "./components_brianboru/Dialogs.vue";
 import Map from "./components_brianboru/Map.vue";
 import PlayerData from "./components_brianboru/PlayerData.vue";
-import SidePanel from "./components_brianboru/SidePanel.vue";
 import TurnInfo from "./components_brianboru/TurnInfo.vue";
+import useGameData from "./composables_brianboru/useGameData";
+import useGameDialogs from "./composables_brianboru/useGameDialogs";
 
-const store = useAppStore();
 const SOUNDTRACK_URL = "/sounds/brianboru.mp3";
 usePageSounds({
     music: [{ name: "soundtrack", url: SOUNDTRACK_URL }],
 });
+
 const { scale } = useGameResize();
 const { isPaused } = useGamePause();
 
-const gameData = ref(null)
-
-onMounted(() => {
-
-
- if (store.socket) {
-
-        store.socket.on("gameData", (data) => {
-            gameData.value = data; 
-            store.setLoading(false)
-        });
-
-        setTimeout(() => {
-            store.emit("gameData", {
-                eventName: "gameDataRequest",
-            });
-        }, 500);
-    }
-
-
-
-    
-    
-});
+const { gameData } = useGameData();
+const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
 </script>
 
 <template>
     <PauseScreen v-if="isPaused" />
     <div class="background">
-        <div v-if="gameData" class="game" :style="{ transform: `scale(${scale})` }">
-            <PlayerData />
-            <TurnInfo />
-            <Map />
+        <div
+            v-if="gameData"
+            class="game"
+            :style="{ transform: `scale(${scale})` }"
+        >
+            <PlayerData :cards="gameData.cards" />
+            <TurnInfo :phases="gameData.phases" :message="gameData.message" />
+            <Map
+                :current-vikings="gameData.currentVikings"
+                :marriages="gameData.marriages"
+                :players="gameData.players"
+                :church="gameData.church"
+                :marriage="gameData.marriage"
+            />
+
+            <Dialogs :game-data="gameData" 
+            :all-dialogs="allDialogs"
+            :close-dialog="closeDialog"
+            :opened-dialog="openedDialog"
+            />
         </div>
+        
     </div>
 </template>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
 .background {
     display: grid;

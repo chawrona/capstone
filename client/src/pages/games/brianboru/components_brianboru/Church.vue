@@ -1,63 +1,68 @@
 <script setup>
-import Church from "@/assets/games/gameAssets/brianboru/church_icon.png";
-const data = [
-    "#d72638",
-    "#d72638",
-    "#d72638",
-    "#3b82f6",
-    "#3b82f6",
-    "#facc15",
-    "#facc15",
-    "#f97316",
-    "#f97316",
-    "#f97316",
-    "#f97316",
-    "#f97316",
-    "#f97316",
-    "#f97316",
-    "#f97316",
-    "#f97316",
-    "#f97316",
-    "#f97316",
-    "#f97316",
-    "#f97316",
-]
+import { ref } from "vue";
 
+import Church from "@/assets/games/gameAssets/brianboru/church_icon.png";
+
+const props = defineProps(["church", "marriage"]);
+
+const flag = ref(true);
+
+const change = () => (flag.value = !flag.value);
 </script>
 
 <template>
-
-<div class="church">
-    <img :src="Church" alt="" class="icon">
-    <div class="players">
-        <div 
-            v-for="color in data"
-            class="player" 
-            :style="`--color: ${color}`"
+    <div v-if="flag" class="church" @click="change">
+        <img :src="Church" alt="" class="icon" />
+        <div class="players">
+            <div
+                v-for="(color, index) in props.church"
+                :key="index"
+                class="player"
+                :style="`--color: ${color.hex}`"
+            />
+        </div>
+    </div>
+    <div v-else class="marriage" @click="change">
+        <img
+            :src="`/src/assets/games/gameAssets/brianboru/${marriage.name.toLowerCase()}.jpg`"
         />
     </div>
-   
-</div>
-
-
 </template>
 
 <style scoped lang="scss">
-
-.church {
+.church,
+.marriage {
     display: flex;
     flex-direction: column-reverse;
     align-items: center;
     position: absolute;
     bottom: 0.5rem;
     right: 0.5rem;
-       padding: 1.25rem 1rem;
-       border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/brownTexture.png");
+    padding: 1.25rem 1rem;
+    border-radius: 0.5rem;
     // background-color: white;
     gap: 2rem;
-      box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
+    background-color: #ffffff11;
+    box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 0.314);
+    width: 202px;
+    height: 283px;
+    cursor: pointer;
 
+    &:hover {
+        filter: brightness(1.1);
+    }
+}
+
+.marriage {
+    padding: 0;
+    overflow: hidden;
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin.webp");
+    box-shadow: 0 1px 5px 5px rgba(0, 0, 0, 0.219);
+
+    img {
+        width: 100%;
+        height: 100%;
+    }
 }
 
 .icon {
@@ -87,6 +92,4 @@ const data = [
         /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
         0 2px 3px rgba(0, 0, 0, 0.308);
 }
-
-
 </style>

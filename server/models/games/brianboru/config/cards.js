@@ -16,8 +16,8 @@ const cards = [
     {
         id: 3,
         bottom1: ["money_plus", "money_plus", "money_plus", "triquetra_5"],
-        bottom2: ["cross", "cross"],
-        top: ["cross", "cross", "money_plus", "triquetra"],
+        bottom2: ["church", "church"],
+        top: ["church", "church", "money_plus", "triquetra"],
         type: "blue",
     },
     {
@@ -37,8 +37,8 @@ const cards = [
     {
         id: 6,
         bottom1: ["money_plus", "money_plus", "money_plus", "triquetra_5"],
-        bottom2: ["cross", "cross"],
-        top: ["cross", "cross", "triquetra"],
+        bottom2: ["church", "church"],
+        top: ["church", "church", "triquetra"],
         type: "blue",
     },
     {
@@ -58,8 +58,8 @@ const cards = [
     {
         id: 9,
         bottom1: ["money_plus", "money_plus", "triquetra_5"],
-        bottom2: ["cross", "cross"],
-        top: ["cross", "money_plus", "triquetra"],
+        bottom2: ["church", "church"],
+        top: ["church", "money_plus", "triquetra"],
         type: "blue",
     },
     {
@@ -79,7 +79,7 @@ const cards = [
     {
         id: 12,
         bottom1: ["money_plus", "money_plus", "triquetra_5"],
-        bottom2: ["cross", "cross"],
+        bottom2: ["church", "church"],
         top: ["money_plus", "money_plus", "triquetra"],
         type: "blue",
     },
@@ -107,7 +107,7 @@ const cards = [
     {
         id: 16,
         bottom1: ["money_plus", "triquetra_5"],
-        bottom2: ["cross", "cross", "cross"],
+        bottom2: ["church", "church", "church"],
         top: ["triquetra"],
         type: "blue",
     },
@@ -128,7 +128,7 @@ const cards = [
     {
         id: 19,
         bottom1: ["money_plus", "triquetra_5"],
-        bottom2: ["cross", "cross", "cross"],
+        bottom2: ["church", "church", "church"],
         top: ["money_minus", "triquetra"],
         type: "blue",
     },
@@ -162,13 +162,6 @@ const cards = [
     },
     {
         id: 24,
-        bottom1: ["build", "money_plus", "money_plus"],
-        bottom2: ["letter", "letter", "letter"],
-        top: ["city", "money_minus", "money_minus"],
-        type: "red",
-    },
-    {
-        id: 24,
         bottom1: ["money_plus", "triquetra_5"],
         bottom2: ["axe", "axe", "axe"],
         top: ["money_minus", "money_minus", "triquetra"],
@@ -177,7 +170,7 @@ const cards = [
     {
         id: 25,
         bottom1: ["money_plus", "triquetra_5"],
-        bottom2: ["cross", "cross", "cross"],
+        bottom2: ["church", "church", "church"],
         top: ["money_minus", "money_minus", "triquetra"],
         type: "blue",
     },

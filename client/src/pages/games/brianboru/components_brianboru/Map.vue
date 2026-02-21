@@ -1,21 +1,25 @@
 <script setup>
-import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
-
-import Marriage from "./Marriage.vue";
-import Players from "./Players.vue";
 import Church from "./Church.vue";
 import Island from "./Island.vue";
+import Marriage from "./Marriage.vue";
+import Players from "./Players.vue";
+import Vikings from "./Vikings.vue";
+
+const props = defineProps([
+    "currentVikings",
+    "marriages",
+    "players",
+    "church",
+    "marriage",
+]);
 </script>
 
 <template>
     <div class="map">
-        <div class="vikings">
-            <img :src="Vikings" alt="" class="vikings-icon" />
-            <span class="vikings-count">14</span>
-        </div>
-        <Marriage />
-        <Players />
-        <Church />
+        <Vikings :vikings="props.currentVikings" />
+        <Marriage :marriages="props.marriages" />
+        <Players :players="props.players" />
+        <Church :church="props.church" :marriage="marriage" />
         <Island />
     </div>
 </template>
@@ -23,33 +27,9 @@ import Island from "./Island.vue";
 <style scoped>
 .map {
     position: relative;
-    width: 87.5%;
-    background-color: rgba(48, 119, 250, 0.616);
+    width: 100%;
+    background-color: rgb(18, 87, 214);
     background-image: url("/src/assets/games/gameAssets/brianboru/sea.png");
     height: 100%;
-}
-
-.vikings {
-    position: relative;
-    top: 1rem;
-    left: 1rem;
-    border-radius: 50%;
-    width: 75px;
-    color: white;
-    font-size: 2.5rem;
-    font-weight: bold;
-    display: grid;
-    place-items: center;
-    height: 75px;
-}
-.vikings-count {
-    transform: translateY(2px);
-    font-family: "MedievalSharp";
-    position: absolute;
-    text-shadow: 0 0 6px black;
-}
-
-.vikings-icon {
-    filter: brightness(1.1);
 }
 </style>

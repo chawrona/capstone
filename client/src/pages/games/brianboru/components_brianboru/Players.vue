@@ -2,7 +2,11 @@
 import Money from "@/assets/games/gameAssets/brianboru/money.png";
 import Money5 from "@/assets/games/gameAssets/brianboru/money5.png";
 import Points from "@/assets/games/gameAssets/brianboru/Points.png";
+import Sun from "@/assets/games/gameAssets/brianboru/sun.png";
+import FirstPlayer from "@/assets/games/gameAssets/brianboru/first_player.png";
 import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
+
+const props = defineProps(["players"]);
 
 const data = [
     {
@@ -54,12 +58,27 @@ const bigCoinCount = (money) => (money - (money % 5)) / 5;
 <template>
     <div class="players">
         <div
-            v-for="player in data"
+            v-for="player in props.players"
+            :key="player.publicId"
             class="player"
             :style="`--color: ${player.color}`"
         >
             <div class="info">
-                <div class="username">
+                <img
+                v-if="player.firstPlayer"
+                    :src="FirstPlayer"
+                    class="icon firstPlayer"
+                />
+                <img
+                    v-for="sun in player.suns"
+                    :key="sun"
+                    :src="Sun"
+                    class="icon sun"
+                />
+                <div
+                    class="username"
+                   
+                >
                     {{ player.username }}
                 </div>
 
@@ -75,17 +94,15 @@ const bigCoinCount = (money) => (money - (money % 5)) / 5;
                         v-for="money in smallCoinCount(player.money)"
                         :key="money"
                         :src="Money"
-                        alt=""
                         class="icon"
                     />
                     <img
                         v-for="money in bigCoinCount(player.money)"
-                        v-if="player.money > 4"
                         :key="money"
                         :src="Money5"
-                        alt=""
                         class="icon"
                     />
+
                     <!-- <div class="count">{{ player.vikings }}</div> -->
                 </div>
 
@@ -120,8 +137,11 @@ const bigCoinCount = (money) => (money - (money % 5)) / 5;
     box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
     // background-repeat: no-repeat;
     background-size: contain;
-       background-image: url(/src/assets/games/gameAssets/brianboru/podstawka2.jpg);
-         background-image: url("/src/assets/games/gameAssets/brianboru/brownTexture.png");
+    // background-image: url(/src/assets/games/gameAssets/brianboru/podstawka2.jpg);
+    // background-image: url("/src/assets/games/gameAssets/brianboru/brownTexture.png");
+
+     background-color: #ffffff11;
+    box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 0.314);
     // background-image:
     // linear-gradient(rgb(0, 0, 0)),
     // url("/src/assets/games/gameAssets/brianboru/background.webp");
@@ -134,7 +154,7 @@ const bigCoinCount = (money) => (money - (money % 5)) / 5;
     flex-direction: column;
     justify-content: end;
     color: white;
-    gap: 0.25rem;
+    gap: 0.35rem;
 }
 .vikings {
     margin-left: 0.2rem;
@@ -157,6 +177,20 @@ const bigCoinCount = (money) => (money - (money % 5)) / 5;
         height: 25px;
         width: 25px;
     }
+}
+
+.sun {
+    align-self: center;
+    height: 25px;
+    width: 25px;
+    transform: translateY(1.15px);
+}
+
+.firstPlayer {
+    height: 25px;
+    width: 25px;
+    transform: translateY(1.5px);
+    align-self: center;
 }
 
 .values,
@@ -194,6 +228,11 @@ const bigCoinCount = (money) => (money - (money % 5)) / 5;
 .username {
     transform: translateY(9px);
     font-size: 1.25rem;
+}
+
+.firstPlayer {
     font-weight: bold;
+    letter-spacing: 0.5px;
+    color: rgb(255, 255, 255);
 }
 </style>
