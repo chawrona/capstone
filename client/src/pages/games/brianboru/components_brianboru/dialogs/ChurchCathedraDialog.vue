@@ -9,13 +9,13 @@ const testChooseCathedral = () => {
         data: "cityId",
         eventName: "chooseCathedral",
     });
-}
+};
 </script>
 
 <template>
     <div class="dialog">
         <h2 class="dialogTitle">Zbuduj katedrę</h2>
-     
+
         <button class="dialogButton" @click="testChooseCathedral">
             buduję katedrę
         </button>
@@ -40,7 +40,8 @@ const testChooseCathedral = () => {
     position: absolute;
     color: white;
     font-weight: normal;
-    padding: 1.25rem 1rem;  z-index: 30;
+    padding: 1.25rem 1rem;
+    z-index: 30;
     border-radius: 0.5rem;
     background-image: url("/src/assets/games/gameAssets/brianboru/blueCard.png");
     background-size: cover;

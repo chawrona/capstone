@@ -66,7 +66,7 @@ const getCellName = (number) => {
 const isTileOwned = (position) => {
     return Boolean(
         props.tilesOwnedBySomeone[position] &&
-            props.gameMap[position].type === "Budynek",
+        props.gameMap[position].type === "Budynek",
     );
 };
 

@@ -9,13 +9,13 @@ const testVikingsYourCity = () => {
         data: "cityId",
         eventName: "chooseYourCityToVikings",
     });
-}
+};
 </script>
 
 <template>
     <div class="dialog">
         <h2 class="dialogTitle">Oddaj miasto wikingom</h2>
-     
+
         <button class="dialogButton" @click="testVikingsYourCity">
             Oddaję miasto
         </button>
@@ -40,7 +40,8 @@ const testVikingsYourCity = () => {
     position: absolute;
     color: white;
     font-weight: normal;
-    padding: 1.25rem 1rem;  z-index: 30;
+    padding: 1.25rem 1rem;
+    z-index: 30;
     border-radius: 0.5rem;
     background-image: url("/src/assets/games/gameAssets/brianboru/redCard.png");
     background-size: cover;

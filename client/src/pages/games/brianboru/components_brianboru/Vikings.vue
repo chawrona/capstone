@@ -5,8 +5,10 @@ const props = defineProps(["vikings"]);
 
 <template>
     <div class="wrap">
-        <div class="vikings" v-if="props.vikings" v-for="viking in props.vikings" :key="viking">
-            <img :src="Vikings" class="vikings-icon"/>
+        <div v-if="props.vikings">
+            <div v-for="viking in props.vikings" :key="viking" class="vikings">
+                <img :src="Vikings" class="vikings-icon" />
+            </div>
         </div>
     </div>
 </template>

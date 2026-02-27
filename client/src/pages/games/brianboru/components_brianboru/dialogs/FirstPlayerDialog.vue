@@ -16,7 +16,8 @@ const props = defineProps(["firstPlayer", "closeDialog"]);
 <style scoped>
 .dialog {
     position: absolute;
-    top: 50%;  z-index: 30;
+    top: 50%;
+    z-index: 30;
     font-family: "MedievalSharp";
     left: 50%;
     transform: translate(-50%, -50%);

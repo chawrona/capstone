@@ -76,7 +76,8 @@ const props = defineProps(["card"]);
         }
 
         .bottom1,
-        .bottom2, .topIcons {
+        .bottom2,
+        .topIcons {
             background-color: hsla(0, 84%, 17%, 0.443);
         }
     }
@@ -88,7 +89,8 @@ const props = defineProps(["card"]);
             color: rgb(147, 172, 241);
         }
         .bottom1,
-        .bottom2, .topIcons {
+        .bottom2,
+        .topIcons {
             background-color: #0413455e;
         }
     }
@@ -100,7 +102,8 @@ const props = defineProps(["card"]);
             color: rgb(246, 244, 142);
         }
         .bottom1,
-        .bottom2, .topIcons {
+        .bottom2,
+        .topIcons {
             background-color: #3d38046b;
             background-color: #3d38046b;
         }
@@ -114,7 +117,8 @@ const props = defineProps(["card"]);
             color: rgb(224, 224, 224);
         }
         .bottom1,
-        .bottom2, .topIcons {
+        .bottom2,
+        .topIcons {
             background-color: #5a5a5a6c;
         }
     }
@@ -122,7 +126,7 @@ const props = defineProps(["card"]);
     .cardData {
         display: flex;
         flex-direction: column;
-    
+
         height: 100%;
         width: 100%;
     }

@@ -1,28 +1,32 @@
 <script setup>
 import dialogs from "../../../../../../server/models/games/brianboru/config/dialogs.js";
 import useGameDialogs from "../composables_brianboru/useGameDialogs.js";
+import ChurchCathedraDialog from "./dialogs/ChurchCathedraDialog.vue";
 import ChurchDialog from "./dialogs/ChurchDialog.vue";
 import FirstPlayerDialog from "./dialogs/FirstPlayerDialog.vue";
 import MarriageDialog from "./dialogs/MarriageDialog.vue";
 import MarriageNoRewardDialog from "./dialogs/MarriageNoRewardDialog.vue";
-import RejectCardsDialog from "./dialogs/RejectCardsDialog.vue";
-import VikingsDialog from "./dialogs/VikingsDialog.vue";
-import VikingsNoAttackDialog from "./dialogs/VikingsNoAttackDialog.vue";
-import MarriageRewardWinningDialog from "./dialogs/MarriageRewardWinningDialog.vue";
-import MarriageRewardsDialog from "./dialogs/MarriageRewardsDialog.vue";
 import MarriageRewardCityDialog from "./dialogs/MarriageRewardCityDialog.vue";
-import VikingsInfoDialog from "./dialogs/VikingsInfoDialog.vue";
+import MarriageRewardsDialog from "./dialogs/MarriageRewardsDialog.vue";
+import MarriageRewardWinningDialog from "./dialogs/MarriageRewardWinningDialog.vue";
+import RejectCardsDialog from "./dialogs/RejectCardsDialog.vue";
 import VikingsAttackSomeoneCityDialog from "./dialogs/VikingsAttackSomeoneCityDialog.vue";
 import VikingsAttackYourCityDialog from "./dialogs/VikingsAttackYourCityDialog.vue";
+import VikingsDialog from "./dialogs/VikingsDialog.vue";
+import VikingsInfoDialog from "./dialogs/VikingsInfoDialog.vue";
+import VikingsNoAttackDialog from "./dialogs/VikingsNoAttackDialog.vue";
 import VikingsRewardsDialog from "./dialogs/VikingsRewardsDialog.vue";
-import ChurchCathedraDialog from "./dialogs/ChurchCathedraDialog.vue";
 
-const props = defineProps(["gameData", "allDialogs", "closeDialog", "openedDialog"]);
-
+const props = defineProps([
+    "gameData",
+    "allDialogs",
+    "closeDialog",
+    "openedDialog",
+]);
 </script>
 
 <template>
-    <pre>
+    <!-- <pre>
         {{ "DIALOGI" }}
         {{ allDialogs }}
         {{ "STATUS" }}
@@ -30,7 +34,7 @@ const props = defineProps(["gameData", "allDialogs", "closeDialog", "openedDialo
         
         {{ "openedDialog" }}
         {{ openedDialog }}
-    </pre>
+    </pre> -->
 
     <RejectCardsDialog
         v-if="openedDialog === dialogs.REJECT_CARDS"
@@ -46,12 +50,12 @@ const props = defineProps(["gameData", "allDialogs", "closeDialog", "openedDialo
     />
     <VikingsRewardsDialog
         v-if="openedDialog === dialogs.VIKINGS_REWARD"
-       :vikings-dialog-info="gameData.vikingsDialogInfo"
+        :vikings-dialog-info="gameData.vikingsDialogInfo"
         :close-dialog="closeDialog"
     />
     <VikingsInfoDialog
         v-if="openedDialog === dialogs.VIKINGS_ATTACK_INFO"
-        :vikingsAttackDialogInfo="gameData.vikingsAttackDialogInfo"
+        :vikings-attack-dialog-info="gameData.vikingsAttackDialogInfo"
         :close-dialog="closeDialog"
     />
 
@@ -72,7 +76,7 @@ const props = defineProps(["gameData", "allDialogs", "closeDialog", "openedDialo
 
     <VikingsAttackSomeoneCityDialog
         v-if="openedDialog === dialogs.VIKINGS_SOMEONE_CITY"
-        :vikingsSomeoneCityInfo="gameData.vikingsSomeoneCityInfo"
+        :vikings-someone-city-info="gameData.vikingsSomeoneCityInfo"
         :close-dialog="closeDialog"
     />
     <VikingsAttackYourCityDialog
@@ -88,18 +92,18 @@ const props = defineProps(["gameData", "allDialogs", "closeDialog", "openedDialo
     <MarriageRewardWinningDialog
         v-if="openedDialog === dialogs.MARRIAGE_REWARD_WINNING"
         :marriage="gameData.marriage"
-        :marriageDialogInfo="gameData.marriageDialogInfo"
+        :marriage-dialog-info="gameData.marriageDialogInfo"
         :close-dialog="closeDialog"
     />
     <MarriageRewardCityDialog
         v-if="openedDialog === dialogs.MARRIAGE_REWARD_CITY"
         :marriage="gameData.marriage"
-        :marriageDialogInfo="gameData.marriageDialogInfo"
+        :marriage-dialog-info="gameData.marriageDialogInfo"
         :close-dialog="closeDialog"
     />
     <MarriageRewardsDialog
         v-if="openedDialog === dialogs.MARRIAGE_REWARDS"
-        :marriageDialogInfo="gameData.marriageDialogInfo"
+        :marriage-dialog-info="gameData.marriageDialogInfo"
         :close-dialog="closeDialog"
     />
 

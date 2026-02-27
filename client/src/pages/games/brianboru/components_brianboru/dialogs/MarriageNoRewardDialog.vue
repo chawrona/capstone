@@ -17,7 +17,7 @@ const props = defineProps(["closeDialog"]);
     font-family: "MedievalSharp";
     left: 50%;
     transform: translate(-50%, -50%);
-  z-index: 30;
+    z-index: 30;
     height: 250px;
     width: 600px;
 

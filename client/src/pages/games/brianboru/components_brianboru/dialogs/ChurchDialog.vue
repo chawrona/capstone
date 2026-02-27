@@ -9,7 +9,12 @@ const props = defineProps(["churchDialogInfo", "closeDialog"]);
             Kraj jest pełen bezbożników
         </h2>
         <h2 v-else>
-      {{ props.churchDialogInfo.map(el => [el.player.username, el.reward]) }}
+            {{
+                props.churchDialogInfo.map((el) => [
+                    el.player.username,
+                    el.reward,
+                ])
+            }}
         </h2>
 
         <button class="dialogButton" @click="props.closeDialog">Dalej</button>

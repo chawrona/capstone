@@ -11,18 +11,22 @@ const cards = computed(() => {
         .sort((a, b) => b.id - a.id);
 });
 
-const showCards = ref(true)
+const showCards = ref(true);
 
 const toggleCards = () => {
-    showCards.value = !showCards.value
-}
-
+    showCards.value = !showCards.value;
+};
 </script>
 
 <template>
     <div class="playerData">
-        <div class="cards" :class="{show: showCards}">
-            <Card v-for="card in cards" :key="card.id" :card="card" class="player-card"/>
+        <div class="cards" :class="{ show: showCards }">
+            <Card
+                v-for="card in cards"
+                :key="card.id"
+                :card="card"
+                class="player-card"
+            />
         </div>
         <div class="toggle" @click="toggleCards">
             {{ showCards ? "Pokaż karty" : "Ukryj karty" }}
@@ -38,10 +42,9 @@ const toggleCards = () => {
     position: absolute;
     bottom: 0.5rem;
     // background-color: rgba(255, 0, 0, 0.616);
-    
+
     z-index: 2;
 }
-
 
 .toggle {
     position: absolute;
@@ -64,19 +67,19 @@ const toggleCards = () => {
     cursor: pointer;
 
     &:hover {
-          background-color: rgb(42, 42, 42);
+        background-color: rgb(42, 42, 42);
     }
 }
 .cards {
     transform: translateY(75%);
     // flex-direction: column;
     align-items: center;
-margin-inline: auto;
-  padding-inline: 1rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
 
     display: flex;
- justify-content: center;
-  transition: transform 0.2s;
+    justify-content: center;
+    transition: transform 0.2s;
     gap: 0.5rem;
 
     .player-card {
@@ -87,5 +90,4 @@ margin-inline: auto;
 .show {
     transform: translateY(0);
 }
-
 </style>

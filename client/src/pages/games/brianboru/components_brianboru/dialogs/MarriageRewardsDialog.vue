@@ -6,12 +6,16 @@ const props = defineProps(["marriageDialogInfo", "closeDialog"]);
     <div class="dialog">
         <h1 class="dialogTitle">Zaślubiny odbyły się</h1>
         <p>Oto kto co dostał:</p>
-      
 
-     <p>{{ props.marriageDialogInfo.map(el => [el.player.username, el.reward]) }}</p>
-        <button class="dialogButton" @click="props.closeDialog">
-            Dalej
-        </button>
+        <p>
+            {{
+                props.marriageDialogInfo.map((el) => [
+                    el.player.username,
+                    el.reward,
+                ])
+            }}
+        </p>
+        <button class="dialogButton" @click="props.closeDialog">Dalej</button>
     </div>
 </template>
 
@@ -22,7 +26,7 @@ const props = defineProps(["marriageDialogInfo", "closeDialog"]);
     font-family: "MedievalSharp";
     left: 50%;
     transform: translate(-50%, -50%);
-  z-index: 30;
+    z-index: 30;
     display: flex;
     flex-direction: column;
     align-items: center;

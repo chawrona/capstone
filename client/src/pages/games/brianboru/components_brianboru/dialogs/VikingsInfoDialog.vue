@@ -5,9 +5,9 @@ const props = defineProps(["vikingsAttackDialogInfo", "closeDialog"]);
 <template>
     <div class="dialog">
         <h2 class="dialogTitle">Najazd wikingów</h2>
-       <p>
-        {{ vikingsAttackDialogInfo[0].status }}
-       </p>
+        <p>
+            {{ vikingsAttackDialogInfo[0].status }}
+        </p>
         <button class="dialogButton" @click="props.closeDialog">
             Focus na Senseia
         </button>
@@ -32,7 +32,8 @@ const props = defineProps(["vikingsAttackDialogInfo", "closeDialog"]);
     position: absolute;
     color: white;
     font-weight: normal;
-    padding: 1.25rem 1rem;  z-index: 30;
+    padding: 1.25rem 1rem;
+    z-index: 30;
     border-radius: 0.5rem;
     background-image: url("/src/assets/games/gameAssets/brianboru/redCard.png");
     background-size: cover;

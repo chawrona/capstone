@@ -20,7 +20,7 @@ const props = defineProps([
         <Marriage :marriages="props.marriages" />
         <Players :players="props.players" />
         <Church :church="props.church" :marriage="marriage" />
-        <Island />
+        <slot />
     </div>
 </template>
 

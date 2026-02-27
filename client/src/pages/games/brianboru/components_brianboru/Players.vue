@@ -1,9 +1,9 @@
 <script setup>
+import FirstPlayer from "@/assets/games/gameAssets/brianboru/first_player.png";
 import Money from "@/assets/games/gameAssets/brianboru/money.png";
 import Money5 from "@/assets/games/gameAssets/brianboru/money5.png";
 import Points from "@/assets/games/gameAssets/brianboru/Points.png";
 import Sun from "@/assets/games/gameAssets/brianboru/sun.png";
-import FirstPlayer from "@/assets/games/gameAssets/brianboru/first_player.png";
 import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
 
 const props = defineProps(["players"]);
@@ -65,7 +65,7 @@ const bigCoinCount = (money) => (money - (money % 5)) / 5;
         >
             <div class="info">
                 <img
-                v-if="player.firstPlayer"
+                    v-if="player.firstPlayer"
                     :src="FirstPlayer"
                     class="icon firstPlayer"
                 />
@@ -75,10 +75,7 @@ const bigCoinCount = (money) => (money - (money % 5)) / 5;
                     :src="Sun"
                     class="icon sun"
                 />
-                <div
-                    class="username"
-                   
-                >
+                <div class="username">
                     {{ player.username }}
                 </div>
 
@@ -140,7 +137,7 @@ const bigCoinCount = (money) => (money - (money % 5)) / 5;
     // background-image: url(/src/assets/games/gameAssets/brianboru/podstawka2.jpg);
     // background-image: url("/src/assets/games/gameAssets/brianboru/brownTexture.png");
 
-     background-color: #ffffff11;
+    background-color: #ffffff11;
     box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 0.314);
     // background-image:
     // linear-gradient(rgb(0, 0, 0)),

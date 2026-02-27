@@ -10,8 +10,7 @@ const testCityChosing = () => {
         data: "cityId",
         eventName: "marriageCityReward",
     });
-}
-
+};
 </script>
 
 <template>
@@ -21,16 +20,15 @@ const testCityChosing = () => {
         <p>
             {{ marriageDialogInfo }}
         </p>
-        <button class="dialogButton" @click="testCityChosing">
-            Dalej
-        </button>
+        <button class="dialogButton" @click="testCityChosing">Dalej</button>
     </div>
 </template>
 
 <style scoped>
 .dialog {
     position: absolute;
-    top: 50%;  z-index: 30;
+    top: 50%;
+    z-index: 30;
     font-family: "MedievalSharp";
     left: 50%;
     transform: translate(-50%, -50%);

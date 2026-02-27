@@ -21,12 +21,11 @@ const selectCard = (id) => {
 };
 
 const cards = computed(() => {
-    const [cards, lockedCards] = props.cards
-    const lockedCardsIds = lockedCards.map(card => card.id)
+    const [cards, lockedCards] = props.cards;
+    const lockedCardsIds = lockedCards.map((card) => card.id);
     return cards
         .filter(
-            (card) =>
-                card.type !== null && !lockedCardsIds.includes(card.id),
+            (card) => card.type !== null && !lockedCardsIds.includes(card.id),
         )
         .sort((a, b) => b.id - a.id);
 });
@@ -75,7 +74,8 @@ const rejectCards = () => {
     position: absolute;
     top: 50%;
     font-family: "MedievalSharp";
-    left: 50%;  z-index: 30;
+    left: 50%;
+    z-index: 30;
     transform: translate(-50%, -50%);
 
     height: 300px;

@@ -4,6 +4,7 @@ import { usePageSounds } from "../../../composables/usePageSounds";
 import { useGamePause } from "../composables_games/useGamePause";
 import { useGameResize } from "../composables_games/useGameResize";
 import Dialogs from "./components_brianboru/Dialogs.vue";
+import Island from "./components_brianboru/Island.vue";
 import Map from "./components_brianboru/Map.vue";
 import PlayerData from "./components_brianboru/PlayerData.vue";
 import TurnInfo from "./components_brianboru/TurnInfo.vue";
@@ -38,15 +39,24 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
                 :players="gameData.players"
                 :church="gameData.church"
                 :marriage="gameData.marriage"
-            />
+            >
+                <Island
+                    :city-under-attack="gameData.cityUnderAttack"
+                    :cities="gameData.cities"
+                    :regions="gameData.regions"
+                    :status="gameData.status"
+                    :cities-to-attack="gameData.citiesToAttack"
+                    :cities-to-cathedra="gameData.citiesToCathedra"
+                /> </Map
+            >/>
 
-            <Dialogs :game-data="gameData" 
-            :all-dialogs="allDialogs"
-            :close-dialog="closeDialog"
-            :opened-dialog="openedDialog"
+            <Dialogs
+                :game-data="gameData"
+                :all-dialogs="allDialogs"
+                :close-dialog="closeDialog"
+                :opened-dialog="openedDialog"
             />
         </div>
-        
     </div>
 </template>
 
