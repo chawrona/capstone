@@ -3,22 +3,29 @@ import Logger from "../services/Logger.js";
 import Player from "./Player.js";
 
 export default class Game {
-    constructor(players, endGame, lobbyId) {
+    constructor(players, endGame, lobbyId, playerClass) {
+        this.playerClass = playerClass;
         this.endGame = endGame;
         this.players = new Map();
         this.playersQueue = [];
         this.currentPlayerIndex = 0;
         this.gameData = {};
         this.createPlayers(players);
+
         this.createTurnOrder();
+
         this.setPlayersData();
+
         this.initializeGameData();
+
         this.logger = new Logger();
+
         this.disconnectedPlayers = new Set();
         this.paused = false;
         this.gameEnded = false;
         this.lobbyId = lobbyId;
         this.eventEmmiter = new eventEmmiter();
+        console.log("XD 2");
     }
 
     useEventEmmiter(targets) {
@@ -56,8 +63,10 @@ export default class Game {
     }
 
     createPlayers(players) {
+        const Constructor = this.playerClass || Player;
+
         for (const player of players) {
-            const newPlayer = new Player(
+            const newPlayer = new Constructor(
                 player.username,
                 player.color,
                 player.publicId,

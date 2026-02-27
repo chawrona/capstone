@@ -1,6 +1,7 @@
 import games from "../config/games.json" with { type: "json" };
 import generateShortId from "../utils/generateShortId.js";
 import BrianBoru from "./games/brianboru/BrianBoru.js";
+import BrianBoruPlayer from "./games/brianboru/BrianBoruPlayer.js";
 import Eurobusiness from "./games/eurobusiness/Eurobusiness.js";
 import Ludo from "./games/Ludo.js";
 
@@ -25,6 +26,7 @@ export default class Lobby {
                     players,
                     () => this.endGame(),
                     this.id,
+                    BrianBoruPlayer,
                 );
                 break;
             case "eurobusiness":

@@ -174,6 +174,7 @@ export default class LobbyEvents {
 
             this.logger.log(`Gra ${gameTitle} została wystartowana.`);
         } catch (error) {
+            console.log(error);
             this.eventEmmiter.toUserError(userId, error);
         }
     }

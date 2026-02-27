@@ -29,8 +29,8 @@ export default class Cards {
 
     resetCardDrawPhase() {
         for (const player of this.players.values()) {
-            this.game.setPlayerStatus(player, statuses.REJECT_CARDS);
-            this.game.addDialogToPlayers(dialogs.REJECT_CARDS);
+            player.setStatus(statuses.REJECT_CARDS);
+            player.addDialog(dialogs.REJECT_CARDS);
             player.setData("cards", () => []);
             player.setData("lockedCards", () => new Set());
         }
@@ -41,6 +41,13 @@ export default class Cards {
         this.passedCardsPlayerCount = 0;
         this.passedCardsData = [];
         this.passingPhase.current = 1;
+    }
+
+    getPlayerCards(player) {
+        return [
+            player.getData("cards"),
+            Array.from(player.getData("lockedCards")),
+        ];
     }
 
     selectCardsToPass(data) {
@@ -94,7 +101,7 @@ export default class Cards {
         if (this.passedCardsPlayerCount === this.players.size) {
             return this.passCards();
         } else {
-            this.game.setPlayerStatus(player, statuses.REJECT_CARDS_WAITING);
+            player.setStatus(statuses.REJECT_CARDS_WAITING);
             return this.game.generateGameData(data.publicId);
         }
     }
@@ -119,9 +126,11 @@ export default class Cards {
 
         if (passPhase > this.passingPhase.total) {
             // Tutaj będziemy udawać, że cała faza gry przeszła i tylko resetować na ponowne wybieranie kart.
-            for (const player of this.players.values()) {
-                this.game.setPlayerStatus(player, "Gramy");
-            }
+
+            this.players
+                .values()
+                .forEach((player) => player.setStatus("Gramy!"));
+
             this.passedCardsData = [];
             this.game.gameData.phases.current = "playing";
 
@@ -137,12 +146,15 @@ export default class Cards {
                 i++;
             }
 
-            return this.game.marriagesPhaseEnd();
+            // return this.game.marriages.marriagesPhaseEnd();
+            return this.game.sendGameDataToAll();
         } else {
-            for (const player of this.players.values()) {
-                this.game.setPlayerStatus(player, statuses.REJECT_CARDS);
-                this.game.dialogs.addDialog(player, dialogs.REJECT_CARDS);
-            }
+            this.players.values().forEach((player) => {
+                player
+                    .setStatus(statuses.REJECT_CARDS)
+                    .addDialog(dialogs.REJECT_CARDS);
+            });
+
             this.passedCardsData = [];
             return this.game.sendGameDataToAll();
         }

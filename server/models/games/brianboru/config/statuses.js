@@ -13,6 +13,10 @@ const statuses = {
     VIKINGS_SOMEONE_CITY: 6, // wybierz czyjeś miasto do ataku wikingów
 
     BUILD_CATHEDRAL: 7, // wybuduj katedrę
+
+    CHOOSE_ATTACKED_CITY: 8,
+    CHOOSE_FIRST_CARD: 9,
+    CHOOSE_CARD: 10,
 };
 
 export default statuses;
