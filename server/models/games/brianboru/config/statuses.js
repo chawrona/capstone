@@ -20,6 +20,9 @@ const statuses = {
     CHOOSE_CARD_EFFECT: 11,
 
     BUILD_ATTACKED_CITY: 12, // wybuduj miasto, które wygrałeś
+    BUILD_BOUGHT_CITY: 13, // wybuduj kupione miasto z karty
+
+    REMOVE_VIKINGS: 14, // Usuń wikingów ze swojego miasta
 };
 
 export default statuses;

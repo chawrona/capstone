@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 import statuses from "../../../../../../server/models/games/brianboru/config/statuses";
 import { useAppStore } from "../../../../store/useAppStore";
@@ -16,6 +16,22 @@ const canChooseHover = (player) => {
     return canChoose.value && player.username === props.you.username;
 };
 
+const chosenCard = ref(null)
+const choosenBottom = ref('bottom1')
+const dialogOpen = ref(false)
+const closeDialog = () => dialogO
+pen.value = true;
+
+const dialogData = ref({
+    buildCity: 
+});
+
+const openChooseCardDialog = (chosenBottom, card, player) => {
+    dialogData.value = {
+        buidCity:
+    }
+}
+
 const chooseCardEffect = () => {
     if (!canChoose.value) return alert("Can't");
 
@@ -24,19 +40,48 @@ const chooseCardEffect = () => {
         eventName: "chooseCardEffect",
     });
 };
+
+
+
 </script>
 
 <template>
     <!-- <pre>
         {{ props.chosenCards }}
     </pre> -->
+    <div class="dialog" v-if="dialogOpen">
+        <h1 class="dialogTitle">Efekt karty</h1>
+
+        <div class="dialogContent">
+            <p>Aktualna liczba monet: {{ props.you.money  + }}</p>
+            <div>
+                <button>-1</button> <p>Dokup X Y za Z monet </p> <button>+1</button>
+            </div>
+
+            <div>
+                <p>Czy chcesz zbudować miasto?</p>
+                Tak
+                <input type="radio" name="buildCity" id="buildCityTrue">
+                Nie
+                <input type="radio" name="buildCity" id="buildCityFalse">
+            </div>
+
+
+        </div>
+
+        <button class="dialogButton" @click="closeDialog">
+            Focus na Senseia
+        </button>
+    </div>
+
+
     <div class="chosenCards">
         <div
             v-for="[card, player] in props.chosenCards"
             class="wrap"
             :style="`--color: ${player.color.hex};`"
             :data-type="card.type"
-            @click="chooseCardEffect(card, player)"
+            @click="openChooseCardDialog(card, player)"
         >
             <Card
                 :key="card.id"
@@ -111,5 +156,52 @@ const chooseCardEffect = () => {
     // text-orientation: sideways;
     //  writing-mode: sideways-lr;
     color: white;
+}
+
+.dialog {
+    position: absolute;
+    top: 50%;
+    font-family: "MedievalSharp";
+    left: 50%;
+    transform: translate(-50%, -65%);
+
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
+    height: 300px;
+    width: 600px;
+    justify-content: space-between;
+    padding: 2rem 1rem;
+    box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    position: absolute;
+    color: white;
+    font-weight: normal;
+
+    z-index: 30;
+    border-radius: 0.5rem;
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_grey.jpg");
+    background-size: cover;
+    gap: 2rem;
+
+    .dialogTitle {
+        letter-spacing: 1px;
+        font-size: 2rem;
+    }
+    .dialogContent {
+        font-size: 1.5rem;
+    }
+    .dialogButton {
+        font-size: 1.25rem;
+        border: none;
+        border-radius: 0.25rem;
+        padding: 0.5rem 1.75rem;
+
+        &[disabled="true"] {
+            color: red;
+        }
+    }
 }
 </style>

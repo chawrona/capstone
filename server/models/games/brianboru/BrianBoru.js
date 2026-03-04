@@ -219,4 +219,14 @@ export default class BrianBoru extends Game {
     buildAttackedCity(data) {
         return this.regions.buildAttackedCity(data);
     }
+
+    // @event
+    buildBoughtCity(data) {
+        return this.regions.buildBoughtCity(data);
+    }
+
+    // @event
+    removeVikings(data) {
+        return this.regions.removeVikings(data);
+    }
 }

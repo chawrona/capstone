@@ -69,10 +69,6 @@ export default class Regions {
         this.getCity(id).vikings = true;
     }
 
-    removeVikings(id) {
-        this.getCity(id).vikings = false;
-    }
-
     getRegionsData() {
         const regions = {};
         Object.entries(this.regions).forEach(([region, player]) => {
@@ -193,5 +189,19 @@ export default class Regions {
             this.game.currentPlayerIndex = newCurrentPlayerIndex;
             return this.game.sendGameDataToAll();
         }
+    }
+
+    // @event
+    buildBoughtCity(data) {
+        const cityId = data.data;
+        const player = this.getPlayer(data.publicId);
+        this.buildCity(cityId, player);
+        return this.game.cards.nextCardEffect();
+    }
+
+    // @event
+    removeVikings(data) {
+        this.getCity(data.data).vikings = false;
+        return this.game.cards.nextCardEffect();
     }
 }

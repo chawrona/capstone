@@ -31,31 +31,29 @@ export default class Marriages {
     }
 
     setPlayerMarriage(player, addLetter) {
-
-        const operation = addLetter === 0 ? "reset" : "add" 
+        const operation = addLetter === 0 ? "reset" : "add";
 
         let index = -1;
 
         this.marriages.forEach((marriage, currentIndex) => {
             if (marriage.username === player.username) {
-                index = currentIndex
+                index = currentIndex;
             }
-        })
+        });
 
         if (operation === "reset") {
-            this.marriages[index] = null
+            this.marriages[index] = null;
         } else {
+            index = Math.max(this.marriages.length - 1, index + addLetter);
 
-            index = Math.max(this.marriages.length - 1, index + addLetter)
-
-            while(this.marriages[index] !== null || index > 0) {
+            while (this.marriages[index] !== null || index > 0) {
                 if (this.marriages[index]) {
                     index--;
                 }
             }
 
             if (index >= 0) {
-                this.marriages[index] = player
+                this.marriages[index] = player;
             }
         }
     }
