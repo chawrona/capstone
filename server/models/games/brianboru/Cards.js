@@ -314,22 +314,86 @@ export default class Cards {
 
     // @event
     chooseCardEffect(data) {
-        const [, player] = this.chosenCards.shift();
+        const [card, player] = this.chosenCards.shift();
         player.setStatus(statuses.WAITING);
 
         console.log(data.data);
 
-        if (this.chosenCards.length === 0) {
-            player.setStatus(statuses.BUILD_ATTACKED_CITY);
-            this.game.setMessage(`${player.username} buduje miasto`);
+        const { chosenBottom, buyAdditional, buildCity} = data.data
+
+        const effects = chosenBottom === "bottom1" ? "bottom1" : "bottom2"
+
+        let letterCount = 0;
+        let buildingCity = false;
+        let removingVikings = false;
+
+        for (const effect of card[effects]) {
+            switch(effect) {
+                case "church":
+                    player.setData("church", (oldChurch) => oldChurch + 1 + buyAdditional)
+                    break;
+                case "letter":
+                   letterCount++;
+                    break;
+                case "axe":
+                    player.setData("vikings", (oldVikings) => Math.min(oldVikings + 1 + buyAdditional, this.game.vikings.currentVikings))
+                    break;
+                case "money_plus":
+                    player.setData("money", (oldMoney) => oldMoney + 1)
+                    break;
+                case "triquetra_5":
+                    if (buildCity) buildingCity = true;
+                    break;
+                case "money_minus":
+                    if (player.getData("money")) {
+                        player.setData("money", (oldMoney) => oldMoney - 1)
+                    } else {
+                        player.setData("points", (oldPoints) => Math.max(oldPoints - 2, 0))
+                    }
+                    break;
+                case "viking_shield":
+                    removingVikings = true
+                    break;
+            }   
+        }
+
+        if (letterCount) {
+            this.game.marriages.setPlayerMarriage(player, letterCount + additionalMoney);
+        } // @to-do odjąć marriages przy budowaniu miasta
+
+        if (buyAdditional) {
+            player.setData("money", (oldMoney) => oldMoney - additionalMoney)
+        }
+
+        const playerHasVikingsCity = false // wyliczyć to
+        if (removingVikings && playerHasVikingsCity) {
+            player.setStatus(statuses.REMOVE_VIKINGS); // dodać status i usuwanie wikingów
+            // ustawić dostępne miasta do odbijania 
+            this.game.setMessage(`${player.username} odbija miasto wikingom`);
             return this.game.sendGameDataToAll();
         }
 
-        const [, nextPlayer] = this.chosenCards[0];
 
-        nextPlayer.setStatus(statuses.CHOOSE_CARD_EFFECT);
-        this.game.setMessage(`${nextPlayer.username} wybiera efekt karty`);
+        if (buildingCity) {
+            player.setStatus(statuses.BUILD_BOUGHT_CITY); // dodać status i budowanie miasta
+            // ustawić dostępne miasta do budowania 
+            this.game.setMessage(`${player.username} buduje zakupione miasto`);
+            return this.game.sendGameDataToAll();
+        } else {
+            if (this.chosenCards.length === 0) {
+                player.setStatus(statuses.BUILD_ATTACKED_CITY);
+                this.game.setMessage(`${player.username} buduje miasto`);
+                return this.game.sendGameDataToAll();
+            }
 
-        return this.game.sendGameDataToAll();
+            const [, nextPlayer] = this.chosenCards[0];
+
+            nextPlayer.setStatus(statuses.CHOOSE_CARD_EFFECT);
+            this.game.setMessage(`${nextPlayer.username} wybiera efekt karty`);
+
+            return this.game.sendGameDataToAll();
+        }
+
+        
     }
 }
