@@ -1,0 +1,141 @@
+@import url("https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Jaini&display=swap");
+
+
+@font-face {
+  font-family: 'Minecraft';
+  font-style: normal;
+  font-weight: normal;
+  src: url('/minecraft.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Minecraft';
+  font-style: normal;
+  font-weight: bold;
+  src: url('/minecraftBold.otf') format('opentype');
+}
+
+
+input {
+  font-family: 'Minecraft';
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  &:not(input) {
+    user-select: none;
+  }
+}
+
+:root {
+  --kawa: #b61e1a;
+  --zboze: #fdd05d;
+  --herbata: #5e9b3d;
+  --wegiel: #63645d;
+  --sol: #f8faf8;
+  --guma: #b16d24;
+
+  --kawa-gradient: linear-gradient(
+    47deg,
+    rgba(182, 30, 26, 1) 0%,
+    rgba(200, 40, 35, 1) 25%,
+    rgba(171, 25, 22, 1) 50%,
+    rgba(140, 20, 18, 1) 74%,
+    rgba(110, 15, 13, 1) 100%
+  );
+  --zboze-gradient: linear-gradient(
+    47deg,
+    rgba(253, 208, 93, 1) 0%,
+    rgba(255, 220, 120, 1) 25%,
+    rgba(250, 200, 80, 1) 50%,
+    rgba(240, 190, 70, 1) 74%,
+    rgba(230, 180, 60, 1) 100%
+  );
+  --herbata-gradient: linear-gradient(
+    47deg,
+    rgb(88, 141, 59) 0%,
+    rgb(97, 161, 59) 25%,
+    rgb(98, 158, 61) 50%,
+    rgb(86, 143, 54) 74%,
+    rgb(83, 146, 49) 100%
+  );
+  --wegiel-gradient: linear-gradient(
+    47deg,
+    rgba(99, 100, 93, 1) 0%,
+    rgba(120, 122, 115, 1) 25%,
+    rgb(91, 92, 86) 50%,
+    rgb(92, 94, 86) 74%,
+    rgb(67, 68, 61) 100%
+  );
+  --sol-gradient: linear-gradient(
+    47deg,
+    rgba(248, 250, 248, 1) 0%,
+    rgba(255, 255, 255, 1) 25%,
+    rgba(240, 242, 240, 1) 50%,
+    rgba(230, 232, 230, 1) 74%,
+    rgba(220, 222, 220, 1) 100%
+  );
+  --guma-gradient: linear-gradient(
+    47deg,
+    rgba(177, 109, 36, 1) 0%,
+    rgb(202, 137, 67) 25%,
+    rgb(199, 120, 50) 50%,
+    rgb(201, 124, 52) 74%,
+    rgb(155, 94, 33) 100%
+  );
+}
+
+#app {
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  font-family: "Minecraft";
+  letter-spacing: 0.25px;
+  place-items: center;
+}
+
+button {
+  padding: 0.75rem 3rem;
+  cursor: pointer;
+  font-family: "Minecraft";
+  font-size: 1.25rem;
+}
+
+h1 {
+  font-size: 3.5rem;
+}
+
+input {
+  padding: 0.75rem 1rem;
+  font-size: 1.25rem;
+}
+
+.numberFont {
+  font-family: 'Minecraft';
+  font-size: 1.05em;
+  letter-spacing: 2px;
+}
+
+[data-card="herbata"] {
+  --bg: var(--herbata-gradient);
+}
+[data-card="zboze"] {
+  --bg: var(--zboze-gradient);
+}
+[data-card="kawa"] {
+  --bg: var(--kawa-gradient);
+}
+[data-card="wegiel"] {
+  --bg: var(--wegiel-gradient);
+}
+[data-card="sol"] {
+  --bg: var(--sol-gradient);
+}
+[data-card="guma"] {
+  --bg: var(--guma-gradient);
+}

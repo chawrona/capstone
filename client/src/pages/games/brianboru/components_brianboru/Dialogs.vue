@@ -41,6 +41,7 @@ const props = defineProps([
         :cards="gameData.cards"
         :phases="gameData.phases"
         :close-dialog="closeDialog"
+        :next-player="gameData.nextPlayer"
     />
 
     <VikingsDialog

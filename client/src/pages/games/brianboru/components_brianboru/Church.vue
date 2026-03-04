@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 
-import Church from "@/assets/games/gameAssets/brianboru/church_icon.png";
+import WhiteChurch from "@/assets/games/gameAssets/brianboru/church_white.png";
 
 const props = defineProps(["church", "marriage"]);
 
@@ -12,7 +12,7 @@ const change = () => (flag.value = !flag.value);
 
 <template>
     <div v-if="flag" class="church" @click="change">
-        <img :src="Church" alt="" class="icon" />
+        <img :src="WhiteChurch" alt="" class="icon" />
         <div class="players">
             <div
                 v-for="(color, index) in props.church"
@@ -39,11 +39,14 @@ const change = () => (flag.value = !flag.value);
     bottom: 0.5rem;
     right: 0.5rem;
     padding: 1.25rem 1rem;
-    border-radius: 0.5rem;
+    border-radius: 0.15rem;
     // background-color: white;
     gap: 2rem;
-    background-color: #ffffff11;
+    background-color: #aab8c45b;
     box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 0.314);
+    box-shadow:
+        rgba(204, 219, 232, 0.527) 3px 3px 6px 0px inset,
+        rgba(255, 255, 255, 0.259) -3px -3px 6px 1px inset;
     width: 202px;
     height: 283px;
     cursor: pointer;
@@ -66,7 +69,12 @@ const change = () => (flag.value = !flag.value);
 }
 
 .icon {
-    height: 96px;
+    height: 72px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.35;
 }
 
 .players {

@@ -4,11 +4,19 @@ const props = defineProps(["marriage", "closeDialog"]);
 
 <template>
     <div class="dialog">
-        <h1 class="dialogTitle">Proponowany partner</h1>
-        <p>Kliknij na kościół, aby sprawdzić</p>
-        <img
-            :src="`/src/assets/games/gameAssets/brianboru/${marriage.name.toLowerCase()}.jpg`"
-        />
+        <h1 class="dialogTitle">Śluby</h1>
+
+        <div class="dialogContent">
+            <p>
+                Kliknij na kościół, aby w dowolnym momencie sprawdzić aktualnego
+                proponowanego małżonka
+            </p>
+            <img
+                :src="`/src/assets/games/gameAssets/brianboru/${marriage.name.toLowerCase()}.jpg`"
+                class="marriageIcon"
+            />
+        </div>
+
         <button class="dialogButton" @click="props.closeDialog">
             Przynajmniej w grze mogę wziąć ślub
         </button>
@@ -22,7 +30,7 @@ const props = defineProps(["marriage", "closeDialog"]);
     z-index: 30;
     font-family: "MedievalSharp";
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -65%);
 
     display: flex;
     flex-direction: column;
@@ -30,22 +38,38 @@ const props = defineProps(["marriage", "closeDialog"]);
     position: absolute;
     color: white;
     font-weight: normal;
-    padding: 1.25rem 1rem;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/yellowCard.png");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_yellow.jpg");
     background-size: cover;
-    gap: 2rem;
-    box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
+    gap: 0rem;
 
-    img {
-        height: 300px;
-        border-radius: 0.25rem;
-    }
+    height: 300px;
+    width: 600px;
+    justify-content: space-between;
+    padding: 2rem 1rem;
+    box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
 
     .dialogTitle {
-        font-weight: normal;
         letter-spacing: 1px;
         font-size: 2rem;
+    }
+
+    .dialogContent {
+        display: flex;
+
+        justify-content: center;
+        gap: 1rem;
+        align-items: center;
+        font-size: 1.5rem;
+
+        width: 85%;
+    }
+
+    .marriageIcon {
+        transform: translateY(-10px);
+        height: 140px;
+        border-radius: 0.25rem;
     }
 
     .dialogButton {

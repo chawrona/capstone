@@ -1,12 +1,21 @@
 <script setup>
-const props = defineProps(["card"]);
+const props = defineProps(["card", "canChoose", "owner"]);
 </script>
 
 <template>
-    <div :type="props.card.type" :class="['card', $attrs.class]">
+    <div
+        :type="props.card.type"
+        :class="['card', { chooseCard: props.canChoose }, $attrs.class]"
+    >
         <div class="cardData">
             <div class="top">
-                <span class="cardId">{{ props.card.id }}</span>
+                <span
+                    class="cardId"
+                    :class="{ owned: props.owner }"
+                    :data-username="props.owner ? props.owner.username : ''"
+                >
+                    {{ props.card.id }}
+                </span>
                 <div class="topIcons">
                     <span v-for="(value, index) in props.card.top" :key="index">
                         <img
@@ -23,6 +32,7 @@ const props = defineProps(["card"]);
                     class="bottom1"
                     :class="{
                         singleBottom: props.card.bottom2.length === 0,
+                        lessGap: props.card.bottom1.length > 3,
                     }"
                 >
                     <span
@@ -36,7 +46,11 @@ const props = defineProps(["card"]);
                         />
                     </span>
                 </div>
-                <div v-if="props.card.bottom2.length > 0" class="bottom2">
+                <div
+                    v-if="props.card.bottom2.length > 0"
+                    class="bottom2"
+                    :class="{ lessGap: props.card.bottom2.length > 3 }"
+                >
                     <span
                         v-for="(value, index) in props.card.bottom2"
                         :key="index"
@@ -55,62 +69,127 @@ const props = defineProps(["card"]);
 
 <style scoped lang="scss">
 .card {
+    position: relative;
     display: flex;
-    box-shadow: 0px 0px 5px 4px rgba(0, 0, 0, 0.658);
     justify-content: space-between;
     // height: 135px;
     // width: 225px;
-    height: 220px;
     width: 145px;
+    height: 220px;
+    box-shadow: 0px 0px 5px 4px rgba(0, 0, 0, 0.658);
     border-radius: 0.25rem;
     overflow: hidden;
     flex-shrink: 0;
+    transition: 0.1;
 
     &[type="red"] {
         background-color: rgb(138, 0, 0);
-        // background-image: url("/src/assets/games/gameAssets/brianboru/redCard.png");
+        background-image: url("/src/assets/games/gameAssets/brianboru/red_card.png");
+
+        &::after {
+            content: "";
+            position: absolute;
+            width: 75px;
+            height: 75px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -32%);
+            opacity: 0.1;
+            background-image: url("/src/assets/games/gameAssets/brianboru/axe_white.png");
+        }
+
         .cardNumber,
         .top {
             background-color: #5b080800;
             color: rgb(247, 160, 160);
         }
 
-        .bottom1,
-        .bottom2,
-        .topIcons {
-            background-color: hsla(0, 84%, 17%, 0.443);
-        }
+        // .bottom1,
+        // .bottom2,
+        // .topIcons {
+        //     background-color: hsla(0, 84%, 17%, 0.443);
+        // }
     }
     &[type="blue"] {
         background-color: rgb(0, 64, 142);
-        // background-image: url("/src/assets/games/gameAssets/brianboru/blueCard.png");
+        background-image: url("/src/assets/games/gameAssets/brianboru/blue_card.png");
+
+        &::after {
+            content: "";
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            top: 50%;
+            left: 50%;
+            background-repeat: no-repeat;
+            background-position: center;
+            object-fit: cover;
+            transform: translate(-50%, -31%);
+            opacity: 0.1;
+            background-image: url("/src/assets/games/gameAssets/brianboru/church_white.png");
+        }
+
         .cardNumber,
         .top {
             color: rgb(147, 172, 241);
         }
-        .bottom1,
-        .bottom2,
-        .topIcons {
-            background-color: #0413455e;
-        }
+        // .bottom1,
+        // .bottom2,
+        // .topIcons {
+        //     background-color: #0413455e;
+        // }
     }
     &[type="yellow"] {
         background-color: rgb(136, 118, 0);
-        // background-image: url("/src/assets/games/gameAssets/brianboru/yellowCard.png");
+        background-image: url("/src/assets/games/gameAssets/brianboru/yellow_card.png");
+
+        &::after {
+            content: "";
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            top: 50%;
+            left: 50%;
+
+            background-repeat: no-repeat;
+            background-position: center;
+            object-fit: cover;
+            transform: translate(-50%, -45%);
+            opacity: 0.1;
+            background-image: url("/src/assets/games/gameAssets/brianboru/letter_white.png");
+        }
+
         .cardNumber,
         .top {
             color: rgb(246, 244, 142);
         }
-        .bottom1,
-        .bottom2,
-        .topIcons {
-            background-color: #3d38046b;
-            background-color: #3d38046b;
-        }
+        // .bottom1,
+        // .bottom2,
+        // .topIcons {
+        //     background-color: #3d38046b;
+        //     background-color: #3d38046b;
+        // }
     }
     &[type="gray"] {
         background-color: rgb(119, 119, 119);
-        // background-image: url("/src/assets/games/gameAssets/brianboru/grayCard.png");
+        background-image: url("/src/assets/games/gameAssets/brianboru/gray_card.png");
+
+        &::after {
+            content: "";
+            position: absolute;
+            width: 75px;
+            height: 75px;
+            top: 50%;
+            left: 50%;
+
+            background-repeat: no-repeat;
+            background-position: center;
+            object-fit: cover;
+            transform: translate(-50%, -29%);
+            opacity: 0.1;
+            background-image: url("/src/assets/games/gameAssets/brianboru/sword.svg");
+        }
+
         .cardNumber,
         .top {
             // background-color: #1e1e1e86;
@@ -142,17 +221,13 @@ const props = defineProps(["card"]);
 }
 
 .top {
-    height: 45px;
     display: flex;
-    align-items: center;
-    padding: 0.35rem;
-    padding-bottom: 0;
+    flex-direction: column;
+    align-items: left;
+    transition: 0.2s;
     border-radius: 0.15rem;
-
-    .resource-image {
-        height: 30px;
-    }
-
+    padding: 0.5rem;
+    gap: 0.5rem;
     .cardId {
         display: grid;
         place-items: center;
@@ -165,12 +240,23 @@ const props = defineProps(["card"]);
     }
 
     .topIcons {
-        width: 80%;
+        width: 100%;
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: space-evenly;
+        border-radius: 0.2rem;
+        gap: 0.3rem;
+        height: 30px;
+        padding: 0.5rem;
+        box-shadow: 1px 1px 5px black;
+        background-image: url("/src/assets/games/gameAssets/brianboru/white_card.png");
     }
+}
+
+.hidden .top {
+    gap: 0.25rem;
+    padding-top: 0.25rem;
 }
 
 .bottom {
@@ -186,20 +272,64 @@ const props = defineProps(["card"]);
 .bottom1,
 .bottom2 {
     display: flex;
-    justify-content: space-evenly;
-    height: 35px;
-    padding: 0.35rem;
+    justify-content: center;
+    gap: 0.3rem;
+    height: 30px;
+    padding: 0.5rem;
     width: 90%;
+    align-items: center;
+    background-color: #fff;
+    background-image: url("/src/assets/games/gameAssets/brianboru/white_card.png");
 
-    border-radius: 0.25rem;
+    // border: 3px solid #940a0a;
+
+    border-radius: 0.2rem;
+
+    box-shadow: 1px 1px 5px black;
 }
 
 .singleBottom {
     align-items: center;
-    height: 70px;
+    height: 30px;
 }
 
 .resource-image {
     height: 25px;
+}
+
+.chooseCard {
+    cursor: pointer;
+    box-shadow: 0 0 5px 3px rgba(255, 255, 255, 0.683);
+
+    &:hover {
+        filter: brightness(0.9);
+    }
+}
+
+.lessGap {
+    gap: 0.15rem;
+}
+
+.top .owned {
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.5rem;
+    padding-inline: 1px;
+
+    &::after {
+        content: attr(data-username);
+        position: absolute;
+        inset: 0;
+        display: grid;
+        align-items: center;
+        text-align: right;
+        font-weight: normal;
+        font-family: "MedievalSharp";
+        opacity: 0.5;
+        font-size: 0.85rem;
+    }
 }
 </style>

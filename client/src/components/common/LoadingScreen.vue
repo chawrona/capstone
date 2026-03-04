@@ -9,7 +9,7 @@ const { isLoading } = storeToRefs(store);
 </script>
 
 <template>
-    <Transition>
+    <Transition name="loadingScreen">
         <div v-if="isLoading" class="background">
             <img :src="Logo" alt="Logo" class="logo" />
             <p class="info">Loading. Please wait</p>

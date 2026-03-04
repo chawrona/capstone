@@ -76,7 +76,7 @@ const joinLobby = () => {
                     <button
                         class="theme-button join"
                         :data-awaiting="awaitingJoinLobby"
-                        :disabled="blockEverything || lobbyId.length < 6"
+                        :disabled="blockEverything || lobbyId.length < 0"
                     >
                         Dołącz
                     </button>

@@ -17,6 +17,9 @@ const statuses = {
     CHOOSE_ATTACKED_CITY: 8,
     CHOOSE_FIRST_CARD: 9,
     CHOOSE_CARD: 10,
+    CHOOSE_CARD_EFFECT: 11,
+
+    BUILD_ATTACKED_CITY: 12, // wybuduj miasto, które wygrałeś
 };
 
 export default statuses;

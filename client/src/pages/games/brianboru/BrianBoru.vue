@@ -3,6 +3,7 @@ import PauseScreen from "../../../components/common/PauseScreen.vue";
 import { usePageSounds } from "../../../composables/usePageSounds";
 import { useGamePause } from "../composables_games/useGamePause";
 import { useGameResize } from "../composables_games/useGameResize";
+import ChosenCards from "./components_brianboru/ChosenCards.vue";
 import Dialogs from "./components_brianboru/Dialogs.vue";
 import Island from "./components_brianboru/Island.vue";
 import Map from "./components_brianboru/Map.vue";
@@ -31,7 +32,11 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
             class="game"
             :style="{ transform: `scale(${scale})` }"
         >
-            <PlayerData :cards="gameData.cards" />
+            <PlayerData
+                :cards="gameData.cards"
+                :status="gameData.status"
+                :city-under-attack="gameData.cityUnderAttack"
+            />
             <TurnInfo :phases="gameData.phases" :message="gameData.message" />
             <Map
                 :current-vikings="gameData.currentVikings"
@@ -39,6 +44,7 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
                 :players="gameData.players"
                 :church="gameData.church"
                 :marriage="gameData.marriage"
+                :you="gameData.you"
             >
                 <Island
                     :city-under-attack="gameData.cityUnderAttack"
@@ -47,8 +53,17 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
                     :status="gameData.status"
                     :cities-to-attack="gameData.citiesToAttack"
                     :cities-to-cathedra="gameData.citiesToCathedra"
-                /> </Map
-            >/>
+                    :cities-to-vikings="gameData.citiesToVikings"
+                    :city-under-attack-type="gameData.cityUnderAttackType"
+                    :cards="gameData.cards"
+                />
+
+                <ChosenCards
+                    :chosen-cards="gameData.chosenCards"
+                    :you="gameData.you"
+                    :status="gameData.status"
+                />
+            </Map>
 
             <Dialogs
                 :game-data="gameData"
@@ -71,8 +86,7 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-    background-image: url("/src/assets/games/gameAssets/brianboru/background.webp");
-    // background-color: black;
+    background-color: rgb(0, 0, 0);
     overflow: hidden;
 }
 
@@ -88,6 +102,7 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
     margin-block: auto;
     transform-origin: top left;
     font-family: "Open sans";
+    overflow: hidden;
 
     * {
         user-select: none;

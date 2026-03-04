@@ -33,12 +33,16 @@ figcaption {
   text-wrap: pretty;
 }
 
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 1s ease;
+.loadingScreen-enter-active,
+.loadingScreen-leave-active {
+  transition: opacity 0.5s ease;
 }
 
-.v-enter-from,
-.v-leave-to {
+.loadingScreen-enter-from,
+.loadingScreen-leave-to {
   opacity: 0;
+}
+
+.loadingScreen-leave-to {
+  pointer-events: none;
 }

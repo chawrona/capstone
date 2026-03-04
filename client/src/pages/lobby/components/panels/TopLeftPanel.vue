@@ -34,7 +34,7 @@ const toggleReadyDisabled = ref(false);
 const blockButtons = () => {
     if (toggleReadyDisabled.value) return true;
     toggleReadyDisabled.value = true;
-    setTimeout(() => (toggleReadyDisabled.value = false), 1000);
+    setTimeout(() => (toggleReadyDisabled.value = false), 300);
 
     return false;
 };

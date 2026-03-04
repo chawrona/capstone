@@ -1,4 +1,6 @@
 import { cities, connections, regions } from "./config/cities.js";
+import dialogs from "./config/dialogs.js";
+import statuses from "./config/statuses.js";
 
 export default class Regions {
     constructor(game) {
@@ -6,6 +8,12 @@ export default class Regions {
         this.players = this.game.players;
 
         this.cityUnderAttack = null;
+        this.cityUnderAttackType = "";
+
+        this.citiesToAttack = [];
+        this.citiesToCathedra = [];
+        this.citiesToVikings = [];
+        this.citiesToBuild = [];
 
         this.regions = {
             // region: owner;
@@ -75,8 +83,12 @@ export default class Regions {
 
     getCitiesData() {
         const cities = {};
-        Object.entries(this.cities).forEach(([city, player]) => {
-            cities[city] = player ? player.getPlayerData() : null;
+        Object.entries(this.cities).forEach(([city, cityData]) => {
+            cities[city] = {
+                owner: cityData.owner.getPlayerData(),
+                vikings: cityData.vikings,
+                cathedra: cityData.cathedra,
+            };
         });
         return cities;
     }
@@ -86,8 +98,100 @@ export default class Regions {
             cityUnderAttack: this.cityUnderAttack,
             cities: this.getCitiesData(),
             regions: this.getRegionsData(),
-            citiesToAttack: [],
-            citiesToCathedra: [],
+            citiesToAttack: this.citiesToAttack,
+            citiesToCathedra: this.citiesToCathedra,
+            citiesToVikings: this.citiesToVikings,
+            citiesToBuild: this.citiesToBuild,
+            cityUnderAttackType: this.cityUnderAttackType,
         };
+    }
+
+    prepareCitiesToAttack(player) {
+        const playerCardTypes = new Set(
+            player.getData("cards").map((card) => card.type),
+        );
+
+        this.citiesToAttack = [...Array(44).keys()]
+            .map((index) => index + 1) // liczymy od 1 miasta
+            .filter(
+                (cityId) =>
+                    !(cityId in this.cities) &&
+                    (playerCardTypes.has("gray") ||
+                        playerCardTypes.has(cities[cityId].type)),
+            );
+    }
+
+    // region Events
+
+    // @event
+    chooseCityToAttack(data) {
+        const player = this.game.getPlayer(data.publicId);
+        if (
+            !player
+                .getData("cards")
+                .map((card) => card.type)
+                .includes(cities[data.data].type) &&
+            !player.getData("cards").some((card) => card.type === "gray")
+        )
+            throw new Error(
+                "Nie masz karty, którą mógłbyś zaatakować to miasto",
+            );
+
+        this.cityUnderAttack = data.data;
+        this.cityUnderAttackType = cities[this.cityUnderAttack].type;
+        console.log(
+            "Wybieramy typ atakowanego miasta: ",
+            cities[this.cityUnderAttack].type,
+            data.data,
+        );
+
+        this.citiesToAttack = [];
+        const firstPlayer = this.game.gameData.firstPlayer;
+        firstPlayer.setStatus(statuses.CHOOSE_FIRST_CARD);
+        this.game.setMessage(`${firstPlayer.username} wybiera kartę`);
+        return this.game.sendGameDataToAll();
+    }
+
+    // @event
+    buildAttackedCity(data) {
+        const player = this.game.getPlayer(data.publicId);
+
+        const newCurrentPlayerIndex = this.game.playersQueue.indexOf(
+            player.publicId,
+        );
+
+        this.citiesToBuild = [];
+
+        this.buildCity(this.cityUnderAttack, player);
+
+        this.game.gameData.firstPlayer.removeFirstPlayer();
+        player.setFirstPlayer();
+        this.game.gameData.firstPlayer = player;
+
+        this.game.gameData.phases.attacking.current++;
+
+        if (
+            this.game.gameData.phases.attacking.current >
+            this.game.gameData.phases.attacking.total
+        ) {
+            // Koniec fazy atakowania miast
+            return this.game.marriages.marriagesPhaseEnd();
+        } else {
+            // Atakujemy miasta dalej
+            this.game.cards.choosingCardsPhase = {
+                current: 1,
+                total: this.players.size,
+            };
+            this.game.addDialogToPlayers(dialogs.FIRST_PLAYER);
+            player.setStatus(statuses.CHOOSE_ATTACKED_CITY);
+            this.game.setMessage(`${player.username} wybiera miasto do ataku`);
+
+            this.cityUnderAttack = null;
+
+            this.prepareCitiesToAttack(player);
+
+            this.game.currentPlayerIndex = newCurrentPlayerIndex;
+            return this.game.sendGameDataToAll();
+        }
     }
 }

@@ -12,17 +12,19 @@ const infoSwitch = ref(true);
     </div>
     <div v-else class="turnInfo" @click="infoSwitch = !infoSwitch">
         <h1>
+            {{ console.log(props.phases.marriage) }}
+
             Faza {{ props.phases.marriage.current }}/{{
                 props.phases.marriage.total
-            }},
+            }}
             <span v-if="props.phases.current === 'passing'">
                 Odrzucanie kart {{ props.phases.passing.current }}/{{
                     props.phases.passing.total
                 }}
             </span>
             <span v-else>
-                Tura {{ props.phases.playing.current }}/{{
-                    props.phases.playing.total
+                Tura {{ props.phases.attacking.current }}/{{
+                    props.phases.attacking.total
                 }}
             </span>
         </h1>
@@ -43,7 +45,7 @@ const infoSwitch = ref(true);
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
 
-    border-radius: 0.5rem;
+    border-radius: 0.15rem;
     background-image: url("/src/assets/games/gameAssets/brianboru/brownTexture.png");
     box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
     cursor: pointer;

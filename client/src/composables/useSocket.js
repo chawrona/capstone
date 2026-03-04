@@ -55,7 +55,7 @@ export default function useSocket() {
         store.setLoading(true);
         setTimeout(() => {
             router.push(`/${data.lobbyId}/${data.gameTitle}`);
-        }, 3000);
+        }, 1000);
     });
 
     socket.on("error", (payload) => {

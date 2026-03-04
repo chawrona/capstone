@@ -4,43 +4,48 @@ const props = defineProps(["firstPlayer", "closeDialog"]);
 
 <template>
     <div class="dialog">
-        <h2 class="dialogTitle">Pierwszy gracz</h2>
-        <h2>
-            Znacznik pierwszego gracza wędruje do: {{ firstPlayer.username }}
-        </h2>
-        <p>Kolor: {{ firstPlayer.color }}</p>
+        <h1 class="dialogTitle">Pierwszy gracz</h1>
+
+        <div class="dialogContent">
+            <span :style="`--color: ${firstPlayer.color.hex}`">
+                {{ firstPlayer.username }}
+            </span>
+            zostaje pierwszym graczem
+        </div>
+
         <button class="dialogButton" @click="props.closeDialog">Dalej</button>
     </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .dialog {
     position: absolute;
     top: 50%;
     z-index: 30;
     font-family: "MedievalSharp";
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -65%);
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
 
-    height: 250px;
+    height: 300px;
     width: 600px;
+    justify-content: space-between;
+    padding: 2rem 1rem;
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     position: absolute;
-    color: white;
+    color: rgb(255, 255, 255);
     font-weight: normal;
-    padding: 1.25rem 1rem;
+
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/grayCard.png");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_grey.jpg");
     background-size: cover;
     gap: 2rem;
-    box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
+    box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
 
     .dialogTitle {
-        font-weight: normal;
         letter-spacing: 1px;
         font-size: 2rem;
     }
@@ -54,6 +59,10 @@ const props = defineProps(["firstPlayer", "closeDialog"]);
         &[disabled="true"] {
             color: red;
         }
+    }
+
+    .dialogContent {
+        font-size: 1.5rem;
     }
 }
 </style>

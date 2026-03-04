@@ -27,20 +27,10 @@ export default function useGameDialogs() {
     const openedDialog = ref(null);
     const allDialogs = ref(null);
 
-    const timeoutId = ref(null);
-
     onMounted(() => {
         if (!store.socket) return;
 
         store.socket.on("dialogs", (dialogs) => {
-            console.log("Dialogi: ", dialogs);
-
-            if (timeoutId.value) {
-                clearTimeout(timeoutId.value);
-                timeoutId.value = null;
-                openedDialog.value = dialogsQueue.value.get();
-            }
-
             dialogsQueue.value.set(dialogs);
             allDialogs.value = dialogs;
             if (openedDialog.value === null) {
@@ -54,15 +44,7 @@ export default function useGameDialogs() {
     });
 
     const closeDialog = () => {
-        if (dialogsQueue.value.getLength() > 0) {
-            openedDialog.value = dialogsQueue.value.get();
-        } else {
-            timeoutId.value = setTimeout(() => {
-                openedDialog.value = dialogsQueue.value.get();
-                timeoutId.value = null;
-            }, 300); // Magiczna liczba, tak naprawdę zależy miganie od tego jak szybko pakiet z nową informacją o dialogu pójdzie
-        }
-
+        openedDialog.value = dialogsQueue.value.get();
         store.emit("gameData", { eventName: "closeDialog" });
     };
 

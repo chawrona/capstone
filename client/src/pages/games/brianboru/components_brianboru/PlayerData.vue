@@ -1,9 +1,13 @@
 <script setup>
 import { computed, ref } from "vue";
 
+import { cities } from "../../../../../../server/models/games/brianboru/config/cities";
+import statuses from "../../../../../../server/models/games/brianboru/config/statuses";
+import { useAppStore } from "../../../../store/useAppStore";
 import Card from "./Card.vue";
 
-const props = defineProps(["cards"]);
+const props = defineProps(["cards", "status", "cityUnderAttack"]);
+const store = useAppStore();
 
 const cards = computed(() => {
     return props.cards[0]
@@ -16,6 +20,41 @@ const showCards = ref(true);
 const toggleCards = () => {
     showCards.value = !showCards.value;
 };
+
+const chooseCard = (card) => {
+    if (!canChooseCard(card.type)) {
+        console.log(card.type, cities[props.cityUnderAttack].type);
+
+        return alert("Nie możesz wybrać tej karty!");
+    }
+
+    if (props.status === statuses.CHOOSE_FIRST_CARD) {
+        store.emit("gameData", {
+            data: card.id,
+            eventName: "chooseFirstCard",
+        });
+    } else if (props.status === statuses.CHOOSE_CARD) {
+        store.emit("gameData", {
+            data: card.id,
+            eventName: "chooseCard",
+        });
+    } else {
+        alert("Nie możesz teraz użyć tej karty");
+    }
+};
+
+const canChooseCard = (cardType) => {
+    if (
+        props.status !== statuses.CHOOSE_CARD &&
+        props.status !== statuses.CHOOSE_FIRST_CARD
+    )
+        return;
+
+    if (props.status === statuses.CHOOSE_CARD) return true;
+    return (
+        cardType === "gray" || cardType === cities[props.cityUnderAttack].type
+    );
+};
 </script>
 
 <template>
@@ -26,6 +65,9 @@ const toggleCards = () => {
                 :key="card.id"
                 :card="card"
                 class="player-card"
+                :class="{ hidden: showCards }"
+                :can-choose="canChooseCard(card.type)"
+                @click="() => chooseCard(card)"
             />
         </div>
         <div class="toggle" @click="toggleCards">
@@ -41,6 +83,7 @@ const toggleCards = () => {
 
     position: absolute;
     bottom: 0.5rem;
+    bottom: calc(0.5rem - 157px);
     // background-color: rgba(255, 0, 0, 0.616);
 
     z-index: 2;
@@ -55,7 +98,7 @@ const toggleCards = () => {
     color: white;
     font-weight: bold;
     right: 0rem;
-    bottom: 0rem;
+
     transform: translateX(100%);
     width: 7rem;
     padding: 0.5rem;
@@ -71,7 +114,7 @@ const toggleCards = () => {
     }
 }
 .cards {
-    transform: translateY(75%);
+    transform: translateY(-71.5%);
     // flex-direction: column;
     align-items: center;
     margin-inline: auto;

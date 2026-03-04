@@ -114,6 +114,8 @@ export default class Vikings {
         }
     }
 
+    // region Events
+
     // @event
     chooseYourCityToVikings(data) {
         const cityId = data.data;

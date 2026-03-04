@@ -4,6 +4,8 @@ import BrianBoru from "./games/brianboru/BrianBoru.js";
 import BrianBoruPlayer from "./games/brianboru/BrianBoruPlayer.js";
 import Eurobusiness from "./games/eurobusiness/Eurobusiness.js";
 import Ludo from "./games/Ludo.js";
+import Philanthropists from "./games/philantropists/Philanthropists.js";
+import PhilanthropistsPlayer from "./games/philantropists/PhilanthropistsPlayer.js";
 
 export default class Lobby {
     constructor() {
@@ -34,6 +36,14 @@ export default class Lobby {
                     players,
                     () => this.endGame(),
                     this.id,
+                );
+                break;
+            case "philanthropists":
+                this.game = new Philanthropists(
+                    players,
+                    () => this.endGame(),
+                    this.id,
+                    PhilanthropistsPlayer,
                 );
                 break;
         }

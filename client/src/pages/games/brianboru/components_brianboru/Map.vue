@@ -11,14 +11,15 @@ const props = defineProps([
     "players",
     "church",
     "marriage",
+    "you",
 ]);
 </script>
 
 <template>
     <div class="map">
-        <Vikings :vikings="props.currentVikings" />
-        <Marriage :marriages="props.marriages" />
-        <Players :players="props.players" />
+        <Vikings :vikings="props.currentVikings" :players="props.players" />
+        <Marriage :marriages="props.marriages" :players="props.players" />
+        <Players :players="props.players" :you="props.you" />
         <Church :church="props.church" :marriage="marriage" />
         <slot />
     </div>

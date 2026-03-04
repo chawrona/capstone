@@ -5,7 +5,7 @@ import { useAppStore } from "@/store/useAppStore";
 
 import Card from "../Card.vue";
 
-const props = defineProps(["cards", "phases", "closeDialog"]);
+const props = defineProps(["cards", "phases", "closeDialog", "nextPlayer"]);
 const store = useAppStore();
 const selectedCards = ref(new Set());
 
@@ -42,13 +42,18 @@ const rejectCards = () => {
 
 <template>
     <div class="dialog">
-        <!-- <pre>
-            {{ props.cards[1] }}
-            {{ props.cards[0] }}
-        </pre> -->
-        <h2 class="dialogTitle">Wybierz 2 karty, które zostawisz</h2>
-        <div class="cards">
-            <Card
+      
+        <h1 class="dialogTitle">Przekazywanie kart</h1>
+        
+        
+        <div class="dialogContent">
+            <p>Wybierz 2 karty, które sobie zostawisz. 
+                <div class="player" :style="`--color: ${nextPlayer.color.hex}`"></div>
+                <span class="nextPlayer"  :style="`--color: ${nextPlayer.color.hex}`">
+                {{ nextPlayer.username }} 
+            </span> otrzyma pozostałe</p>
+            <div class="cards-wrap">
+<Card
                 v-for="card in cards"
                 :key="card.id"
                 :card="card"
@@ -58,7 +63,11 @@ const rejectCards = () => {
                 }"
                 @click="() => selectCard(card.id)"
             />
+            </div>
+            
         </div>
+
+
         <button
             class="dialogButton"
             :disabled="selectedCards.size < cardsToReject"
@@ -76,9 +85,10 @@ const rejectCards = () => {
     font-family: "MedievalSharp";
     left: 50%;
     z-index: 30;
-    transform: translate(-50%, -50%);
+   transform: translate(-50%, -65%);
 
-    height: 300px;
+
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
 
     display: flex;
     flex-direction: column;
@@ -86,20 +96,37 @@ const rejectCards = () => {
     position: absolute;
     color: white;
     font-weight: normal;
-    padding: 1.25rem 1rem;
+    padding: 1.2rem 2rem;
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/brownTexture.png");
+        background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_grey_big.jpg");
     background-size: cover;
-    gap: 2rem;
-    box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
+    gap: 0rem;
+  
+
+  height: 440px;
+    /* width: 600px; */
+    justify-content: space-between;
+    padding: 2rem 1rem;
+    box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
+
+
 
     .dialogTitle {
-        font-weight: normal;
         letter-spacing: 1px;
         font-size: 2rem;
     }
 
+    .dialogContent {
+        p {
+            max-width: none;
+            margin-block: 1rem;
+        }
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
     .dialogButton {
+        margin-top: 1rem;
         font-size: 1.25rem;
         border: none;
         border-radius: 0.25rem;
@@ -111,21 +138,46 @@ const rejectCards = () => {
     }
 }
 .selectedCard {
-    box-shadow: 0 0 5px 3px rgba(255, 255, 255, 0.515);
+
+    box-shadow: 0px 0px 5px 4px rgba(255, 255, 255, 0.658);
 }
 
 .card:not(.blockedCard),
 .selectedCard {
     &:hover {
         cursor: pointer;
-        filter: brightness(1.4);
+        filter: brightness(1.2);
     }
 }
 
-.cards {
+.cards-wrap {
     display: flex;
     justify-content: space-around;
     width: 100%;
-    gap: 1rem;
+    gap: 0rem;
+
+    .card {
+        scale: 0.9;
+    }
+}
+
+.nextPlayer {
+    font-weight: bold;
+    color: var(--color);
+}
+
+.player {
+    display: inline-block;
+    margin-right: 0.25ch;
+    transform: translateY(20%);
+     width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.349);
+    background-color: hsl(from var(--color) h s calc(l * 1));
+    box-shadow:
+        inset 0 1.5px 3px rgba(255, 255, 255, 0.576),
+        /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+        0 2px 3px rgba(0, 0, 0, 0.308);
 }
 </style>

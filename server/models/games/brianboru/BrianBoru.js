@@ -2,6 +2,7 @@ import Game from "../../Game.js";
 import Cards from "./Cards.js";
 import Church from "./Church.js";
 import dialogs from "./config/dialogs.js";
+import statuses from "./config/statuses.js";
 import Dialogs from "./Dialogs.js";
 import Marriages from "./Marriages.js";
 import Regions from "./Regions.js";
@@ -21,10 +22,28 @@ export default class BrianBoru extends Game {
     initializeGameData() {
         this.gameData.phases = {
             playing: { current: 1, total: 4 },
+            attacking: {
+                current: 1,
+                total:
+                    this.players.size === 5
+                        ? 4
+                        : this.players.size === 4
+                          ? 5
+                          : 7,
+            },
             current: "passing",
         };
         this.gameData.message = "Odrzucanie kart";
         this.gameData.firstPlayer = this.getCurrentPlayer().setFirstPlayer();
+    }
+
+    getNextPlayer(publicId) {
+        const playerIndex = this.playersQueue.indexOf(publicId);
+        const nextPlayerIndex = (playerIndex + 1) % this.playersQueue.length;
+
+        const nextPlayer = this.getPlayer(this.playersQueue[nextPlayerIndex]);
+
+        return nextPlayer;
     }
 
     setPlayerData(player) {
@@ -41,6 +60,8 @@ export default class BrianBoru extends Game {
         return data;
     }
 
+    // region GameData START
+
     generateGameData(publicId) {
         const player = this.getPlayer(publicId);
         return [
@@ -49,6 +70,8 @@ export default class BrianBoru extends Game {
                 eventName: "gameData",
                 data: {
                     cards: this.cards.getPlayerCards(player),
+                    chosenCards: this.cards.getChosenCards(),
+                    nextPlayer: this.getNextPlayer(publicId).getPlayerData(),
 
                     ...this.regions.getMapData(),
 
@@ -59,18 +82,21 @@ export default class BrianBoru extends Game {
                     phases: {
                         ...this.gameData.phases,
                         passing: this.cards.passingPhase,
-                        marragie: this.marriages.marriagePhase,
+                        marriage: this.marriages.marriagePhase,
                     },
 
                     status: player.getStatus(),
                     message: player.getPlayerStatus() ?? this.gameData.message,
                     players: this.generatePlayersData(),
                     firstPlayer: this.gameData.firstPlayer.getPlayerData(),
+                    you: player.getPlayerData(),
                 },
             },
             ...this.dialogs.generateDialogsQueue(publicId),
         ];
     }
+
+    // region GameData END
 
     sendGameDataToAll() {
         const data = [];
@@ -88,12 +114,23 @@ export default class BrianBoru extends Game {
         this.players.values().forEach((player) => player.setStatus(status));
     }
 
+    setMessage(message) {
+        this.gameData.message = message;
+    }
+
     addDialogToPlayers(dialog) {
         this.players.values().forEach((player) => player.addDialog(dialog));
     }
 
     resetEverything() {
         this.gameData.phases.playing.current++;
+        this.gameData.phases.attacking.current = 1;
+
+        if (
+            this.gameData.phases.playing.current >
+            this.gameData.phases.playing.total
+        )
+            throw new Error("Koniec gry");
 
         this.vikings.resetVikings();
         this.marriages.resetMarriages();
@@ -104,13 +141,24 @@ export default class BrianBoru extends Game {
 
         this.cards.resetCardDrawPhase();
 
-        this.gameData.phases = {
-            playing: { current: 1, total: 4 },
-            current: "passing",
-        };
+        this.gameData.phases.current = "passing";
 
         return this.sendGameDataToAll();
     }
+
+    startPlayingPhase() {
+        this.players
+            .values()
+            .forEach((player) => player.setStatus(statuses.WAITING));
+        this.gameData.firstPlayer.setStatus(statuses.CHOOSE_ATTACKED_CITY);
+
+        this.regions.prepareCitiesToAttack(this.gameData.firstPlayer);
+
+        this.gameData.message = `${this.gameData.firstPlayer.username} wybiera miasto do atakowania`;
+        this.gameData.phases.current = "playing";
+    }
+
+    // region Events
 
     // @event
     selectCardsToPass(data) {
@@ -124,26 +172,51 @@ export default class BrianBoru extends Game {
 
     // @event
     chooseYourCityToVikings(data) {
-        this.vikings.chooseYourCityToVikings(data);
+        return this.vikings.chooseYourCityToVikings(data);
     }
 
     // @event
     chooseSomeoneCityToVikings(data) {
-        this.vikings.chooseSomeoneCityToVikings(data);
+        return this.vikings.chooseSomeoneCityToVikings(data);
     }
 
     // @event
     marriageWinnerChooseReward(data) {
-        this.marriages.marriageWinnerChooseReward(data);
+        return this.marriages.marriageWinnerChooseReward(data);
     }
 
     // @event
     marriageCityReward(data) {
-        this.marriages.marriageCityReward(data);
+        return this.marriages.marriageCityReward(data);
     }
 
     // @event
     chooseCathedral(data) {
-        this.church.chooseCathedral(data);
+        return this.church.chooseCathedral(data);
+    }
+
+    // @event
+    chooseCityToAttack(data) {
+        return this.regions.chooseCityToAttack(data);
+    }
+
+    // @event
+    chooseFirstCard(data) {
+        return this.cards.chooseFirstCard(data);
+    }
+
+    // @event
+    chooseCard(data) {
+        return this.cards.chooseCard(data);
+    }
+
+    // @event
+    chooseCardEffect(data) {
+        return this.cards.chooseCardEffect(data);
+    }
+
+    // @event
+    buildAttackedCity(data) {
+        return this.regions.buildAttackedCity(data);
     }
 }

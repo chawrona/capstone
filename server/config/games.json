@@ -9,6 +9,15 @@
     "difficulty": "średni"
   },
   {
+    "title": "philanthropists",
+    "polishTitle": "Filantropi",
+    "maxPlayers": 4,
+    "minPlayers": 1,
+    "description": "Gra planszowa dla 2–4 osób, w której celem jest wprowadzenie wszystkich swoich czterech pionków na pola końcowe jako pierwszy.",
+    "time": "10-25 min.",
+    "difficulty": "średni"
+  },
+  {
     "title": "eurobusiness",
     "polishTitle": "Eurobiznes",
     "maxPlayers": 5,

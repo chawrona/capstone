@@ -51,41 +51,6 @@ export default class Marriages {
         };
     }
 
-    // @event
-    marriageWinnerChooseReward(data) {
-        const cityId = data.data;
-
-        const winningPlayer = this.game.getPlayer(data.publicId);
-
-        winningPlayer.setStatus(statuses.WAITING);
-
-        console.log(cityId); // zbudowaliśmy miasto, przełączamy się teraz na city winnera
-
-        const cityWinner = this.gameData.marriagesRewards.city;
-
-        if (!cityWinner) return this.game.vikings.vikingsPhaseEnd();
-
-        cityWinner
-            .setStatus(statuses.BUILD_CITY)
-            .addDialog(dialogs.MARRIAGE_REWARD_CITY);
-
-        this.game.gameData.message = `${cityWinner.username} buduje miasto`;
-
-        return this.game.sendGameDataToAll();
-    }
-
-    // @event
-    marriageCityReward(data) {
-        const cityId = data.data;
-        const cityWinner = this.getPlayer(data.publicId);
-
-        console.log(cityId); // zbudowaliśmy miasto, ogarniamy wikingów
-
-        cityWinner.setStatus(statuses.WAITING);
-
-        return this.game.vikings.vikingsPhaseEnd();
-    }
-
     marriagesPhaseEnd() {
         const rewards = [
             "",
@@ -151,5 +116,42 @@ export default class Marriages {
         }
 
         return this.game.sendGameDataToAll();
+    }
+
+    // region Events
+
+    // @event
+    marriageWinnerChooseReward(data) {
+        const cityId = data.data;
+
+        const winningPlayer = this.game.getPlayer(data.publicId);
+
+        winningPlayer.setStatus(statuses.WAITING);
+
+        console.log(cityId); // zbudowaliśmy miasto, przełączamy się teraz na city winnera
+
+        const cityWinner = this.gameData.marriagesRewards.city;
+
+        if (!cityWinner) return this.game.vikings.vikingsPhaseEnd();
+
+        cityWinner
+            .setStatus(statuses.BUILD_CITY)
+            .addDialog(dialogs.MARRIAGE_REWARD_CITY);
+
+        this.game.gameData.message = `${cityWinner.username} buduje miasto`;
+
+        return this.game.sendGameDataToAll();
+    }
+
+    // @event
+    marriageCityReward(data) {
+        const cityId = data.data;
+        const cityWinner = this.getPlayer(data.publicId);
+
+        console.log(cityId); // zbudowaliśmy miasto, ogarniamy wikingów
+
+        cityWinner.setStatus(statuses.WAITING);
+
+        return this.game.vikings.vikingsPhaseEnd();
     }
 }

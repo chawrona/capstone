@@ -25,7 +25,6 @@ export default class Game {
         this.gameEnded = false;
         this.lobbyId = lobbyId;
         this.eventEmmiter = new eventEmmiter();
-        console.log("XD 2");
     }
 
     useEventEmmiter(targets) {

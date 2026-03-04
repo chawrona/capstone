@@ -110,6 +110,8 @@ export default class Church {
         }
     }
 
+    // region Events
+
     // @event
     chooseCathedral(data) {
         const cityId = data.data;

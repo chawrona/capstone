@@ -24,6 +24,12 @@ const routes = [
         path: "/:id/brianboru",
     },
     {
+        component: () =>
+            import("@/pages/games/philanthropists/Philanthropists.vue"),
+        name: "philanthropists",
+        path: "/:id/philanthropists",
+    },
+    {
         component: () => import("@/pages/lobby/LobbyPage.vue"),
         name: "lobby",
         path: "/:id",

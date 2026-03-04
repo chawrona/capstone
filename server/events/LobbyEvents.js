@@ -68,15 +68,42 @@ export default class LobbyEvents {
 
     onJoinLobby({ userId, data: { lobbyId } }) {
         try {
+            if (process.env.DEVELOPMENT) {
+                lobbyId = this.lobbyManager.lobbies.entries().next().value[0];
+            }
+
             const lobby = this.lobbyManager.getLobby(lobbyId);
 
             this.eventHelper.checkIfLobbyActive(lobby);
 
             const user = this.userManager.getUser(userId);
 
+            if (process.env.DEVELOPMENT) {
+                console.log(lobby.users.size);
+
+                user.color = {
+                    name:
+                        lobby.users.size === 1
+                            ? "blue"
+                            : lobby.users.size === 2
+                              ? "green"
+                              : "yellow",
+                    hex:
+                        lobby.users.size === 1
+                            ? "#3b82f6"
+                            : lobby.users.size === 2
+                              ? "#22c55e"
+                              : "#facc15",
+                };
+
+                console.log(user.color);
+            }
+
             if (user.lobbyId) throw new UserInLobbyError();
 
-            user.color = null;
+            if (!process.env.DEVELOPMENT) {
+                user.color = null;
+            }
 
             lobby.joinUser(userId);
             user.lobbyId = lobbyId;
