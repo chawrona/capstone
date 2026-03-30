@@ -1,4 +1,5 @@
 <script setup>
+import { soundBus } from "../../../../audio/soundBus";
 import { useAppStore } from "../../../../store/useAppStore";
 import SrodekKarty from "../SrodekKarty.vue";
 // import useSound from "../../composables/useSound";
@@ -26,13 +27,16 @@ const sprzedaj = (typ) => {
         data: typ,
         eventName: "sprzedaj",
     });
+
+    soundBus.playEffect("sell");
 };
 </script>
 
 <template>
     <div class="karty">
         <div
-            v-for="typ in sortKarty(props.gameData.karty)"
+            v-for="(typ, i) in sortKarty(props.gameData.karty)"
+            :key="i"
             class="card"
             :data-typ="typ"
             :style="`background-color: var(--${typ})`"

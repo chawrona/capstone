@@ -1,61 +1,111 @@
 <script setup>
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
+// import crown from "@/assets/games/gameAssets/philanthropists/crown.png";
+// import user from "@/assets/games/gameAssets/philanthropists/user.png";
+// import trash from "@/assets/games/gameAssets/philanthropists/villager.png";
+import { useRoute, useRouter } from "vue-router";
 
-import crown from "@/assets/games/gameAssets/philanthropists/crown.png";
-import user from "@/assets/games/gameAssets/philanthropists/user.png";
-import trash from "@/assets/games/gameAssets/philanthropists/villager.png";
-
+import { soundBus } from "../../../audio/soundBus";
+import { useAppStore } from "../../../store/useAppStore";
 import SrodekKarty from "./SrodekKarty.vue";
 
 // import useSound from "../composables/useSound";
 const coPokazujemyRef = ref(false);
 
 const props = defineProps(["gameData"]);
+const router = useRouter();
+const route = useRoute();
+const store = useAppStore();
+
+const getButtonText = computed(() => {
+    // Pierwszy panel
+    if (!coPokazujemyRef.value) return "Dalej";
+    // Drugi panel
+    if (coPokazujemyRef.value && !props.gameData.koniecGry) return "Zamknij";
+    if (coPokazujemyRef.value === "koniec") return "Lobby";
+    // Trzeci panel
+    if (
+        coPokazujemyRef.value &&
+        coPokazujemyRef.value !== "koniec" &&
+        props.gameData.koniecGry
+    )
+        return "Dalej";
+
+    return undefined;
+});
+
+const getTableText = computed(() => {
+    // Pierwszy panel
+    if (!coPokazujemyRef.value) return "Przekazane karty";
+    // Drugi panel
+    if (coPokazujemyRef.value && !props.gameData.koniecGry)
+        return "Tabela filantropów";
+    if (
+        coPokazujemyRef.value &&
+        coPokazujemyRef.value !== "koniec" &&
+        props.gameData.koniecGry
+    )
+        return "Końcowa tabela filantropów";
+    // Trzeci panel
+    if (coPokazujemyRef.value === "koniec") return "Podsumowanie";
+    return undefined;
+});
+
+const showPodsumowanieFazy = ref(false);
+
+watch(
+    () => props.gameData.podsumowanieFazy,
+    (newValue) => {
+        // if (newValue === true) useSound("Wygrana");
+        if (newValue === true) {
+            showPodsumowanieFazy.value = true;
+            coPokazujemyRef.value = true;
+        }
+    },
+);
 
 const dunno = () => {
-    if (!coPokazujemyRef.value) coPokazujemyRef.value = true;
-    else {
-        if (coPokazujemyRef.value === "koniec") props.gameData.active = false;
-
-        if (props.gameData.koniecGry) {
-            // if (coPokazujemyRef.value !== "koniec") useSound("Koniec gry", 0.5);
-            coPokazujemyRef.value = "koniec";
-        } else {
-            props.gameData.podsumowanieFazy = false;
-        }
+    if (!coPokazujemyRef.value) {
+        coPokazujemyRef.value = true;
+    } else if (coPokazujemyRef.value && !props.gameData.koniecGry) {
+        showPodsumowanieFazy.value = false;
+    } else if (
+        coPokazujemyRef.value &&
+        coPokazujemyRef.value !== "koniec" &&
+        props.gameData.koniecGry
+    ) {
+        coPokazujemyRef.value = "koniec";
+    } else if (coPokazujemyRef.value === "koniec") {
+        soundBus.playMusic("soundtrack");
+        store.setLoading(true);
+        setTimeout(() => {
+            router.push(`/${props.gameData.lobbyId}`);
+        }, 1000);
     }
 };
-
-// watch(() => props.gameData.podsumowanieFazy, (newValue) => {
-//     if (newValue === true) useSound("Wygrana");
-// });
 </script>
 
 <template>
-    <div v-if="props.gameData.podsumowanieFazy" class="dropdown"></div>
+    <div v-if="showPodsumowanieFazy" class="dropdown"></div>
 
-    <div v-if="props.gameData.podsumowanieFazy" class="div">
-        <h1 class="podsumowanko">
-            {{
-                coPokazujemyRef === "koniec"
-                    ? "Podsumowanie"
-                    : !coPokazujemyRef
-                      ? "Przekazane karty"
-                      : !props.gameData.koniecGry
-                        ? "Tabela filantropów"
-                        : "Końcowa tabela filantropów"
-            }}
-        </h1>
+    <div v-if="showPodsumowanieFazy" class="div">
+        <h1 class="podsumowanko">{{ getTableText }}</h1>
 
         <div v-if="!coPokazujemyRef" class="gracze">
             <div
-                v-for="podsumowanie in props.gameData.podsumowanieFilantropii"
+                v-for="(podsumowanie, i) in props.gameData
+                    .podsumowanieFilantropii"
+                :key="i"
                 class="jedenGracz"
             >
                 <p class="nick">{{ podsumowanie.nick }}</p>
                 <div class="tabela1">
                     <div class="row">
-                        <div v-for="karta in podsumowanie.karty" class="karta">
+                        <div
+                            v-for="(karta, i2) in podsumowanie.karty"
+                            :key="i2"
+                            class="karta"
+                        >
                             <div
                                 class="card"
                                 :data-typ="karta.typ"
@@ -69,6 +119,7 @@ const dunno = () => {
                 </div>
             </div>
         </div>
+
         <div v-if="coPokazujemyRef === true" class="tabelaFilantropii">
             <div class="row1">
                 <div class="td">Gracz</div>
@@ -77,6 +128,7 @@ const dunno = () => {
             </div>
             <div
                 v-for="gracz in props.gameData.podsumowanieWynikow"
+                :key="gracz.kolor"
                 class="row1"
                 :class="gracz.kolor"
                 :style="`--lastOrder: ${gracz.lastOrder}; --order: ${gracz.order}`"
@@ -92,6 +144,7 @@ const dunno = () => {
                 {{ console.log(props.gameData.koniecDane) }}
                 <p
                     v-for="(gracz, index) in props.gameData.koniecDane"
+                    :key="index"
                     :class="
                         index === 0
                             ? 'filantrop'
@@ -111,38 +164,17 @@ const dunno = () => {
                     />
                     {{
                         index === 0
-                            ? "Real Player:"
+                            ? "Prawdziwy Filantrop:"
                             : index === props.gameData.koniecDane.length - 1
-                              ? "Villager: "
-                              : "Regular:"
+                              ? "Hazardzista: "
+                              : "Aspirujący filantrop:"
                     }}
                     <span class="white">{{ gracz.name }}</span>
                 </p>
             </div>
-            <div class="wyniczki">
-                <p>Tabela rekordów</p>
-                <ul>
-                    <li v-for="(rekord, index) in props.gameData.rekordy">
-                        <span
-                            >{{ index + 1 }}. {{ rekord.name }} -
-                            {{ rekord.hajs }}<span class="hajss">$</span></span
-                        >
-                    </li>
-                </ul>
-            </div>
         </div>
 
-        <button class="button" @click="dunno">
-            {{
-                coPokazujemyRef === "koniec"
-                    ? "Menu"
-                    : !coPokazujemyRef
-                      ? "Dalej"
-                      : props.gameData.koniecGry
-                        ? "Dalej"
-                        : "Zamknij"
-            }}
-        </button>
+        <button class="button" @click="dunno">{{ getButtonText }}</button>
     </div>
 </template>
 
@@ -197,7 +229,7 @@ const dunno = () => {
     margin-bottom: 0.25rem;
     font-size: 3rem;
     img {
-        width: 6rem;
+        width: 5rem;
         filter: drop-shadow(3px 3px 5px black);
     }
     text-shadow: 2px 2px 5px rgb(0, 0, 0);
@@ -229,7 +261,7 @@ const dunno = () => {
     text-shadow: 2px 2px 5px rgb(0, 0, 0);
     margin-top: 0.5rem;
     img {
-        width: 7rem;
+        width: 4rem;
         margin-left: -0.5rem;
         filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.877));
     }
@@ -494,10 +526,9 @@ const dunno = () => {
 
 .dropdown {
     position: absolute;
-    width: 1920px;
-    top: 0;
-    left: 0;
-    height: 1080px;
+
+    inset: 0;
+
     background-color: rgba(0, 0, 0, 0.473);
     z-index: -1;
     z-index: 99999;

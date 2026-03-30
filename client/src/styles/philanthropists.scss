@@ -1,24 +1,22 @@
 @import url("https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Jaini&display=swap");
 
-
 @font-face {
-  font-family: 'Minecraft';
+  font-family: "Minecraft";
   font-style: normal;
   font-weight: normal;
-  src: url('/minecraft.otf') format('opentype');
+  src: url("/minecraft.otf") format("opentype");
 }
 
 @font-face {
-  font-family: 'Minecraft';
+  font-family: "Minecraft";
   font-style: normal;
   font-weight: bold;
-  src: url('/minecraftBold.otf') format('opentype');
+  src: url("/minecraftBold.otf") format("opentype");
 }
 
-
 input {
-  font-family: 'Minecraft';
+  font-family: "Minecraft";
 }
 
 * {
@@ -116,7 +114,7 @@ input {
 }
 
 .numberFont {
-  font-family: 'Minecraft';
+  font-family: "Minecraft";
   font-size: 1.05em;
   letter-spacing: 2px;
 }

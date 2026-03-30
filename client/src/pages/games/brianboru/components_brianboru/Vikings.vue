@@ -72,7 +72,8 @@ const data = [
 
         <div class="rightContainer">
             <div
-                v-for="player in props.players"
+                v-for="(player, i) in props.players"
+                :key="i"
                 class="playerData"
                 :style="`--color: ${player.color.hex}`"
             >
@@ -154,6 +155,7 @@ const data = [
 
 .vikingsWrapper {
     padding: 0.5rem;
+    z-index: 3;
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;

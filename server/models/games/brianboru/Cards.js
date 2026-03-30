@@ -11,6 +11,7 @@ export default class Cards {
 
         this.passingPhase = { current: 1, total: 3 };
         this.choosingCardsPhase = { current: 1, total: this.players.size };
+        this.hideCards = true;
 
         this.chosenCards = [];
         // this.chosenCards = [
@@ -114,6 +115,20 @@ export default class Cards {
             card,
             player.getPlayerData(),
         ]);
+    }
+
+    startRejectPhase() {
+        this.hideCards = false;
+        this.game.setMessage("Odrzucanie kart");
+
+        this.game.addDialogToPlayers(dialogs.FIRST_PLAYER);
+        this.game.addDialogToPlayers(dialogs.VIKINGS);
+        this.game.addDialogToPlayers(dialogs.MARRIAGE);
+        this.game.addDialogToPlayers(dialogs.REJECT_CARDS);
+
+        this.game.setPlayersStatus(statuses.REJECT_CARDS);
+
+        return this.game.sendGameDataToAll();
     }
 
     passCards() {
@@ -314,28 +329,29 @@ export default class Cards {
 
     // @event
     chooseCardEffect(data) {
+        // { chosenBottom: 'top', buyAdditional: 0, buildCity: false }
         const [card, player] = this.chosenCards.shift();
         player.setStatus(statuses.WAITING);
 
-        console.log(data.data);
+        console.log(card);
 
         const { chosenBottom, buyAdditional, buildCity } = data.data;
 
-        const effects = chosenBottom === "bottom1" ? "bottom1" : "bottom2";
+        const effects = chosenBottom;
 
         let letterCount = 0;
+        let churchCount = 0;
         let buildingCity = false;
         let removingVikings = false;
 
         for (const effect of card[effects]) {
             switch (effect) {
                 case "church":
-                    player.setData(
-                        "church",
-                        (oldChurch) => oldChurch + 1 + buyAdditional,
-                    );
+                    churchCount++;
                     break;
                 case "letter":
+                    console.log("Dodano letter");
+
                     letterCount++;
                     break;
                 case "axe":
@@ -367,28 +383,36 @@ export default class Cards {
             }
         }
 
+        if (churchCount) {
+            player.setData(
+                "church",
+                (oldChurch) => oldChurch + churchCount + buyAdditional,
+            );
+        }
+
         if (letterCount) {
+            console.log(letterCount + buyAdditional);
+
             this.game.marriages.setPlayerMarriage(
                 player,
                 letterCount + buyAdditional,
             );
-        } // @to-do odjąć marriages przy budowaniu miasta
+        }
 
         if (buyAdditional) {
             player.setData("money", (oldMoney) => oldMoney - buyAdditional * 2);
         }
 
-        const playerHasVikingsCity = false; // wyliczyć to
-        if (removingVikings && playerHasVikingsCity) {
-            player.setStatus(statuses.REMOVE_VIKINGS); // dodać status i usuwanie wikingów
-            // ustawić dostępne miasta do odbijania
+        if (removingVikings && this.game.regions.doesPlayerHasVikings(player)) {
+            player.setStatus(statuses.REMOVE_VIKINGS);
+            this.game.regions.setCitiesToRemoveVikings(player);
             this.game.setMessage(`${player.username} odbija miasto wikingom`);
             return this.game.sendGameDataToAll();
         }
 
         if (buildingCity) {
-            player.setStatus(statuses.BUILD_BOUGHT_CITY); // dodać status i budowanie miasta
-            // ustawić dostępne miasta do budowania
+            player.setStatus(statuses.BUILD_BOUGHT_CITY);
+            this.game.regions.setCitiesToBuy(player);
             this.game.setMessage(`${player.username} buduje zakupione miasto`);
             return this.game.sendGameDataToAll();
         } else {
@@ -399,9 +423,7 @@ export default class Cards {
     // @event
     nextCardEffect(player) {
         if (this.chosenCards.length === 0) {
-            player.setStatus(statuses.BUILD_ATTACKED_CITY);
-            this.game.setMessage(`${player.username} buduje miasto`);
-            return this.game.sendGameDataToAll();
+            return this.game.regions.buildAttackedCity(player);
         }
 
         const [, nextPlayer] = this.chosenCards[0];
@@ -417,12 +439,8 @@ export default class Cards {
 /*
 dialog wybierania efektów
 
-usuwanie marriages na koniec
-
 usuwanie wikingów
-
 budowanie kupowanego miasta
-
 
 
 

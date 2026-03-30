@@ -3,6 +3,8 @@ import { ref, watch } from "vue";
 
 import gwiazda from "@/assets/games/gameAssets/philanthropists/gwiazda.png";
 
+import { soundBus } from "../../../../audio/soundBus";
+
 // import useSound from "../../composables/useSound";
 
 const props = defineProps(["gameData"]);
@@ -25,9 +27,13 @@ const startCountdown = () => {
     interval = setInterval(() => {
         if (props.gameData.pauza) return;
 
-        //  if (czas.value < 11 && props.gameData.active) {
-        //   useSound("Tykanie zegara")
-        //  }
+        if (
+            czas.value < 11 &&
+            props.gameData.active &&
+            props.gameData.twojaTura
+        ) {
+            soundBus.playEffect("tick");
+        }
 
         if (czas.value > 0) {
             czas.value--;
@@ -86,6 +92,7 @@ const getStyle = (index) => {
 
             <div
                 v-for="(gracz, index) in props.gameData.gracze"
+                :key="index"
                 class="gracz"
                 :data-gracz="index"
                 :style="getStyle(index)"
@@ -108,7 +115,8 @@ const getStyle = (index) => {
                 <div class="filantropiaInfo">
                     <div class="filantropiaKarty">
                         <div
-                            v-for="karta in gracz.filantropiaKarty"
+                            v-for="(karta, index2) in gracz.filantropiaKarty"
+                            :key="index2"
                             :class="{ jestKarta: karta }"
                             class="karta"
                         ></div>

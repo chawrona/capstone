@@ -43,7 +43,11 @@ const kup = (typ) => {
                     <Specjalny :game-data="props.gameData" />
                 </div>
 
-                <div v-for="(row, index) in props.gameData.plansza" class="row">
+                <div
+                    v-for="(row, index) in props.gameData.plansza"
+                    :key="index"
+                    class="row"
+                >
                     <img
                         v-if="index === 0"
                         class="ikoneczka1 wegiel"
@@ -133,6 +137,7 @@ const kup = (typ) => {
         <div class="karty">
             <div
                 v-for="(type, index) in Object.entries(props.gameData.bank)"
+                :key="index"
                 class="card"
                 :class="type[1] === 0 ? 'wyzerowane' : ''"
                 :data-card="type"

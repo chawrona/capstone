@@ -1,14 +1,30 @@
 <script setup>
-const props = defineProps(["card", "canChoose", "owner"]);
+const props = defineProps([
+    "card",
+    "canChoose",
+    "owner",
+    "callback",
+    "chooseBottoms",
+    "callback",
+    "chooseTop",
+]);
 </script>
 
 <template>
     <div
         :type="props.card.type"
-        :class="['card', { chooseCard: props.canChoose }, $attrs.class]"
+        :class="[
+            'card',
+            {
+                chooseCard: props.canChoose,
+                chosingBottoms: props.chooseBottoms,
+                chosingTop: props.chooseTop,
+            },
+            $attrs.class,
+        ]"
     >
         <div class="cardData">
-            <div class="top">
+            <div class="top" @click="() => callback('top', card)">
                 <span
                     class="cardId"
                     :class="{ owned: props.owner }"
@@ -34,6 +50,7 @@ const props = defineProps(["card", "canChoose", "owner"]);
                         singleBottom: props.card.bottom2.length === 0,
                         lessGap: props.card.bottom1.length > 3,
                     }"
+                    @click="() => callback('bottom1', card)"
                 >
                     <span
                         v-for="(value, index) in props.card.bottom1"
@@ -50,6 +67,7 @@ const props = defineProps(["card", "canChoose", "owner"]);
                     v-if="props.card.bottom2.length > 0"
                     class="bottom2"
                     :class="{ lessGap: props.card.bottom2.length > 3 }"
+                    @click="() => callback('bottom2', card)"
                 >
                     <span
                         v-for="(value, index) in props.card.bottom2"
@@ -221,6 +239,7 @@ const props = defineProps(["card", "canChoose", "owner"]);
 }
 
 .top {
+    z-index: 3;
     display: flex;
     flex-direction: column;
     align-items: left;
@@ -260,6 +279,7 @@ const props = defineProps(["card", "canChoose", "owner"]);
 }
 
 .bottom {
+    z-index: 3;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -299,10 +319,38 @@ const props = defineProps(["card", "canChoose", "owner"]);
 
 .chooseCard {
     cursor: pointer;
-    box-shadow: 0 0 5px 3px rgba(255, 255, 255, 0.683);
+    box-shadow: 0 0 5px 3px rgba(175, 218, 238, 0.712);
+}
 
-    &:hover {
-        filter: brightness(0.9);
+.chosingBottoms {
+    filter: brightness(1.1);
+    .bottom1,
+    .bottom2 {
+        cursor: pointer;
+        filter: brightness(1);
+
+        &:hover {
+            filter: brightness(0.9);
+        }
+    }
+
+    .topIcons {
+        filter: brightness(0.7);
+    }
+}
+
+.chosingTop {
+    filter: brightness(1.1);
+    .bottom1,
+    .bottom2 {
+        filter: brightness(0.7);
+    }
+    .top {
+        cursor: pointer;
+        filter: brightness(1);
+        &:hover {
+            filter: brightness(0.9);
+        }
     }
 }
 
@@ -329,7 +377,7 @@ const props = defineProps(["card", "canChoose", "owner"]);
         font-weight: normal;
         font-family: "MedievalSharp";
         opacity: 0.5;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
 }
 </style>

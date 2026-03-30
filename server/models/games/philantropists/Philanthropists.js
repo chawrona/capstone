@@ -8,7 +8,7 @@ export default class Philanthropists extends Game {
         this.gracze = Array.from(this.players.values());
 
         this.gracze.forEach((gracz, index) => {
-            (gracz.setData("index", () => index), console.log(gracz));
+            gracz.setData("index", () => index);
         });
 
         this.active = false;
@@ -25,6 +25,8 @@ export default class Philanthropists extends Game {
         this.tury = 4;
 
         this.czat = [];
+
+        this.coAktualnieKupil = [];
 
         this.firstPlayerIndex = 0;
         this.whosTurn = 0;
@@ -51,6 +53,8 @@ export default class Philanthropists extends Game {
         this.czyMozekupic = true;
 
         this.licznikSprzedazyLubKupowania = 0;
+
+        this.soundToPlay = null;
 
         this.bank = {
             wegiel: 10,
@@ -251,6 +255,7 @@ export default class Philanthropists extends Game {
                 name: gracz.username,
                 dotacje: gracz.filantropiaHajs,
                 hajs: gracz.hajs,
+                hajsf: gracz.filantropiaHajs,
                 kolor: this.orderKolor(this.thisGraczOrder(gracz.data.index)),
                 lastOrder: gracz.lastOrder ? gracz.lastOrder : gracz.data.index,
                 order: this.thisGraczOrder(gracz.data.index),
@@ -259,32 +264,7 @@ export default class Philanthropists extends Game {
             gracz.lastOrder = this.thisGraczOrder(gracz.data.index);
         }
         this.podsumowanieWynikow = podsumowanie;
-    }
-
-    generujeWynikow() {
-        const podsumowanie = [];
-
-        for (const gracz of this.gracze) {
-            podsumowanie.push({
-                name: gracz.username,
-                hajs: gracz.hajs,
-                hajsf: gracz.filantropiaHajs,
-            });
-        }
-
-        podsumowanie.sort((a, b) => a.hajs - b.hajs);
-
-        let minHajsfIndex = 0;
-        for (let i = 1; i < podsumowanie.length; i++) {
-            if (podsumowanie[i].hajsf < podsumowanie[minHajsfIndex].hajsf) {
-                minHajsfIndex = i;
-            }
-        }
-
-        const [minHajsfObj] = podsumowanie.splice(minHajsfIndex, 1);
-        podsumowanie.push(minHajsfObj);
-
-        return podsumowanie;
+        this.koniecDane = podsumowanie.sort((a, b) => a.order - b.order);
     }
 
     generujDaneDoRekordow() {
@@ -420,6 +400,8 @@ export default class Philanthropists extends Game {
 
         this.whosTurn++;
 
+        this.coAktualnieKupil = [];
+
         if (this.whosTurn > this.gracze.length - 1) this.whosTurn = 0;
 
         if (this.whosTurn === this.firstPlayerIndex) {
@@ -431,6 +413,10 @@ export default class Philanthropists extends Game {
                 this.tura++;
                 this.timer.setTimer(60);
 
+                for (const gracz of this.gracze) {
+                    gracz.hajs += this.tura - 1 * 25;
+                }
+
                 if (this.tura > this.tury) {
                     this.generujPodsumowanieFilantropii();
                     this.generujPodsumowanieWynikow();
@@ -440,10 +426,9 @@ export default class Philanthropists extends Game {
                     this.faza = this.fazy;
                     this.tura = this.tury;
 
-                    this.koniecDane = this.generujeWynikow();
-
+                    this.endGame();
                     this.active = false;
-
+                    clearInterval(this.intervalId);
                     return this.wyslijObiektyGraczom();
                 } else {
                     this.log("Nowa tura");
@@ -455,9 +440,56 @@ export default class Philanthropists extends Game {
                 this.generujKartyGry();
                 this.podsumowanieFazy = true;
             } else {
+                this.podsumowanieFazy = false;
                 this.log(
                     `Nowa faza - ${this.faza % 2 == 0 ? "manipulacja" : "kupowanie/sprzedawanie"}`,
                 );
+
+                if (this.faza % 2 === 0) {
+                    this.log("Rynek się stabilizuje");
+
+                    const wartosci = this.plansza.map((s) => s.current);
+                    const posortowane = [...wartosci].sort((a, b) => a - b);
+                    const mediana =
+                        posortowane[Math.floor(posortowane.length / 2)];
+
+                    const min = Math.min(...wartosci);
+                    const max = Math.max(...wartosci);
+                    const roznica = max - min;
+
+                    const ponizej40 = wartosci.filter((v) => v < 40).length;
+                    const ponizej55 = wartosci.filter((v) => v < 55).length;
+
+                    for (const surowiec of this.plansza) {
+                        const odchylenie = surowiec.current - mediana;
+
+                        if (Math.abs(odchylenie) > 9) {
+                            let krokMinus = 2;
+                            let krokPlus = 2;
+
+                            if (roznica > 160) krokMinus += 2;
+                            else if (roznica > 125) krokMinus += 1;
+
+                            // zwiększanie kroku dodawania
+                            if (ponizej40 <= 2) krokPlus += 1;
+                            if (ponizej55 === 1) krokPlus += 1;
+
+                            if (odchylenie > 0) {
+                                surowiec.current -= krokMinus;
+                            } else {
+                                surowiec.current += krokPlus;
+                            }
+
+                            surowiec.current = Math.max(
+                                0,
+                                Math.min(
+                                    surowiec.current,
+                                    this.ceny.length - 1,
+                                ),
+                            );
+                        }
+                    }
+                }
             }
 
             this.whosTurn = this.firstPlayerIndex;
@@ -472,8 +504,6 @@ export default class Philanthropists extends Game {
         this.graczCoRobi = this.faza % 2 === 0 ? "Manipuluje" : "Czeka";
 
         this.logGracz("rozpoczyna ruch");
-
-        this.podsumowanieFazy = false;
         return this.wyslijObiektyGraczom();
     }
 
@@ -544,6 +574,8 @@ export default class Philanthropists extends Game {
 
         this.ktoraKartaManipulacji++;
 
+        this.soundToPlay = `manipulate${this.ktoraKartaManipulacji}`;
+
         karty[index] = null;
 
         this.logGracz(
@@ -572,7 +604,10 @@ export default class Philanthropists extends Game {
             if (karty[index]) losowyIndexNiepustejKarty = index;
         }
 
-        this.uzyjManipulacji([ktoraStrona, losowyIndexNiepustejKarty], true);
+        this.uzyjManipulacji(
+            { data: [ktoraStrona, losowyIndexNiepustejKarty] },
+            true,
+        );
     }
 
     automatycznaManipulacja() {
@@ -618,7 +653,6 @@ export default class Philanthropists extends Game {
     }
 
     prawyGracz(index) {
-        console.log(index, this.gracze.length, this.gracze.length - 1);
         if (index === this.gracze.length - 1) return this.gracze[0].username;
         return this.gracze[index + 1].username;
     }
@@ -660,9 +694,9 @@ export default class Philanthropists extends Game {
                 graczCoRobi: this.coRobiGracz(
                     this.whosTurn === gracz.data.index,
                 ),
-
+                lobbyId: this.lobbyId,
                 nick: gracz.username,
-
+                soundToPlay: this.soundToPlay,
                 jestesPierwszymGraczem:
                     gracz.data.index === this.firstPlayerIndex,
                 twojaTura: this.whosTurn === gracz.data.index,
@@ -754,8 +788,6 @@ export default class Philanthropists extends Game {
 
         if (this.dalFilantropie) return;
 
-        console.log(typ, index);
-
         const aktualnyGracz = this.gracze[this.whosTurn];
 
         if (aktualnyGracz.karty.indexOf(typ) === -1) return;
@@ -766,6 +798,8 @@ export default class Philanthropists extends Game {
 
         this.dalFilantropie = true;
 
+        this.soundToPlay = `filantropia`;
+
         this.logGracz(`- filantropia`, this.getLogKolor("filantropia"));
         return this.wyslijObiektyGraczom();
     }
@@ -773,12 +807,6 @@ export default class Philanthropists extends Game {
     // @event
     kup(data) {
         const typ = data.data;
-
-        if (this.czyMozekupic) {
-            this.czyMozeSprzedac = false;
-        } else {
-            return;
-        }
 
         if (this.licznikSprzedazyLubKupowania === 3) {
             return (this.graczCoRobi = "Skonczyl");
@@ -806,18 +834,46 @@ export default class Philanthropists extends Game {
 
         if (this.bank[typ2] === 0) return;
 
+        if (this.czyMozekupic) {
+            this.czyMozeSprzedac = false;
+        } else {
+            return;
+        }
+
         this.bank[typ2] -= 1;
         aktualnyGracz.hajs -= cena;
         aktualnyGracz.karty.push(typ);
+        this.coAktualnieKupil.push(typ);
+
+        console.log("KUPIONE KARTY");
+
+        console.log(this.coAktualnieKupil.length);
+        console.log(this.coAktualnieKupil);
+
+        if (
+            this.coAktualnieKupil.length === 3 &&
+            this.coAktualnieKupil[0] === this.coAktualnieKupil[1] &&
+            this.coAktualnieKupil[1] === this.coAktualnieKupil[2]
+        ) {
+            for (const surowiec of this.plansza) {
+                if (surowiec.type === this.coAktualnieKupil[1]) {
+                    surowiec.current = Math.max(
+                        0,
+                        Math.min(surowiec.current - 1, this.ceny.length - 1),
+                    );
+                }
+            }
+        }
 
         this.licznikSprzedazyLubKupowania++;
+
+        this.soundToPlay = `buy${this.licznikSprzedazyLubKupowania}`;
 
         if (this.licznikSprzedazyLubKupowania === 3) {
             this.graczCoRobi = "Skonczyl";
             this.czyMozekupic = false;
         }
 
-        this.graczCoRobi = "Kupuje";
         this.logGracz(`kupił za ${cena}$`, this.getLogKolor(typ));
 
         if (
@@ -862,6 +918,8 @@ export default class Philanthropists extends Game {
         this.usunKarteGracza(aktualnyGracz.karty, typ);
 
         this.licznikSprzedazyLubKupowania++;
+
+        this.soundToPlay = `sell${this.licznikSprzedazyLubKupowania}`;
 
         if (this.licznikSprzedazyLubKupowania === 3) {
             this.graczCoRobi = "Skonczyl";

@@ -44,6 +44,7 @@ const filantropia = (typ) => {
     if (props.gameData.pauza) return console.log("PAUZA");
 
     modalRef.value = false;
+    // eslint-disable-next-line
     props.gameData.filantropiaKarty[indexRef.value] = typ;
     // useSound("Oddanie kart na filantropię");
 
@@ -81,6 +82,7 @@ const oddajFilantropia = (typ, indeks) => {
                         v-for="(karta, index) in [
                             ...new Set(props.gameData.karty),
                         ]"
+                        :key="index"
                         :src="ikony[karta]"
                         :class="`wybor ${karta}`"
                         @click="() => filantropia(karta)"
@@ -88,6 +90,7 @@ const oddajFilantropia = (typ, indeks) => {
                 </div>
                 <div
                     v-for="indeks in 4"
+                    :key="indeks"
                     class="card"
                     :class="
                         props.gameData.filantropiaKarty[indeks - 1]

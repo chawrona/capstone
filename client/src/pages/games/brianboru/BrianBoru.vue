@@ -36,6 +36,7 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
                 :cards="gameData.cards"
                 :status="gameData.status"
                 :city-under-attack="gameData.cityUnderAttack"
+                :hide-cards="gameData.hideCards"
             />
             <TurnInfo :phases="gameData.phases" :message="gameData.message" />
             <Map
@@ -55,7 +56,9 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
                     :cities-to-cathedra="gameData.citiesToCathedra"
                     :cities-to-vikings="gameData.citiesToVikings"
                     :city-under-attack-type="gameData.cityUnderAttackType"
+                    :cities-to-build="gameData.citiesToBuild"
                     :cards="gameData.cards"
+                    :you="gameData.you"
                 />
 
                 <ChosenCards
@@ -91,14 +94,15 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
 }
 
 .game {
-    background-color: #ffffffbf;
     position: relative;
+
     display: flex;
-    // flex-direction: column;
     justify-content: center;
     align-items: center;
+
     width: 1920px;
     height: 950px;
+
     margin-block: auto;
     transform-origin: top left;
     font-family: "Open sans";

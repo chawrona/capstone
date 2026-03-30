@@ -13,7 +13,7 @@ const goToLobby = () => {
     store.setLoading(true);
     soundBus.playMusic("soundtrack");
     setTimeout(() => {
-        router.push(`/${route.params.id}`);
+        router.push(`/`);
     }, 1000);
 };
 

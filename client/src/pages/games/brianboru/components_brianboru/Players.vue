@@ -64,12 +64,18 @@ const data = [
 
 const smallCoinCount = (money) => money % 5;
 const bigCoinCount = (money) => (money - (money % 5)) / 5;
+
+const sortPlayers = (playerA, playerB) => {
+    if (playerA.username === props.you.username) return 1;
+    if (playerB.username === props.you.username) return -1;
+    return 0;
+};
 </script>
 
 <template>
     <div class="players">
-        <div
-            v-for="player in props.players"
+        <!--  eslint-disable-next-line -->
+        <div v-for="player in props.players.sort(sortPlayers)"
             :key="player.publicId"
             class="player"
             :class="{ you: player.username === props.you.username }"
@@ -150,7 +156,7 @@ const bigCoinCount = (money) => (money - (money % 5)) / 5;
 
     // box-shadow: rgba(0, 0, 0, 0.853) 0px 0px 5px; // TEN JEST AKTUALNY
     height: calc(650px - 1rem);
-    width: 325px;
+    width: 355px;
 }
 
 .player {

@@ -53,6 +53,7 @@ const manipuluj = (index, wartosc) => {
         <div class="cards">
             <div
                 v-for="(card, index) in props.gameData.leweKarty"
+                :key="index"
                 class="card"
                 :class="card ? 'cardShadow' : 'pusta'"
                 :data-card="card ? card.typ : 'pusta'"

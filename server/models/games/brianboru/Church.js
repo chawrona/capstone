@@ -59,6 +59,10 @@ export default class Church {
             }
 
             winningChurchPlayer.setData("firstPlayer", () => true);
+            console.log(
+                "MODYFIKUJEMY FIRSTPLAYER 2",
+                winningChurchPlayer?.username,
+            );
             this.game.gameData.firstPlayer =
                 winningChurchPlayer.getPlayerData();
 

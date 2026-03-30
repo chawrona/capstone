@@ -1,5 +1,17 @@
 <script setup>
-const props = defineProps(["width", "height"]);
+import { computed } from "vue";
+
+const props = defineProps(["width", "height", "regions"]);
+
+const getRegionsColor = computed(() => {
+    let styleString = "";
+
+    for (const [region, owner] of Object.entries(props.regions)) {
+        styleString += `--${region.replace(/ /g, "-")}: ${owner.color.hex}60;`;
+    }
+
+    return styleString;
+});
 </script>
 
 <template>
@@ -8,6 +20,7 @@ const props = defineProps(["width", "height"]);
         :width="`${props.width}`"
         :height="`${props.height}`"
         :viewBox="`0 0 1100 800`"
+        :style="getRegionsColor"
     >
         <g transform="translate(0,800) scale(0.1,-0.1)">
             <path
@@ -474,7 +487,92 @@ svg {
     inset: 0;
 }
 
-/* #leinster {
-    fill: rgba(255, 0, 0, 0.507);
-} */
+#leinster-small {
+    fill: var(--Leinster, #0000);
+}
+#leinster {
+    fill: var(--Leinster, #0000);
+}
+#ulaid {
+    fill: var(--Ulaid, #0000);
+}
+
+#southern {
+    fill: var(--Southern-Uí-Néill, #0000);
+}
+
+#dublin-1 {
+    fill: var(--Dubhlinn, #0000);
+}
+
+#dublin-2 {
+    fill: var(--Dubhlinn, #0000);
+}
+
+#munster-1 {
+    fill: var(--Munster, #0000);
+}
+#munster-2 {
+    fill: var(--Munster, #0000);
+}
+#munster-3 {
+    fill: var(--Munster, #0000);
+}
+#munster-4 {
+    fill: var(--Munster, #0000);
+}
+#munster-5 {
+    fill: var(--Munster, #0000);
+}
+#munster-6 {
+    fill: var(--Munster, #0000);
+}
+#munster-7 {
+    fill: var(--Munster, #0000);
+}
+#munster-8 {
+    fill: var(--Munster, #0000);
+}
+#munster-9 {
+    fill: var(--Munster, #0000);
+}
+#munster-10 {
+    fill: var(--Munster, #0000);
+}
+
+#northern-1 {
+    fill: var(--Northern-Uí-Néill, #0000);
+}
+#northern-2 {
+    fill: var(--Northern-Uí-Néill, #0000);
+}
+#northern-3 {
+    fill: var(--Northern-Uí-Néill, #0000);
+}
+#northern-4 {
+    fill: var(--Northern-Uí-Néill, #0000);
+}
+
+#breifne {
+    fill: var(--Bréifne, #0000);
+}
+
+#connaught-1 {
+    fill: var(--Connaught, #0000);
+}
+#connaught-2 {
+    fill: var(--Connaught, #0000);
+}
+#connaught-3 {
+    fill: var(--Connaught, #0000);
+}
+#connaught-4 {
+    fill: var(--Connaught, #0000);
+}
+#connaught-5 {
+    fill: var(--Connaught, #0000);
+}
+#connaught-6 {
+    fill: var(--Connaught, #0000);
+}
 </style>

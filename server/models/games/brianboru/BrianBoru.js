@@ -33,8 +33,12 @@ export default class BrianBoru extends Game {
             },
             current: "passing",
         };
-        this.gameData.message = "Odrzucanie kart";
+
         this.gameData.firstPlayer = this.getCurrentPlayer().setFirstPlayer();
+        this.setMessage(
+            `${this.gameData.firstPlayer.username} buduje pierwsze miasto`,
+        );
+        this.gameData.firstPlayer.setStatus(statuses.BUILD_FIRST_CITY);
     }
 
     getNextPlayer(publicId) {
@@ -71,6 +75,7 @@ export default class BrianBoru extends Game {
                 data: {
                     cards: this.cards.getPlayerCards(player),
                     chosenCards: this.cards.getChosenCards(),
+                    hideCards: this.cards.hideCards,
                     nextPlayer: this.getNextPlayer(publicId).getPlayerData(),
 
                     ...this.regions.getMapData(),
@@ -216,11 +221,6 @@ export default class BrianBoru extends Game {
     }
 
     // @event
-    buildAttackedCity(data) {
-        return this.regions.buildAttackedCity(data);
-    }
-
-    // @event
     buildBoughtCity(data) {
         return this.regions.buildBoughtCity(data);
     }
@@ -229,4 +229,11 @@ export default class BrianBoru extends Game {
     removeVikings(data) {
         return this.regions.removeVikings(data);
     }
+
+    // @ event
+    buildFirstCity(data) {
+        return this.regions.buildFirstCity(data);
+    }
+
+    // @TO-DO dorobić messages dla gracza który ma jakis status
 }

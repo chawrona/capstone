@@ -42,31 +42,39 @@ const rejectCards = () => {
 
 <template>
     <div class="dialog">
-      
         <h1 class="dialogTitle">Przekazywanie kart</h1>
-        
-        
-        <div class="dialogContent">
-            <p>Wybierz 2 karty, które sobie zostawisz. 
-                <div class="player" :style="`--color: ${nextPlayer.color.hex}`"></div>
-                <span class="nextPlayer"  :style="`--color: ${nextPlayer.color.hex}`">
-                {{ nextPlayer.username }} 
-            </span> otrzyma pozostałe</p>
-            <div class="cards-wrap">
-<Card
-                v-for="card in cards"
-                :key="card.id"
-                :card="card"
-                :class="{
-                    selectedCard: selectedCards.has(card.id),
-                    blockedCard: selectedCards.size >= cardsToReject,
-                }"
-                @click="() => selectCard(card.id)"
-            />
-            </div>
-            
-        </div>
 
+        <div class="dialogContent">
+            <p>
+                Wybierz 2 karty, które sobie zostawisz.
+
+                <span
+                    class="player"
+                    :style="`--color: ${nextPlayer.color.hex}`"
+                >
+                </span>
+
+                <span
+                    class="nextPlayer"
+                    :style="`--color: ${nextPlayer.color.hex}`"
+                >
+                    {{ nextPlayer.username }}
+                </span>
+                otrzyma pozostałe
+            </p>
+            <div class="cards-wrap">
+                <Card
+                    v-for="card in cards"
+                    :key="card.id"
+                    :card="card"
+                    :class="{
+                        selectedCard: selectedCards.has(card.id),
+                        blockedCard: selectedCards.size >= cardsToReject,
+                    }"
+                    @click="() => selectCard(card.id)"
+                />
+            </div>
+        </div>
 
         <button
             class="dialogButton"
@@ -85,10 +93,9 @@ const rejectCards = () => {
     font-family: "MedievalSharp";
     left: 50%;
     z-index: 30;
-   transform: translate(-50%, -65%);
+    transform: translate(-50%, -65%);
 
-
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
 
     display: flex;
     flex-direction: column;
@@ -98,18 +105,15 @@ const rejectCards = () => {
     font-weight: normal;
     padding: 1.2rem 2rem;
     border-radius: 0.5rem;
-        background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_grey_big.jpg");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_grey_big.jpg");
     background-size: cover;
     gap: 0rem;
-  
 
-  height: 440px;
+    height: 440px;
     /* width: 600px; */
     justify-content: space-between;
     padding: 2rem 1rem;
     box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
-
-
 
     .dialogTitle {
         letter-spacing: 1px;
@@ -138,7 +142,6 @@ const rejectCards = () => {
     }
 }
 .selectedCard {
-
     box-shadow: 0px 0px 5px 4px rgba(255, 255, 255, 0.658);
 }
 
@@ -170,7 +173,7 @@ const rejectCards = () => {
     display: inline-block;
     margin-right: 0.25ch;
     transform: translateY(20%);
-     width: 30px;
+    width: 30px;
     height: 30px;
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.349);

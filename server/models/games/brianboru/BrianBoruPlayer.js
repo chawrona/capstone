@@ -1,5 +1,5 @@
 import Player from "../../Player.js";
-import dialogs from "./config/dialogs.js";
+// import dialogs from "./config/dialogs.js";
 import statuses from "./config/statuses.js";
 
 export default class BrianBoruPlayer extends Player {
@@ -17,13 +17,9 @@ export default class BrianBoruPlayer extends Player {
         this.setData("lockedCards", () => new Set());
         this.setData("cards", () => []);
         this.setData("dialogs", () => []);
+        this.setData("canExpand", () => false);
 
-        this.addDialog(dialogs.FIRST_PLAYER)
-            .addDialog(dialogs.VIKINGS)
-            .addDialog(dialogs.MARRIAGE)
-            .addDialog(dialogs.REJECT_CARDS);
-
-        this.setStatus(statuses.REJECT_CARDS);
+        this.setStatus(statuses.WAITING);
     }
 
     setStatus(status) {

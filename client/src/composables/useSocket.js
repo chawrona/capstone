@@ -13,11 +13,8 @@ export default function useSocket() {
     const route = useRoute();
     const toast = useToast();
     const reconnectAttemptCount = ref(0);
-    const socket = io("http://localhost:3000", {
-        reconnectionAttempts: 2,
-        reconnectionDelay: 5000,
-    });
-    // const socket = io("http://100.105.85.19:3000");
+    const socket = io("http://localhost:3000");
+    // const socket = io("http://194.110.5.243");
 
     let userId = getUserId();
 

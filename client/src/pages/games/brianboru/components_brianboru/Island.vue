@@ -18,9 +18,11 @@ const props = defineProps([
     "regions",
     "citiesToAttack",
     "citiesToCathedra",
+    "citiesToBuild",
     "citiesToVikings",
     "status",
     "cards",
+    "you",
 ]);
 
 const mapWidth = 1100 * 1.08;
@@ -72,6 +74,20 @@ const chooseCity = (cityId) => {
             }
             eventName = "chooseCityToAttack";
             break;
+        case statuses.BUILD_BOUGHT_CITY:
+            if (!props.citiesToBuild.includes(cityId)) {
+                alert("Nie wolno zaatakować tego miasta!");
+                return;
+            }
+            eventName = "buildBoughtCity";
+            break;
+        case statuses.BUILD_FIRST_CITY:
+            if (!props.citiesToBuild.includes(cityId)) {
+                alert("Nie wolno zaatakować tego miasta!");
+                return;
+            }
+            eventName = "buildFirstCity";
+            break;
         default:
             return; // opcjonalnie dla nieznanego statusu
     }
@@ -83,20 +99,29 @@ const chooseCity = (cityId) => {
         eventName,
     });
 };
+
+const getHoverColor = (cityId) => {
+    if (
+        props.status === statuses.BUILD_BOUGHT_CITY ||
+        (props.status === statuses.BUILD_FIRST_CITY &&
+            props.citiesToBuild.includes(cityId))
+    )
+        return props.you.color.hex;
+    return "#ffffff";
+};
 </script>
 
 <template>
-    <!-- <pre> -->
-    <!-- {{ `${props.cityUnderAttack}` }} -->
-    <!-- {{ props.cities }} -->
-    <!-- {{ props.regions }} -->
-
-    <!-- </pre> -->
     <div
         class="island"
         :style="`--width: ${mapWidth}px; --height: ${mapHeight}px`"
     >
-        <RegionsSVG :width="mapWidth" :height="mapHeight" class="regions" />
+        <RegionsSVG
+            :width="mapWidth"
+            :height="mapHeight"
+            class="regions"
+            :regions="props.regions"
+        />
         <!-- <pre> 
             <{{ props.cities }} 
              {{ Object.keys(statuses).find(key => statuses[key] === props.status) }} 
@@ -114,8 +139,13 @@ const chooseCity = (cityId) => {
                         owned: Boolean(props.cities[city]),
                         vikings: props.cities[city]?.vikings,
                         buildHover:
-                            props.status === statuses.BUILD_ATTACKED_CITY &&
-                            city === props.cityUnderAttack,
+                            (props.status === statuses.BUILD_BOUGHT_CITY ||
+                                props.status === statuses.BUILD_FIRST_CITY) &&
+                            props.citiesToBuild.includes(city),
+                        canBuild:
+                            (props.status === statuses.BUILD_BOUGHT_CITY ||
+                                props.status === statuses.BUILD_FIRST_CITY) &&
+                            props.citiesToBuild.includes(city),
                         attackedHover:
                             props.citiesToAttack.includes(city) &&
                             props.status === statuses.CHOOSE_ATTACKED_CITY,
@@ -132,7 +162,7 @@ const chooseCity = (cityId) => {
                     },
                     `${region.replace(/\s+/g, '')}_${city}`,
                 ]"
-                :style="`--owner: ${getOwnerColor(city)}`"
+                :style="`--owner: ${getOwnerColor(city)}; --hoverColor: ${getHoverColor(city)}`"
                 @click="() => chooseCity(city)"
             />
         </template>
@@ -213,19 +243,27 @@ const chooseCity = (cityId) => {
     border-radius: 50%;
     z-index: 6;
     box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
+    &::before {
+        position: absolute;
+        inset: -0.5rem;
+        border-radius: 50%;
+        content: "";
+        background: rgba(255, 0, 0, 0);
+        z-index: -2;
+    }
 }
 
-[data-type="red"] {
+[data-type="red"]:not(.owned) {
     background-image: url("/src/assets/games/gameAssets/brianboru/miasto_red.png");
     background-size: cover;
     background-position: center;
 }
-[data-type="blue"] {
+[data-type="blue"]:not(.owned) {
     background-image: url("/src/assets/games/gameAssets/brianboru/miasto_blue.png");
     background-size: cover;
     background-position: center;
 }
-[data-type="yellow"] {
+[data-type="yellow"]:not(.owned) {
     background-image: url("/src/assets/games/gameAssets/brianboru/miasto_yellow.png");
     background-size: cover;
     background-position: center;
@@ -246,14 +284,15 @@ const chooseCity = (cityId) => {
 .owned {
     display: grid;
     place-items: center;
+    box-shadow: none;
 }
 
 .owned::after {
     display: grid;
     font-weight: bold;
     font-size: 1.5rem;
-    width: 70%;
-    height: 70%;
+    width: 100%;
+    height: 100%;
     place-items: center;
     content: "";
     border-radius: 50%;
@@ -262,7 +301,8 @@ const chooseCity = (cityId) => {
     box-shadow:
         inset 0 1.5px 3px rgba(255, 255, 255, 0.576),
         /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
-        0 2px 3px rgba(0, 0, 0, 0.308);
+        0 2px 3px rgba(0, 0, 0, 0.308),
+        0px 0px 3px 2px rgba(0, 0, 0, 0.358);
 }
 
 .cathedraHover:hover::after,
@@ -313,8 +353,40 @@ const chooseCity = (cityId) => {
 .canAttack,
 .canCathedra,
 .canVikings,
-.buildHover::after {
+.canBuild {
     cursor: pointer;
     box-shadow: 0 0 5px 4px rgba(255, 255, 255, 0.485);
+}
+
+.buildHover:hover {
+    display: grid;
+    place-items: center;
+
+    &::after {
+        display: grid;
+        font-weight: bold;
+        font-size: 1.5rem;
+        width: 70%;
+        height: 70%;
+        place-items: center;
+        content: "";
+        border-radius: 50%;
+        border: 1px solid rgba(0, 0, 0, 0.349);
+        background-color: hsl(from var(--hoverColor) h s calc(l * 1));
+        box-shadow:
+            inset 0 1.5px 3px rgba(255, 255, 255, 0.576),
+            /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+            0 0px 3px rgba(0, 0, 0, 0.699);
+    }
+
+    &[data-type="red"]::after {
+        transform: translate(0.3px, 0px);
+    }
+    &[data-type="yellow"]::after {
+        transform: translate(0.4px, 0.2px);
+    }
+    &[data-type="blue"]::after {
+        transform: translate(0.3px, 0px);
+    }
 }
 </style>

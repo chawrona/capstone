@@ -12,7 +12,7 @@ const marriages = [
     {
         name: "Conall",
         points: 2,
-        region: "Southern Ui Neill",
+        region: "Southern Uí Néill",
     },
     {
         name: "Cormac",
@@ -22,12 +22,13 @@ const marriages = [
     {
         name: "Niall",
         points: 2,
-        region: "Northern Ui Neill",
+        region: "Northern Uí Néill",
     },
 
     {
-        name: "Aoife",
-        points: "sun",
+        name: "Aolfe",
+        points: 2,
+        suns: 1,
     },
     {
         name: "Brigid",
@@ -38,6 +39,7 @@ const marriages = [
         name: "Estrid",
         points: 4,
         region: "Vikings",
+        suns: 4,
     },
 ];
 

@@ -6,7 +6,7 @@ import statuses from "../../../../../../server/models/games/brianboru/config/sta
 import { useAppStore } from "../../../../store/useAppStore";
 import Card from "./Card.vue";
 
-const props = defineProps(["cards", "status", "cityUnderAttack"]);
+const props = defineProps(["cards", "status", "cityUnderAttack", "hideCards"]);
 const store = useAppStore();
 
 const cards = computed(() => {
@@ -59,7 +59,11 @@ const canChooseCard = (cardType) => {
 
 <template>
     <div class="playerData">
-        <div class="cards" :class="{ show: showCards }">
+        <div
+            class="cards"
+            :class="{ show: showCards }"
+            :style="`opacity: ${hideCards ? 0 : 1}`"
+        >
             <Card
                 v-for="card in cards"
                 :key="card.id"
@@ -70,7 +74,11 @@ const canChooseCard = (cardType) => {
                 @click="() => chooseCard(card)"
             />
         </div>
-        <div class="toggle" @click="toggleCards">
+        <div
+            class="toggle"
+            :style="`opacity: ${hideCards ? 0 : 1}`"
+            @click="toggleCards"
+        >
             {{ showCards ? "Pokaż karty" : "Ukryj karty" }}
         </div>
     </div>
@@ -90,6 +98,7 @@ const canChooseCard = (cardType) => {
 }
 
 .toggle {
+    transition: opacity 0.5s;
     position: absolute;
     display: grid;
     place-items: center;
@@ -122,11 +131,13 @@ const canChooseCard = (cardType) => {
 
     display: flex;
     justify-content: center;
-    transition: transform 0.2s;
+    transition:
+        transform 0.2s,
+        opacity 0.5s;
     gap: 0.5rem;
 
     .player-card {
-        transition: transform 0.2s;
+        transition: transform 0s;
     }
 }
 

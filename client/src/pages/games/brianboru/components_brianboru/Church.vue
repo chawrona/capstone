@@ -80,24 +80,25 @@ const change = () => (flag.value = !flag.value);
 .players {
     display: flex;
     flex-wrap: wrap;
-    justify-content: start;
-    align-items: start;
-    align-content: start;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
     gap: 0.5rem;
     grid-row: 2;
-    width: 170px;
-    height: 115px;
+    width: 150px;
+    height: 100%;
 }
 
 .player {
-    width: 27px;
-    height: 27px;
+    z-index: 3;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.349);
     background-color: hsl(from var(--color) h s calc(l * 1));
     box-shadow:
         inset 0 1.5px 3px rgba(255, 255, 255, 0.576),
         /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
-        0 2px 3px rgba(0, 0, 0, 0.308);
+        0 2px 3px rgba(0, 0, 0, 0.562);
 }
 </style>

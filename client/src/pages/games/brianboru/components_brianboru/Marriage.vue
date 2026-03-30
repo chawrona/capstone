@@ -18,6 +18,7 @@ const classes = [
     "money",
     "money",
     "",
+    "",
 ];
 
 const playersNotInMarriageQueue = computed(() => {
@@ -43,7 +44,14 @@ const playersNotInMarriageQueue = computed(() => {
 <template>
     <div class="marriage">
         <div class="level">
-            <div class="circle end"></div>
+            <div class="circle end">
+                <span v-if="props.marriages[props.marriages.length - 1]">
+                    <div
+                        class="player"
+                        :style="`--color: ${props.marriages[props.marriages.length - 1].hex}`"
+                    ></div>
+                </span>
+            </div>
         </div>
 
         <div v-for="(image, index) in images" :key="index" class="level">
@@ -51,8 +59,13 @@ const playersNotInMarriageQueue = computed(() => {
                 <img v-if="image" :src="image" :class="classes[index]" />
             </div>
             <div class="circle">
-                <span v-if="props.marriages[index]">
-                    {{ props.marriages[index] }}
+                <span
+                    v-if="props.marriages[props.marriages.length - index - 2]"
+                >
+                    <div
+                        class="player"
+                        :style="`--color: ${props.marriages[props.marriages.length - index - 1].hex}`"
+                    ></div>
                 </span>
             </div>
         </div>
@@ -62,6 +75,7 @@ const playersNotInMarriageQueue = computed(() => {
         >
             <span
                 v-for="(color, index) in playersNotInMarriageQueue"
+                :key="index"
                 class="player"
                 :style="`--color: ${color}`"
             >
@@ -122,6 +136,8 @@ const playersNotInMarriageQueue = computed(() => {
 }
 
 .circle {
+    display: grid;
+    place-items: center;
     width: 50px;
     height: 50px;
     aspect-ratio: 1 / 1;
@@ -207,6 +223,7 @@ const playersNotInMarriageQueue = computed(() => {
 }
 
 .player {
+    z-index: 3;
     width: 30px;
     height: 30px;
     border-radius: 50%;

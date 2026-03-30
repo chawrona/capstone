@@ -23,6 +23,8 @@ const statuses = {
     BUILD_BOUGHT_CITY: 13, // wybuduj kupione miasto z karty
 
     REMOVE_VIKINGS: 14, // Usuń wikingów ze swojego miasta
+
+    BUILD_FIRST_CITY: 15, // wybuduj pierwsze miasto
 };
 
 export default statuses;
