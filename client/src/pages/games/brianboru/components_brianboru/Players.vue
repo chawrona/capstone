@@ -1,7 +1,7 @@
 <script setup>
-import FirstPlayer from "@/assets/games/gameAssets/brianboru/first_player.png";
-import Money from "@/assets/games/gameAssets/brianboru/money.png";
+import FirstPlayer from "@/assets/games/gameAssets/brianboru/first_player_icon.png";
 import Money5 from "@/assets/games/gameAssets/brianboru/money5.png";
+import Money from "@/assets/games/gameAssets/brianboru/money.png";
 import Points from "@/assets/games/gameAssets/brianboru/Points.png";
 import Sun from "@/assets/games/gameAssets/brianboru/sun.png";
 import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
@@ -225,10 +225,13 @@ const sortPlayers = (playerA, playerB) => {
 }
 
 .firstPlayer {
-    height: 25px;
-    width: 25px;
+    height: 30px;
+    width: 30px;
     transform: translateY(1.5px);
     align-self: center;
+    filter: drop-shadow(1.5px 1.5px 3px rgb(0, 0, 0));
+    // box-shadow: 0 0 5px 1px rgba(253, 203, 246, 0.568);
+
 }
 
 .values,
@@ -292,10 +295,11 @@ const sortPlayers = (playerA, playerB) => {
     &::after {
         position: absolute;
         content: "";
-        inset: -0.5rem;
+        inset: -0.45rem;
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
+        transform: translateY(-1.5px);
         background-image: url("/src/assets/games/gameAssets/brianboru/Points.png");
         filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.589));
     }

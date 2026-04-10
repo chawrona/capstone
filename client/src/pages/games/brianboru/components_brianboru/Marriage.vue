@@ -48,7 +48,7 @@ const playersNotInMarriageQueue = computed(() => {
                 <span v-if="props.marriages[props.marriages.length - 1]">
                     <div
                         class="player"
-                        :style="`--color: ${props.marriages[props.marriages.length - 1].hex}`"
+                        :style="`--color: ${props.marriages[props.marriages.length - 2]?.hex}`"
                     ></div>
                 </span>
             </div>
@@ -64,7 +64,7 @@ const playersNotInMarriageQueue = computed(() => {
                 >
                     <div
                         class="player"
-                        :style="`--color: ${props.marriages[props.marriages.length - index - 1].hex}`"
+                        :style="`--color: ${props.marriages[props.marriages.length - index - 2]?.hex}`"
                     ></div>
                 </span>
             </div>

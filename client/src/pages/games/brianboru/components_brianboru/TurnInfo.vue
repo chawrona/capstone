@@ -58,7 +58,7 @@ const infoSwitch = ref(true);
 
     h1 {
         font-weight: normal;
-        font-size: 1.7rem;
+        font-size: 1.5rem;
     }
 }
 </style>

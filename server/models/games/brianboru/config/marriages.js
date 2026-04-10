@@ -27,7 +27,7 @@ const marriages = [
 
     {
         name: "Aolfe",
-        points: 2,
+        points: 0,
         suns: 1,
     },
     {

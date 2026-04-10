@@ -3,6 +3,7 @@ import Cards from "./Cards.js";
 import Church from "./Church.js";
 import dialogs from "./config/dialogs.js";
 import statuses from "./config/statuses.js";
+import Debug from "./Debug.js";
 import Dialogs from "./Dialogs.js";
 import Marriages from "./Marriages.js";
 import Regions from "./Regions.js";
@@ -16,6 +17,7 @@ export default class BrianBoru extends Game {
         this.vikings = new Vikings(this);
         this.marriages = new Marriages(this);
         this.church = new Church(this);
+        this.debug = new Debug(this);
         this.regions = new Regions(this);
     }
 
@@ -24,12 +26,13 @@ export default class BrianBoru extends Game {
             playing: { current: 1, total: 4 },
             attacking: {
                 current: 1,
-                total:
-                    this.players.size === 5
-                        ? 4
-                        : this.players.size === 4
-                          ? 5
-                          : 7,
+                // total:
+                //     this.players.size === 5
+                //         ? 4
+                //         : this.players.size === 4
+                //           ? 5
+                //           : 7,
+                total: 2,
             },
             current: "passing",
         };
@@ -103,10 +106,14 @@ export default class BrianBoru extends Game {
 
     // region GameData END
 
-    sendGameDataToAll() {
+    sendGameDataToAll(isLogging) {
         const data = [];
         for (const publicId of this.players.keys()) {
             data.push(...this.generateGameData(publicId));
+        }
+
+        if (isLogging) {
+            this.log(JSON.stringify(data));
         }
         return data;
     }
@@ -196,6 +203,11 @@ export default class BrianBoru extends Game {
     }
 
     // @event
+    estridReward(data) {
+        return this.marriages.estridReward(data);
+    }
+
+    // @event
     chooseCathedral(data) {
         return this.church.chooseCathedral(data);
     }
@@ -235,5 +247,8 @@ export default class BrianBoru extends Game {
         return this.regions.buildFirstCity(data);
     }
 
-    // @TO-DO dorobić messages dla gracza który ma jakis status
+    // @debug
+    debugCommand(data) {
+        return this.debug.run(data);
+    }
 }

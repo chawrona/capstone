@@ -31,7 +31,7 @@ const testCityChosing = () => {
     z-index: 30;
     font-family: "MedievalSharp";
     left: 50%;
-    transform: translate(-50%, -50%);
+   transform: translate(-50%, -65%);
 
     display: flex;
     flex-direction: column;

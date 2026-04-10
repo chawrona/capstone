@@ -3,8 +3,9 @@ import PauseScreen from "../../../components/common/PauseScreen.vue";
 import { usePageSounds } from "../../../composables/usePageSounds";
 import { useGamePause } from "../composables_games/useGamePause";
 import { useGameResize } from "../composables_games/useGameResize";
-import ChosenCards from "./components_brianboru/ChosenCards.vue";
+import Debug from "./components_brianboru/Debug.vue";
 import Dialogs from "./components_brianboru/Dialogs.vue";
+import ChosenCards from "./components_brianboru/dialogs/ChosenCardDialog.vue";
 import Island from "./components_brianboru/Island.vue";
 import Map from "./components_brianboru/Map.vue";
 import PlayerData from "./components_brianboru/PlayerData.vue";
@@ -46,6 +47,7 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
                 :church="gameData.church"
                 :marriage="gameData.marriage"
                 :you="gameData.you"
+                :regions="gameData.regions"
             >
                 <Island
                     :city-under-attack="gameData.cityUnderAttack"
@@ -74,6 +76,8 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
                 :close-dialog="closeDialog"
                 :opened-dialog="openedDialog"
             />
+
+            <Debug />
         </div>
     </div>
 </template>

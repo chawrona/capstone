@@ -19,7 +19,7 @@ const testVikingsYourCity = () => {
         </h2>
 
         <button class="dialogButton" @click="testVikingsYourCity">
-            Oddaję miasto
+            Niech mają
         </button>
     </div>
 </template>
@@ -30,7 +30,7 @@ const testVikingsYourCity = () => {
     top: 50%;
     font-family: "MedievalSharp";
     left: 50%;
-    transform: translate(-50%, -50%);
+   transform: translate(-50%, -65%);
 
     height: 250px;
     width: 600px;

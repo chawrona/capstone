@@ -194,8 +194,6 @@ export default class Regions {
 
     setCitiesToBuy(player) {
         const checkIfAtLeastOneOwnersNeighbourCity = (cityId) => {
-            console.log(connections, cityId);
-
             for (const city of connections[cityId]) {
                 if (
                     city in this.cities &&
@@ -218,6 +216,8 @@ export default class Regions {
     }
 
     setCitiesToBuildInRegion(player, region) {
+        console.log({ region });
+
         this.citiesToBuild = [...Array(53).keys()]
             .map((index) => index + 1)
             .filter(
@@ -225,6 +225,12 @@ export default class Regions {
                     !(cityId in this.cities) &&
                     regions[region].cities.includes(cityId),
             );
+    }
+
+    setCitiesToBuildAnywhere() {
+        this.citiesToBuild = [...Array(53).keys()]
+            .map((index) => index + 1)
+            .filter((cityId) => !(cityId in this.cities));
     }
 
     // region Events
@@ -274,6 +280,9 @@ export default class Regions {
         this.game.gameData.firstPlayer = player;
 
         this.game.gameData.phases.attacking.current++;
+
+        this.cityUnderAttack = null;
+        this.cityUnderAttackType = "";
 
         if (
             this.game.gameData.phases.attacking.current >
@@ -348,12 +357,17 @@ export default class Regions {
         const cityId = data.data;
         const player = this.game.getPlayer(data.publicId);
         this.buildCity(cityId, player);
+        this.citiesToBuild = [];
+        player.setStatus(statuses.WAITING);
         return this.game.cards.nextCardEffect();
     }
 
     // @event
     removeVikings(data) {
-        this.getCity(data.data).vikings = false;
+        const cityId = data.data;
+        this.getCity(cityId).vikings = false;
+        const player = this.game.getPlayer(data.publicId);
+        player.setStatus(statuses.WAITING);
         return this.game.cards.nextCardEffect();
     }
 }

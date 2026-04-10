@@ -31,6 +31,8 @@ export default class Marriages {
     }
 
     setPlayerMarriage(player, addLetter) {
+        console.log("Dajemy gracza do przodu o ", addLetter);
+
         const operation = addLetter === 0 ? "reset" : "add";
 
         let originalIndex = -1;
@@ -57,10 +59,14 @@ export default class Marriages {
                 this.marriages[index] !== null
             ) {
                 index--;
+                console.log("Zmiejszamy index o 1, teraz jest: ", index);
             }
 
             if (index >= 0) {
+                console.log("index większy od zera");
+                console.log(this.marriages);
                 this.marriages[index] = player;
+                console.log(this.marriages);
             }
 
             if (index !== originalIndex && originalIndex !== -1) {
@@ -72,6 +78,10 @@ export default class Marriages {
     resetMarriages() {
         this.marriage.shift();
         this.marriagePhase.current++;
+        this.marriagesRewards = {
+            winner: null,
+            city: null,
+        };
     }
 
     getPlayersQueue() {
@@ -113,7 +123,12 @@ export default class Marriages {
                     this.marriages[i] = null;
 
                     this.marriageDialogInfo.push({
+                        name:
+                            this.marriage[0].name === "Estrid"
+                                ? "Księżniczkę Danii Estrid"
+                                : this.marriage[0].name,
                         reward: "winner",
+                        fiancee: this.marriage[0],
                         player: this.marriagesRewards.winner,
                     });
                 } else {
@@ -141,47 +156,58 @@ export default class Marriages {
 
         const winner = this.marriagesRewards.winner;
 
-        for (let i = 0; i < this.marriages.length - 1; i++) {
-            if (i === 0) {
-                this.marriages[i] = null;
-            } else {
-                this.marriages[i] = this.marriages[i] + 1;
-            }
+        // Gracze cofają się o 1 w małżeństwach
+        for (let i = 0; i < this.marriages.length; i++) {
+            this.marriages[i] = this.marriages[i + 1];
         }
 
         if (winner) {
+            const currentFiancee = this.getCurrentfiancee();
+            const currentFianceeRegion = currentFiancee.region;
+            console.log({ currentFianceeRegion });
+
             this.game.addDialogToPlayers(dialogs.MARRIAGE_REWARDS);
+
+            console.log({ Punkty: winner.getData("points") });
 
             winner.setData(
                 "points",
-                (oldPoints) => oldPoints + this.marriage.points,
+                (oldPoints) => oldPoints + this.marriage[0].points,
             );
 
-            if (this.marriage.suns) {
-                winner.setData(
-                    "suns",
-                    (oldSuns) => oldSuns + this.marriage.suns,
-                );
-            } else if (this.marriage.region === "Vikings") {
-                winner.setData(
-                    "suns",
-                    (oldSuns) => oldSuns + this.marriage.suns,
-                );
-            } else {
-                winner
-                    .setStatus(statuses.BUILD_CITY_REGION)
-                    .addDialog(dialogs.MARRIAGE_REWARD_WINNING);
+            console.log({ Dodajemy: this.marriage.points });
+            console.log({ Jest: winner.getData("points") });
 
-                this.game.regions.setCitiesToBuildInRegion(
-                    winner,
-                    this.marriage.region,
-                );
+            switch (currentFiancee.name) {
+                case "Aolfe":
+                    winner.setData(
+                        "suns",
+                        (oldSuns) => oldSuns + this.marriage[0].suns,
+                    );
+                    return this.setCityWinner();
+                case "Brigid":
+                    return this.setCityWinner();
+                case "Estrid":
+                    winner.setData(
+                        "suns",
+                        (oldSuns) => oldSuns + this.marriage[0].suns,
+                    );
+                    winner
+                        .setStatus(statuses.CHOOSE_ESTRID_REWARD)
+                        .addDialog(dialogs.ESTRID_REWARD_DIALOG);
+                    this.game.gameData.message = `${winner.username} prosi o pomoc Księżniczkę Danii`;
+                    return this.game.sendGameDataToAll();
+                default:
+                    winner.setStatus(statuses.BUILD_CITY_REGION);
 
-                this.game.gameData.message = `${winner.username} buduje miasto w ${this.marriage.region}`;
-                return this.game.sendGameDataToAll();
+                    this.game.regions.setCitiesToBuildInRegion(
+                        winner,
+                        currentFianceeRegion,
+                    );
+
+                    this.game.gameData.message = `${winner.username} buduje miasto w ${currentFianceeRegion}`;
+                    return this.game.sendGameDataToAll();
             }
-
-            return this.setCityWinner();
         } else {
             this.game.addDialogToPlayers(dialogs.MARRIAGE_NO_WINNER);
             return this.game.vikings.vikingsPhaseEnd();
@@ -189,17 +215,17 @@ export default class Marriages {
     }
 
     setCityWinner() {
+        const cityWinner = this.marriagesRewards.city;
+
+        if (!cityWinner) return this.game.vikings.vikingsPhaseEnd();
+
         cityWinner
             .setStatus(statuses.BUILD_CITY)
             .addDialog(dialogs.MARRIAGE_REWARD_CITY);
 
-        this.game.regions.setCitiesToBuildInRegion(cityWinner);
+        this.game.regions.setCitiesToBuildAnywhere();
 
         this.game.gameData.message = `${cityWinner.username} buduje miasto`;
-
-        const cityWinner = this.marriagesRewards.city;
-
-        if (!cityWinner) return this.game.vikings.vikingsPhaseEnd();
 
         return this.game.sendGameDataToAll();
     }
@@ -227,6 +253,23 @@ export default class Marriages {
         this.game.regions.buildCity(cityId, cityWinner);
 
         cityWinner.setStatus(statuses.WAITING);
+
+        return this.game.vikings.vikingsPhaseEnd();
+    }
+
+    // @event
+    estridReward(data) {
+        const reward = data.data;
+
+        if (reward === "vikings") {
+            console.log("Reward");
+            this.game.addDialogToPlayers(dialogs.ESTRID_REWARD_VIKINGS);
+        }
+
+        if (reward === "regions") {
+            console.log("Reward");
+            this.game.addDialogToPlayers(dialogs.ESTRID_REWARD_REGIONS);
+        }
 
         return this.game.vikings.vikingsPhaseEnd();
     }

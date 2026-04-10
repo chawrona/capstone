@@ -1,11 +1,11 @@
 <script setup>
+import Rysa from "@/assets/games/gameAssets/brianboru/rysa.png";
 const props = defineProps([
     "card",
     "canChoose",
     "owner",
     "callback",
     "chooseBottoms",
-    "callback",
     "chooseTop",
 ]);
 </script>
@@ -23,8 +23,9 @@ const props = defineProps([
             $attrs.class,
         ]"
     >
+            <img v-if="props.card.id === 25" :src="Rysa" class="rysa">
         <div class="cardData">
-            <div class="top" @click="() => callback('top', card)">
+            <div class="top" @click="() => props.callback?.('top', card)">
                 <span
                     class="cardId"
                     :class="{ owned: props.owner }"
@@ -50,7 +51,7 @@ const props = defineProps([
                         singleBottom: props.card.bottom2.length === 0,
                         lessGap: props.card.bottom1.length > 3,
                     }"
-                    @click="() => callback('bottom1', card)"
+                    @click="() => props.callback?.('bottom1', card)"
                 >
                     <span
                         v-for="(value, index) in props.card.bottom1"
@@ -67,7 +68,7 @@ const props = defineProps([
                     v-if="props.card.bottom2.length > 0"
                     class="bottom2"
                     :class="{ lessGap: props.card.bottom2.length > 3 }"
-                    @click="() => callback('bottom2', card)"
+                    @click="() => props.callback?.('bottom2', card)"
                 >
                     <span
                         v-for="(value, index) in props.card.bottom2"
@@ -379,5 +380,12 @@ const props = defineProps([
         opacity: 0.5;
         font-size: 0.8rem;
     }
+}
+
+.rysa {
+    position: absolute;
+    height: 35px;
+    right: 20px;
+    top: -8px;
 }
 </style>

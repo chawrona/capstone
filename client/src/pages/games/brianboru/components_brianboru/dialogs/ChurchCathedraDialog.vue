@@ -3,21 +3,14 @@ import { useAppStore } from "@/store/useAppStore";
 
 const props = defineProps(["closeDialog"]);
 const store = useAppStore();
-const testChooseCathedral = () => {
-    props.closeDialog();
-    store.emit("gameData", {
-        data: "cityId",
-        eventName: "chooseCathedral",
-    });
-};
 </script>
 
 <template>
     <div class="dialog">
         <h2 class="dialogTitle">Zbuduj katedrę</h2>
 
-        <button class="dialogButton" @click="testChooseCathedral">
-            buduję katedrę
+        <button class="dialogButton" @click="() => props.closeDialog()">
+            Buduję katedrę
         </button>
     </div>
 </template>
@@ -28,7 +21,7 @@ const testChooseCathedral = () => {
     top: 50%;
     font-family: "MedievalSharp";
     left: 50%;
-    transform: translate(-50%, -50%);
+     transform: translate(-50%, -65%);
 
     height: 250px;
     width: 600px;

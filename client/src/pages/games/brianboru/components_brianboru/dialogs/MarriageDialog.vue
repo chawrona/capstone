@@ -1,25 +1,41 @@
 <script setup>
 const props = defineProps(["marriage", "closeDialog"]);
+import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
+
 </script>
 
 <template>
     <div class="dialog">
-        <h1 class="dialogTitle">Śluby</h1>
+        <h1 class="dialogTitle">Propozycja małżeństwa</h1>
 
         <div class="dialogContent">
-            <p>
-                Kliknij na kościół, aby w dowolnym momencie sprawdzić aktualnego
-                proponowanego małżonka
-            </p>
-            <img
-                :src="`/src/assets/games/gameAssets/brianboru/${marriage.name.toLowerCase()}.jpg`"
-                class="marriageIcon"
-            />
+            <div>
+
+                <p><b>{{ marriage.name }}</b> 
+                    
+                    
+                    {{marriage.region && marriage.region !== "Vikings" ? "z regionu ": "" }}
+                    <b>
+                        {{marriage.region && marriage.region !== "Vikings" ? marriage.region : "" }}
+                    </b><br>
+                    szuka kogoś do poślubienia
+                    
+                </p>
+                
+            </div>
+            <div class="wrapper">
+                <p>
+                
+                (Kliknij na kościół, aby sprawdzić posag)
+                </p>
+                
+            </div>
+            
+            
         </div>
 
-        <button class="dialogButton" @click="props.closeDialog">
-            Przynajmniej w grze mogę wziąć ślub
-        </button>
+                <button class="dialogButton yellowButton" @click="props.closeDialog">  dalej <img :src="Letter" class="icon"></button>
+
     </div>
 </template>
 
@@ -57,10 +73,12 @@ const props = defineProps(["marriage", "closeDialog"]);
 
     .dialogContent {
         display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        text-align: center;
 
-        justify-content: center;
-        gap: 1rem;
-        align-items: center;
+        line-height: 1.2;
+     
         font-size: 1.5rem;
 
         width: 85%;
@@ -68,19 +86,36 @@ const props = defineProps(["marriage", "closeDialog"]);
 
     .marriageIcon {
         transform: translateY(-10px);
-        height: 140px;
+        height: 50px;
         border-radius: 0.25rem;
     }
 
     .dialogButton {
+        position: relative;
         font-size: 1.25rem;
         border: none;
         border-radius: 0.25rem;
-        padding: 0.5rem 1.75rem;
+        color: transparent;
+        
+    }
 
-        &[disabled="true"] {
-            color: red;
-        }
+    .wrapper {
+        margin-top: 0.5rem;;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.85rem;
+        font-family: sans-serif;
+        color: rgb(255, 255, 255);
+    }
+
+     .icon {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        display: inline-block;
+        height: 27px;
+        transform: translate(-50%, -50%);
     }
 }
 </style>

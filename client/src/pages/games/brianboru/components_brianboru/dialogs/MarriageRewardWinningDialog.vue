@@ -6,10 +6,6 @@ const store = useAppStore();
 
 const testCityChosing = () => {
     props.closeDialog();
-    store.emit("gameData", {
-        data: "cityId",
-        eventName: "marriageWinnerChooseReward",
-    });
 };
 </script>
 
@@ -30,7 +26,7 @@ const testCityChosing = () => {
     top: 50%;
     font-family: "MedievalSharp";
     left: 50%;
-    transform: translate(-50%, -50%);
+      transform: translate(-50%, -65%);
     z-index: 30;
     display: flex;
     flex-direction: column;

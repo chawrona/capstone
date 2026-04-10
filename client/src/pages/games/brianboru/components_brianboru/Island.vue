@@ -1,4 +1,6 @@
 <script setup>
+import { computed } from "vue";
+
 import Island from "@/assets/games/gameAssets/brianboru/MAPA.png";
 import "@/styles/brianBoru.scss";
 import { useAppStore } from "@/store/useAppStore";
@@ -9,7 +11,18 @@ import {
     regions as gameRegions,
 } from "../../../../../../server/models/games/brianboru/config/cities";
 import statuses from "../../../../../../server/models/games/brianboru/config/statuses";
+import chooseCity from "../composables_brianboru/useBrianBoruCityActions.js";
+import getCitiesColors from "../composables_brianboru/useBrianBoruCityColor.js";
+import getCityState from "../composables_brianboru/useBrianBoruCityState.js";
 import RegionsSVG from "./RegionsSVG.vue";
+import CityIcon1 from "./svgs/CityIcon1.vue";
+import CityIcon2 from "./svgs/CityIcon2.vue";
+import CityIcon3 from "./svgs/CityIcon3.vue";
+import CityIcon4 from "./svgs/CityIcon4.vue";
+import CityIcon5 from "./svgs/CityIcon5.vue";
+import CityIcon6 from "./svgs/CityIcon6.vue";
+import CathedraIcon from "./svgs/CathedraIcon.vue";
+
 const store = useAppStore();
 const props = defineProps([
     "cityUnderAttack",
@@ -28,86 +41,11 @@ const props = defineProps([
 const mapWidth = 1100 * 1.08;
 const mapHeight = 800 * 1.08;
 
-const getOwnerColor = (city) => {
-    if (props.cities[city]) return props.cities[city].owner.color.hex;
-};
-
-const chooseCity = (cityId) => {
-    if (
-        statuses.BUILD_ATTACKED_CITY === props.status &&
-        cityId === props.cityUnderAttack
-    ) {
-        return store.emit("gameData", {
-            data: cityId,
-            eventName: "buildAttackedCity",
-        });
-    }
-
-    let eventName;
-
-    switch (props.status) {
-        case statuses.BUILD_CATHEDRAL:
-            if (!props.citiesToCathedra.includes(cityId)) {
-                alert("Nie wolno wybrać tego miasta do budowy katedry!");
-                return;
-            }
-            eventName = "chooseCathedral";
-            break;
-        case statuses.VIKINGS_SOMEONE_CITY:
-            if (!props.citiesToVikings.includes(cityId)) {
-                alert("Nie wolno wysłać wikingów do tego miasta!");
-                return;
-            }
-            eventName = "chooseSomeoneCityToVikings";
-            break;
-        case statuses.VIKINGS_YOUR_CITY:
-            if (!props.citiesToVikings.includes(cityId)) {
-                alert("Nie wolno wysłać wikingów do swojego miasta!");
-                return;
-            }
-            eventName = "chooseYourCityToVikings";
-            break;
-        case statuses.CHOOSE_ATTACKED_CITY:
-            if (!props.citiesToAttack.includes(cityId)) {
-                alert("Nie wolno zaatakować tego miasta!");
-                return;
-            }
-            eventName = "chooseCityToAttack";
-            break;
-        case statuses.BUILD_BOUGHT_CITY:
-            if (!props.citiesToBuild.includes(cityId)) {
-                alert("Nie wolno zaatakować tego miasta!");
-                return;
-            }
-            eventName = "buildBoughtCity";
-            break;
-        case statuses.BUILD_FIRST_CITY:
-            if (!props.citiesToBuild.includes(cityId)) {
-                alert("Nie wolno zaatakować tego miasta!");
-                return;
-            }
-            eventName = "buildFirstCity";
-            break;
-        default:
-            return; // opcjonalnie dla nieznanego statusu
-    }
-
-    // dalsza logika z eventName
-
-    store.emit("gameData", {
-        data: cityId,
-        eventName,
-    });
-};
-
-const getHoverColor = (cityId) => {
-    if (
-        props.status === statuses.BUILD_BOUGHT_CITY ||
-        (props.status === statuses.BUILD_FIRST_CITY &&
-            props.citiesToBuild.includes(cityId))
-    )
-        return props.you.color.hex;
-    return "#ffffff";
+const isImageVisible = (cityId) => {
+    if (!props.cities[cityId]) return 0;
+    if (props.cities[cityId].cathedra) return "cathedra";
+    if (true) return "cathedra";
+    return ((cityId * 31 + props.cities[cityId].owner.turnOrder) % 6) + 1;
 };
 </script>
 
@@ -116,100 +54,44 @@ const getHoverColor = (cityId) => {
         class="island"
         :style="`--width: ${mapWidth}px; --height: ${mapHeight}px`"
     >
-        <RegionsSVG
+        <!-- <RegionsSVG
             :width="mapWidth"
             :height="mapHeight"
             class="regions"
             :regions="props.regions"
-        />
-        <!-- <pre> 
-            <{{ props.cities }} 
-             {{ Object.keys(statuses).find(key => statuses[key] === props.status) }} 
-       </pre> -->
+            :everything-dark="false"
+        /> -->
+
         <template v-for="region in Object.keys(gameRegions)" :key="region">
             <div
-                v-for="city in gameRegions[region].cities"
-                :key="`${region}_${city}`"
-                class="city"
-                :data-type="gameCities[city].type"
-                :class="[
-                    {
-                        attacked: props.cityUnderAttack === city,
-                        cathedra: props.cities[city]?.cathedra,
-                        owned: Boolean(props.cities[city]),
-                        vikings: props.cities[city]?.vikings,
-                        buildHover:
-                            (props.status === statuses.BUILD_BOUGHT_CITY ||
-                                props.status === statuses.BUILD_FIRST_CITY) &&
-                            props.citiesToBuild.includes(city),
-                        canBuild:
-                            (props.status === statuses.BUILD_BOUGHT_CITY ||
-                                props.status === statuses.BUILD_FIRST_CITY) &&
-                            props.citiesToBuild.includes(city),
-                        attackedHover:
-                            props.citiesToAttack.includes(city) &&
-                            props.status === statuses.CHOOSE_ATTACKED_CITY,
-                        cathedraHover:
-                            props.status === statuses.BUILD_CATHEDRAL,
-                        vikingsHover:
-                            props.status === statuses.VIKINGS_SOMEONE_CITY ||
-                            props.status === statuses.VIKINGS_YOUR_CITY,
-                        canAttack:
-                            props.citiesToAttack.includes(city) &&
-                            props.status === statuses.CHOOSE_ATTACKED_CITY,
-                        canCathedra: props.citiesToCathedra.includes(city),
-                        canVikings: props.citiesToVikings.includes(city),
-                    },
-                    `${region.replace(/\s+/g, '')}_${city}`,
-                ]"
-                :style="`--owner: ${getOwnerColor(city)}; --hoverColor: ${getHoverColor(city)}`"
-                @click="() => chooseCity(city)"
-            />
+                v-for="cityId in gameRegions[region].cities"
+                :key="`${region}_${cityId}`"
+                :data-type="gameCities[cityId].type"
+                :class="getCityState(cityId, region, props)"
+                :style="getCitiesColors(cityId, props)"
+                @click="() => chooseCity(cityId, props)"
+            >
+
+                <CityIcon1 v-if="isImageVisible(cityId) === 1" class="cityIcon"/>
+                <CityIcon2 v-if="isImageVisible(cityId) === 2" class="cityIcon"/>
+                <CityIcon3 v-if="isImageVisible(cityId) === 3" class="cityIcon"/>
+                <CityIcon4 v-if="isImageVisible(cityId) === 4" class="cityIcon"/>
+                <CityIcon5 v-if="isImageVisible(cityId) === 5" class="cityIcon"/>
+                <CityIcon6 v-if="isImageVisible(cityId) === 6" class="cityIcon"/>
+                <CathedraIcon v-if="isImageVisible(cityId) === 'cathedra'" class="cityIcon"/>
+            </div>
         </template>
 
         <img :src="Island" alt="" class="map" />
-
-        <!-- <div class="grid-container">
-            <div 
-                v-for="n in 400" 
-                :key="n" 
-                class="grid-item"
-                >
-                 {{ (Math.floor((n - 1) / 20) / 19 * 100).toFixed(0) }}% {{ (( (n - 1) % 20 ) / 19 * 100).toFixed(0) }}%
-            </div>
-        </div> -->
     </div>
 </template>
 
 <style scoped lang="scss">
-.grid-container {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    z-index: 5;
-    font-size: 0.7rem;
-    grid-template-columns: repeat(20, 1fr);
-    grid-template-rows: repeat(20, 1fr);
-    gap: 0; /* brak odstępów między komórkami */
-}
-
-.grid-item {
-    border: 1px solid #333; /* widoczny border */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    box-sizing: border-box;
-    font-weight: bold;
-}
-
 .island {
-    // background-color: #ffffff4e;
     top: 50%;
     left: 50%;
     transform: translate(calc(-50%), -50%);
     position: absolute;
-    // background-color: #ffffff69;
     width: var(--width);
     height: var(--height);
 }
@@ -218,22 +100,13 @@ const getHoverColor = (cityId) => {
     z-index: 3;
 }
 
-.region {
-    inset: 0;
-    position: absolute;
-    z-index: 6;
-}
-
-.map {
-    z-index: 2;
-}
-
 .map {
     position: absolute;
     width: var(--width);
     height: var(--height);
     filter: drop-shadow(2px 2px 25px rgba(208, 226, 247, 0.683))
         drop-shadow(2px 2px 1px rgba(0, 0, 0, 0.864));
+    z-index: 2;
 }
 
 .city {
@@ -251,22 +124,78 @@ const getHoverColor = (cityId) => {
         background: rgba(255, 0, 0, 0);
         z-index: -2;
     }
+
+    &:not(.owned) {
+        background-size: cover;
+        background-position: center;
+
+        &[data-type="red"] {
+            background-image: url("/src/assets/games/gameAssets/brianboru/miasto_red.png");
+        }
+
+        &[data-type="blue"] {
+            background-image: url("/src/assets/games/gameAssets/brianboru/miasto_blue.png");
+        }
+
+        &[data-type="yellow"] {
+            background-image: url("/src/assets/games/gameAssets/brianboru/miasto_yellow.png");
+        }
+    }
 }
 
-[data-type="red"]:not(.owned) {
-    background-image: url("/src/assets/games/gameAssets/brianboru/miasto_red.png");
-    background-size: cover;
-    background-position: center;
+.hide {
+    opacity: 0.5;
 }
-[data-type="blue"]:not(.owned) {
-    background-image: url("/src/assets/games/gameAssets/brianboru/miasto_blue.png");
-    background-size: cover;
-    background-position: center;
+
+.canAttack,
+.canCathedra,
+.canVikings,
+.canBuild {
+    cursor: pointer;
+    box-shadow: 0 0 3px 3px rgba(255, 255, 255, 0.726);
 }
-[data-type="yellow"]:not(.owned) {
-    background-image: url("/src/assets/games/gameAssets/brianboru/miasto_yellow.png");
-    background-size: cover;
-    background-position: center;
+
+.owned {
+    display: grid;
+    place-items: center;
+    box-shadow: none;
+}
+
+.cityIcon {
+    position: absolute;
+    width: 90%;
+    height: 90%;
+}
+
+.owned::after {
+    display: grid;
+    font-weight: bold;
+    font-size: 1.5rem;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    content: "";
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.349);
+    background: #ffffff;
+    box-shadow:
+        inset 0 1.5px 3px rgba(255, 255, 255, 0.576),
+        /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+        0 2px 3px rgba(0, 0, 0, 0.705),
+        0px 0px 3px 2px rgba(0, 0, 0, 0.603);
+}
+
+.owned.cathedra {
+    &::after {
+        width: 120%;
+        height: 120%;
+    }
+
+    .cityIcon {
+        transform: translateY(-2px);
+        width: 100%;
+        height: 100%;
+    }
 }
 
 .vikings::after {
@@ -281,112 +210,116 @@ const getHoverColor = (cityId) => {
     border-radius: 50%;
 }
 
-.owned {
-    display: grid;
-    place-items: center;
-    box-shadow: none;
+.canAttack {
+    cursor: url("/src/assets/games/gameAssets/brianboru/sword.png"), pointer;
 }
 
-.owned::after {
-    display: grid;
-    font-weight: bold;
-    font-size: 1.5rem;
-    width: 100%;
-    height: 100%;
-    place-items: center;
-    content: "";
-    border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.349);
-    background-color: hsl(from var(--owner) h s calc(l * 1));
-    box-shadow:
-        inset 0 1.5px 3px rgba(255, 255, 255, 0.576),
-        /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
-        0 2px 3px rgba(0, 0, 0, 0.308),
-        0px 0px 3px 2px rgba(0, 0, 0, 0.358);
+.attacked {
+        box-shadow: 0 0 3px 3px rgba(255, 255, 255, 0.76);
+
+         &[data-type="red"]::before {
+         background-color: #9a2a13;
+    }
+
+    &[data-type="blue"]::before  {
+         background-color: #3b74ab;
+    }
+
+        &[data-type="yellow"]::before  {
+             background-color: #e0c007;
+        }
 }
 
-.cathedraHover:hover::after,
-.cathedra::after {
-    --border-radius: 8px;
-    display: grid;
-    font-weight: bold;
-    font-size: 1.5rem;
-    width: calc(100% + var(--border-radius));
-    height: calc(100% + var(--border-radius));
-    transform: translate(
-        calc(-1 / 2 * var(--border-radius)),
-        calc(-1 / 2 * var(--border-radius))
-    );
-    border: var(--border-radius) solid rgb(23, 103, 143);
-    place-items: center;
-    content: "";
+.attacked::before {
+     --border-radius: 8px;
+     content: "";
     position: absolute;
-    inset: 0;
-    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    width: calc(100% - var(--border-radius));
+    height: calc(100% - var(--border-radius));
+
+    background-image: url("/src/assets/games/gameAssets/brianboru/sword.svg");
+    background-size: 70%;
+    background-position: center;
+    background-repeat: no-repeat;
+   
 }
 
-.attackedHover:hover::after,
 .attacked::after {
     --border-radius: 8px;
     display: grid;
     font-weight: bold;
     font-size: 1.5rem;
-    width: calc(100% + var(--border-radius));
-    height: calc(100% + var(--border-radius));
+    width: calc(300% + var(--border-radius));
+    height: calc(300% + var(--border-radius));
     transform: translate(
         calc(-1 / 2 * var(--border-radius)),
         calc(-1 / 2 * var(--border-radius))
     );
-    // border: var(--border-radius) solid rgb(143, 23, 75);
 
-    box-shadow: 0 0 5px 3px rgba(255, 255, 255, 0.753);
+  
 
     background-image: url("/src/assets/games/gameAssets/brianboru/first_player.png");
     background-size: contain;
     place-items: center;
     content: "";
     position: absolute;
-    inset: 0;
-    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+  
 }
 
-.canAttack,
-.canCathedra,
-.canVikings,
+.attackedHover:hover{
+
+    filter: grayscale(1);
+    box-shadow: 0 0 5px 4px rgba(0, 0, 0, 0.788);
+
+    &::after {
+        width: 70%;
+        height: 70%;
+        background-image: url("/src/assets/games/gameAssets/brianboru/flame-lit.gif");
+        background-size: contain;
+        place-items: center;
+        content: "";
+        position: absolute;
+        transform: translate(-50%, -50%);
+        top: 50%;
+        left: 50%;
+        z-index: 2;
+    }
+
+}
+
 .canBuild {
-    cursor: pointer;
-    box-shadow: 0 0 5px 4px rgba(255, 255, 255, 0.485);
-}
-
-.buildHover:hover {
-    display: grid;
-    place-items: center;
+    box-shadow: 0 0 5px 4px rgb(255, 255, 255);
 
     &::after {
         display: grid;
         font-weight: bold;
         font-size: 1.5rem;
-        width: 70%;
-        height: 70%;
+        width: 100%;
+        height: 100%;
         place-items: center;
         content: "";
         border-radius: 50%;
         border: 1px solid rgba(0, 0, 0, 0.349);
-        background-color: hsl(from var(--hoverColor) h s calc(l * 1));
+        background-color: #9c9c9c;
         box-shadow:
-            inset 0 1.5px 3px rgba(255, 255, 255, 0.576),
+            inset 0 2px 3px rgb(255, 255, 255),
             /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
-            0 0px 3px rgba(0, 0, 0, 0.699);
+            0 2px 3px rgba(0, 0, 0, 0.705),
+            0px 0px 3px 2px rgba(0, 0, 0, 0.603);
+        background-image: url("/src/assets/games/gameAssets/brianboru/hammer.png");
+        background-size: 65%;
+        background-repeat: no-repeat;
+        background-position: center;
     }
 
-    &[data-type="red"]::after {
-        transform: translate(0.3px, 0px);
-    }
-    &[data-type="yellow"]::after {
-        transform: translate(0.4px, 0.2px);
-    }
-    &[data-type="blue"]::after {
-        transform: translate(0.3px, 0px);
+    &:hover::after {
+        background-color: hsl(from var(--hoverColor) h s calc(l * 1));
     }
 }
 </style>

@@ -1,13 +1,18 @@
 <script setup>
 import { computed } from "vue";
 
-const props = defineProps(["width", "height", "regions"]);
+const props = defineProps(["width", "height", "regions", "everythingDark"]);
 
 const getRegionsColor = computed(() => {
+
+
+
+    if (props.everythingDark) return "--Leinster:var(--dark); --Ulaid:var(--dark); --Southern-Uí-Néill:var(--dark); --Dubhlinn:var(--dark); --Munster:var(--dark); --Northern-Uí-Néill:var(--dark); --Bréifne:var(--dark); --Connaught:var(--dark);"
+
     let styleString = "";
 
     for (const [region, owner] of Object.entries(props.regions)) {
-        styleString += `--${region.replace(/ /g, "-")}: ${owner.color.hex}60;`;
+        styleString += `--${region.replace(/ /g, "-")}: ${owner.color.hex}45;`;
     }
 
     return styleString;
@@ -79,7 +84,7 @@ l-72 -3 -89 72 c-60 48 -103 75 -133 83 -62 15 -197 84 -219 112 -20 25 -50
 -13 -4 -16 -10z"
             />
             <path
-                id="uland"
+                id="ulaid"
                 class="region-svg"
                 d="M8860 6990 c-29 -27 -30 -29 -15 -64 9 -20 15 -66 15 -107 0 -60 5
 -81 30 -131 33 -64 35 -77 20 -140 -5 -24 -14 -103 -20 -177 -9 -114 -16 -146
@@ -485,6 +490,7 @@ svg path {
 svg {
     position: absolute;
     inset: 0;
+    --dark: rgba(0, 0, 0, 0.24);
 }
 
 #leinster-small {

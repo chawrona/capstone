@@ -1,23 +1,84 @@
 <script setup>
 const props = defineProps(["churchDialogInfo", "closeDialog"]);
+import Points from "@/assets/games/gameAssets/brianboru/points.png";
+import Cathedra from "@/assets/games/gameAssets/brianboru/cathdera.png";
+import Church from "@/assets/games/gameAssets/brianboru/no_church.png";
+import { computed } from "vue";
+import PlayerIcon from "../PlayerIcon.vue";
+
+const rewardsAvailable = computed(() => {
+    return props.churchDialogInfo.includes('Brak ludzi w kościele')
+})
+
 </script>
 
 <template>
     <div class="dialog">
-        <h2 class="dialogTitle">Kościół</h2>
-        <h2 v-if="props.churchDialogInfo.includes('Brak ludzi w kościele')">
-            Kraj jest pełen bezbożników
-        </h2>
-        <h2 v-else>
-            {{
-                props.churchDialogInfo.map((el) => [
-                    el.player.username,
-                    el.reward,
-                ])
-            }}
-        </h2>
+        <h2 class="dialogTitle">{{rewardsAvailable ? "Wiara w kraju słabnie" : "Chrześcijańskie wpływy" }}</h2>
+       
+      
 
-        <button class="dialogButton" @click="props.closeDialog">Dalej</button>
+        <div class="dialogContent">
+            <div v-if="rewardsAvailable">
+                <p>
+                    Nikt nie został znaleziony w Kościele.
+                </p>
+            </div>
+            <div v-else>
+                <p>Działania w Kościele przynoszą uznanie. <br>Czujecie przypływ władzy duchowej i prestiżu.</p>
+                <div class="container">
+                    
+               
+                <div v-for="player in props.churchDialogInfo" class="wrapper">
+
+                    <PlayerIcon :player="player.player" :playerColor="white" class="icon"/>
+
+                    <div v-if="player.reward.points" class="points">
+                        <span>
+                            {{player.reward.points}}
+                        </span>
+                        <img class="rewardIcon" :src="Points">
+                    </div>
+
+                   
+
+                    <div v-if="player.reward.church" class="church">
+                        <img class="rewardIcon" :src="Church" v-for="(i,k) in player.reward.church * -1">
+                    </div>
+                     <div v-if="player.reward.cathedral">
+                        <img class="rewardIcon cathedra" :src="Cathedra">
+                    </div>
+
+                </div>
+                 </div>
+            </div>
+        </div>
+
+        <!-- 
+        name
+        {
+        church: int
+        cathedral: true
+        points: int
+        }
+        
+        
+        -->
+
+     
+        
+
+    <!-- {{
+        
+        props.churchDialogInfo.map((el) => [
+            el.player.username,
+            el.reward,
+        ])
+    }} -->
+
+        
+
+        <button class="dialogButton blueButton" @click="props.closeDialog">Dalej</button>
     </div>
 </template>
 
@@ -27,40 +88,112 @@ const props = defineProps(["churchDialogInfo", "closeDialog"]);
     top: 50%;
     font-family: "MedievalSharp";
     left: 50%;
-    transform: translate(-50%, -50%);
+     transform: translate(-50%, -65%);
     z-index: 30;
-    height: 250px;
+          text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
+     height: 300px;
     width: 600px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+ justify-content: space-between;
+ padding: 2rem 1rem;
     position: absolute;
     color: white;
     font-weight: normal;
-    padding: 1.25rem 1rem;
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/blueCard.png");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_blue.jpg");
     background-size: cover;
-    gap: 2rem;
-    box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
+    gap: 0.5rem;
+   box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
+
+    .dialogContent {
+        width: 100%;
+           line-height: 1.4;
+        text-align: center;
+    }
 
     .dialogTitle {
-        font-weight: normal;
+    margin-bottom: 0;
         letter-spacing: 1px;
         font-size: 2rem;
     }
+}
 
-    .dialogButton {
-        font-size: 1.25rem;
-        border: none;
-        border-radius: 0.25rem;
-        padding: 0.5rem 1.75rem;
+  .points {
+        position: relative;
+          height: 48px;
+          width: 48px;
 
-        &[disabled="true"] {
-            color: red;
+          img {
+            transform: none;
+          }
+
+        span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-size: 1.3rem;
+            font-weight: bold;
+            transform: translate(-60%, -40%);
+        }
+
+       
+    }
+
+        .rewardIcon {
+        height: 32px;
+          transform: translateY(7px);
+        display: inline-block;
+        filter: drop-shadow(0px 0px 1px rgb(20, 20, 20))
+     
+    }
+
+      .wrapper {
+      
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+          gap: 0rem;
+          flex-shrink: 0;
+    }
+
+    .container {
+        display: flex;
+        gap: 0 1rem;
+        flex-wrap: wrap;
+    }
+
+    .church {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.1rem;
+        font-family: sans-serif;
+
+        .rewardIcon {
+              transform: translateY(3px);
+        }
+        
+    }
+
+    .points {
+        
+        .rewardIcon {  height: 40px;
+            transform: translateY(7px);
+        }   
+        span {
+            transform: translate(-60%, -28%);
         }
     }
-}
+
+    .cathedra {
+        transform: translateY(5px);
+        height: 46px;
+         filter: drop-shadow(0px 0px 1px rgb(2, 122, 2));
+         border: 1px solid black;
+    }
+    .icon {
+        margin-right: 0.25rem;
+    }
 </style>

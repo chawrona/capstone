@@ -9,7 +9,7 @@ const props = defineProps(["vikingsAttackDialogInfo", "closeDialog"]);
             {{ vikingsAttackDialogInfo[0].status }}
         </p>
         <button class="dialogButton" @click="props.closeDialog">
-            Focus na Senseia
+            Dalej
         </button>
     </div>
 </template>
@@ -20,7 +20,7 @@ const props = defineProps(["vikingsAttackDialogInfo", "closeDialog"]);
     top: 50%;
     font-family: "MedievalSharp";
     left: 50%;
-    transform: translate(-50%, -50%);
+     transform: translate(-50%, -65%);
 
     height: 250px;
     width: 600px;

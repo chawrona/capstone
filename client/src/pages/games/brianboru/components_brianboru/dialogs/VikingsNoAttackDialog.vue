@@ -4,9 +4,11 @@ const props = defineProps(["closeDialog"]);
 
 <template>
     <div class="dialog">
-        <h2 class="dialogTitle">Brak najazdu wikingów</h2>
-        <h2>Wszyscy wikingowie zostali pokonani</h2>
-        <button class="dialogButton" @click="props.closeDialog">Dalej</button>
+        <h1 class="dialogTitle">Wikingowie odparci</h1>
+        <p class="subtitle">
+            Wszyscy wikingowie zostali pokonani.<br> Żadne miasto nie jest zagrożone
+        </p>
+        <button class="dialogButton blueButton" @click="props.closeDialog">Dalej</button>
     </div>
 </template>
 
@@ -16,11 +18,11 @@ const props = defineProps(["closeDialog"]);
     top: 50%;
     font-family: "MedievalSharp";
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -65%);
 
-    height: 250px;
+height: 300px;
     width: 600px;
-
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -31,26 +33,22 @@ const props = defineProps(["closeDialog"]);
     font-weight: normal;
     padding: 1.25rem 1rem;
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/redCard.png");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_red.jpg");
     background-size: cover;
     gap: 2rem;
-    box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
+    box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
+ justify-content: space-between;
+ padding: 2rem 1rem;
 
+ .subtitle {
+    text-align: center;
+    font-size: 1.5rem;
+    line-height: 1.4;
+ }
     .dialogTitle {
-        font-weight: normal;
+   
         letter-spacing: 1px;
         font-size: 2rem;
-    }
-
-    .dialogButton {
-        font-size: 1.25rem;
-        border: none;
-        border-radius: 0.25rem;
-        padding: 0.5rem 1.75rem;
-
-        &[disabled="true"] {
-            color: red;
-        }
     }
 }
 </style>

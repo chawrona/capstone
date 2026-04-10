@@ -17,6 +17,10 @@ const dialogs = {
 
     CHURCH: 13, // Informacje o kościele
     BUILD_CATHEDRAL: 14, // Informacja że budujesz katedrę
+
+    ESTRID_REWARD_DIALOG: 15, // Wybór nagrody
+    ESTRID_REWARD_VIKINGS: 16, // Informacja o nagrodzie 1
+    ESTRID_REWARD_REGIONS: 17, // Informacja o nagrodzie 2
 };
 
 export default dialogs;

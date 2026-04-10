@@ -1,9 +1,9 @@
 <script setup>
 import { computed, ref } from "vue";
 
-import statuses from "../../../../../../server/models/games/brianboru/config/statuses";
-import { useAppStore } from "../../../../store/useAppStore";
-import Card from "./Card.vue";
+import statuses from "../../../../../../../server/models/games/brianboru/config/statuses";
+import { useAppStore } from "../../../../../store/useAppStore";
+import Card from "../Card.vue";
 
 const props = defineProps(["chosenCards", "you", "status"]);
 const store = useAppStore();
@@ -126,6 +126,7 @@ const activateCardEffect = () => {
                           : "dokupić miejsce w kościele"
                 }}?
             </div>
+
             <div v-else-if="canYouBuyACity">
                 <p>Czy chcesz zbudować miasto?</p>
             </div>

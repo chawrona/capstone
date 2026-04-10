@@ -80,8 +80,11 @@ export default class Cards {
     }
 
     giveCardsToPlayers() {
-        const playerCount = this.game.playersQueue.length;
-        const cardsToGive = playerCount === 5 ? 5 : playerCount === 4 ? 6 : 8;
+        // const playerCount = this.game.playersQueue.length;
+        // const cardsToGive = playerCount === 5 ? 5 : playerCount === 4 ? 6 : 8;
+
+        const cardsToGive = 3;
+
         for (const player of this.players.values()) {
             player.setData("cards", () => this.cards.splice(0, cardsToGive));
         }
@@ -329,6 +332,7 @@ export default class Cards {
 
     // @event
     chooseCardEffect(data) {
+        const start = performance.now();
         // { chosenBottom: 'top', buyAdditional: 0, buildCity: false }
         const [card, player] = this.chosenCards.shift();
         player.setStatus(statuses.WAITING);
@@ -412,8 +416,13 @@ export default class Cards {
 
         if (buildingCity) {
             player.setStatus(statuses.BUILD_BOUGHT_CITY);
+            const start1 = performance.now();
             this.game.regions.setCitiesToBuy(player);
+            const end1 = performance.now();
+            console.log(`Czas wykonania setCitiesToBuy: ${end1 - start1} ms`);
             this.game.setMessage(`${player.username} buduje zakupione miasto`);
+            const end = performance.now();
+            console.log(`Czas wykonania chooseCardEffect: ${end - start} ms`);
             return this.game.sendGameDataToAll();
         } else {
             return this.nextCardEffect(player);
@@ -422,6 +431,9 @@ export default class Cards {
 
     // @event
     nextCardEffect(player) {
+        // player przekazany tylko z chooseCardEffect. W innych miejscach gdzie wywołuje się nextCardEffect nie dostarczamy gracza.
+        // Nigdy nie ma potrzeby bo są to miejsca, gdzie robią się akcję unikalne tylko dla graczy, którzy nie wygrali
+        // NIE OPERAĆ TUTAJ NA PLAYERZE
         if (this.chosenCards.length === 0) {
             return this.game.regions.buildAttackedCity(player);
         }
@@ -429,6 +441,7 @@ export default class Cards {
         const [, nextPlayer] = this.chosenCards[0];
 
         nextPlayer.setStatus(statuses.CHOOSE_CARD_EFFECT);
+
         this.game.setMessage(`${nextPlayer.username} wybiera efekt karty`);
 
         return this.game.sendGameDataToAll();

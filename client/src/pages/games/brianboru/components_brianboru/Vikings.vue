@@ -64,8 +64,8 @@ const data = [
 <template>
     <div class="wrap">
         <img :src="WhiteAxe" alt="" class="axe-icon" />
-        <div v-if="14" class="vikingsWrapper">
-            <div v-for="viking in 0" :key="viking" class="vikings">
+        <div  class="vikingsWrapper">
+            <div v-for="viking in props.vikings" :key="viking" class="vikings">
                 <img :src="Vikings" class="vikings-icon" />
             </div>
         </div>

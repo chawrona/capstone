@@ -1,20 +1,82 @@
 <script setup>
+import PlayerIcon from '../PlayerIcon.vue';
+
+import MoneyDouble from "@/assets/games/gameAssets/brianboru/money_double_plus.png";
+import Money from "@/assets/games/gameAssets/brianboru/money_plus.png";
+import Sun from "@/assets/games/gameAssets/brianboru/sun.png";
+import City from "@/assets/games/gameAssets/brianboru/triquetra.png";
+import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
+import Points from "@/assets/games/gameAssets/brianboru/points.png";
+import { computed } from 'vue';
+
 const props = defineProps(["marriageDialogInfo", "closeDialog"]);
+
+
+const rewards = [
+  
+      
+            "money",
+            "doubleMoney",
+            "sun",
+            "city",
+        ];
+
+        const fiancee = computed(() => {
+
+            return props.marriageDialogInfo[0].fiancee
+        })
+
 </script>
 
 <template>
     <div class="dialog">
-        <h1 class="dialogTitle">Zaślubiny odbyły się</h1>
-        <p>Oto kto co dostał:</p>
+        <h1 class="dialogTitle">Odbyły się zaślubiny</h1>
 
-        <p>
-            {{
-                props.marriageDialogInfo.map((el) => [
-                    el.player.username,
-                    el.reward,
-                ])
-            }}
-        </p>
+        <div class="dialogContent">
+            <span class="mainReward">
+
+                <p>Gracz  <PlayerIcon :player="props.marriageDialogInfo[0].player" :playerColor="white" />
+                    poślubił <b>{{ fiancee.name }}</b>  <img class="rewardIcon letter" :src="Letter">
+                </p>
+            </span>
+    
+
+        <div class="rewardsContainer">
+            <br>
+            <p class="info">Otrzymane nagrody:</p>
+            <div class="flex">
+                <div v-for="player in props.marriageDialogInfo" class="wrapper">
+                    <PlayerIcon :player="player.player" :playerColor="white" />
+                    <div v-if="player.reward === 'winner' && fiancee.region !== 'Vikings'" class="winnerRewards">
+                        <img class="rewardIcon" :src="Money" v-for="(sun, index) in fiancee.suns">
+
+                        <div v-if="fiancee.points" class="points">
+                            <span>{{ fiancee.points }}</span>
+                            <img class="rewardIcon" :src="Points">
+                        </div>
+
+                        <div v-if="fiancee.region" class="winnerRegion">
+                            <b><i>{{ fiancee.region }}</i></b>
+                            <img class="City rewardIcon" :src="City">
+                        </div>
+                      
+                    </div>
+                    <div v-if="player.reward === 'winner' && fiancee.region === 'Vikings'" class="help">
+                        <i><b>Wsparcie Wojskowe/Regionalne</b></i>
+                    </div>
+                    
+                    <img class="rewardIcon" :src="Money" v-if="player.reward === 'money'">
+                    <img class="rewardIcon" :src="MoneyDouble" v-if="player.reward === 'doubleMoney'">
+                    <img class="rewardIcon" :src="Sun" v-if="player.reward === 'sun'">
+                    <img class="rewardIcon" :src="City" v-if="player.reward === 'city'">
+                </div>
+            </div>
+            
+        </div>
+        </div>
+        
+        
+      
         <button class="dialogButton" @click="props.closeDialog">Dalej</button>
     </div>
 </template>
@@ -23,32 +85,46 @@ const props = defineProps(["marriageDialogInfo", "closeDialog"]);
 .dialog {
     position: absolute;
     top: 50%;
+    z-index: 30;
     font-family: "MedievalSharp";
     left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 30;
+    transform: translate(-50%, -65%);
+
     display: flex;
     flex-direction: column;
     align-items: center;
     position: absolute;
     color: white;
     font-weight: normal;
-    padding: 1.25rem 1rem;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/yellowCard.png");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_yellow.jpg");
     background-size: cover;
-    gap: 2rem;
-    box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
+    gap: 0rem;
 
-    img {
-        height: 300px;
-        border-radius: 0.25rem;
-    }
+    min-height: 300px;
+    width: 700px;
+    justify-content: space-between;
+    padding: 2rem 1rem;
+    box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
 
     .dialogTitle {
-        font-weight: normal;
         letter-spacing: 1px;
         font-size: 2rem;
+    }
+
+    .dialogContent {
+     
+     
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+        width: 90%;
+    }
+
+    .marriageIcon {
+        transform: translateY(-10px);
+        height: 140px;
+        border-radius: 0.25rem;
     }
 
     .dialogButton {
@@ -61,5 +137,92 @@ const props = defineProps(["marriageDialogInfo", "closeDialog"]);
             color: red;
         }
     }
+
+    .rewardsContainer {
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .flex {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0 1rem;
+      justify-content: start;
+    }
+
+    .wrapper {
+        
+        display: flex;
+        align-items: center;
+          gap: 0.5rem;
+    }
+
+    .rewardIcon {
+        height: 48px;
+          transform: translateY(7px);
+        display: inline-block;
+     
+    }
+
+    .mainReward {
+        text-align: center;
+        font-size: 1.2rem;
+    }
+
+    .letter {
+      
+        height: 35px;
+         transform: translateY(12px);
+    }
+
+    .help {
+        align-self: flex-end;
+        font-size: 1.1rem;
+    }
+
+    .points {
+        position: relative;
+          height: 48px;
+          width: 48px;
+
+          img {
+            transform: none;
+          }
+
+        span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-size: 1.3rem;
+            font-weight: bold;
+            transform: translate(-60%, -40%);
+        }
+
+       
+    }
+
+     .winnerRewards {
+            display: flex;
+            gap: 0.2rem;
+            margin-left: 0.5rem;
+            font-display: row;
+            align-items: center;
+        }
+
+        .winnerRegion {
+             height: 48px;
+             gap: 0.5rem;
+            flex-direction: column-reverse;
+            display: flex;
+            align-items: center;
+            transform: translateY(40%);
+            
+
+        }
+
+        .info {
+            margin-bottom: 0.5rem;
+        }
 }
 </style>

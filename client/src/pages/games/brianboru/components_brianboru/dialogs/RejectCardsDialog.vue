@@ -4,6 +4,7 @@ import { computed, ref } from "vue";
 import { useAppStore } from "@/store/useAppStore";
 
 import Card from "../Card.vue";
+import PlayerIcon from "../PlayerIcon.vue";
 
 const props = defineProps(["cards", "phases", "closeDialog", "nextPlayer"]);
 const store = useAppStore();
@@ -48,18 +49,7 @@ const rejectCards = () => {
             <p>
                 Wybierz 2 karty, które sobie zostawisz.
 
-                <span
-                    class="player"
-                    :style="`--color: ${nextPlayer.color.hex}`"
-                >
-                </span>
-
-                <span
-                    class="nextPlayer"
-                    :style="`--color: ${nextPlayer.color.hex}`"
-                >
-                    {{ nextPlayer.username }}
-                </span>
+                <PlayerIcon :player="nextPlayer" />
                 otrzyma pozostałe
             </p>
             <div class="cards-wrap">
@@ -77,7 +67,7 @@ const rejectCards = () => {
         </div>
 
         <button
-            class="dialogButton"
+            class="dialogButton blueButton"
             :disabled="selectedCards.size < cardsToReject"
             @click="rejectCards"
         >
@@ -137,7 +127,7 @@ const rejectCards = () => {
         padding: 0.5rem 1.75rem;
 
         &[disabled="true"] {
-            color: red;
+            background-color: red;
         }
     }
 }
@@ -164,23 +154,4 @@ const rejectCards = () => {
     }
 }
 
-.nextPlayer {
-    font-weight: bold;
-    color: var(--color);
-}
-
-.player {
-    display: inline-block;
-    margin-right: 0.25ch;
-    transform: translateY(20%);
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.349);
-    background-color: hsl(from var(--color) h s calc(l * 1));
-    box-shadow:
-        inset 0 1.5px 3px rgba(255, 255, 255, 0.576),
-        /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
-        0 2px 3px rgba(0, 0, 0, 0.308);
-}
 </style>

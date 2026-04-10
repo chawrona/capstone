@@ -1,4 +1,6 @@
 <script setup>
+import PlayerIcon from '../PlayerIcon.vue';
+import FirstPlayer from "@/assets/games/gameAssets/brianboru/first_player_icon.png";
 const props = defineProps(["firstPlayer", "closeDialog"]);
 </script>
 
@@ -7,13 +9,13 @@ const props = defineProps(["firstPlayer", "closeDialog"]);
         <h1 class="dialogTitle">Pierwszy gracz</h1>
 
         <div class="dialogContent">
-            <span :style="`--color: ${firstPlayer.color.hex}`">
-                {{ firstPlayer.username }}
-            </span>
+            
+            <PlayerIcon :player="firstPlayer"/>
             zostaje pierwszym graczem
+         
         </div>
 
-        <button class="dialogButton" @click="props.closeDialog">Dalej</button>
+        <button class="dialogButton blueButton" @click="props.closeDialog">   <img :src="FirstPlayer" class="icon"></button>
     </div>
 </template>
 
@@ -54,7 +56,7 @@ const props = defineProps(["firstPlayer", "closeDialog"]);
         font-size: 1.25rem;
         border: none;
         border-radius: 0.25rem;
-        padding: 0.5rem 1.75rem;
+        padding: 0.1rem 2.5rem;
 
         &[disabled="true"] {
             color: red;
@@ -63,6 +65,12 @@ const props = defineProps(["firstPlayer", "closeDialog"]);
 
     .dialogContent {
         font-size: 1.5rem;
+    }
+
+    .icon {
+        display: inline-block;
+        width: 32px;
+        transform: translateY(3px);
     }
 }
 </style>

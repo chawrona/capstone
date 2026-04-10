@@ -1,0 +1,31 @@
+
+ikona katedry
+ładne ui wybierania katedry i miasta z katedrą
+kolor przejętych regionów?
+
+1. podwójyn dialog nagród marriage
+3. budowanie katedry
+4. w nagrodach kościoła brak odjęcia kościoła innym graczom
+
+
+
+
+2. oddawanie miast dla wikingów
+4. bug z kartami, nie idzie na wube
+
+3. estri wybór
+1. estrid pomoc wojskowa
+2. estrid pomoc regionalna
+5. Brak nagród
+6. Miasto
+7. usunąć info, że poślubiłeś
+9. nagrody w kościele
+10. nagrody z wikingów
+
+
+karty małżeństw
+lepsze okienka dialogowe? jeden kolor jest nudny
+
+
+koniec gry - podsumowanie punktów.
+muzyka i dźwięki

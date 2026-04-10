@@ -59,12 +59,7 @@ export default class Church {
             }
 
             winningChurchPlayer.setData("firstPlayer", () => true);
-            console.log(
-                "MODYFIKUJEMY FIRSTPLAYER 2",
-                winningChurchPlayer?.username,
-            );
-            this.game.gameData.firstPlayer =
-                winningChurchPlayer.getPlayerData();
+            this.game.gameData.firstPlayer = winningChurchPlayer;
 
             winningChurchPlayer.setData("church", () => 0);
         }
@@ -104,6 +99,8 @@ export default class Church {
             this.game.setPlayersStatus(statuses.WAITING);
             this.game.addDialogToPlayers(dialogs.CHURCH);
 
+            // budowanie katedry
+            this.game.regions.setCitiesToCathedra(player);
             player
                 .setStatus(statuses.BUILD_CATHEDRAL)
                 .addDialog(dialogs.BUILD_CATHEDRAL);
@@ -117,7 +114,7 @@ export default class Church {
     // region Events
 
     // @event
-    chooseCathedral(data) {
+    chooseCathedra(data) {
         const cityId = data.data;
         const player = this.game.getPlayer(data.publicId);
         console.log("Wybudowaliśmy katedrę", cityId);

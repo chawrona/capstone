@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "moduleResolution": "node",
+    "module": "Node16",
+    "moduleResolution": "node16",
+    "ignoreDeprecations": "6.0",
     "checkJs": false 
   },
   "exclude": ["node_modules", "dist", ".git"]
