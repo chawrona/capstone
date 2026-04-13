@@ -121,25 +121,7 @@ const data = [
     position: absolute;
     top: 0.5rem;
     left: 0.5rem;
-    box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 0.314);
-    box-shadow:
-        rgba(0, 0, 0, 0.12) 0px 1px 3px,
-        rgba(0, 0, 0, 0.24) 0px 1px 2px;
 
-    box-shadow:
-        rgba(6, 24, 44, 0.4) 0px 0px 0px 2px,
-        rgba(6, 24, 44, 0.65) 0px 4px 6px -1px,
-        rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
-
-    box-shadow:
-        rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset,
-        rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
-    box-shadow:
-        rgba(0, 0, 0, 0.19) 0px 10px 20px,
-        rgba(0, 0, 0, 0.23) 0px 6px 6px;
-    box-shadow:
-        rgb(204, 219, 232) 3px 3px 6px 0px inset,
-        rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;
     box-shadow:
         rgba(204, 219, 232, 0.527) 3px 3px 6px 0px inset,
         rgba(255, 255, 255, 0.259) -3px -3px 6px 1px inset;
@@ -177,6 +159,9 @@ const data = [
     place-items: center;
     height: 55px;
     box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.477);
+     filter: 
+                drop-shadow(1px 1px 2px rgba(33, 36, 1, 0.252));
+          
 }
 .vikings-count {
     transform: translateY(2px);

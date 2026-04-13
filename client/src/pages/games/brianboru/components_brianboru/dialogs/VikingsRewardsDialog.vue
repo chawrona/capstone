@@ -1,14 +1,41 @@
 <script setup>
+import PlayerIcon from '../PlayerIcon.vue';
+import Points from "@/assets/games/gameAssets/brianboru/points.png";
+import Sun from "@/assets/games/gameAssets/brianboru/sun.png";
+import NoVikings from "@/assets/games/gameAssets/brianboru/noVikings.png";
 const props = defineProps(["vikingsDialogInfo", "closeDialog"]);
 </script>
 
 <template>
     <div class="dialog">
         <h1 class="dialogTitle">Łupy wojenne</h1>
+  
+        <div class="dialogContent">
+            
+            <div v-for="player in vikingsDialogInfo" class="wrap">
+                <PlayerIcon :player="player.player" />
+
+                <div v-for="sun in player.reward.suns" class="suns">
+                    <img class="icon" :src="Sun">
+                </div>
+
+                <div v-if="player.reward.points" class="points">
+                    <span>{{ player.reward.points }}</span>
+                    <img class="icon" :src="Points">
+                </div>
+
+         
+
+                <div v-for="viking in player.reward.vikingsTaken" class="removeVikings">
+                    <img class="icon" :src="NoVikings">
+                </div>
+
+            </div>
+        </div>
         <p>
-            {{ vikingsDialogInfo.map((el) => el.reward) }}
+            
         </p>
-        <button class="dialogButton" @click="props.closeDialog">
+        <button class="dialogButton blueButton" @click="props.closeDialog">
             Dalej
         </button>
     </div>
@@ -58,5 +85,35 @@ const props = defineProps(["vikingsDialogInfo", "closeDialog"]);
             color: red;
         }
     }
+}
+
+.points {
+    transform: translateY(5px);
+    display: grid;
+    place-items: center;
+
+    .icon {
+        height: 42px;
+    }
+    span {
+        font-size: 1.5rem;
+        transform: translateY(2px);
+        font-weight: bold;
+        position: absolute;
+    }
+}
+
+.removeVikings, .suns {
+    transform: translateY(5px);
+    .icon {
+        height: 32px;
+                transform: translateY(2px);
+    }
+}
+
+.wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 </style>

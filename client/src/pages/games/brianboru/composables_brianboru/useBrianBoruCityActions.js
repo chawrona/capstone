@@ -32,12 +32,17 @@ const chooseCity = (cityId, props) => {
         props.status === statuses.BUILD_CATHEDRAL &&
         props.citiesToCathedra.includes(cityId)
     ) {
-        eventName = "chooseCathedra";
+        eventName = "chooseCathedral";
     } else if (
         props.status === statuses.CHOOSE_ATTACKED_CITY &&
         props.citiesToAttack.includes(cityId)
     ) {
         eventName = "chooseCityToAttack";
+    } else if (
+        props.status === statuses.REMOVE_VIKINGS &&
+        props.citiesToRemoveVikings.includes(cityId)
+    ) {
+        eventName = "removeVikings";
     } else {
         return alert("Nie możesz wybrać tego miasta.");
     }

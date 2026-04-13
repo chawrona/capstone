@@ -1,7 +1,7 @@
 <script setup>
 const props = defineProps(["churchDialogInfo", "closeDialog"]);
 import Points from "@/assets/games/gameAssets/brianboru/points.png";
-import Cathedra from "@/assets/games/gameAssets/brianboru/cathdera.png";
+import CathedraIcon from "../svgs/CathedraIcon.vue";
 import Church from "@/assets/games/gameAssets/brianboru/no_church.png";
 import { computed } from "vue";
 import PlayerIcon from "../PlayerIcon.vue";
@@ -9,6 +9,7 @@ import PlayerIcon from "../PlayerIcon.vue";
 const rewardsAvailable = computed(() => {
     return props.churchDialogInfo.includes('Brak ludzi w kościele')
 })
+
 
 </script>
 
@@ -26,9 +27,8 @@ const rewardsAvailable = computed(() => {
             </div>
             <div v-else>
                 <p>Działania w Kościele przynoszą uznanie. <br>Czujecie przypływ władzy duchowej i prestiżu.</p>
-                <div class="container">
+                <div class="container" :style="`justify-content: ${2 < 3 ? 'center' : 'start'}`">
                     
-               
                 <div v-for="player in props.churchDialogInfo" class="wrapper">
 
                     <PlayerIcon :player="player.player" :playerColor="white" class="icon"/>
@@ -45,8 +45,9 @@ const rewardsAvailable = computed(() => {
                     <div v-if="player.reward.church" class="church">
                         <img class="rewardIcon" :src="Church" v-for="(i,k) in player.reward.church * -1">
                     </div>
-                     <div v-if="player.reward.cathedral">
-                        <img class="rewardIcon cathedra" :src="Cathedra">
+                     <div v-if="player.reward.cathedral" class="cathedra-container">
+                        <!-- <img class="rewardIcon cathedra" :src="Cathedra"> -->
+                         <CathedraIcon class="cathedraIcon"/>
                     </div>
 
                 </div>
@@ -188,12 +189,35 @@ const rewardsAvailable = computed(() => {
     }
 
     .cathedra {
-        transform: translateY(5px);
-        height: 46px;
-         filter: drop-shadow(0px 0px 1px rgb(2, 122, 2));
+     
+       
+      
          border: 1px solid black;
     }
     .icon {
         margin-right: 0.25rem;
+    }
+
+    .cathedra-container {
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgb(5, 3, 104);
+         transform: translateY(4px);
+
+            border: 1px solid rgba(0, 0, 0, 0.349);
+    box-shadow:
+        inset 0 1.5px 3px rgba(97, 120, 253, 0.699),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+        0 2px 3px rgba(0, 0, 0, 0.308);
+    }
+
+    .cathedraIcon {
+        width: 24px;
+        height: 24px;
+           transform: translateY(-2px);
+        
     }
 </style>

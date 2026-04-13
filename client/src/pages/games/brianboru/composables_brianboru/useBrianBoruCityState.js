@@ -6,6 +6,7 @@ export default function getCityState(cityId, region, props) {
         citiesToAttack,
         citiesToBuild,
         citiesToCathedra,
+        citiesToRemoveVikings,
         citiesToVikings,
         cityUnderAttack,
         status,
@@ -17,7 +18,6 @@ export default function getCityState(cityId, region, props) {
     return {
         [`${region.replace(/\s+/g, "")}_${cityId}`]: true,
         attacked: cityUnderAttack === cityId,
-
         attackedHover:
             isStatus(statuses.CHOOSE_ATTACKED_CITY) &&
             citiesToAttack.includes(cityId),
@@ -39,9 +39,7 @@ export default function getCityState(cityId, region, props) {
                 statuses.VIKINGS_SOMEONE_CITY,
                 statuses.VIKINGS_YOUR_CITY,
             ]) && citiesToVikings.includes(cityId),
-
         cathedra: cities[cityId]?.cathedra,
-        cathedra: true,
         cathedraHover: isStatus(statuses.BUILD_CATHEDRAL),
         city: true, // domyślna klasa dla każdego miasta
         hide:
@@ -56,6 +54,10 @@ export default function getCityState(cityId, region, props) {
                 !citiesToAttack.includes(cityId) &&
                 !Boolean(cities[cityId])),
         owned: Boolean(cities[cityId]),
+        removeVikingsHover:
+            isStatus(statuses.REMOVE_VIKINGS) &&
+            citiesToRemoveVikings.includes(cityId),
         vikings: cities[cityId]?.vikings,
+        waiting: citiesToRemoveVikings.length > 0 && cityUnderAttack === cityId,
     };
 }

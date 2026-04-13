@@ -1,37 +1,38 @@
 const marriages = [
     {
-        name: "Orlaith",
+        name: "Anon",
         points: 2,
         region: "Munster",
     },
     {
-        name: "Aodhan",
+        name: "Debiddo",
         points: 2,
         region: "Leinster",
     },
     {
-        name: "Conall",
+        name: "Hageneko",
         points: 2,
         region: "Southern Uí Néill",
     },
     {
-        name: "Cormac",
+        name: "Kyōshi",
         points: 2,
         region: "Connaught",
     },
     {
-        name: "Niall",
+        name: "Nekootoko",
         points: 2,
         region: "Northern Uí Néill",
     },
 
     {
-        name: "Aolfe",
-        points: 0,
+        name: "Sāikō",
+        points: 2,
         suns: 1,
+        region: null,
     },
     {
-        name: "Brigid",
+        name: "Saishi",
         points: 4,
         region: null,
     },

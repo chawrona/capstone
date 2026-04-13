@@ -152,6 +152,7 @@ export default class BrianBoru extends Game {
         this.addDialogToPlayers(dialogs.VIKINGS);
 
         this.cards.resetCardDrawPhase();
+        this.church.resetChurch();
 
         this.gameData.phases.current = "passing";
 

@@ -104,6 +104,7 @@ export default class Cards {
         this.passedCardsPlayerCount = 0;
         this.passedCardsData = [];
         this.passingPhase.current = 1;
+        this.choosingCardsPhase.current = 1;
     }
 
     getPlayerCards(player) {
@@ -283,7 +284,7 @@ export default class Cards {
 
         player.setStatus(statuses.WAITING);
 
-        if (this.choosingCardsPhase.current === this.choosingCardsPhase.total) {
+        if (this.choosingCardsPhase.current >= this.choosingCardsPhase.total) {
             // Sortowanie kart
             this.chosenCards.sort(([cardA], [cardB]) => {
                 return cardA.id - cardB.id;
@@ -347,6 +348,7 @@ export default class Cards {
         let churchCount = 0;
         let buildingCity = false;
         let removingVikings = false;
+        let vikingsCount = 0;
 
         for (const effect of card[effects]) {
             switch (effect) {
@@ -359,12 +361,7 @@ export default class Cards {
                     letterCount++;
                     break;
                 case "axe":
-                    player.setData("vikings", (oldVikings) =>
-                        Math.min(
-                            oldVikings + 1 + buyAdditional,
-                            this.game.vikings.currentVikings,
-                        ),
-                    );
+                    vikingsCount++;
                     break;
                 case "money_plus":
                     player.setData("money", (oldMoney) => oldMoney + 1);
@@ -392,6 +389,17 @@ export default class Cards {
                 "church",
                 (oldChurch) => oldChurch + churchCount + buyAdditional,
             );
+        }
+
+        if (vikingsCount) {
+            const vikingsToGet = Math.min(
+                player.getData("vikings") + vikingsCount + buyAdditional,
+                this.game.vikings.currentVikings,
+            );
+
+            player.setData("vikings", () => vikingsToGet);
+
+            this.game.vikings.currentVikings -= vikingsToGet;
         }
 
         if (letterCount) {
@@ -424,9 +432,9 @@ export default class Cards {
             const end = performance.now();
             console.log(`Czas wykonania chooseCardEffect: ${end - start} ms`);
             return this.game.sendGameDataToAll();
-        } else {
-            return this.nextCardEffect(player);
         }
+
+        return this.nextCardEffect(player);
     }
 
     // @event

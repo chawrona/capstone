@@ -76,8 +76,8 @@ const pobierzKoordynaty = (event) => {
 .map {
     position: relative;
     width: 100%;
-    background-color: rgb(18, 87, 214);
-    background-image: url("/src/assets/games/gameAssets/brianboru/sea.png");
+    /* background-color: rgb(18, 87, 214); */
+    /* background-image: url("/src/assets/games/gameAssets/brianboru/sea.png"); */
     height: 100%;
 }
 

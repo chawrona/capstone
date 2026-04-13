@@ -48,7 +48,7 @@ import Regions from "@/assets/games/gameAssets/brianboru/map_icon.png";
     flex-direction: column;
     position: absolute;
     bottom: 6.52rem;
-    right: 218px;
+    right: 205px;
     padding: .5rem 0.0rem;
     border-radius: 0.15rem;
     gap: 0.25rem;

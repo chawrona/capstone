@@ -20,16 +20,23 @@ const chosenCard = ref(null);
 const chosenBottom = ref("bottom1");
 const dialogOpen = ref(false);
 const bottomResources = computed(() => chosenCard.value[chosenBottom.value]);
-const doesContainResource = computed(() =>
-    bottomResources.value.some((resource) =>
-        ["church", "letter", "axe"].includes(resource),
-    ),
+const doesContainResource = computed(() => {
+    console.log("HERE", bottomResources.value.some((resource) =>
+        ["church", "letter", "axe", "viking_shield"].includes(resource),
+    ));
+    
+return bottomResources.value.some((resource) =>
+        ["church", "letter", "axe", "viking_shield"].includes(resource),
+    )
+}
+    
 );
 const containedResource = computed(() => {
     const resources = new Set(bottomResources.value);
     if (resources.has("church")) return "church";
     if (resources.has("letter")) return "letter";
     if (resources.has("axe")) return "axe";
+    if (resources.has("viking_shield")) return "viking_shield";
     return false;
 });
 
@@ -117,14 +124,16 @@ const activateCardEffect = () => {
 
         <div class="dialogContent">
             <div v-if="doesContainResource">
-                Czy chcesz
+               
                 {{
                     bottomResources[0] === "axe"
-                        ? "nająć dodatkowych wikingów"
+                        ? " Czy chcesz nająć dodatkowych wikingów?"
                         : bottomResources[0] === "letter"
-                          ? "zakupić dodatkowe listy"
-                          : "dokupić miejsce w kościele"
-                }}?
+                          ? " Czy chcesz zakupić dodatkowe listy?"
+                          : bottomResources.includes('viking_shield')
+                          ? "Brian Boru odbija Twoje miasto z rąk wikingów" : 
+                          " Czy chcesz dokupić miejsce w kościele?"
+                }}
             </div>
 
             <div v-else-if="canYouBuyACity">
@@ -133,7 +142,7 @@ const activateCardEffect = () => {
 
             <div class="buyingAdditional">
                 <button
-                    v-if="doesContainResource"
+                    v-if="doesContainResource && !bottomResources.includes('viking_shield')"
                     :disabled="canManipulate.substract"
                     @click="substractResource"
                 >
@@ -177,6 +186,11 @@ const activateCardEffect = () => {
                                 :src="`/src/assets/games/gameAssets/brianboru/${bottomResources[0]}.png`"
                             />
                         </span>
+                        <img
+                                class="resource-image"
+                                :src="`/src/assets/games/gameAssets/brianboru/viking_shield.png`"
+                                v-if="bottomResources.includes('viking_shield')"
+                        />
                     </span>
 
                     <!-- TOP -->
@@ -291,7 +305,7 @@ const activateCardEffect = () => {
                     </span>
                 </div>
                 <button
-                    v-if="doesContainResource"
+                    v-if="doesContainResource  && !bottomResources.includes('viking_shield')"
                     :disabled="canManipulate.add"
                     @click="addResource"
                 >
@@ -315,12 +329,12 @@ const activateCardEffect = () => {
         <div class="buttons">
             <button
                 v-if="chosenBottom !== 'top'"
-                class="dialogButton"
+                class="dialogButton blueButton"
                 @click="closeDialog"
             >
                 Przemyślę to
             </button>
-            <button class="dialogButton" @click="activateCardEffect">
+            <button class="dialogButton blueButton" @click="activateCardEffect">
                 Aktywuj Efekt
             </button>
         </div>
@@ -546,5 +560,9 @@ const activateCardEffect = () => {
     top: 1.75rem;
     font-size: 2.5rem;
     left: 2.2rem;
+}
+
+.blueButton {
+    font-weight: normal;
 }
 </style>

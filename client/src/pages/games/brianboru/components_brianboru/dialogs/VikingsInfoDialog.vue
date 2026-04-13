@@ -1,60 +1,89 @@
 <script setup>
 const props = defineProps(["vikingsAttackDialogInfo", "closeDialog"]);
+import Axe from "@/assets/games/gameAssets/brianboru/axe.png";
+import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
+import PlayerIcon from "../PlayerIcon.vue";
 </script>
 
 <template>
     <div class="dialog">
-        <h2 class="dialogTitle">Najazd wikingów</h2>
-        <p>
-            {{ vikingsAttackDialogInfo[0].status }}
-        </p>
-        <button class="dialogButton" @click="props.closeDialog">
-            Dalej
+        <h1 class="dialogTitle">Najazd wikingów</h1>
+        
+      
+
+        <div class="dialogContent">
+            Pomimo wszelkich starań wrogowie nie zostali odparci.<br>
+            Wikingowie przejmują kontrolę nad  {{ props.vikingsAttackDialogInfo.length > 2 ? "miastami graczy" : "miastem gracza"}}<br>
+            <PlayerIcon :player="player" v-for="(player) in props.vikingsAttackDialogInfo.slice(1)" class="playerIcon"/>
+        </div>
+
+        <button class="dialogButton blueButton" @click="props.closeDialog">
+                 Dalej <img :src="Axe" class="icon">
         </button>
     </div>
 </template>
 
 <style scoped>
 .dialog {
-    position: absolute;
+   position: absolute;
     top: 50%;
     font-family: "MedievalSharp";
     left: 50%;
-     transform: translate(-50%, -65%);
+    transform: translate(-50%, -65%);
 
-    height: 250px;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
+    height: 300px;
     width: 600px;
+    justify-content: space-between;
+    padding: 2rem 1rem;
+    box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+
     position: absolute;
     color: white;
     font-weight: normal;
-    padding: 1.25rem 1rem;
+
     z-index: 30;
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/redCard.png");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_red.jpg");
     background-size: cover;
     gap: 2rem;
-    box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
 
     .dialogTitle {
-        font-weight: normal;
         letter-spacing: 1px;
         font-size: 2rem;
     }
-
+    .dialogContent {
+        font-size: 1.3rem;
+        text-align: center;
+        line-height: 1.5;
+    }
     .dialogButton {
         font-size: 1.25rem;
         border: none;
         border-radius: 0.25rem;
-        padding: 0.5rem 1.75rem;
+          
 
-        &[disabled="true"] {
-            color: red;
-        }
+     position: relative;
+        
+               color: transparent;
     }
+
+     .icon {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        display: inline-block;
+        height: 30px;
+        transform: translate(-50%, -45%);
+    }
+
+    .playerIcon {
+        margin-right: 1rem;
+    }
+
 }
 </style>

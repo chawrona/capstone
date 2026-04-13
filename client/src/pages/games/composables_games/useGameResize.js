@@ -4,7 +4,7 @@ export function useGameResize(baseWidth = 1920, baseHeight = 950) {
     const scale = ref(1);
 
     const resizeGame = () => {
-        const vw = Math.min(window.innerWidth, baseWidth);
+        const vw = window.innerWidth;
         const vh = window.innerHeight;
         scale.value = Math.min(vw / baseWidth, vh / baseHeight);
     };

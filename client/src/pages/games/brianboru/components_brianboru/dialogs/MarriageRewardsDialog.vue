@@ -39,8 +39,7 @@ const rewards = [
                     poślubił <b>{{ fiancee.name }}</b>  <img class="rewardIcon letter" :src="Letter">
                 </p>
             </span>
-    
-
+  
         <div class="rewardsContainer">
             <br>
             <p class="info">Otrzymane nagrody:</p>
@@ -65,6 +64,10 @@ const rewards = [
                         <i><b>Wsparcie Wojskowe/Regionalne</b></i>
                     </div>
                     
+                    <div v-if="player.reward === ''" class="figa">
+                        Figa z makiem
+                    </div>
+
                     <img class="rewardIcon" :src="Money" v-if="player.reward === 'money'">
                     <img class="rewardIcon" :src="MoneyDouble" v-if="player.reward === 'doubleMoney'">
                     <img class="rewardIcon" :src="Sun" v-if="player.reward === 'sun'">
@@ -224,5 +227,13 @@ const rewards = [
         .info {
             margin-bottom: 0.5rem;
         }
+}
+
+.figa {
+    font-weight: bold;
+    font-size: 1.2rem;
+    transform: translateY(7px);
+    font-style: italic;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
 }
 </style>

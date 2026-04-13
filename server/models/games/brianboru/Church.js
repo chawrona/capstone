@@ -23,6 +23,11 @@ export default class Church {
         };
     }
 
+    resetChurch() {
+        this.churchDialogInfo = [];
+        this.churchQueue = [];
+    }
+
     churchEndPhase() {
         let totalChurchCount = 0;
         const churchData = [];
@@ -45,11 +50,18 @@ export default class Church {
 
         if (!churchRemis) {
             const winningChurchPlayer = churchData[0][0];
-            this.churchQueue.push(winningChurchPlayer);
+            const canCathedral =
+                this.game.regions.doesPlayerHasCityForCathedral(
+                    winningChurchPlayer,
+                );
+            if (canCathedral) {
+                this.churchQueue.push(winningChurchPlayer);
+            }
             this.churchDialogInfo.push({
                 player: churchData[0][0],
                 reward: {
-                    cathedral: true,
+                    cathedral: canCathedral,
+
                     church: -1 * winningChurchPlayer.getData("church"),
                 },
             });
@@ -61,6 +73,10 @@ export default class Church {
             winningChurchPlayer.setData("firstPlayer", () => true);
             this.game.gameData.firstPlayer = winningChurchPlayer;
 
+            this.game.currentPlayerIndex = this.game.playersQueue.indexOf(
+                winningChurchPlayer.publicId,
+            );
+
             winningChurchPlayer.setData("church", () => 0);
         }
 
@@ -68,27 +84,29 @@ export default class Church {
             if (player.getData("church") > 0) {
                 player.setData("church", (oldChurch) => oldChurch - 1);
                 player.setData("points", (oldPoints) => oldPoints + 1);
+
+                const reward = {
+                    points: 1,
+                    church: -1,
+                };
+
+                if (player.getData("church") >= 4) {
+                    reward.church -= player.getData("church");
+
+                    const canCathedral =
+                        this.game.regions.doesPlayerHasCityForCathedral(player);
+                    if (canCathedral) {
+                        this.churchQueue.push(player);
+                        reward.cathedral = true;
+                    }
+
+                    player.setData("church", () => 0);
+                }
+
                 this.churchDialogInfo.push({
                     player,
-                    reward: {
-                        points: 1,
-                    },
+                    reward,
                 });
-            }
-        }
-
-        for (const player of this.players.values()) {
-            if (player.getData("church") >= 4) {
-                this.churchQueue.push(player);
-
-                this.churchDialogInfo.push({
-                    player,
-                    reward: {
-                        cathedral: true,
-                        church: -1 * player.getData("church"),
-                    },
-                });
-                player.setData("church", () => 0);
             }
         }
 
@@ -114,10 +132,11 @@ export default class Church {
     // region Events
 
     // @event
-    chooseCathedra(data) {
+    chooseCathedral(data) {
         const cityId = data.data;
         const player = this.game.getPlayer(data.publicId);
-        console.log("Wybudowaliśmy katedrę", cityId);
+
+        this.game.regions.cities[cityId].cathedra = true;
 
         const nextPlayer = this.churchQueue.shift();
 
@@ -125,7 +144,7 @@ export default class Church {
             this.game.gameData.message = `${nextPlayer.username} buduje katedrę`;
 
             player.setStatus(statuses.WAITING);
-
+            this.game.regions.setCitiesToCathedra(nextPlayer);
             nextPlayer
                 .setStatus(statuses.BUILD_CATHEDRAL)
                 .addDialog(dialogs.BUILD_CATHEDRAL);

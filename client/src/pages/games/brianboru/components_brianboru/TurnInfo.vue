@@ -33,7 +33,7 @@ const infoSwitch = ref(true);
 
 <style scoped>
 .turnInfo {
-    position: absolute;
+    position: fixed;
     top: 0.5rem;
     left: 50%;
     transform: translateX(-50%);

@@ -71,7 +71,7 @@ const rejectCards = () => {
             :disabled="selectedCards.size < cardsToReject"
             @click="rejectCards"
         >
-            Odrzuć
+            Zachowaj
         </button>
     </div>
 </template>

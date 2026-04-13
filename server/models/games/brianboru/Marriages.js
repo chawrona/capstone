@@ -179,13 +179,13 @@ export default class Marriages {
             console.log({ Jest: winner.getData("points") });
 
             switch (currentFiancee.name) {
-                case "Aolfe":
+                case "Sāikō":
                     winner.setData(
                         "suns",
                         (oldSuns) => oldSuns + this.marriage[0].suns,
                     );
                     return this.setCityWinner();
-                case "Brigid":
+                case "Saishi":
                     return this.setCityWinner();
                 case "Estrid":
                     winner.setData(
@@ -198,15 +198,18 @@ export default class Marriages {
                     this.game.gameData.message = `${winner.username} prosi o pomoc Księżniczkę Danii`;
                     return this.game.sendGameDataToAll();
                 default:
-                    winner.setStatus(statuses.BUILD_CITY_REGION);
-
-                    this.game.regions.setCitiesToBuildInRegion(
-                        winner,
-                        currentFianceeRegion,
-                    );
-
-                    this.game.gameData.message = `${winner.username} buduje miasto w ${currentFianceeRegion}`;
-                    return this.game.sendGameDataToAll();
+                    if (
+                        this.game.regions.setCitiesToBuildInRegion(
+                            winner,
+                            currentFianceeRegion,
+                        )
+                    ) {
+                        winner.setStatus(statuses.BUILD_CITY_REGION);
+                        this.game.gameData.message = `${winner.username} buduje miasto w ${currentFianceeRegion}`;
+                        return this.game.sendGameDataToAll();
+                    } else {
+                        return this.setCityWinner();
+                    }
             }
         } else {
             this.game.addDialogToPlayers(dialogs.MARRIAGE_NO_WINNER);

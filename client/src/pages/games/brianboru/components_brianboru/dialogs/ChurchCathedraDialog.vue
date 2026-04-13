@@ -1,5 +1,6 @@
 <script setup>
 import { useAppStore } from "@/store/useAppStore";
+import Church from "@/assets/games/gameAssets/brianboru/church.png";
 
 const props = defineProps(["closeDialog"]);
 const store = useAppStore();
@@ -8,9 +9,13 @@ const store = useAppStore();
 <template>
     <div class="dialog">
         <h2 class="dialogTitle">Zbuduj katedrę</h2>
-
-        <button class="dialogButton" @click="() => props.closeDialog()">
-            Buduję katedrę
+        <div class="dialogContent">
+            <p>
+                Miasto posiadające katedrę dominuję nad innymi <b>w regionie</b>. <br>Obecność Biskupstwa sprawia, że miasto jest <b>dwukrotnie ważniejsze</b>.
+            </p>
+        </div>
+        <button class="dialogButton blueButton" @click="() => props.closeDialog()">
+           <img :src="Church" class="icon">
         </button>
     </div>
 </template>
@@ -22,40 +27,40 @@ const store = useAppStore();
     font-family: "MedievalSharp";
     left: 50%;
      transform: translate(-50%, -65%);
-
-    height: 250px;
+    z-index: 30;
+          text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
+     height: 300px;
     width: 600px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+ justify-content: space-between;
+ padding: 2rem 1rem;
     position: absolute;
     color: white;
     font-weight: normal;
-    padding: 1.25rem 1rem;
-    z-index: 30;
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/blueCard.png");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_blue.jpg");
     background-size: cover;
-    gap: 2rem;
-    box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
+    gap: 0.5rem;
+   box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
+
+    .dialogContent {
+        width: 100%;
+           line-height: 1.4;
+        text-align: center;
+        font-size: 1.1rem;
+    }
 
     .dialogTitle {
-        font-weight: normal;
+    margin-bottom: 0;
         letter-spacing: 1px;
         font-size: 2rem;
     }
 
-    .dialogButton {
-        font-size: 1.25rem;
-        border: none;
-        border-radius: 0.25rem;
-        padding: 0.5rem 1.75rem;
-
-        &[disabled="true"] {
-            color: red;
-        }
+    .icon {
+        height: 150%;
+        transform: translateY(-0.28rem);
     }
 }
 </style>

@@ -1,4 +1,4 @@
-// import getRandomNumber from "../../../utils/getRandomNumber.js";
+import getRandomNumber from "../../../utils/getRandomNumber.js";
 import dialogs from "./config/dialogs.js";
 import statuses from "./config/statuses.js";
 
@@ -19,12 +19,8 @@ export default class Vikings {
     }
 
     getCurrentVikings() {
-        return 0;
-
-        // const cardIndex = getRandomNumber(0, this.vikings);
-        // return this.vikings.splice(cardIndex, 1)[0];
-
-        // return this.vikings.splice(3, 1)[0];
+        const cardIndex = getRandomNumber(0, this.vikings);
+        return this.vikings.splice(cardIndex, 1)[0];
     }
 
     resetVikings() {
@@ -85,7 +81,7 @@ export default class Vikings {
                 this.game.gameData.message = `${player.username} oddaje miasto wikingom`;
                 this.vikingsYourCityQueue = lowestVikingsPlayers;
                 this.game.addDialogToPlayers(dialogs.VIKINGS_ATTACK_INFO);
-
+                this.game.regions.setCitiesToVikings(player);
                 player
                     .setStatus(statuses.VIKINGS_YOUR_CITY)
                     .addDialog(dialogs.VIKINGS_YOUR_CITY);
@@ -104,7 +100,9 @@ export default class Vikings {
                 winningPlayer
                     .setStatus(statuses.VIKINGS_SOMEONE_CITY)
                     .addDialog(dialogs.VIKINGS_SOMEONE_CITY);
-
+                this.game.regions.setCitiesToVikings(
+                    this.vikingsSomeoneCityQueue[0],
+                );
                 this.game.gameData.message = `${winningPlayer.username} oddaje miasto ${this.vikingsSomeoneCityQueue[0].username} wikingom`;
                 this.vikingsSomeoneCityInfo =
                     this.vikingsSomeoneCityQueue.shift();
@@ -123,7 +121,7 @@ export default class Vikings {
 
         player.setStatus(statuses.WAITING);
 
-        console.log("Blokujemy miasto", cityId);
+        this.game.regions.cities[cityId].vikings = true;
 
         const nextPlayer = this.vikingsYourCityQueue.shift();
 
@@ -132,6 +130,8 @@ export default class Vikings {
         }
 
         this.game.gameData.message = `${nextPlayer.username} oddaje miasto wikingom`;
+
+        this.game.regions.setCitiesToVikings(nextPlayer);
 
         nextPlayer
             .setStatus(statuses.VIKINGS_YOUR_CITY)
@@ -145,7 +145,7 @@ export default class Vikings {
         const cityId = data.data;
         const player = this.game.getPlayer(data.publicId);
 
-        console.log("Blokujemy miasto", cityId);
+        this.game.regions.cities[cityId].vikings = true;
 
         const nextPlayer = this.vikingsSomeoneCityQueue.shift();
 
@@ -156,6 +156,8 @@ export default class Vikings {
         this.game.gameData.message = `${player.username} oddaje miasto ${nextPlayer.username} wikingom`;
         this.vikingsSomeoneCityInfo = nextPlayer;
 
+        this.game.regions.setCitiesToVikings(nextPlayer);
+
         player.addDialog(dialogs.VIKINGS_SOMEONE_CITY);
 
         return this.game.sendGameDataToAll();
@@ -163,6 +165,7 @@ export default class Vikings {
 
     vikingsRewardsPhaseEnd() {
         const vikings = [];
+        this.vikingsDialogInfo = [];
         for (const player of this.players.values()) {
             vikings.push([player, player.getData("vikings")]);
         }
@@ -198,8 +201,6 @@ export default class Vikings {
 
         const startIndex = doesOnlyOneHasHighestVikings ? 1 : 0;
 
-        this.vikingsDialogInfo = [];
-
         for (let i = startIndex; i < vikings.length; i++) {
             const player = vikings[i][0];
             if (vikings[i][1] > 0) {
@@ -220,7 +221,10 @@ export default class Vikings {
             }
         }
 
-        this.game.addDialogToPlayers(dialogs.VIKINGS_REWARD);
+        if (this.vikingsDialogInfo.length) {
+            this.game.addDialogToPlayers(dialogs.VIKINGS_REWARD);
+        }
+
         this.game.setPlayersStatus(statuses.WAITING);
 
         return this.game.church.churchEndPhase();

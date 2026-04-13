@@ -11,7 +11,7 @@ import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
         <div class="dialogContent">
             <div>
 
-                <p><b>{{ marriage.name }}</b> 
+                <p><b class="marriageName">{{ marriage.name }}</b> 
                     
                     
                     {{marriage.region && marriage.region !== "Vikings" ? "z regionu ": "" }}
@@ -117,5 +117,11 @@ import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
         height: 27px;
         transform: translate(-50%, -50%);
     }
+
+}
+
+.marriageName {
+    display: inline-block;
+    margin-bottom: 0.3rem;
 }
 </style>

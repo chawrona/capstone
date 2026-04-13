@@ -36,8 +36,8 @@ const color = props.playerColor ? "#fff" : props.player.color.hex;
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.349);
     background-color: hsl(from var(--color) h s calc(l * 1));
+    border: 1px solid rgba(0, 0, 0, 0.349);
     box-shadow:
         inset 0 1.5px 3px rgba(255, 255, 255, 0.576),
         inset 0 -3px 5px rgba(0, 0, 0, 0.247),

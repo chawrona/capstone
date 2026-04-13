@@ -120,6 +120,14 @@ export default class Regions {
         return false;
     }
 
+    doesPlayerHasCityForCathedral(player) {
+        for (const city of Object.values(this.cities)) {
+            if (city.owner.publicId === player.publicId && !city.vikings)
+                return true;
+        }
+        return false;
+    }
+
     prepareCitiesToAttack(player) {
         const playerCardTypes = new Set(
             player.getData("cards").map((card) => card.type),
@@ -144,28 +152,14 @@ export default class Regions {
                 city.vikings === false &&
                 city.cathedra === false
             ) {
-                citiesToCathedra.push(id);
+                citiesToCathedra.push(Number(id));
             }
         }
 
         this.citiesToCathedra = citiesToCathedra;
     }
+
     setCitiesToVikings(player) {
-        const citiesToVikings = [];
-
-        for (const [id, city] of Object.entries(this.cities)) {
-            if (
-                city.owner.publicId !== player.publicId &&
-                city.vikings === false
-            ) {
-                citiesToVikings.push(id);
-            }
-        }
-
-        this.citiesToVikings = citiesToVikings;
-    }
-
-    setCitiesToVikingsYourself(player) {
         const citiesToVikings = [];
 
         for (const [id, city] of Object.entries(this.cities)) {
@@ -173,7 +167,7 @@ export default class Regions {
                 city.owner.publicId === player.publicId &&
                 city.vikings === false
             ) {
-                citiesToVikings.push(id);
+                citiesToVikings.push(Number(id));
             }
         }
 
@@ -184,8 +178,8 @@ export default class Regions {
         const citiesToRemoveVikings = [];
 
         for (const [id, city] of Object.entries(this.cities)) {
-            if (city.owner.publicId === player.publicId) {
-                citiesToRemoveVikings.push(id);
+            if (city.owner.publicId === player.publicId && city.vikings) {
+                citiesToRemoveVikings.push(Number(id));
             }
         }
 
@@ -216,8 +210,6 @@ export default class Regions {
     }
 
     setCitiesToBuildInRegion(player, region) {
-        console.log({ region });
-
         this.citiesToBuild = [...Array(53).keys()]
             .map((index) => index + 1)
             .filter(
@@ -225,6 +217,9 @@ export default class Regions {
                     !(cityId in this.cities) &&
                     regions[region].cities.includes(cityId),
             );
+
+        if (this.citiesToBuild.length === 0) return false;
+        return true;
     }
 
     setCitiesToBuildAnywhere() {
@@ -269,13 +264,14 @@ export default class Regions {
             player.publicId,
         );
 
+        this.game.currentPlayerIndex = newCurrentPlayerIndex;
+
         this.citiesToBuild = [];
 
         this.buildCity(this.cityUnderAttack, player);
 
         this.game.gameData.firstPlayer.removeFirstPlayer();
         player.setFirstPlayer();
-        console.log("MODYFIKUJEMY FIRSTPLAYER 1", player?.username);
 
         this.game.gameData.firstPlayer = player;
 
@@ -300,11 +296,7 @@ export default class Regions {
             player.setStatus(statuses.CHOOSE_ATTACKED_CITY);
             this.game.setMessage(`${player.username} wybiera miasto do ataku`);
 
-            this.cityUnderAttack = null;
-
             this.prepareCitiesToAttack(player);
-
-            this.game.currentPlayerIndex = newCurrentPlayerIndex;
             return this.game.sendGameDataToAll();
         }
     }

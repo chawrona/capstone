@@ -33,6 +33,7 @@ const props = defineProps([
     "citiesToCathedra",
     "citiesToBuild",
     "citiesToVikings",
+    "citiesToRemoveVikings",
     "status",
     "cards",
     "you",
@@ -44,7 +45,6 @@ const mapHeight = 800 * 1.08;
 const isImageVisible = (cityId) => {
     if (!props.cities[cityId]) return 0;
     if (props.cities[cityId].cathedra) return "cathedra";
-    if (true) return "cathedra";
     return ((cityId * 31 + props.cities[cityId].owner.turnOrder) % 6) + 1;
 };
 </script>
@@ -164,6 +164,7 @@ const isImageVisible = (cityId) => {
 .cityIcon {
     position: absolute;
     width: 90%;
+    z-index: 1;
     height: 90%;
 }
 
@@ -187,14 +188,15 @@ const isImageVisible = (cityId) => {
 
 .owned.cathedra {
     &::after {
-        width: 120%;
-        height: 120%;
+        width: 110%;
+        height: 110%;
+        background-color: currentColor;
     }
 
     .cityIcon {
         transform: translateY(-2px);
-        width: 100%;
-        height: 100%;
+        width: 70%;
+      
     }
 }
 
@@ -210,12 +212,19 @@ const isImageVisible = (cityId) => {
     border-radius: 50%;
 }
 
+
 .canAttack {
     cursor: url("/src/assets/games/gameAssets/brianboru/sword.png"), pointer;
 }
 
 .attacked {
-        box-shadow: 0 0 3px 3px rgba(255, 255, 255, 0.76);
+     width: 43px;
+    height: 43px;
+    transform: translate(-1.5px, -1.5px);
+      
+    &:not(.waiting) {
+          box-shadow: 0 0 3px 3px rgba(255, 255, 255, 0.76);
+    }
 
          &[data-type="red"]::before {
          background-color: #9a2a13;
@@ -293,7 +302,7 @@ const isImageVisible = (cityId) => {
 
 }
 
-.canBuild {
+.canBuild:not(.owned) {
     box-shadow: 0 0 5px 4px rgb(255, 255, 255);
 
     &::after {
@@ -322,4 +331,119 @@ const isImageVisible = (cityId) => {
         background-color: hsl(from var(--hoverColor) h s calc(l * 1));
     }
 }
+
+.owned.canCathedra {
+    .cityIcon {
+        display: none;
+    }
+
+    &::after {
+        color: currentColor;
+        background: rgb(5, 3, 104);
+        background-image: url("/src/assets/games/gameAssets/brianboru/church_white.png");
+        background-size: 55%;
+        background-repeat: no-repeat;
+        background-position: center;
+       box-shadow:
+        inset 0 1.5px 3px rgba(97, 120, 253, 0.699),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+        0 2px 3px rgba(0, 0, 0, 0.308),
+            0 0 3px 3px rgba(255, 255, 255, 0.877);
+    }
+
+    &:hover::after {
+        color: gold;
+        background-color: rgb(209, 155, 6);
+             box-shadow:
+        inset 0 1.5px 3px rgba(237, 253, 97, 0.699),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+        0 2px 3px rgba(0, 0, 0, 0.308),
+            0 0 3px 3px #ffffffe0;
+    }
+}
+
+.owned.canVikings {
+
+    .cityIcon {
+        display: none;
+    }
+
+    &::after {
+        color: currentColor;
+        background: rgba(75, 1, 1, 0);
+        background-image: url("/src/assets/games/gameAssets/brianboru/vikings.png");
+        background-size: 110%;
+        background-repeat: no-repeat;
+        background-position: center;
+       box-shadow:
+        inset 0 1.5px 3px rgba(255, 255, 255, 0.699),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+        0 2px 3px rgba(0, 0, 0, 0.308),
+            0 0 3px 3px rgb(255, 255, 255);
+    }
+
+    &:hover::after {
+        filter: brightness(0.8)
+    }
+}
+
+.owned.vikings {
+  
+    background-color: currentColor;
+    color: red;
+
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    
+    &::after {
+        
+        content: "";
+        width: 100%;
+        height: 100%;
+        filter: 
+                drop-shadow(1px 1px 2px rgba(33, 36, 1, 0.252));
+     
+    background-image: url("/src/assets/games/gameAssets/brianboru/axe_white.png");
+    background-size: 65%;
+    background-repeat: no-repeat;
+    background-position: center;
+
+  
+       
+background-color: transparent;
+       
+    box-shadow:
+        inset 0 1.5px 3px rgba(255, 255, 255, 0.411),
+        /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+        0 2px 3px rgba(0, 0, 0, 0.705),
+        0px 0px 3px 2px rgba(0, 0, 0, 0.603);
+       
+    }
+   
+    .cityIcon {
+        display: none;
+    }
+}
+
+.owned.vikings.removeVikingsHover {
+    cursor: pointer;
+      box-shadow: 0 0 3px 3px rgba(255, 255, 255, 0.76);
+    &::after {
+         box-shadow:
+        inset 0 1.5px 3px rgba(255, 255, 255, 0.411),
+        /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+    }
+
+    &:hover {
+        
+
+        &::after {
+                    filter: brightness(1.1);
+             background-image: url("/src/assets/games/gameAssets/brianboru/viking_shield.png");
+        }
+    }
+}
+
 </style>

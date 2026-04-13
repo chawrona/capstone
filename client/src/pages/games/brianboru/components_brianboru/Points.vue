@@ -1,8 +1,8 @@
 <script setup>
-
 import Points from "@/assets/games/gameAssets/brianboru/points.png";
-import City  from "@/assets/games/gameAssets/brianboru/citiesReq.png";
-import { computed, reactive } from "vue";
+import City from "@/assets/games/gameAssets/brianboru/citiesReq.png";
+import PlayerIcon from "./PlayerIcon.vue"; // Dodany import komponentu
+import { reactive } from "vue";
 
 const props = defineProps(["regions"]);
 
@@ -12,22 +12,10 @@ const flipped = reactive({});
 const toggle = (region) => {
   flipped[region] = !flipped[region];
 };
-
-const styles = computed(() => {
-  let styleString = '';
-
-  for (const [region, player] of Object.entries(props.regions)) {
-    styleString += `--${region.split(" ")[0]}: ${player.color.hex};`;
-  }
-
-  return styleString;
-});
 </script>
 
 <template>
-<div :style="styles">
-
-  <!-- Munster -->
+<div>
   <div class="point seven munster" @click="toggle('Munster')">
     <div v-if="!flipped['Munster']" class="wrap">
       <span class="value">7</span>
@@ -37,10 +25,15 @@ const styles = computed(() => {
       <span class="value">5</span>
       <img :src="City" alt="" class="icon">
     </div>
-    <span>Munster</span>
+    <div class="region-label">
+      <span>Munster</span>
+      <span class="owner-username" v-if="regions['Munster']"> 
+        <span class="ownerColor" :style="`color: ${regions['Munster'].color.hex}`"/>
+        {{ regions['Munster'].username }}
+      </span>
+    </div>
   </div>
 
-  <!-- Connaught -->
   <div class="point seven connaught" @click="toggle('Connaught')">
     <div v-if="!flipped['Connaught']" class="wrap">
       <span class="value">7</span>
@@ -50,10 +43,15 @@ const styles = computed(() => {
       <span class="value">5</span>
       <img :src="City" alt="" class="icon">
     </div>
-    <span>Connaught</span>
+    <div class="region-label">
+      <span>Connaught</span>
+      <span class="owner-username" v-if="regions['Connaught']" > 
+        <span class="ownerColor" :style="`color: ${regions['Connaught'].color.hex}`"/>
+        {{ regions['Connaught'].username }}
+      </span>
+    </div>
   </div>
 
-  <!-- Northern Uí Néill -->
   <div class="point six northern" @click="toggle('Northern')">
     <div v-if="!flipped['Northern']" class="wrap">
       <span class="value">6</span>
@@ -63,10 +61,15 @@ const styles = computed(() => {
       <span class="value">4</span>
       <img :src="City" alt="" class="icon">
     </div>
-    <span>Northern <br>Uí Néill</span>
+    <div class="region-label">
+      <span>Northern <br>Uí Néill</span>
+       <span class="owner-username" v-if="regions['Northern']"> 
+        <span class="ownerColor" :style="`color: ${regions['Northern'].color.hex}`"/>
+        {{ regions['Northern'].username }}
+      </span>
+    </div>
   </div>
 
-  <!-- Leinster -->
   <div class="point six leintser" @click="toggle('Leinster')">
     <div v-if="!flipped['Leinster']" class="wrap">
       <span class="value">6</span>
@@ -76,10 +79,15 @@ const styles = computed(() => {
       <span class="value">4</span>
       <img :src="City" alt="" class="icon">
     </div>
-    <span>Leintser</span>
+    <div class="region-label">
+      <span>Leinster</span>
+      <span class="owner-username" v-if="regions['Leinster']"> 
+        <span class="ownerColor" :style="`color: ${regions['Leinster'].color.hex}`"/>
+        {{ regions['Leinster'].username }}
+      </span>
+    </div>
   </div>
 
-  <!-- Southern Uí Néill -->
   <div class="point five southern" @click="toggle('Southern')">
     <div v-if="!flipped['Southern']" class="wrap">
       <span class="value">5</span>
@@ -89,10 +97,15 @@ const styles = computed(() => {
       <span class="value">3</span>
       <img :src="City" alt="" class="icon">
     </div>
-    <span>Southern <br>Uí Néill</span>
+    <div class="region-label">
+      <span>Southern <br>Uí Néill</span>
+       <span class="owner-username" v-if="regions['Southern']"> 
+        <span class="ownerColor" :style="`color: ${regions['Southern'].color.hex}`"/>
+        {{ regions['Southern'].username }}
+      </span>
+    </div>
   </div>
 
-  <!-- Ulaid -->
   <div class="point four ulaid" @click="toggle('Ulaid')">
     <div v-if="!flipped['Ulaid']" class="wrap">
       <span class="value">4</span>
@@ -102,10 +115,15 @@ const styles = computed(() => {
       <span class="value">3</span>
       <img :src="City" alt="" class="icon">
     </div>
-    <span>Ulaid</span>
+    <div class="region-label">
+      <span>Ulaid</span>
+         <span class="owner-username" v-if="regions['Ulaid']"> 
+        <span class="ownerColor" :style="`color: ${regions['Ulaid'].color.hex}`"/>
+        {{ regions['Ulaid'].username }}
+      </span>
+    </div>
   </div>
 
-  <!-- Bréifne -->
   <div class="point three breifne" @click="toggle('Bréifne')">
     <div v-if="!flipped['Bréifne']" class="wrap">
       <span class="value">3</span>
@@ -115,10 +133,15 @@ const styles = computed(() => {
       <span class="value">2</span>
       <img :src="City" alt="" class="icon">
     </div>
-    <span>Bréifne</span>
+    <div class="region-label">
+      <span>Bréifne</span>
+          <span class="owner-username" v-if="regions['Bréifne']"> 
+        <span class="ownerColor" :style="`color: ${regions['Bréifne'].color.hex}`"/>
+        {{ regions['Bréifne'].username }}
+      </span>
+    </div>
   </div>
 
-  <!-- Dublinn -->
   <div class="point three dublinn" @click="toggle('Dublinn')">
     <div v-if="!flipped['Dublinn']" class="wrap">
       <span class="value">2</span>
@@ -128,86 +151,85 @@ const styles = computed(() => {
       <span class="value">2</span>
       <img :src="City" alt="" class="icon">
     </div>
-    <span>Dublinn</span>
+    <div class="region-label">
+      <span>Dublinn</span>
+          <span class="owner-username" v-if="regions['Dublinn']"> 
+        <span class="ownerColor" :style="`color: ${regions['Dublinn'].color.hex}`"/>
+        {{ regions['Dublinn'].username }}
+      </span>
+    </div>
   </div>
 
 </div>
 </template>
 
 <style scoped>
-
-
-
 .point {
     display: flex;
-    
     position: absolute;
-   
     font-weight: bold;
     color: white;
     align-items: center;
     font-family: "MedievalSharp";
     filter: drop-shadow(2px 2px 25px rgba(208, 226, 247, 0.683))
     drop-shadow(2px 2px 1px rgba(0, 0, 0, 0.864));
-   
+}
+
+/* Nowa klasa do ułożenia nazwy regionu i znacznika gracza jedno pod drugim */
+.region-label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
 }
 
 .munster {
     top: 480px;
-    left: 480px;;
-    color: hsl(from var(--Munster, #fff) h s calc(l * 1));
+    left: 480px;
 }
 
 .connaught {
     top: 221px;
-    left: 460px;;
-    color: hsl(from var(--Connaught, #fff) h s calc(l * 1));
+    left: 460px;
 }
 
 .northern.six {
     top: 60px;
     gap: 0.9rem;
-    left: 875px;;
-    color: hsl(from var(--Northern, #fff) h s calc(l * 1));
+    left: 875px;
 }
 
 .southern.five {
     top: 470px;
-    left: 1257px;;
-     gap: 0.9rem;
-     color: hsl(from var(--Southern, #fff) h s calc(l * 1));
+    left: 1257px;
+    gap: 0.9rem;
 }
 
 .leintser {
     top: 764px;
-    left: 1143px;;
-    color: hsl(from var(--Leinster, #fff) h s calc(l * 1));
+    left: 1143px;
 }
 
 .ulaid {
     top: 148px;
-    left: 1420px;;
+    left: 1420px;
     font-weight: normal;
-    color: hsl(from var(--Ulaid, #fff) h s calc(l * 1));
 }
 
 .breifne {
-        top: 173px;
-    left: 898px;;
+    top: 173px;
+    left: 898px;
     font-weight: normal;
-    color: hsl(from var(--Bréifne, #fff) h s calc(l * 1));
 
     .wrap {
         transform: translateY(-8%);
     }
-  
 }
 
 .dublinn {
-     top: 605px;
-    left: 1225px;;
+    top: 605px;
+    left: 1225px;
     font-weight: normal;
-    color: hsl(from var(--Dublinn, #fff) h s calc(l * 1));
 }
 
 .seven {
@@ -245,7 +267,6 @@ const styles = computed(() => {
     .icon {
         width: 50px;
     }
-
     .value {
         transform: translate(-49%, -37%);
         font-size: 0.85em;
@@ -260,7 +281,6 @@ const styles = computed(() => {
     .icon {
         width: 40px;
     }
-
     .value {
        transform: translate(-51%, -40%);
         font-size: 0.78em;
@@ -272,11 +292,9 @@ const styles = computed(() => {
     gap: 0.4rem;
     letter-spacing: 0.1px;
     
-   
     .icon {
          width: 38px;
     }
-
     .value {
         transform: translate(-48%, -39%);
         font-size: 0.85em;
@@ -291,9 +309,7 @@ const styles = computed(() => {
     .icon {
         width: 40px;
     }
-
     .value {
-       
         font-size: 0.85em;
     } 
 }
@@ -323,4 +339,37 @@ const styles = computed(() => {
     transform: translate(-48%, -35%);
 }
 
+.region-label {
+  position: relative;
+}
+
+.owner-username {
+  display: flex;
+ 
+  width: auto;
+  position: absolute;
+  bottom: -1em;
+left: 0.2em;
+  font-size: 0.4em;
+  font-weight: normal;
+  gap: 0.3em;
+  align-items: center;
+}
+
+.ownerColor {
+  transform: translateY(-0.1em);
+  display: inline-block;
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  background-color: currentColor;
+
+      border: 1px solid rgba(0, 0, 0, 0.288);
+    box-shadow:
+        inset 0 0px 2px rgba(255, 255, 255, 0.576),
+        inset 0 -1px 3px rgba(0, 0, 0, 0.116),
+      
+}
 </style>
