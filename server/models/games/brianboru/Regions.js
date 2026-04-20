@@ -43,7 +43,7 @@ export default class Regions {
 
         player.setData("canExpand", () => this.canPlayerExpand(player));
 
-        this.checkRegion(id, player);
+        this.checkRegion(cities[id].region);
     }
 
     canPlayerExpand(player) {
@@ -56,17 +56,66 @@ export default class Regions {
             );
     }
 
-    checkRegion(id, player) {
-        const region = cities[id].region;
+    checkAllRegions(vikingsOwner) {
+        for (const region of Object.keys(regions)) {
+            this.checkRegion(region, vikingsOwner);
+        }
+    }
+
+    checkRegion(region, vikingsOwner = false) {
         const minCity = regions[region].minCity;
         let cityCount = 0;
 
-        Object.values(this.cities).forEach((city) => {
-            if (city.region === region) cityCount++;
+        let citiesOwners = {};
+
+        let estridHelp = !vikingsOwner ? false : vikingsOwner.getData("estrid");
+
+        Object.entries(this.cities).forEach(([cityId, city]) => {
+            if (cities[cityId].region === region) {
+                cityCount++;
+                if (city.cathedra) cityCount++;
+                let bonus = city.cathedra ? 1 : 0;
+                const owner =
+                    city.vikings && estridHelp === "vikings"
+                        ? vikingsOwner.publicId
+                        : city.vikings
+                          ? "vikings"
+                          : city.owner.publicId;
+
+                if (!citiesOwners[owner] && owner !== "vikings") {
+                    citiesOwners[owner] = 1 + bonus;
+                } else if (owner !== "vikings") {
+                    citiesOwners[owner] += 1 + bonus;
+                }
+            }
         });
 
+        let maxCitiesCount = 0;
+        let topOwners = [];
+
+        for (const [ownerPublicId, citiesCount] of Object.entries(
+            citiesOwners,
+        )) {
+            if (citiesCount > maxCitiesCount) {
+                maxCitiesCount = citiesCount;
+                topOwners = [ownerPublicId];
+            } else if (citiesCount === maxCitiesCount) {
+                topOwners.push(ownerPublicId);
+            }
+        }
+
+        const remis = topOwners.length > 1;
+
         if (minCity <= cityCount) {
-            this.regions[region] = player;
+            if (remis) {
+                this.regions[region] = topOwners.map((ownerId) =>
+                    this.game.getPlayer(ownerId),
+                );
+            } else {
+                this.regions[region] = [this.game.getPlayer(topOwners[0])];
+            }
+        } else {
+            this.regions[region] = [];
         }
     }
 
@@ -80,8 +129,8 @@ export default class Regions {
 
     getRegionsData() {
         const regions = {};
-        Object.entries(this.regions).forEach(([region, player]) => {
-            regions[region] = player ? player.getPlayerData() : null;
+        Object.entries(this.regions).forEach(([region, players]) => {
+            regions[region] = players.map((player) => player.getPlayerData());
         });
         return regions;
     }
@@ -120,6 +169,14 @@ export default class Regions {
         return false;
     }
 
+    canVikingCity(player) {
+        for (const city of Object.values(this.cities)) {
+            if (city.owner.publicId === player.publicId && !city.vikings)
+                return true;
+        }
+        return false;
+    }
+
     doesPlayerHasCityForCathedral(player) {
         for (const city of Object.values(this.cities)) {
             if (city.owner.publicId === player.publicId && !city.vikings)
@@ -127,6 +184,8 @@ export default class Regions {
         }
         return false;
     }
+
+    // region Setters
 
     prepareCitiesToAttack(player) {
         const playerCardTypes = new Set(
@@ -246,11 +305,6 @@ export default class Regions {
 
         this.cityUnderAttack = data.data;
         this.cityUnderAttackType = cities[this.cityUnderAttack].type;
-        console.log(
-            "Wybieramy typ atakowanego miasta: ",
-            cities[this.cityUnderAttack].type,
-            data.data,
-        );
 
         this.citiesToAttack = [];
         const firstPlayer = this.game.gameData.firstPlayer;
@@ -315,13 +369,11 @@ export default class Regions {
             ...regions[region].cities,
         ];
 
-        console.log(this.blockedRegions);
-
         this.citiesToBuild = [...Array(53).keys()]
             .map((index) => index + 1)
             .filter((cityId) => !this.blockedRegions.includes(cityId));
 
-        this.regions[region] = player;
+        this.regions[region] = [player];
 
         if (!this.firstPlayer) {
             this.firstPlayer = player.publicId;
@@ -330,8 +382,6 @@ export default class Regions {
         player.setStatus(statuses.WAITING);
 
         const nextPlayer = this.game.getNextPlayer(player.publicId);
-
-        console.log(nextPlayer.publicId, this.firstPlayer);
 
         if (nextPlayer.publicId === this.firstPlayer) {
             this.regions = {};
@@ -358,6 +408,7 @@ export default class Regions {
     removeVikings(data) {
         const cityId = data.data;
         this.getCity(cityId).vikings = false;
+        this.checkRegion(cities[cityId].region);
         const player = this.game.getPlayer(data.publicId);
         player.setStatus(statuses.WAITING);
         return this.game.cards.nextCardEffect();

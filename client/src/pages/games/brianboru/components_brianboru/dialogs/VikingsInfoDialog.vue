@@ -2,30 +2,39 @@
 const props = defineProps(["vikingsAttackDialogInfo", "closeDialog"]);
 import Axe from "@/assets/games/gameAssets/brianboru/axe.png";
 import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
+
 import PlayerIcon from "../PlayerIcon.vue";
 </script>
 
 <template>
     <div class="dialog">
         <h1 class="dialogTitle">Najazd wikingów</h1>
-        
-      
 
         <div class="dialogContent">
-            Pomimo wszelkich starań wrogowie nie zostali odparci.<br>
-            Wikingowie przejmują kontrolę nad  {{ props.vikingsAttackDialogInfo.length > 2 ? "miastami graczy" : "miastem gracza"}}<br>
-            <PlayerIcon :player="player" v-for="(player) in props.vikingsAttackDialogInfo.slice(1)" class="playerIcon"/>
+            Pomimo wszelkich starań wrogowie nie zostali odparci.<br />
+            Wikingowie przejmują kontrolę nad
+            {{
+                props.vikingsAttackDialogInfo.length > 2
+                    ? "miastami graczy"
+                    : "miastem gracza"
+            }}<br />
+            <PlayerIcon
+                v-for="(player, i) in props.vikingsAttackDialogInfo.slice(1)"
+                :key="i"
+                :player="player"
+                class="playerIcon"
+            />
         </div>
 
         <button class="dialogButton blueButton" @click="props.closeDialog">
-                 Dalej <img :src="Axe" class="icon">
+            Dalej <img :src="Axe" class="icon" />
         </button>
     </div>
 </template>
 
 <style scoped>
 .dialog {
-   position: absolute;
+    position: absolute;
     top: 50%;
     font-family: "MedievalSharp";
     left: 50%;
@@ -65,14 +74,13 @@ import PlayerIcon from "../PlayerIcon.vue";
         font-size: 1.25rem;
         border: none;
         border-radius: 0.25rem;
-          
 
-     position: relative;
-        
-               color: transparent;
+        position: relative;
+
+        color: transparent;
     }
 
-     .icon {
+    .icon {
         position: absolute;
         left: 50%;
         top: 50%;
@@ -84,6 +92,5 @@ import PlayerIcon from "../PlayerIcon.vue";
     .playerIcon {
         margin-right: 1rem;
     }
-
 }
 </style>

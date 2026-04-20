@@ -13,14 +13,12 @@ export function useGamePause() {
         store.socket.on("pause", () => {
             timeoutId.value = setTimeout(() => {
                 isPaused.value = true;
-                console.log("GRA ZAPAUZOWANA");
             }, 500);
         });
 
         store.socket.on("resume", () => {
             clearTimeout(timeoutId.value);
             isPaused.value = false;
-            console.log("GRA W TOKU");
         });
     });
 

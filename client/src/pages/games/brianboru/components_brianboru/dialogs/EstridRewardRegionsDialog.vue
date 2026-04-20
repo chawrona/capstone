@@ -5,7 +5,7 @@ import statuses from "../../../../../../../server/models/games/brianboru/config/
 import { useAppStore } from "../../../../../store/useAppStore";
 import Card from "../Card.vue";
 
-const props = defineProps(["marriageDialogInfo","closeDialog"]);
+const props = defineProps(["marriageDialogInfo", "closeDialog"]);
 const store = useAppStore();
 
 const chooseEstridReward = (reward) => {
@@ -17,10 +17,16 @@ const chooseEstridReward = (reward) => {
     <div class="dialog">
         <h1 class="dialogTitle">Księżniczka Danii</h1>
         <div class="dialogContent">
-            <p>Zaślubiona Księżniczka Danii Estrid udzieliła wsparcia w regionach swojemu małżonkowi, Thinkofistodo</p>
+            <p>
+                Zaślubiona Księżniczka Danii Estrid udzieliła wsparcia w
+                regionach swojemu małżonkowi, Thinkofistodo
+            </p>
         </div>
         <div class="buttons">
-            <button class="dialogButton yellowButton" @click="chooseEstridReward('regions')">
+            <button
+                class="dialogButton yellowButton"
+                @click="chooseEstridReward('regions')"
+            >
                 Dalej
             </button>
         </div>

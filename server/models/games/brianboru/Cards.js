@@ -9,67 +9,11 @@ export default class Cards {
         this.passedCardsPlayerCount = 0;
         this.passedCardsData = [];
 
-        this.passingPhase = { current: 1, total: 3 };
-        this.choosingCardsPhase = { current: 1, total: this.players.size };
+        this.setPassingPhase();
+
         this.hideCards = true;
 
         this.chosenCards = [];
-        // this.chosenCards = [
-        //     [
-        //         {
-        //             id: 21,
-        //             bottom1: ["money_plus", "money_plus", "triquetra_5"],
-        //             bottom2: [],
-        //             top: ["money_minus", "triquetra"],
-        //             type: "gray",
-        //         },
-        //         this.game.getCurrentPlayer(),
-        //     ],
-
-        //     [
-        //         {
-        //             id: 22,
-        //             bottom1: ["money_plus", "money_plus", "triquetra_5"],
-        //             bottom2: [],
-        //             top: ["money_minus", "money_minus", "triquetra"],
-        //             type: "gray",
-        //         },
-        //         this.game.getCurrentPlayer(),
-        //     ],
-
-        //     [
-        //         {
-        //             id: 23,
-        //             bottom1: ["money_plus", "triquetra_5"],
-        //             bottom2: ["letter", "letter", "letter"],
-        //             top: ["money_minus", "money_minus", "triquetra"],
-        //             type: "yellow",
-        //         },
-        //         this.game.getCurrentPlayer(),
-        //     ],
-
-        //     [
-        //         {
-        //             id: 24,
-        //             bottom1: ["money_plus", "triquetra_5"],
-        //             bottom2: ["axe", "axe", "axe"],
-        //             top: ["money_minus", "money_minus", "triquetra"],
-        //             type: "red",
-        //         },
-        //         this.game.getCurrentPlayer(),
-        //     ],
-
-        //     [
-        //         {
-        //             id: 25,
-        //             bottom1: ["money_plus", "triquetra_5"],
-        //             bottom2: ["church", "church", "church"],
-        //             top: ["money_minus", "money_minus", "triquetra"],
-        //             type: "blue",
-        //         },
-        //         this.game.getCurrentPlayer(),
-        //     ],
-        // ];
 
         this.cards = this.initalizeRandomCards();
         this.giveCardsToPlayers();
@@ -79,11 +23,18 @@ export default class Cards {
         return structuredClone(cards).sort(() => Math.random() - 0.5);
     }
 
-    giveCardsToPlayers() {
-        // const playerCount = this.game.playersQueue.length;
-        // const cardsToGive = playerCount === 5 ? 5 : playerCount === 4 ? 6 : 8;
+    setPassingPhase() {
+        const size = this.players.size;
+        this.passingPhase = {
+            current: 1,
+            total: size === 5 ? 3 : size === 4 ? 3 : 4,
+        };
+        this.choosingCardsPhase = { current: 1, total: size };
+    }
 
-        const cardsToGive = 3;
+    giveCardsToPlayers() {
+        const playerCount = this.game.playersQueue.length;
+        const cardsToGive = playerCount === 5 ? 5 : playerCount === 4 ? 6 : 8;
 
         for (const player of this.players.values()) {
             player.setData("cards", () => this.cards.splice(0, cardsToGive));
@@ -173,9 +124,13 @@ export default class Cards {
         const player = this.game.getPlayer(data.publicId);
         const cardsIdToSave = data.data;
 
-        // Test
-        if (cardsIdToSave.length !== 1) {
-            // if (cardsIdToSave.length !== 4 - this.passingPhase.current) {
+        if (
+            (cardsIdToSave.length !== 2 &&
+                this.passingPhase.current !== this.passingPhase.total) ||
+            (this.players.size === 5 &&
+                this.passingPhase.current !== this.passingPhase.total &&
+                this.cardsIdToSave.length !== 1)
+        ) {
             throw new Error(
                 `Przekazałeś niewłaściwą ilość kart: ${cardsIdToSave.length} zamiast ${4 - this.passingPhase.current}`,
             );
@@ -230,8 +185,6 @@ export default class Cards {
         const cardId = data.data;
         const cardType = cards[cardId - 1].type; // cards to tablica, nie mapa
         const player = this.game.getPlayer(data.publicId);
-
-        console.log(`${player.username} wybrał pierwszą kartę`);
 
         if (
             cardType !== "gray" &&
@@ -333,12 +286,9 @@ export default class Cards {
 
     // @event
     chooseCardEffect(data) {
-        const start = performance.now();
         // { chosenBottom: 'top', buyAdditional: 0, buildCity: false }
         const [card, player] = this.chosenCards.shift();
         player.setStatus(statuses.WAITING);
-
-        console.log(card);
 
         const { chosenBottom, buyAdditional, buildCity } = data.data;
 
@@ -356,8 +306,6 @@ export default class Cards {
                     churchCount++;
                     break;
                 case "letter":
-                    console.log("Dodano letter");
-
                     letterCount++;
                     break;
                 case "axe":
@@ -403,8 +351,6 @@ export default class Cards {
         }
 
         if (letterCount) {
-            console.log(letterCount + buyAdditional);
-
             this.game.marriages.setPlayerMarriage(
                 player,
                 letterCount + buyAdditional,
@@ -424,13 +370,11 @@ export default class Cards {
 
         if (buildingCity) {
             player.setStatus(statuses.BUILD_BOUGHT_CITY);
-            const start1 = performance.now();
+
             this.game.regions.setCitiesToBuy(player);
-            const end1 = performance.now();
-            console.log(`Czas wykonania setCitiesToBuy: ${end1 - start1} ms`);
+
             this.game.setMessage(`${player.username} buduje zakupione miasto`);
-            const end = performance.now();
-            console.log(`Czas wykonania chooseCardEffect: ${end - start} ms`);
+
             return this.game.sendGameDataToAll();
         }
 
@@ -455,30 +399,3 @@ export default class Cards {
         return this.game.sendGameDataToAll();
     }
 }
-
-// @TO-DO
-/*
-dialog wybierania efektów
-
-usuwanie wikingów
-budowanie kupowanego miasta
-
-
-
-
-wybieram kartę -> okienko karty, można zamknąć.
-
-aktualna kasa po wybraniu np kasa gracza + 3 monety
-
-pytanie czy chcesz zbudować miasto?
-
-czy chcesz dokupić X? monety + nowe monety / 2 
-
-wysyłanie
-
-{
-buildCity: boolean,
-buyAdditional: 3,
-}
-
-*/

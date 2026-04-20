@@ -1,4 +1,3 @@
-import colors from "../config/colors.json" with { type: "json" };
 import ColorDoesNotExistError from "../errors/ColorDoesNotExistError.js";
 import ColorDuplicatedError from "../errors/ColorDuplicatedError.js";
 import GameAbortedPlayerLeftError from "../errors/GameAbortedPlayerLeftError.js";
@@ -117,7 +116,11 @@ export default class UserEvents {
                     return user.color && user.color.name === newColor.name;
                 });
             if (isColorTaken) throw new ColorDuplicatedError();
-            if (!colors.some((color) => color.name === newColor.name)) {
+            if (
+                !lobby.gameInfo.colors.some(
+                    (color) => color.name === newColor.name,
+                )
+            ) {
                 throw new ColorDoesNotExistError();
             }
             user.color = newColor;

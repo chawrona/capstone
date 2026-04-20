@@ -1,16 +1,21 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
-
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="128.000000pt" height="128.000000pt" viewBox="0 0 128.000000 128.000000"
- preserveAspectRatio="xMidYMid meet">
-
-<g transform="translate(0.000000,118.000000) scale(0.100000,-0.100000)"
-fill="currentColor" stroke="none">
-<path d="M480 835 c0 -33 4 -45 15 -45 13 0 15 -24 15 -160 l0 -160 -70 0 -70
+    <svg
+        version="1.0"
+        xmlns="http://www.w3.org/2000/svg"
+        width="128.000000pt"
+        height="128.000000pt"
+        viewBox="0 0 128.000000 128.000000"
+        preserveAspectRatio="xMidYMid meet"
+    >
+        <g
+            transform="translate(0.000000,118.000000) scale(0.100000,-0.100000)"
+            fill="currentColor"
+            stroke="none"
+        >
+            <path
+                d="M480 835 c0 -33 4 -45 15 -45 13 0 15 -24 15 -160 l0 -160 -70 0 -70
 0 0 50 c0 28 5 50 10 50 6 0 10 9 10 20 0 23 -28 27 -49 8 -11 -10 -14 -10
 -18 0 -3 6 -13 12 -23 12 -10 0 -20 -6 -23 -12 -4 -10 -7 -10 -18 0 -21 19
 -49 15 -49 -8 0 -11 5 -20 10 -20 6 0 10 -73 10 -200 l0 -200 175 0 175 0 0
@@ -27,12 +32,10 @@ fill="currentColor" stroke="none">
 -25 38 0 49 6 57 34 46z m134 -42 c3 -39 1 -42 -22 -42 -23 0 -26 4 -26 38 0
 43 7 54 30 50 10 -2 16 -17 18 -46z m370 36 c7 -7 12 -27 12 -46 0 -30 -2 -33
 -27 -30 -22 2 -29 9 -31 31 -3 26 12 57 27 57 4 0 12 -5 19 -12z m116 6 c11
--4 16 -19 16 -45 0 -35 -3 -39 -25 -39 -22 0 -25 4 -25 38 0 49 6 57 34 46z"/>
-</g>
-</svg>
-
+-4 16 -19 16 -45 0 -35 -3 -39 -25 -39 -22 0 -25 4 -25 38 0 49 6 57 34 46z"
+            />
+        </g>
+    </svg>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

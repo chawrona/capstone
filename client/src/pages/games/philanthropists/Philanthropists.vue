@@ -35,7 +35,6 @@ watch(
     () => gameData.value?.twojaTura,
     (neww) => {
         if (neww) soundBus.playEffect("turn");
-        if (neww) console.log("xddddddddddddddddddddddd");
     },
 );
 

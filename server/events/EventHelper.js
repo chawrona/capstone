@@ -1,4 +1,3 @@
-import colors from "../config/colors.json" with { type: "json" };
 import games from "../config/games.json" with { type: "json" };
 import GameAlreadyStartedError from "../errors/GameAlreadyStartedError.js";
 import InvalidUsernameCharactersError from "../errors/InvalidUsernameCharactersError.js";
@@ -36,7 +35,6 @@ export default class EventHelper {
 
             return {
                 lobbyUsers,
-                availableColors: colors,
                 currentGame: lobby.gameInfo,
                 availableGames: games,
             };

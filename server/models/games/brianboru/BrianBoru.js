@@ -5,6 +5,7 @@ import dialogs from "./config/dialogs.js";
 import statuses from "./config/statuses.js";
 import Debug from "./Debug.js";
 import Dialogs from "./Dialogs.js";
+import EndGame from "./EndGame.js";
 import Marriages from "./Marriages.js";
 import Regions from "./Regions.js";
 import Vikings from "./Vikings.js";
@@ -19,6 +20,7 @@ export default class BrianBoru extends Game {
         this.church = new Church(this);
         this.debug = new Debug(this);
         this.regions = new Regions(this);
+        this.end = new EndGame(this);
     }
 
     initializeGameData() {
@@ -26,13 +28,12 @@ export default class BrianBoru extends Game {
             playing: { current: 1, total: 4 },
             attacking: {
                 current: 1,
-                // total:
-                //     this.players.size === 5
-                //         ? 4
-                //         : this.players.size === 4
-                //           ? 5
-                //           : 7,
-                total: 2,
+                total:
+                    this.players.size === 5
+                        ? 4
+                        : this.players.size === 4
+                          ? 5
+                          : 7,
             },
             current: "passing",
         };
@@ -76,6 +77,8 @@ export default class BrianBoru extends Game {
                 target: publicId,
                 eventName: "gameData",
                 data: {
+                    lobbyId: this.lobbyId,
+                    end: this.end.endData,
                     cards: this.cards.getPlayerCards(player),
                     chosenCards: this.cards.getChosenCards(),
                     hideCards: this.cards.hideCards,
@@ -135,26 +138,39 @@ export default class BrianBoru extends Game {
     }
 
     resetEverything() {
+        let isEndGame = false;
         this.gameData.phases.playing.current++;
         this.gameData.phases.attacking.current = 1;
 
         if (
             this.gameData.phases.playing.current >
             this.gameData.phases.playing.total
-        )
-            throw new Error("Koniec gry");
+        ) {
+            isEndGame = true;
+            this.end.endGame();
+        } else {
+            this.vikings.resetVikings();
+            this.marriages.resetMarriages();
 
-        this.vikings.resetVikings();
-        this.marriages.resetMarriages();
+            this.addDialogToPlayers(dialogs.FIRST_PLAYER);
+            this.addDialogToPlayers(dialogs.MARRIAGE);
+            this.addDialogToPlayers(dialogs.VIKINGS);
 
-        this.addDialogToPlayers(dialogs.FIRST_PLAYER);
-        this.addDialogToPlayers(dialogs.MARRIAGE);
-        this.addDialogToPlayers(dialogs.VIKINGS);
+            this.cards.resetCardDrawPhase();
+            this.church.resetChurch();
 
-        this.cards.resetCardDrawPhase();
-        this.church.resetChurch();
+            this.gameData.phases.current = "passing";
+        }
 
-        this.gameData.phases.current = "passing";
+        if (isEndGame) {
+            return [
+                {
+                    target: "lobby",
+                    eventName: "endGame",
+                },
+                ...this.sendGameDataToAll(),
+            ];
+        }
 
         return this.sendGameDataToAll();
     }

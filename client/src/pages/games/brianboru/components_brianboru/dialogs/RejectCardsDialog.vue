@@ -3,22 +3,40 @@ import { computed, ref } from "vue";
 
 import { useAppStore } from "@/store/useAppStore";
 
+import { soundBus } from "../../../../../audio/soundBus";
 import Card from "../Card.vue";
 import PlayerIcon from "../PlayerIcon.vue";
 
-const props = defineProps(["cards", "phases", "closeDialog", "nextPlayer"]);
+const props = defineProps([
+    "cards",
+    "phases",
+    "closeDialog",
+    "nextPlayer",
+    "players",
+]);
 const store = useAppStore();
 const selectedCards = ref(new Set());
 
 const cardsToReject = computed(() => {
-    return 1;
-    // return 4 - props.phases.passing.current;
+    if (
+        props.phases.passing.current === props.phases.passing.total &&
+        props.players.length === 5
+    ) {
+        return 1;
+    } else {
+        return 2;
+    }
 });
 
 const selectCard = (id) => {
-    if (selectedCards.value.has(id)) return selectedCards.value.delete(id);
-    if (selectedCards.value.size < cardsToReject.value)
-        selectedCards.value.add(id);
+    if (selectedCards.value.has(id)) {
+        soundBus.playEffect("selectCard");
+        return selectedCards.value.delete(id);
+    }
+    if (selectedCards.value.size < cardsToReject.value) {
+        soundBus.playEffect("selectCard");
+        return selectedCards.value.add(id);
+    }
 };
 
 const cards = computed(() => {
@@ -47,10 +65,19 @@ const rejectCards = () => {
 
         <div class="dialogContent">
             <p>
-                Wybierz 2 karty, które sobie zostawisz.
-
-                <PlayerIcon :player="nextPlayer" />
-                otrzyma pozostałe
+                <span
+                    v-if="
+                        props.phases.passing.current ===
+                        props.phases.passing.total
+                    "
+                >
+                    Zachowaj pozostałe karty dla siebie
+                </span>
+                <span v-else>
+                    Wybierz 2 karty, które sobie zostawisz.
+                    <PlayerIcon :player="nextPlayer" />
+                    otrzyma pozostałe
+                </span>
             </p>
             <div class="cards-wrap">
                 <Card
@@ -100,7 +127,7 @@ const rejectCards = () => {
     gap: 0rem;
 
     height: 440px;
-    /* width: 600px; */
+    min-width: 600px;
     justify-content: space-between;
     padding: 2rem 1rem;
     box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
@@ -153,5 +180,4 @@ const rejectCards = () => {
         scale: 0.9;
     }
 }
-
 </style>

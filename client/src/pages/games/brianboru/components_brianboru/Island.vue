@@ -3,7 +3,6 @@ import { computed } from "vue";
 
 import Island from "@/assets/games/gameAssets/brianboru/MAPA.png";
 import "@/styles/brianBoru.scss";
-import { useAppStore } from "@/store/useAppStore";
 
 import {
     cities as gameCities,
@@ -15,15 +14,14 @@ import chooseCity from "../composables_brianboru/useBrianBoruCityActions.js";
 import getCitiesColors from "../composables_brianboru/useBrianBoruCityColor.js";
 import getCityState from "../composables_brianboru/useBrianBoruCityState.js";
 import RegionsSVG from "./RegionsSVG.vue";
+import CathedraIcon from "./svgs/CathedraIcon.vue";
 import CityIcon1 from "./svgs/CityIcon1.vue";
 import CityIcon2 from "./svgs/CityIcon2.vue";
 import CityIcon3 from "./svgs/CityIcon3.vue";
 import CityIcon4 from "./svgs/CityIcon4.vue";
 import CityIcon5 from "./svgs/CityIcon5.vue";
 import CityIcon6 from "./svgs/CityIcon6.vue";
-import CathedraIcon from "./svgs/CathedraIcon.vue";
 
-const store = useAppStore();
 const props = defineProps([
     "cityUnderAttack",
     "cityUnderAttackType",
@@ -71,14 +69,34 @@ const isImageVisible = (cityId) => {
                 :style="getCitiesColors(cityId, props)"
                 @click="() => chooseCity(cityId, props)"
             >
-
-                <CityIcon1 v-if="isImageVisible(cityId) === 1" class="cityIcon"/>
-                <CityIcon2 v-if="isImageVisible(cityId) === 2" class="cityIcon"/>
-                <CityIcon3 v-if="isImageVisible(cityId) === 3" class="cityIcon"/>
-                <CityIcon4 v-if="isImageVisible(cityId) === 4" class="cityIcon"/>
-                <CityIcon5 v-if="isImageVisible(cityId) === 5" class="cityIcon"/>
-                <CityIcon6 v-if="isImageVisible(cityId) === 6" class="cityIcon"/>
-                <CathedraIcon v-if="isImageVisible(cityId) === 'cathedra'" class="cityIcon"/>
+                <CityIcon1
+                    v-if="isImageVisible(cityId) === 1"
+                    class="cityIcon"
+                />
+                <CityIcon2
+                    v-if="isImageVisible(cityId) === 2"
+                    class="cityIcon"
+                />
+                <CityIcon3
+                    v-if="isImageVisible(cityId) === 3"
+                    class="cityIcon"
+                />
+                <CityIcon4
+                    v-if="isImageVisible(cityId) === 4"
+                    class="cityIcon"
+                />
+                <CityIcon5
+                    v-if="isImageVisible(cityId) === 5"
+                    class="cityIcon"
+                />
+                <CityIcon6
+                    v-if="isImageVisible(cityId) === 6"
+                    class="cityIcon"
+                />
+                <CathedraIcon
+                    v-if="isImageVisible(cityId) === 'cathedra'"
+                    class="cityIcon"
+                />
             </div>
         </template>
 
@@ -196,7 +214,6 @@ const isImageVisible = (cityId) => {
     .cityIcon {
         transform: translateY(-2px);
         width: 70%;
-      
     }
 }
 
@@ -212,36 +229,35 @@ const isImageVisible = (cityId) => {
     border-radius: 50%;
 }
 
-
 .canAttack {
     cursor: url("/src/assets/games/gameAssets/brianboru/sword.png"), pointer;
 }
 
 .attacked {
-     width: 43px;
+    width: 43px;
     height: 43px;
     transform: translate(-1.5px, -1.5px);
-      
+
     &:not(.waiting) {
-          box-shadow: 0 0 3px 3px rgba(255, 255, 255, 0.76);
+        box-shadow: 0 0 3px 3px rgba(255, 255, 255, 0.76);
     }
 
-         &[data-type="red"]::before {
-         background-color: #9a2a13;
+    &[data-type="red"]::before {
+        background-color: #9a2a13;
     }
 
-    &[data-type="blue"]::before  {
-         background-color: #3b74ab;
+    &[data-type="blue"]::before {
+        background-color: #3b74ab;
     }
 
-        &[data-type="yellow"]::before  {
-             background-color: #e0c007;
-        }
+    &[data-type="yellow"]::before {
+        background-color: #e0c007;
+    }
 }
 
 .attacked::before {
-     --border-radius: 8px;
-     content: "";
+    --border-radius: 8px;
+    content: "";
     position: absolute;
     transform: translate(-50%, -50%);
     top: 50%;
@@ -253,7 +269,6 @@ const isImageVisible = (cityId) => {
     background-size: 70%;
     background-position: center;
     background-repeat: no-repeat;
-   
 }
 
 .attacked::after {
@@ -268,8 +283,6 @@ const isImageVisible = (cityId) => {
         calc(-1 / 2 * var(--border-radius))
     );
 
-  
-
     background-image: url("/src/assets/games/gameAssets/brianboru/first_player.png");
     background-size: contain;
     place-items: center;
@@ -278,11 +291,9 @@ const isImageVisible = (cityId) => {
     transform: translate(-50%, -50%);
     top: 50%;
     left: 50%;
-  
 }
 
-.attackedHover:hover{
-
+.attackedHover:hover {
     filter: grayscale(1);
     box-shadow: 0 0 5px 4px rgba(0, 0, 0, 0.788);
 
@@ -299,7 +310,6 @@ const isImageVisible = (cityId) => {
         left: 50%;
         z-index: 2;
     }
-
 }
 
 .canBuild:not(.owned) {
@@ -344,26 +354,25 @@ const isImageVisible = (cityId) => {
         background-size: 55%;
         background-repeat: no-repeat;
         background-position: center;
-       box-shadow:
-        inset 0 1.5px 3px rgba(97, 120, 253, 0.699),
-        inset 0 -3px 5px rgba(0, 0, 0, 0.247),
-        0 2px 3px rgba(0, 0, 0, 0.308),
+        box-shadow:
+            inset 0 1.5px 3px rgba(97, 120, 253, 0.699),
+            inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+            0 2px 3px rgba(0, 0, 0, 0.308),
             0 0 3px 3px rgba(255, 255, 255, 0.877);
     }
 
     &:hover::after {
         color: gold;
         background-color: rgb(209, 155, 6);
-             box-shadow:
-        inset 0 1.5px 3px rgba(237, 253, 97, 0.699),
-        inset 0 -3px 5px rgba(0, 0, 0, 0.247),
-        0 2px 3px rgba(0, 0, 0, 0.308),
+        box-shadow:
+            inset 0 1.5px 3px rgba(237, 253, 97, 0.699),
+            inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+            0 2px 3px rgba(0, 0, 0, 0.308),
             0 0 3px 3px #ffffffe0;
     }
 }
 
 .owned.canVikings {
-
     .cityIcon {
         display: none;
     }
@@ -375,20 +384,19 @@ const isImageVisible = (cityId) => {
         background-size: 110%;
         background-repeat: no-repeat;
         background-position: center;
-       box-shadow:
-        inset 0 1.5px 3px rgba(255, 255, 255, 0.699),
-        inset 0 -3px 5px rgba(0, 0, 0, 0.247),
-        0 2px 3px rgba(0, 0, 0, 0.308),
+        box-shadow:
+            inset 0 1.5px 3px rgba(255, 255, 255, 0.699),
+            inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+            0 2px 3px rgba(0, 0, 0, 0.308),
             0 0 3px 3px rgb(255, 255, 255);
     }
 
     &:hover::after {
-        filter: brightness(0.8)
+        filter: brightness(0.8);
     }
 }
 
 .owned.vikings {
-  
     background-color: currentColor;
     color: red;
 
@@ -396,54 +404,53 @@ const isImageVisible = (cityId) => {
     background-repeat: no-repeat;
     background-position: center;
 
-    
     &::after {
-        
         content: "";
         width: 100%;
         height: 100%;
-        filter: 
-                drop-shadow(1px 1px 2px rgba(33, 36, 1, 0.252));
-     
-    background-image: url("/src/assets/games/gameAssets/brianboru/axe_white.png");
-    background-size: 65%;
-    background-repeat: no-repeat;
-    background-position: center;
+        filter: drop-shadow(1px 1px 2px rgba(33, 36, 1, 0.252));
 
-  
-       
-background-color: transparent;
-       
-    box-shadow:
-        inset 0 1.5px 3px rgba(255, 255, 255, 0.411),
-        /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
-        0 2px 3px rgba(0, 0, 0, 0.705),
-        0px 0px 3px 2px rgba(0, 0, 0, 0.603);
-       
+        background-image: url("/src/assets/games/gameAssets/brianboru/axe_white.png");
+        background-size: 65%;
+        background-repeat: no-repeat;
+        background-position: center;
+
+        background-color: transparent;
+
+        box-shadow:
+            inset 0 1.5px 3px rgba(255, 255, 255, 0.411),
+            /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
+            0 2px 3px rgba(0, 0, 0, 0.705),
+            0px 0px 3px 2px rgba(0, 0, 0, 0.603);
     }
-   
+
     .cityIcon {
         display: none;
     }
 }
 
-.owned.vikings.removeVikingsHover {
-    cursor: pointer;
-      box-shadow: 0 0 3px 3px rgba(255, 255, 255, 0.76);
-    &::after {
-         box-shadow:
-        inset 0 1.5px 3px rgba(255, 255, 255, 0.411),
-        /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247),
-    }
-
-    &:hover {
-        
-
-        &::after {
-                    filter: brightness(1.1);
-             background-image: url("/src/assets/games/gameAssets/brianboru/viking_shield.png");
-        }
+.owned.vikings.cathedra {
+    .cityIcon {
+        display: block;
+        filter: invert(1);
+        z-index: -1;
     }
 }
 
+.owned.vikings.removeVikingsHover {
+    cursor: pointer;
+    box-shadow: 0 0 3px 3px rgba(255, 255, 255, 0.76);
+    &::after {
+        box-shadow:
+            inset 0 1.5px 3px rgba(255, 255, 255, 0.411),
+            /* highlight góry */ inset 0 -3px 5px rgba(0, 0, 0, 0.247);
+    }
+
+    &:hover {
+        &::after {
+            filter: brightness(1.1);
+            background-image: url("/src/assets/games/gameAssets/brianboru/viking_shield.png");
+        }
+    }
+}
 </style>

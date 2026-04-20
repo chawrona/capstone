@@ -27,12 +27,14 @@ export default class Marriages {
         const candidates = structuredClone(marriages);
         const princess = candidates.splice(7, 1)[0];
         candidates.sort(() => Math.random() - 0.5);
-        return [...candidates.slice(0, 3), princess];
+        // Jak jest 3 graczy to tylko 2 zaślubiny przed Estrid
+        return [
+            ...candidates.slice(0, this.players.size === 3 ? 2 : 3),
+            princess,
+        ];
     }
 
     setPlayerMarriage(player, addLetter) {
-        console.log("Dajemy gracza do przodu o ", addLetter);
-
         const operation = addLetter === 0 ? "reset" : "add";
 
         let originalIndex = -1;
@@ -51,22 +53,16 @@ export default class Marriages {
                 originalIndex + addLetter,
             );
 
-            console.log("Index: ", index);
-
             while (
                 index >= 0 &&
                 index > originalIndex &&
                 this.marriages[index] !== null
             ) {
                 index--;
-                console.log("Zmiejszamy index o 1, teraz jest: ", index);
             }
 
             if (index >= 0) {
-                console.log("index większy od zera");
-                console.log(this.marriages);
                 this.marriages[index] = player;
-                console.log(this.marriages);
             }
 
             if (index !== originalIndex && originalIndex !== -1) {
@@ -164,19 +160,13 @@ export default class Marriages {
         if (winner) {
             const currentFiancee = this.getCurrentfiancee();
             const currentFianceeRegion = currentFiancee.region;
-            console.log({ currentFianceeRegion });
 
             this.game.addDialogToPlayers(dialogs.MARRIAGE_REWARDS);
-
-            console.log({ Punkty: winner.getData("points") });
 
             winner.setData(
                 "points",
                 (oldPoints) => oldPoints + this.marriage[0].points,
             );
-
-            console.log({ Dodajemy: this.marriage.points });
-            console.log({ Jest: winner.getData("points") });
 
             switch (currentFiancee.name) {
                 case "Sāikō":
@@ -265,12 +255,10 @@ export default class Marriages {
         const reward = data.data;
 
         if (reward === "vikings") {
-            console.log("Reward");
             this.game.addDialogToPlayers(dialogs.ESTRID_REWARD_VIKINGS);
         }
 
         if (reward === "regions") {
-            console.log("Reward");
             this.game.addDialogToPlayers(dialogs.ESTRID_REWARD_REGIONS);
         }
 

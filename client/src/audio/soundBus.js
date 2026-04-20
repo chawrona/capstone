@@ -63,7 +63,6 @@ class SoundBus {
 
         audio.currentTime = 0;
         audio.play();
-        console.log("PLAYED");
     }
 
     // =============== MUSIC WITH CROSS-FADE ===============
@@ -80,9 +79,6 @@ class SoundBus {
             next.volume = this.musicMuted ? 0 : this.musicVolume;
             next.play().catch(() => {
                 this.soundtrackPlaying.value = false;
-                console.log(
-                    "Nie było poprzedniej muzyki, a następna ma błąd w graniu (1)",
-                );
             });
             this.currentMusic = next;
             return;
@@ -91,18 +87,11 @@ class SoundBus {
         const prev = this.currentMusic;
 
         // jeśli gra ta sama – nic nie rób
-        if (prev === next) {
-            return console.log("Gra ta sama muzyka");
-        }
-
-        console.log("Robimy fade");
+        if (prev === next) return;
 
         next.currentTime = 0;
         next.play().catch(() => {
             this.soundtrackPlaying.value = false;
-            console.log(
-                "Nie było poprzedniej muzyki, a następna ma błąd w graniu (2)",
-            );
         });
 
         // crossfade
@@ -136,12 +125,7 @@ class SoundBus {
 
     stopMusic() {
         if (this.currentMusic) {
-            console.log(this.currentMusic);
-            console.log("Pauzujemy");
-
             this.currentMusic.pause();
-            console.log(this.currentMusic);
-            console.log("Stop music robi soundtrackPlaying na false");
 
             this.soundtrackPlaying.value = false;
         }

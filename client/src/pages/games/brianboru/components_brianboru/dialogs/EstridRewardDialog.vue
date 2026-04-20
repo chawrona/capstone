@@ -1,7 +1,8 @@
 <script setup>
 import { computed, ref } from "vue";
-import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
+
 import Mapa from "@/assets/games/gameAssets/brianboru/map_icon.png";
+import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
 
 import statuses from "../../../../../../../server/models/games/brianboru/config/statuses";
 import { useAppStore } from "../../../../../store/useAppStore";
@@ -16,7 +17,6 @@ const chooseEstridReward = (reward) => {
         data: reward,
         eventName: "estridReward",
     });
-    
 };
 </script>
 
@@ -24,19 +24,36 @@ const chooseEstridReward = (reward) => {
     <div class="dialog">
         <h1 class="dialogTitle">Estrid użycza pomocy</h1>
         <div class="dialogContent">
-            <p class="subtitle">Wybierz rodzaj wsparcia od Księżniczki Danii Estrid</p> 
-            <div> <img :src="Vikings" class="icon-text"><b class="red">Wsparcie Wojskowe</b> - wszystkie miasta należące do Wikingów zostaną oddane pod Twoją kontrolę</div>
-            <div> <img :src="Mapa" class="icon-text"><b class="blue">Wsparcie Regionalne</b> - Miasta wikingów namacają regiony, w których się znajdują Twoją obecnością</div>
+            <p class="subtitle">
+                Wybierz rodzaj wsparcia od Księżniczki Danii Estrid
+            </p>
+            <div>
+                <img :src="Vikings" class="icon-text" /><b class="red"
+                    >Wsparcie Wojskowe</b
+                >
+                - wszystkie miasta należące do Wikingów zostaną oddane pod Twoją
+                kontrolę
+            </div>
+            <div>
+                <img :src="Mapa" class="icon-text" /><b class="blue"
+                    >Wsparcie Regionalne</b
+                >
+                - Miasta wikingów namacają regiony, w których się znajdują Twoją
+                obecnością
+            </div>
         </div>
         <div class="buttons">
             <button
-                class="dialogButton"
+                class="dialogButton blueButton"
                 @click="() => chooseEstridReward('vikings')"
             >
-                <img :src="Vikings" class="icon">
+                <img :src="Vikings" class="icon" />
             </button>
-            <button class="dialogButton" @click="() => chooseEstridReward('regions')">
-                <img :src="Mapa" class="icon">
+            <button
+                class="dialogButton blueButton"
+                @click="() => chooseEstridReward('regions')"
+            >
+                <img :src="Mapa" class="icon" />
             </button>
         </div>
     </div>
@@ -77,7 +94,7 @@ const chooseEstridReward = (reward) => {
     .dialogContent {
         flex-direction: column;
         display: flex;
-text-align: left;
+        text-align: left;
         justify-content: center;
         gap: 1rem;
 
@@ -92,30 +109,30 @@ text-align: left;
         }
     }
 
-.buttons {
-    display: flex;
-    gap: 1rem;
-}
+    .buttons {
+        display: flex;
+        gap: 1rem;
+    }
 
     .dialogButton {
         font-size: 1.25rem;
         border: none;
         border-radius: 0.25rem;
-       padding: 0.1rem 2.5rem;
+        padding: 0.1rem 2.5rem;
 
         &[disabled="true"] {
             color: red;
         }
     }
 
-     .icon {
+    .icon {
         display: inline-block;
-        height:  32px;
+        height: 32px;
         transform: translateY(2px);
     }
 
     .icon-text {
-        width:  45px;
+        width: 45px;
         float: left;
         margin-right: 10px;
         transform: translateY(3px);

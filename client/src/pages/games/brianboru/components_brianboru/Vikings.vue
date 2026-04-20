@@ -64,7 +64,7 @@ const data = [
 <template>
     <div class="wrap">
         <img :src="WhiteAxe" alt="" class="axe-icon" />
-        <div  class="vikingsWrapper">
+        <div class="vikingsWrapper">
             <div v-for="viking in props.vikings" :key="viking" class="vikings">
                 <img :src="Vikings" class="vikings-icon" />
             </div>
@@ -159,9 +159,7 @@ const data = [
     place-items: center;
     height: 55px;
     box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.477);
-     filter: 
-                drop-shadow(1px 1px 2px rgba(33, 36, 1, 0.252));
-          
+    filter: drop-shadow(1px 1px 2px rgba(33, 36, 1, 0.252));
 }
 .vikings-count {
     transform: translateY(2px);

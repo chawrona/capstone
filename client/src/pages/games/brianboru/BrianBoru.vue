@@ -13,8 +13,35 @@ import TurnInfo from "./components_brianboru/TurnInfo.vue";
 import useGameData from "./composables_brianboru/useGameData";
 import useGameDialogs from "./composables_brianboru/useGameDialogs";
 
-const SOUNDTRACK_URL = "/sounds/brianboru.mp3";
+const SOUNDTRACK_URL = "/sounds/brianboru/brian_boru_soundtrack.mp3";
 usePageSounds({
+    effects: [
+        { name: "buildCathedra", url: "/sounds/brianboru/buildCathedra.mp3" },
+        { name: "buildCity", url: "/sounds/brianboru/buildCity.mp3" },
+        {
+            name: "chooseAttackCity",
+            url: "/sounds/brianboru/chooseAttackCity.mp3",
+        },
+        { name: "chooseCard", url: "/sounds/brianboru/chooseCard.mp3" },
+        { name: "removeVikings", url: "/sounds/brianboru/removeVikings.mp3" },
+        {
+            name: "selectCardEffect",
+            poolSize: 2,
+            url: "/sounds/brianboru/selectCardEffect.mp3",
+        },
+        { name: "click", poolSize: 3, url: "/sounds/brianboru/click.mp3" },
+        {
+            name: "selectCard",
+            poolSize: 3,
+            url: "/sounds/brianboru/selectCard.mp3",
+        },
+        { name: "pop", url: "/sounds/brianboru/pop.mp3" },
+        {
+            name: "attackVikings",
+            poolSize: 2,
+            url: "/sounds/brianboru/attackVikings.mp3",
+        },
+    ],
     music: [{ name: "soundtrack", url: SOUNDTRACK_URL }],
 });
 
@@ -111,7 +138,7 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
     height: 950px;
 
     margin-block: auto;
-  transform-origin: top left;
+    transform-origin: top left;
     font-family: "Open sans";
     overflow: hidden;
 

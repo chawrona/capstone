@@ -6,7 +6,33 @@
     "minPlayers": 2,
     "description": "Strategiczna gra planszowa o kontrolę Irlandii w średniowieczu poprzez budowanie, politykę i walki z Wikingami.",
     "time": "20-30 min.",
-    "difficulty": "średni"
+    "difficulty": "średni",
+    "colors": [
+      {
+        "name": "crimson",
+        "hex": "#d72638"
+      },
+      {
+        "name": "blue",
+        "hex": "#3b82f6"
+      },
+      {
+        "name": "green",
+        "hex": "#22c55e"
+      },
+      {
+        "name": "yellow",
+        "hex": "#facc15"
+      },
+      {
+        "name": "purple",
+        "hex": "#9333ea"
+      },
+      {
+        "name": "orange",
+        "hex": "#f97316"
+      }
+    ]
   },
   {
     "title": "philanthropists",
@@ -15,7 +41,33 @@
     "minPlayers": 2,
     "description": "Ekonomiczna gra planszowa, w której inwestujesz, handlujesz zasobami i dzielisz się majątkiem, by zdobyć zwycięstwo",
     "time": "25-35 min.",
-    "difficulty": "Trudny"
+    "difficulty": "Trudny",
+    "colors": [
+      {
+        "name": "crimson",
+        "hex": "#d72638"
+      },
+      {
+        "name": "blue",
+        "hex": "#3b82f6"
+      },
+      {
+        "name": "green",
+        "hex": "#22c55e"
+      },
+      {
+        "name": "yellow",
+        "hex": "#facc15"
+      },
+      {
+        "name": "purple",
+        "hex": "#9333ea"
+      },
+      {
+        "name": "orange",
+        "hex": "#f97316"
+      }
+    ]
   },
   {
     "title": "eurobusiness",
@@ -24,7 +76,33 @@
     "minPlayers": 1,
     "description": "Klasyczna gra planszowa, w której gracze kupują nieruchomości, pobierają czynsze i inwestują w zabudowę.",
     "time": "45-75 min.",
-    "difficulty": "średni"
+    "difficulty": "średni",
+    "colors": [
+      {
+        "name": "crimson",
+        "hex": "#d72638"
+      },
+      {
+        "name": "blue",
+        "hex": "#3b82f6"
+      },
+      {
+        "name": "green",
+        "hex": "#22c55e"
+      },
+      {
+        "name": "yellow",
+        "hex": "#facc15"
+      },
+      {
+        "name": "purple",
+        "hex": "#9333ea"
+      },
+      {
+        "name": "orange",
+        "hex": "#f97316"
+      }
+    ]
   },
   {
     "title": "ludo",
@@ -33,6 +111,32 @@
     "minPlayers": 1,
     "description": "Gra planszowa dla 2–4 osób, w której celem jest wprowadzenie wszystkich swoich czterech pionków na pola końcowe jako pierwszy.",
     "time": "10-25 min.",
-    "difficulty": "łatwy"
+    "difficulty": "łatwy",
+    "colors": [
+      {
+        "name": "crimson",
+        "hex": "#d72638"
+      },
+      {
+        "name": "blue",
+        "hex": "#3b82f6"
+      },
+      {
+        "name": "green",
+        "hex": "#22c55e"
+      },
+      {
+        "name": "yellow",
+        "hex": "#facc15"
+      },
+      {
+        "name": "purple",
+        "hex": "#9333ea"
+      },
+      {
+        "name": "orange",
+        "hex": "#f97316"
+      }
+    ]
   }
 ]

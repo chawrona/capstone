@@ -1,3 +1,4 @@
+import { cities } from "./config/cities.js";
 import dialogs from "./config/dialogs.js";
 import statuses from "./config/statuses.js";
 
@@ -137,6 +138,8 @@ export default class Church {
         const player = this.game.getPlayer(data.publicId);
 
         this.game.regions.cities[cityId].cathedra = true;
+
+        this.game.regions.checkRegion(cities[cityId].region);
 
         const nextPlayer = this.churchQueue.shift();
 

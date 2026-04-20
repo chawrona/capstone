@@ -79,8 +79,6 @@ export default class LobbyEvents {
             const user = this.userManager.getUser(userId);
 
             if (process.env.DEVELOPMENT) {
-                console.log(lobby.users.size);
-
                 user.color = {
                     name:
                         lobby.users.size === 1
@@ -95,8 +93,6 @@ export default class LobbyEvents {
                               ? "#22c55e"
                               : "#facc15",
                 };
-
-                console.log(user.color);
             }
 
             if (user.lobbyId) throw new UserInLobbyError();
@@ -276,6 +272,7 @@ export default class LobbyEvents {
             for (const userId of lobby.users) {
                 const user = this.userManager.getUser(userId);
                 user.isReady = false;
+                user.color = null;
             }
 
             lobby.gameInfo = gameInfo;

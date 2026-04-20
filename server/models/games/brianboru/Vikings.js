@@ -1,4 +1,5 @@
 import getRandomNumber from "../../../utils/getRandomNumber.js";
+import { cities } from "./config/cities.js";
 import dialogs from "./config/dialogs.js";
 import statuses from "./config/statuses.js";
 
@@ -36,6 +37,12 @@ export default class Vikings {
         };
     }
 
+    findPlayerWithEstrid() {
+        return this.game.players
+            .values()
+            .find((player) => player.getData("estrid"));
+    }
+
     vikingsPhaseEnd() {
         if (this.currentVikings <= 0) {
             this.game.addDialogToPlayers(dialogs.VIKINGS_NO_ATTACK);
@@ -68,7 +75,8 @@ export default class Vikings {
                         playersWithVikings[playersWithVikings.length - 1][1]
                     );
                 })
-                .map(([player]) => player);
+                .map(([player]) => player)
+                .filter((player) => this.game.regions.canVikingCity(player));
 
             if (allPlayersEqualVikingCount || multipleMaxVikingsCount) {
                 this.vikingsAttackDialogInfo = [
@@ -123,6 +131,8 @@ export default class Vikings {
 
         this.game.regions.cities[cityId].vikings = true;
 
+        this.game.regions.checkRegion(cities[cityId].region);
+
         const nextPlayer = this.vikingsYourCityQueue.shift();
 
         if (!nextPlayer) {
@@ -146,6 +156,8 @@ export default class Vikings {
         const player = this.game.getPlayer(data.publicId);
 
         this.game.regions.cities[cityId].vikings = true;
+
+        this.game.regions.checkRegion(cities[cityId].region);
 
         const nextPlayer = this.vikingsSomeoneCityQueue.shift();
 
@@ -191,12 +203,6 @@ export default class Vikings {
                 return points + winningPlayer.getData("suns");
             });
             winningPlayer.setData("vikings", () => 0);
-
-            console.log(`winningPlayer (${winningPlayer.username}): `, {
-                suns: winningPlayer.getData("suns"),
-                points: winningPlayer.getData("points"),
-                vikings: winningPlayer.getData("vikings"),
-            });
         }
 
         const startIndex = doesOnlyOneHasHighestVikings ? 1 : 0;
@@ -204,11 +210,6 @@ export default class Vikings {
         for (let i = startIndex; i < vikings.length; i++) {
             const player = vikings[i][0];
             if (vikings[i][1] > 0) {
-                console.log(`normal player (${player.username}): `, {
-                    suns: player.getData("suns"),
-                    points: player.getData("points"),
-                    vikings: player.getData("vikings"),
-                });
                 player.setData("vikings", (oldVikings) => oldVikings - 1);
                 player.setData("points", (points) => points + 1);
                 this.vikingsDialogInfo.push({

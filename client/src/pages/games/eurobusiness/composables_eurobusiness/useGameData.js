@@ -44,7 +44,6 @@ export function useGameData(isPaused) {
             }
 
             isPaused.value = data.paused;
-            console.log("GameDataRequest Pauza");
 
             intervalId.value = setInterval(() => {
                 if (!isPaused.value)

@@ -1,26 +1,23 @@
 <script setup>
-import { useAppStore } from "@/store/useAppStore";
 import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
+import { useAppStore } from "@/store/useAppStore";
 
 const props = defineProps(["closeDialog"]);
-
-
-
 </script>
 
 <template>
     <div class="dialog">
-        <h1 class="dialogTitle">Wybierz miasto <br>z którego się wycofasz</h1>
-            
-           <button class="dialogButton blueButton" @click="props.closeDialog">
-                 Dalej <img :src="Vikings" class="icon">
+        <h1 class="dialogTitle">Wybierz miasto <br />z którego się wycofasz</h1>
+
+        <button class="dialogButton blueButton" @click="props.closeDialog">
+            Dalej <img :src="Vikings" class="icon" />
         </button>
     </div>
 </template>
 
 <style scoped>
 .dialog {
-   position: absolute;
+    position: absolute;
     top: 50%;
     font-family: "MedievalSharp";
     left: 50%;
@@ -64,14 +61,13 @@ const props = defineProps(["closeDialog"]);
         font-size: 1.25rem;
         border: none;
         border-radius: 0.25rem;
-          
 
-     position: relative;
-        
-               color: transparent;
+        position: relative;
+
+        color: transparent;
     }
 
-     .icon {
+    .icon {
         position: absolute;
         left: 50%;
         top: 50%;
@@ -79,6 +75,5 @@ const props = defineProps(["closeDialog"]);
         height: 30px;
         transform: translate(-50%, -45%);
     }
-
 }
 </style>

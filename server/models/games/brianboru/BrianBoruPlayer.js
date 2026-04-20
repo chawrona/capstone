@@ -18,6 +18,7 @@ export default class BrianBoruPlayer extends Player {
         this.setData("cards", () => []);
         this.setData("dialogs", () => []);
         this.setData("canExpand", () => false);
+        this.setData("estrid", () => false);
 
         this.setStatus(statuses.WAITING);
     }

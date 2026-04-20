@@ -21,6 +21,8 @@ const dialogs = {
     ESTRID_REWARD_DIALOG: 15, // Wybór nagrody
     ESTRID_REWARD_VIKINGS: 16, // Informacja o nagrodzie 1
     ESTRID_REWARD_REGIONS: 17, // Informacja o nagrodzie 2
+
+    END: 18,
 };
 
 export default dialogs;

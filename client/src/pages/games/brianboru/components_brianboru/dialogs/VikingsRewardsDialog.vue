@@ -1,40 +1,42 @@
 <script setup>
-import PlayerIcon from '../PlayerIcon.vue';
+import NoVikings from "@/assets/games/gameAssets/brianboru/noVikings.png";
 import Points from "@/assets/games/gameAssets/brianboru/points.png";
 import Sun from "@/assets/games/gameAssets/brianboru/sun.png";
-import NoVikings from "@/assets/games/gameAssets/brianboru/noVikings.png";
+
+import PlayerIcon from "../PlayerIcon.vue";
 const props = defineProps(["vikingsDialogInfo", "closeDialog"]);
 </script>
 
 <template>
     <div class="dialog">
         <h1 class="dialogTitle">Łupy wojenne</h1>
-  
+
         <div class="dialogContent">
-            
-            <div v-for="player in vikingsDialogInfo" class="wrap">
+            <div
+                v-for="player in vikingsDialogInfo"
+                :key="player.player.publicId"
+                class="wrap"
+            >
                 <PlayerIcon :player="player.player" />
 
-                <div v-for="sun in player.reward.suns" class="suns">
-                    <img class="icon" :src="Sun">
+                <div v-for="sun in player.reward.suns" :key="sun" class="suns">
+                    <img class="icon" :src="Sun" />
                 </div>
 
                 <div v-if="player.reward.points" class="points">
                     <span>{{ player.reward.points }}</span>
-                    <img class="icon" :src="Points">
+                    <img class="icon" :src="Points" />
                 </div>
 
-         
-
-                <div v-for="viking in player.reward.vikingsTaken" class="removeVikings">
-                    <img class="icon" :src="NoVikings">
+                <div
+                    v-for="viking in player.reward.vikingsTaken"
+                    :key="viking"
+                    class="removeVikings"
+                >
+                    <img class="icon" :src="NoVikings" />
                 </div>
-
             </div>
         </div>
-        <p>
-            
-        </p>
         <button class="dialogButton blueButton" @click="props.closeDialog">
             Dalej
         </button>
@@ -47,10 +49,10 @@ const props = defineProps(["vikingsDialogInfo", "closeDialog"]);
     top: 50%;
     font-family: "MedievalSharp";
     left: 50%;
-     transform: translate(-50%, -65%);
+    transform: translate(-50%, -65%);
 
-       text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
-    height: 300px;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
+    min-height: 300px;
     width: 600px;
 
     display: flex;
@@ -66,9 +68,9 @@ const props = defineProps(["vikingsDialogInfo", "closeDialog"]);
     background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_red.jpg");
     background-size: cover;
     gap: 2rem;
-     justify-content: space-between;
- padding: 2rem 1rem;
-   box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
+    justify-content: space-between;
+    padding: 2rem 1rem;
+    box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
 
     .dialogTitle {
         letter-spacing: 1px;
@@ -103,11 +105,12 @@ const props = defineProps(["vikingsDialogInfo", "closeDialog"]);
     }
 }
 
-.removeVikings, .suns {
+.removeVikings,
+.suns {
     transform: translateY(5px);
     .icon {
         height: 32px;
-                transform: translateY(2px);
+        transform: translateY(2px);
     }
 }
 

@@ -2,7 +2,6 @@
 const props = defineProps(["currentVikings", "closeDialog"]);
 import Axe from "@/assets/games/gameAssets/brianboru/axe.png";
 import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
-
 </script>
 
 <template>
@@ -10,19 +9,18 @@ import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
         <h1 class="dialogTitle">Wikingowie</h1>
 
         <div class="dialogContent">
-            Zwiadowcy donoszą o obecności statku z 
-            
+            Zwiadowcy donoszą o obecności statku z
+
             <span class="wrap">
-               {{ props.currentVikings }}
-                <img :src="Vikings" alt="" class="vikings">
+                {{ props.currentVikings }}
+                <img :src="Vikings" alt="" class="vikings" />
             </span>
 
-
-           wikingami na pokładzie.
+            wikingami na pokładzie.
         </div>
 
         <button class="dialogButton blueButton" @click="props.closeDialog">
-            Dalej <img :src="Axe" class="icon">
+            Dalej <img :src="Axe" class="icon" />
         </button>
     </div>
 </template>
@@ -69,14 +67,13 @@ import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
         font-size: 1.25rem;
         border: none;
         border-radius: 0.25rem;
-          
 
-     position: relative;
-        
-               color: transparent;
+        position: relative;
+
+        color: transparent;
     }
 
-     .icon {
+    .icon {
         position: absolute;
         left: 50%;
         top: 50%;
@@ -84,8 +81,6 @@ import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
         height: 30px;
         transform: translate(-50%, -45%);
     }
-
- 
 
     .wrap {
         font-size: 2rem;
@@ -96,7 +91,7 @@ import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
         justify-content: center;
     }
 
-       .vikings {
+    .vikings {
         display: inline-block;
         height: 38px;
         transform: translateY(-3px);

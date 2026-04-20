@@ -33,9 +33,6 @@ const readyUsers = computed(
 
 onMounted(() => {
     store.socket.on("lobbyData", (lobbyData) => {
-        console.log(lobbyData);
-        console.log("DATA PREV:", data.value);
-
         data.value = lobbyData;
         store.setLoading(false);
     });

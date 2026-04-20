@@ -2,6 +2,8 @@ import { ref, onMounted, onUnmounted } from "vue";
 
 import { useAppStore } from "@/store/useAppStore";
 
+import { soundBus } from "../../../../audio/soundBus.js";
+
 class Queue {
     constructor() {
         this.queue = [];
@@ -26,6 +28,7 @@ export default function useGameDialogs() {
     const dialogsQueue = ref(new Queue());
     const openedDialog = ref(null);
     const allDialogs = ref(null);
+    const endGame = ref(false);
 
     onMounted(() => {
         if (!store.socket) return;
@@ -35,17 +38,35 @@ export default function useGameDialogs() {
             allDialogs.value = dialogs;
             if (openedDialog.value === null) {
                 openedDialog.value = dialogsQueue.value.get();
+                if (openedDialog.value) {
+                    soundBus.playEffect("pop");
+                }
             }
+        });
+
+        store.socket.on("endGame", () => {
+            endGame.value = true;
         });
     });
 
     onUnmounted(() => {
         store.socket.off("dialogs");
+        store.socket.off("endGame");
     });
 
     const closeDialog = () => {
         openedDialog.value = dialogsQueue.value.get();
-        store.emit("gameData", { eventName: "closeDialog" });
+
+        if (!endGame.value) {
+            store.emit("gameData", { eventName: "closeDialog" });
+            console.log("WHY");
+
+            soundBus.playEffect("click");
+        }
+
+        if (openedDialog.value) {
+            soundBus.playEffect("pop");
+        }
     };
 
     return {

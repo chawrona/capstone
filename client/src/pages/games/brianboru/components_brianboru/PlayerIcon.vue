@@ -1,32 +1,23 @@
 <script setup>
-const props = defineProps(["player", "playerColor"])
-
+const props = defineProps(["player", "playerColor"]);
 
 const color = props.playerColor ? "#fff" : props.player.color.hex;
-
 </script>
 
 <template>
     <span>
-                <span
-                    class="player"
-                    :style="`--color: ${props.player.color.hex}`"
-                >
-                </span>
+        <span class="player" :style="`--color: ${props.player.color.hex}`">
+        </span>
 
-                <span
-                    class="nextPlayer"
-                    :style="`--color: ${color}`"
-                >
-                    {{ props.player.username }}
-                </span>
+        <span class="nextPlayer" :style="`--color: ${color}`">
+            {{ props.player.username }}
+        </span>
     </span>
 </template>
 
 <style scoped>
 .nextPlayer {
     font-weight: bold;
-
 }
 
 .player {

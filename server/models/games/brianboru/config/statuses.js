@@ -27,6 +27,8 @@ const statuses = {
     BUILD_FIRST_CITY: 15, // wybuduj pierwsze miasto
 
     CHOOSE_ESTRID_REWARD: 16, // Wybierz wsparcie wojskowe lub pomoc w regionach
+
+    END: 17,
 };
 
 export default statuses;

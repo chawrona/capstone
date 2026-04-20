@@ -1,6 +1,7 @@
 <script setup>
-import PlayerIcon from '../PlayerIcon.vue';
 import FirstPlayer from "@/assets/games/gameAssets/brianboru/first_player_icon.png";
+
+import PlayerIcon from "../PlayerIcon.vue";
 const props = defineProps(["firstPlayer", "closeDialog"]);
 </script>
 
@@ -9,13 +10,13 @@ const props = defineProps(["firstPlayer", "closeDialog"]);
         <h1 class="dialogTitle">Pierwszy gracz</h1>
 
         <div class="dialogContent">
-            
-            <PlayerIcon :player="firstPlayer"/>
+            <PlayerIcon :player="firstPlayer" />
             zostaje pierwszym graczem
-         
         </div>
 
-        <button class="dialogButton blueButton" @click="props.closeDialog">   <img :src="FirstPlayer" class="icon"></button>
+        <button class="dialogButton blueButton" @click="props.closeDialog">
+            <img :src="FirstPlayer" class="icon" />
+        </button>
     </div>
 </template>
 

@@ -1,16 +1,21 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
-
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="128.000000pt" height="128.000000pt" viewBox="0 0 128.000000 128.000000"
- preserveAspectRatio="xMidYMid meet">
-
-<g transform="translate(0.000000,128.000000) scale(0.100000,-0.100000)"
-fill="currentColor" stroke="none">
-<path d="M252 1032 c-7 -29 -17 -84 -23 -122 -7 -39 -15 -70 -18 -70 -3 0 -5
+    <svg
+        version="1.0"
+        xmlns="http://www.w3.org/2000/svg"
+        width="128.000000pt"
+        height="128.000000pt"
+        viewBox="0 0 128.000000 128.000000"
+        preserveAspectRatio="xMidYMid meet"
+    >
+        <g
+            transform="translate(0.000000,128.000000) scale(0.100000,-0.100000)"
+            fill="currentColor"
+            stroke="none"
+        >
+            <path
+                d="M252 1032 c-7 -29 -17 -84 -23 -122 -7 -39 -15 -70 -18 -70 -3 0 -5
 -67 -3 -150 3 -131 1 -150 -12 -150 -14 0 -16 -22 -16 -168 0 -163 1 -169 23
 -190 19 -18 35 -22 85 -22 55 0 62 2 62 20 0 20 7 20 300 20 293 0 300 0 300
 -20 0 -17 7 -20 53 -20 47 0 57 4 85 33 l32 33 0 156 c0 147 -1 156 -20 161
@@ -32,13 +37,10 @@ c-2 -13 -11 -22 -25 -24 -20 -3 -23 1 -23 33 0 20 5 46 12 58 11 21 12 21 25
 -12 8 -18 13 -43 11 -55z m120 0 c-2 -13 -11 -22 -25 -24 -20 -3 -23 1 -23 33
 0 20 5 46 12 58 11 21 12 21 25 -12 8 -18 13 -43 11 -55z m120 0 c-2 -13 -11
 -22 -25 -24 -20 -3 -23 1 -23 33 0 20 5 46 12 58 11 21 12 21 25 -12 8 -18 13
--43 11 -55z"/>
-</g>
-</svg>
-
-
+-43 11 -55z"
+            />
+        </g>
+    </svg>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

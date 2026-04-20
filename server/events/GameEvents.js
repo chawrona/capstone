@@ -35,6 +35,7 @@ export default class GameEvents {
 
             for (const { target, eventName, data } of targets) {
                 if (target === "lobby") {
+                    console.log("EVENT", { target, eventName, data });
                     this.eventEmmiter.toLobby(user.lobbyId, eventName, data);
                 } else if (eventName === "error") {
                     this.eventEmmiter.toPublicUserError(target, data);

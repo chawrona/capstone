@@ -17,10 +17,12 @@ const chooseEstridReward = (reward) => {
     <div class="dialog">
         <h1 class="dialogTitle">Księżniczka Danii</h1>
         <div class="dialogContent">
-            <p>Zaślubiona Księżniczka Danii Estrid udzieliła wsparcia wojskowego swojemu małżonkowi, Thinkofistodo</p>
+            <p>
+                Zaślubiona Księżniczka Danii Estrid udzieliła wsparcia
+                wojskowego swojemu małżonkowi, Thinkofistodo
+            </p>
         </div>
         <div class="buttons">
-            
             <button class="dialogButton" @click="chooseEstridReward('regions')">
                 Dalej
             </button>

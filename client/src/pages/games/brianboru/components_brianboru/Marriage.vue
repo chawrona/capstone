@@ -27,8 +27,6 @@ const playersNotInMarriageQueue = computed(() => {
     );
     const colorsToBase = [];
 
-    console.log(props.marriages);
-
     for (const candidate of props.marriages) {
         if (candidate && playersColor.has(candidate.hex)) {
             colorsToBase.push(candidate.hex);

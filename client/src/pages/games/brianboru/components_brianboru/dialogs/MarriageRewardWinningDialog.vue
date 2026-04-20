@@ -26,7 +26,7 @@ const testCityChosing = () => {
     top: 50%;
     font-family: "MedievalSharp";
     left: 50%;
-      transform: translate(-50%, -65%);
+    transform: translate(-50%, -65%);
     z-index: 30;
     display: flex;
     flex-direction: column;

@@ -6,9 +6,12 @@ const props = defineProps(["closeDialog"]);
     <div class="dialog">
         <h1 class="dialogTitle">Wikingowie odparci</h1>
         <p class="subtitle">
-            Wszyscy wikingowie zostali pokonani.<br> Żadne miasto nie jest zagrożone
+            Wszyscy wikingowie zostali pokonani.<br />
+            Żadne miasto nie jest zagrożone
         </p>
-        <button class="dialogButton blueButton" @click="props.closeDialog">Dalej</button>
+        <button class="dialogButton blueButton" @click="props.closeDialog">
+            Dalej
+        </button>
     </div>
 </template>
 
@@ -20,7 +23,7 @@ const props = defineProps(["closeDialog"]);
     left: 50%;
     transform: translate(-50%, -65%);
 
-height: 300px;
+    height: 300px;
     width: 600px;
     text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
     display: flex;
@@ -37,16 +40,15 @@ height: 300px;
     background-size: cover;
     gap: 2rem;
     box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);
- justify-content: space-between;
- padding: 2rem 1rem;
+    justify-content: space-between;
+    padding: 2rem 1rem;
 
- .subtitle {
-    text-align: center;
-    font-size: 1.5rem;
-    line-height: 1.4;
- }
+    .subtitle {
+        text-align: center;
+        font-size: 1.5rem;
+        line-height: 1.4;
+    }
     .dialogTitle {
-   
         letter-spacing: 1px;
         font-size: 2rem;
     }

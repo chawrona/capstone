@@ -1,4 +1,5 @@
 import statuses from "../../../../../../server/models/games/brianboru/config/statuses";
+import { soundBus } from "../../../../audio/soundBus.js";
 import { useAppStore } from "../../../../store/useAppStore";
 
 const store = useAppStore();
@@ -16,36 +17,41 @@ const vikingsStatusesMap = {
 };
 
 const chooseCity = (cityId, props) => {
-    let eventName = "defaultEventName";
+    let eventName = undefined;
 
     if (
         buildingStatusesMap[props.status] &&
         props.citiesToBuild.includes(cityId)
     ) {
         eventName = buildingStatusesMap[props.status];
+        soundBus.playEffect("buildCity");
     } else if (
         vikingsStatusesMap[props.status] &&
         props.citiesToVikings.includes(cityId)
     ) {
         eventName = vikingsStatusesMap[props.status];
+        soundBus.playEffect("attackVikings");
     } else if (
         props.status === statuses.BUILD_CATHEDRAL &&
         props.citiesToCathedra.includes(cityId)
     ) {
         eventName = "chooseCathedral";
+        soundBus.playEffect("buildCathedra");
     } else if (
         props.status === statuses.CHOOSE_ATTACKED_CITY &&
         props.citiesToAttack.includes(cityId)
     ) {
         eventName = "chooseCityToAttack";
+        soundBus.playEffect("chooseAttackCity");
     } else if (
         props.status === statuses.REMOVE_VIKINGS &&
         props.citiesToRemoveVikings.includes(cityId)
     ) {
         eventName = "removeVikings";
-    } else {
-        return alert("Nie możesz wybrać tego miasta.");
+        soundBus.playEffect("removeVikings");
     }
+
+    if (!eventName) return;
 
     store.emit("gameData", {
         data: cityId,

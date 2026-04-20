@@ -1,31 +1,22 @@
 <script setup>
-import PlayerIcon from '../PlayerIcon.vue';
+import { computed } from "vue";
 
+import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
 import MoneyDouble from "@/assets/games/gameAssets/brianboru/money_double_plus.png";
 import Money from "@/assets/games/gameAssets/brianboru/money_plus.png";
+import Points from "@/assets/games/gameAssets/brianboru/points.png";
 import Sun from "@/assets/games/gameAssets/brianboru/sun.png";
 import City from "@/assets/games/gameAssets/brianboru/triquetra.png";
-import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
-import Points from "@/assets/games/gameAssets/brianboru/points.png";
-import { computed } from 'vue';
+
+import PlayerIcon from "../PlayerIcon.vue";
 
 const props = defineProps(["marriageDialogInfo", "closeDialog"]);
 
+const rewards = ["money", "doubleMoney", "sun", "city"];
 
-const rewards = [
-  
-      
-            "money",
-            "doubleMoney",
-            "sun",
-            "city",
-        ];
-
-        const fiancee = computed(() => {
-
-            return props.marriageDialogInfo[0].fiancee
-        })
-
+const fiancee = computed(() => {
+    return props.marriageDialogInfo[0].fiancee;
+});
 </script>
 
 <template>
@@ -34,53 +25,98 @@ const rewards = [
 
         <div class="dialogContent">
             <span class="mainReward">
-
-                <p>Gracz  <PlayerIcon :player="props.marriageDialogInfo[0].player" :playerColor="white" />
-                    poślubił <b>{{ fiancee.name }}</b>  <img class="rewardIcon letter" :src="Letter">
+                <p>
+                    Gracz
+                    <PlayerIcon
+                        :player="props.marriageDialogInfo[0].player"
+                        :player-color="white"
+                    />
+                    poślubił <b>{{ fiancee.name }}</b>
+                    <img class="rewardIcon letter" :src="Letter" />
                 </p>
             </span>
-  
-        <div class="rewardsContainer">
-            <br>
-            <p class="info">Otrzymane nagrody:</p>
-            <div class="flex">
-                <div v-for="player in props.marriageDialogInfo" class="wrapper">
-                    <PlayerIcon :player="player.player" :playerColor="white" />
-                    <div v-if="player.reward === 'winner' && fiancee.region !== 'Vikings'" class="winnerRewards">
-                        <img class="rewardIcon" :src="Money" v-for="(sun, index) in fiancee.suns">
 
-                        <div v-if="fiancee.points" class="points">
-                            <span>{{ fiancee.points }}</span>
-                            <img class="rewardIcon" :src="Points">
+            <div class="rewardsContainer">
+                <br />
+                <p class="info">Otrzymane nagrody:</p>
+                <div class="flex">
+                    <div
+                        v-for="(player, i) in props.marriageDialogInfo"
+                        :key="i"
+                        class="wrapper"
+                    >
+                        <PlayerIcon
+                            :player="player.player"
+                            :player-color="white"
+                        />
+                        <div
+                            v-if="
+                                player.reward === 'winner' &&
+                                fiancee.region !== 'Vikings'
+                            "
+                            class="winnerRewards"
+                        >
+                            <img
+                                v-for="sun in fiancee.suns"
+                                :key="sun"
+                                class="rewardIcon"
+                                :src="Money"
+                            />
+
+                            <div v-if="fiancee.points" class="points">
+                                <span>{{ fiancee.points }}</span>
+                                <img class="rewardIcon" :src="Points" />
+                            </div>
+
+                            <div v-if="fiancee.region" class="winnerRegion">
+                                <b
+                                    ><i>{{ fiancee.region }}</i></b
+                                >
+                                <img class="City rewardIcon" :src="City" />
+                            </div>
+                        </div>
+                        <div
+                            v-if="
+                                player.reward === 'winner' &&
+                                fiancee.region === 'Vikings'
+                            "
+                            class="help"
+                        >
+                            <i><b>Wsparcie Wojskowe/Regionalne</b></i>
                         </div>
 
-                        <div v-if="fiancee.region" class="winnerRegion">
-                            <b><i>{{ fiancee.region }}</i></b>
-                            <img class="City rewardIcon" :src="City">
+                        <div v-if="player.reward === ''" class="figa">
+                            Figa z makiem
                         </div>
-                      
-                    </div>
-                    <div v-if="player.reward === 'winner' && fiancee.region === 'Vikings'" class="help">
-                        <i><b>Wsparcie Wojskowe/Regionalne</b></i>
-                    </div>
-                    
-                    <div v-if="player.reward === ''" class="figa">
-                        Figa z makiem
-                    </div>
 
-                    <img class="rewardIcon" :src="Money" v-if="player.reward === 'money'">
-                    <img class="rewardIcon" :src="MoneyDouble" v-if="player.reward === 'doubleMoney'">
-                    <img class="rewardIcon" :src="Sun" v-if="player.reward === 'sun'">
-                    <img class="rewardIcon" :src="City" v-if="player.reward === 'city'">
+                        <img
+                            v-if="player.reward === 'money'"
+                            class="rewardIcon"
+                            :src="Money"
+                        />
+                        <img
+                            v-if="player.reward === 'doubleMoney'"
+                            class="rewardIcon"
+                            :src="MoneyDouble"
+                        />
+                        <img
+                            v-if="player.reward === 'sun'"
+                            class="rewardIcon"
+                            :src="Sun"
+                        />
+                        <img
+                            v-if="player.reward === 'city'"
+                            class="rewardIcon"
+                            :src="City"
+                        />
+                    </div>
                 </div>
             </div>
-            
         </div>
-        </div>
-        
-        
-      
-        <button class="dialogButton" @click="props.closeDialog">Dalej</button>
+
+        <button class="dialogButton blueButton" @click="props.closeDialog">
+            Dalej
+        </button>
     </div>
 </template>
 
@@ -117,8 +153,6 @@ const rewards = [
     }
 
     .dialogContent {
-     
-     
         font-size: 1rem;
         margin-bottom: 1.5rem;
         width: 90%;
@@ -151,21 +185,19 @@ const rewards = [
         flex-wrap: wrap;
         align-items: center;
         gap: 0 1rem;
-      justify-content: start;
+        justify-content: start;
     }
 
     .wrapper {
-        
         display: flex;
         align-items: center;
-          gap: 0.5rem;
+        gap: 0.5rem;
     }
 
     .rewardIcon {
         height: 48px;
-          transform: translateY(7px);
+        transform: translateY(7px);
         display: inline-block;
-     
     }
 
     .mainReward {
@@ -174,9 +206,8 @@ const rewards = [
     }
 
     .letter {
-      
         height: 35px;
-         transform: translateY(12px);
+        transform: translateY(12px);
     }
 
     .help {
@@ -186,12 +217,13 @@ const rewards = [
 
     .points {
         position: relative;
-          height: 48px;
-          width: 48px;
+        height: 48px;
+        transform: translateY(4.5px);
+        width: 48px;
 
-          img {
+        img {
             transform: none;
-          }
+        }
 
         span {
             position: absolute;
@@ -201,32 +233,28 @@ const rewards = [
             font-weight: bold;
             transform: translate(-60%, -40%);
         }
-
-       
     }
 
-     .winnerRewards {
-            display: flex;
-            gap: 0.2rem;
-            margin-left: 0.5rem;
-            font-display: row;
-            align-items: center;
-        }
+    .winnerRewards {
+        display: flex;
+        gap: 0.2rem;
+        margin-left: 0.5rem;
+        font-display: row;
+        align-items: center;
+    }
 
-        .winnerRegion {
-             height: 48px;
-             gap: 0.5rem;
-            flex-direction: column-reverse;
-            display: flex;
-            align-items: center;
-            transform: translateY(40%);
-            
+    .winnerRegion {
+        height: 48px;
+        gap: 0.5rem;
+        flex-direction: column-reverse;
+        display: flex;
+        align-items: center;
+        transform: translateY(40%);
+    }
 
-        }
-
-        .info {
-            margin-bottom: 0.5rem;
-        }
+    .info {
+        margin-bottom: 0.5rem;
+    }
 }
 
 .figa {

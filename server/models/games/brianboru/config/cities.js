@@ -125,38 +125,38 @@ const regions = {
     },
     Ulaid: {
         cities: [8, 9, 10, 11, 12],
-        points: 0,
-        minCity: 0,
+        points: 4,
+        minCity: 3,
     },
     Bréifne: {
         cities: [13, 14, 15, 16],
-        points: 0,
-        minCity: 0,
+        points: 3,
+        minCity: 2,
     },
     "Southern Uí Néill": {
         cities: [17, 18, 19, 20, 21, 22],
-        points: 0,
-        minCity: 0,
+        points: 5,
+        minCity: 3,
     },
     Dubhlinn: {
         cities: [23, 24, 25],
-        points: 0,
-        minCity: 0,
+        points: 2,
+        minCity: 2,
     },
     Connaught: {
         cities: [26, 27, 28, 29, 30, 31, 32, 33, 53],
-        points: 0,
-        minCity: 0,
+        points: 7,
+        minCity: 5,
     },
     Leinster: {
         cities: [34, 35, 36, 37, 38, 39, 40, 41, 42],
-        points: 0,
-        minCity: 0,
+        points: 6,
+        minCity: 4,
     },
     Munster: {
         cities: [43, 44, 45, 46, 47, 48, 49, 50, 51, 52],
-        points: 0,
-        minCity: 0,
+        points: 7,
+        minCity: 5,
     },
 };
 

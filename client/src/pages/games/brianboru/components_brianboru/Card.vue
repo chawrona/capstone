@@ -23,7 +23,7 @@ const props = defineProps([
             $attrs.class,
         ]"
     >
-            <img v-if="props.card.id === 25" :src="Rysa" class="rysa">
+        <img v-if="props.card.id === 25" :src="Rysa" class="rysa" />
         <div class="cardData">
             <div class="top" @click="() => props.callback?.('top', card)">
                 <span

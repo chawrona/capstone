@@ -7,6 +7,8 @@ export default class Debug {
     }
 
     run(data) {
+        // console.log(data);
+        // return this.game.sendGameDataToAll();
         const command = data.data;
         const player = this.game.getPlayer(data.publicId);
 
@@ -129,6 +131,9 @@ export default class Debug {
     debugGameEnd() {
         this.setAttackingPhase(undefined, ["last"]);
         this.setGamePhase(undefined, ["last"]);
+        this.debugEstrid();
+        this.game.vikings.currentVikings = 0;
+        this.buildCities();
     }
 
     getProperty(player, data) {
@@ -148,5 +153,18 @@ export default class Debug {
 
     setProperty(player, data) {
         eval(data.join(" "));
+    }
+
+    buildCities() {
+        let i = 0;
+        let ids = [17, 18, 19, 20, 21, 22];
+        for (const player of this.game.players.values()) {
+            this.game.regions.buildCity(ids[i++], player);
+            this.game.regions.buildCity(ids[i++], player);
+        }
+    }
+
+    buildCity(player, data) {
+        this.game.regions.buildCities(data, player);
     }
 }

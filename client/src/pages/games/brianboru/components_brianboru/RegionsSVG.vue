@@ -4,10 +4,8 @@ import { computed } from "vue";
 const props = defineProps(["width", "height", "regions", "everythingDark"]);
 
 const getRegionsColor = computed(() => {
-
-
-
-    if (props.everythingDark) return "--Leinster:var(--dark); --Ulaid:var(--dark); --Southern-Uí-Néill:var(--dark); --Dubhlinn:var(--dark); --Munster:var(--dark); --Northern-Uí-Néill:var(--dark); --Bréifne:var(--dark); --Connaught:var(--dark);"
+    if (props.everythingDark)
+        return "--Leinster:var(--dark); --Ulaid:var(--dark); --Southern-Uí-Néill:var(--dark); --Dubhlinn:var(--dark); --Munster:var(--dark); --Northern-Uí-Néill:var(--dark); --Bréifne:var(--dark); --Connaught:var(--dark);";
 
     let styleString = "";
 

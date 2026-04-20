@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 
 import { cities } from "../../../../../../server/models/games/brianboru/config/cities";
 import statuses from "../../../../../../server/models/games/brianboru/config/statuses";
+import { soundBus } from "../../../../audio/soundBus";
 import { useAppStore } from "../../../../store/useAppStore";
 import Card from "./Card.vue";
 
@@ -22,24 +23,20 @@ const toggleCards = () => {
 };
 
 const chooseCard = (card) => {
-    if (!canChooseCard(card.type)) {
-        console.log(card.type, cities[props.cityUnderAttack].type);
-
-        return alert("Nie możesz wybrać tej karty!");
-    }
+    if (!canChooseCard(card.type)) return;
 
     if (props.status === statuses.CHOOSE_FIRST_CARD) {
         store.emit("gameData", {
             data: card.id,
             eventName: "chooseFirstCard",
         });
+        soundBus.playEffect("chooseCard");
     } else if (props.status === statuses.CHOOSE_CARD) {
         store.emit("gameData", {
             data: card.id,
             eventName: "chooseCard",
         });
-    } else {
-        alert("Nie możesz teraz użyć tej karty");
+        soundBus.playEffect("chooseCard");
     }
 };
 

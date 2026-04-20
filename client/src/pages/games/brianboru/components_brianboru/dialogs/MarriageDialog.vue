@@ -1,7 +1,6 @@
 <script setup>
 const props = defineProps(["marriage", "closeDialog"]);
 import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
-
 </script>
 
 <template>
@@ -10,32 +9,32 @@ import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
 
         <div class="dialogContent">
             <div>
+                <p>
+                    <b class="marriageName">{{ marriage.name }}</b>
 
-                <p><b class="marriageName">{{ marriage.name }}</b> 
-                    
-                    
-                    {{marriage.region && marriage.region !== "Vikings" ? "z regionu ": "" }}
+                    {{
+                        marriage.region && marriage.region !== "Vikings"
+                            ? "z regionu "
+                            : ""
+                    }}
                     <b>
-                        {{marriage.region && marriage.region !== "Vikings" ? marriage.region : "" }}
-                    </b><br>
+                        {{
+                            marriage.region && marriage.region !== "Vikings"
+                                ? marriage.region
+                                : ""
+                        }} </b
+                    ><br />
                     szuka kogoś do poślubienia
-                    
                 </p>
-                
             </div>
             <div class="wrapper">
-                <p>
-                
-                (Kliknij na kościół, aby sprawdzić posag)
-                </p>
-                
+                <p>(Kliknij na kościół, aby sprawdzić posag)</p>
             </div>
-            
-            
         </div>
 
-                <button class="dialogButton yellowButton" @click="props.closeDialog">  dalej <img :src="Letter" class="icon"></button>
-
+        <button class="dialogButton yellowButton" @click="props.closeDialog">
+            dalej <img :src="Letter" class="icon" />
+        </button>
     </div>
 </template>
 
@@ -78,7 +77,7 @@ import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
         text-align: center;
 
         line-height: 1.2;
-     
+
         font-size: 1.5rem;
 
         width: 85%;
@@ -96,11 +95,10 @@ import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
         border: none;
         border-radius: 0.25rem;
         color: transparent;
-        
     }
 
     .wrapper {
-        margin-top: 0.5rem;;
+        margin-top: 0.5rem;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -109,7 +107,7 @@ import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
         color: rgb(255, 255, 255);
     }
 
-     .icon {
+    .icon {
         position: absolute;
         left: 50%;
         top: 50%;
@@ -117,7 +115,6 @@ import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
         height: 27px;
         transform: translate(-50%, -50%);
     }
-
 }
 
 .marriageName {

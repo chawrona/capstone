@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 
 import statuses from "../../../../../../../server/models/games/brianboru/config/statuses";
+import { soundBus } from "../../../../../audio/soundBus";
 import { useAppStore } from "../../../../../store/useAppStore";
 import Card from "../Card.vue";
 
@@ -21,16 +22,10 @@ const chosenBottom = ref("bottom1");
 const dialogOpen = ref(false);
 const bottomResources = computed(() => chosenCard.value[chosenBottom.value]);
 const doesContainResource = computed(() => {
-    console.log("HERE", bottomResources.value.some((resource) =>
+    return bottomResources.value.some((resource) =>
         ["church", "letter", "axe", "viking_shield"].includes(resource),
-    ));
-    
-return bottomResources.value.some((resource) =>
-        ["church", "letter", "axe", "viking_shield"].includes(resource),
-    )
-}
-    
-);
+    );
+});
 const containedResource = computed(() => {
     const resources = new Set(bottomResources.value);
     if (resources.has("church")) return "church";
@@ -43,7 +38,6 @@ const containedResource = computed(() => {
 const additionalResource = ref(0);
 const buyingCity = ref(false);
 const canYouBuyACity = computed(() => {
-    // Sprawdzić czy masz dostępne miasta do rozbudowy
     if (!props.you.canExpand) return false;
 
     return (
@@ -67,13 +61,16 @@ const useCardEffect = (bottom, card) => {
         activateCardEffect();
     } else {
         dialogOpen.value = true;
+        soundBus.playEffect("selectCardEffect");
     }
 };
 
-const closeDialog = () => (dialogOpen.value = false);
+const closeDialog = () => {
+    soundBus.playEffect("click");
+    dialogOpen.value = false;
+};
 
 const canManipulate = computed(() => {
-    // @TO-DO W JAKIŚ SPOSÓB WYLICZYĆ CZY MOŻNA MANIPULOWAĆ RESOURCAMI JAK SIĘ WYBIERA GÓRĘ ORAZ OBLICZAĆ ILE MONET WYŚWIETLIĆ DO ZABRANIA
     const moneyInTop = bottomResources.value.reduce(
         (acc, d) => (acc += d === "money_plus" ? 1 : 0),
         0,
@@ -124,15 +121,14 @@ const activateCardEffect = () => {
 
         <div class="dialogContent">
             <div v-if="doesContainResource">
-               
                 {{
                     bottomResources[0] === "axe"
                         ? " Czy chcesz nająć dodatkowych wikingów?"
                         : bottomResources[0] === "letter"
                           ? " Czy chcesz zakupić dodatkowe listy?"
-                          : bottomResources.includes('viking_shield')
-                          ? "Brian Boru odbija Twoje miasto z rąk wikingów" : 
-                          " Czy chcesz dokupić miejsce w kościele?"
+                          : bottomResources.includes("viking_shield")
+                            ? "Brian Boru odbija Twoje miasto z rąk wikingów"
+                            : " Czy chcesz dokupić miejsce w kościele?"
                 }}
             </div>
 
@@ -142,7 +138,10 @@ const activateCardEffect = () => {
 
             <div class="buyingAdditional">
                 <button
-                    v-if="doesContainResource && !bottomResources.includes('viking_shield')"
+                    v-if="
+                        doesContainResource &&
+                        !bottomResources.includes('viking_shield')
+                    "
                     :disabled="canManipulate.substract"
                     @click="substractResource"
                 >
@@ -187,9 +186,9 @@ const activateCardEffect = () => {
                             />
                         </span>
                         <img
-                                class="resource-image"
-                                :src="`/src/assets/games/gameAssets/brianboru/viking_shield.png`"
-                                v-if="bottomResources.includes('viking_shield')"
+                            v-if="bottomResources.includes('viking_shield')"
+                            class="resource-image"
+                            :src="`/src/assets/games/gameAssets/brianboru/viking_shield.png`"
                         />
                     </span>
 
@@ -305,7 +304,10 @@ const activateCardEffect = () => {
                     </span>
                 </div>
                 <button
-                    v-if="doesContainResource  && !bottomResources.includes('viking_shield')"
+                    v-if="
+                        doesContainResource &&
+                        !bottomResources.includes('viking_shield')
+                    "
                     :disabled="canManipulate.add"
                     @click="addResource"
                 >

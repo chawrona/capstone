@@ -821,14 +821,12 @@ export default class Philanthropists extends Game {
                 typ2 = surowiec.type;
                 cena = this.ceny[surowiec.current];
                 if (cena === 0) {
-                    console.log("Nie można kupować jak jest surowiec za zero");
                     return;
                 }
             }
         }
 
         if (aktualnyGracz.hajs < cena) {
-            console.log("Nie można kupować jak masz mniej hajsu");
             return;
         }
 
@@ -844,11 +842,6 @@ export default class Philanthropists extends Game {
         aktualnyGracz.hajs -= cena;
         aktualnyGracz.karty.push(typ);
         this.coAktualnieKupil.push(typ);
-
-        console.log("KUPIONE KARTY");
-
-        console.log(this.coAktualnieKupil.length);
-        console.log(this.coAktualnieKupil);
 
         if (
             this.coAktualnieKupil.length === 3 &&

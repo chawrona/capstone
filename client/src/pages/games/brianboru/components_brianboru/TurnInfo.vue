@@ -12,8 +12,6 @@ const infoSwitch = ref(true);
     </div>
     <div v-else class="turnInfo" @click="infoSwitch = !infoSwitch">
         <h1>
-            {{ console.log(props.phases.marriage) }}
-
             Faza {{ props.phases.marriage.current }}/{{
                 props.phases.marriage.total
             }}

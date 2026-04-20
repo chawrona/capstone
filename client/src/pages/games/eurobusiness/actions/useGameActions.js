@@ -89,10 +89,7 @@ export function useGameActions(availableActions, dialogsOpen) {
     };
 
     const bid = (bidIncrement) => {
-        console.log("XD");
-
         if (!canEmit(actions.auction)) return;
-        console.log("XD");
 
         store.emit("gameData", {
             data: bidIncrement,
