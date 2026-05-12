@@ -153,9 +153,9 @@ export default class Marriages {
         const winner = this.marriagesRewards.winner;
 
         // Gracze cofają się o 1 w małżeństwach
-        for (let i = 0; i < this.marriages.length; i++) {
-            this.marriages[i] = this.marriages[i + 1];
-        }
+        // for (let i = 0; i < this.marriages.length; i++) {
+        //     this.marriages[i] = this.marriages[i + 1];
+        // }
 
         if (winner) {
             const currentFiancee = this.getCurrentfiancee();
