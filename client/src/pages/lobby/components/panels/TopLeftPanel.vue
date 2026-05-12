@@ -120,6 +120,7 @@ const handleGameStart = () => {
 
         <OptionButton
             :icon="Color"
+            :disabled="!props.availableColors"
             :content="props.currentUser.color ? 'Zmień kolor' : 'Wybierz kolor'"
             @click="changeUserColorDialogRef?.openDialog"
         />

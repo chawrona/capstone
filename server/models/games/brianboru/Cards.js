@@ -121,6 +121,8 @@ export default class Cards {
 
     // @event
     selectCardsToPass(data) {
+        console.log(data);
+
         const player = this.game.getPlayer(data.publicId);
         const cardsIdToSave = data.data;
 
@@ -128,8 +130,8 @@ export default class Cards {
             (cardsIdToSave.length !== 2 &&
                 this.passingPhase.current !== this.passingPhase.total) ||
             (this.players.size === 5 &&
-                this.passingPhase.current !== this.passingPhase.total &&
-                this.cardsIdToSave.length !== 1)
+                this.passingPhase.current === this.passingPhase.total &&
+                cardsIdToSave.length !== 1)
         ) {
             throw new Error(
                 `Przekazałeś niewłaściwą ilość kart: ${cardsIdToSave.length} zamiast ${4 - this.passingPhase.current}`,
@@ -369,13 +371,18 @@ export default class Cards {
         }
 
         if (buildingCity) {
-            player.setStatus(statuses.BUILD_BOUGHT_CITY);
+            if (player.getData("money") >= 5) {
+                player.setData("money", (old) => old - 5);
+                player.setStatus(statuses.BUILD_BOUGHT_CITY);
 
-            this.game.regions.setCitiesToBuy(player);
+                this.game.regions.setCitiesToBuy(player);
 
-            this.game.setMessage(`${player.username} buduje zakupione miasto`);
+                this.game.setMessage(
+                    `${player.username} buduje zakupione miasto`,
+                );
 
-            return this.game.sendGameDataToAll();
+                return this.game.sendGameDataToAll();
+            }
         }
 
         return this.nextCardEffect(player);

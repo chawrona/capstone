@@ -38,9 +38,9 @@ const handleKeyPress = (event) => {
     const target = event.target;
     if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
 
-    if (event.key === "d") {
-        isActive.value = !isActive.value;
-    }
+    // if (event.key === "d") {
+    //     isActive.value = !isActive.value;
+    // }
 };
 
 const handleInputKey = (event) => {

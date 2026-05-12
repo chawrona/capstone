@@ -17,7 +17,10 @@ const store = useAppStore();
 const dialogRef = ref(null);
 
 const closeDialog = () => dialogRef.value.close();
-const openDialog = () => dialogRef.value.showModal();
+const openDialog = () => {
+    if (props.availableColors.length <= 0) return;
+    dialogRef.value.showModal();
+};
 
 defineExpose({
     closeDialog,

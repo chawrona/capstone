@@ -3,11 +3,29 @@ import { ref } from "vue";
 
 import WhiteChurch from "@/assets/games/gameAssets/brianboru/church_white.png";
 import Map from "@/assets/games/gameAssets/brianboru/map_icon.png";
+import Anon from "@/assets/games/gameAssets/brianboru/marriages/Anon.png";
+import Saishi from "@/assets/games/gameAssets/brianboru/marriages/Anon.png";
+import Debiddo from "@/assets/games/gameAssets/brianboru/marriages/Debiddo.png";
+import Estrid from "@/assets/games/gameAssets/brianboru/marriages/Estrid.png";
+import Hageneko from "@/assets/games/gameAssets/brianboru/marriages/Hageneko.png";
+import Kyōshi from "@/assets/games/gameAssets/brianboru/marriages/Kyōshi.png";
+import Nekootoko from "@/assets/games/gameAssets/brianboru/marriages/Nekootoko.png";
+import Sāikō from "@/assets/games/gameAssets/brianboru/marriages/Sāikō.png";
 import Points from "@/assets/games/gameAssets/brianboru/points.png";
 import Sun from "@/assets/games/gameAssets/brianboru/sun.png";
 import City from "@/assets/games/gameAssets/brianboru/triquetra.png";
 import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
 
+const marriagesMap = {
+    Anon: Anon,
+    Debiddo: Debiddo,
+    Estrid: Estrid,
+    Hageneko: Hageneko,
+    Kyōshi: Kyōshi,
+    Nekootoko: Nekootoko,
+    Sāikō: Sāikō,
+    Saishi: Saishi,
+};
 const props = defineProps(["church", "marriage"]);
 
 const flag = ref(true);
@@ -28,10 +46,7 @@ const change = () => (flag.value = !flag.value);
         </div>
     </div>
     <div v-else class="marriage" @click="change">
-        <img
-            class="marriage-image"
-            :src="`/src/assets/games/gameAssets/brianboru/marriages/${marriage.name}.png`"
-        />
+        <img class="marriage-image" :src="marriagesMap[marriage.name]" />
         <p class="marriageName">{{ marriage.name }}</p>
         <div class="marriagePoints">
             <div v-if="marriage.name === 'Estrid'" class="estrid">

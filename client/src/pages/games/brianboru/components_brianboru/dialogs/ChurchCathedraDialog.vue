@@ -45,7 +45,7 @@ const store = useAppStore();
     color: white;
     font-weight: normal;
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_blue.jpg");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_blue.webp");
     background-size: cover;
     gap: 0.5rem;
     box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);

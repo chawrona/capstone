@@ -50,6 +50,8 @@ const cards = computed(() => {
 });
 
 const rejectCards = () => {
+    console.log(selectedCards.value);
+    
     props.closeDialog();
     store.emit("gameData", {
         data: Array.from(selectedCards.value),
@@ -122,7 +124,7 @@ const rejectCards = () => {
     font-weight: normal;
     padding: 1.2rem 2rem;
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_grey_big.jpg");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_grey_big.webp");
     background-size: cover;
     gap: 0rem;
 

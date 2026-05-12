@@ -1,5 +1,6 @@
 <script setup>
 import PauseScreen from "../../../components/common/PauseScreen.vue";
+import PlaySoundtrack from "../../../components/common/PlaySoundtrack.vue";
 import { usePageSounds } from "../../../composables/usePageSounds";
 import { useGamePause } from "../composables_games/useGamePause";
 import { useGameResize } from "../composables_games/useGameResize";
@@ -13,7 +14,7 @@ import TurnInfo from "./components_brianboru/TurnInfo.vue";
 import useGameData from "./composables_brianboru/useGameData";
 import useGameDialogs from "./composables_brianboru/useGameDialogs";
 
-const SOUNDTRACK_URL = "/sounds/brianboru/brian_boru_soundtrack.mp3";
+const SOUNDTRACK_URL = "/sounds/brianboru/brian_boru_soundtrack.opus";
 usePageSounds({
     effects: [
         { name: "buildCathedra", url: "/sounds/brianboru/buildCathedra.mp3" },
@@ -54,6 +55,7 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
 
 <template>
     <PauseScreen v-if="isPaused" />
+    <PlaySoundtrack :url="SOUNDTRACK_URL" />
     <div class="background">
         <div
             v-if="gameData"
@@ -75,8 +77,10 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
                 :marriage="gameData.marriage"
                 :you="gameData.you"
                 :regions="gameData.regions"
+                v-slot="{ hide }">
             >
                 <Island
+                    :hide="hide"
                     :city-under-attack="gameData.cityUnderAttack"
                     :cities="gameData.cities"
                     :regions="gameData.regions"
@@ -122,7 +126,7 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
     background-repeat: no-repeat;
     background-color: rgb(0, 0, 0);
     overflow: hidden;
-    background-image: url("/src/assets/games/gameAssets/brianboru/sea.png");
+    background-image: url("/src/assets/games/gameAssets/brianboru/sea.webp");
 }
 
 .game {

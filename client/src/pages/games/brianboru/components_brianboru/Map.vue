@@ -1,5 +1,9 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
+
+import Farmland from "@/assets/games/gameAssets/brianboru/farmland.gif";
+import Mill from "@/assets/games/gameAssets/brianboru/mill.gif";
+import Mine from "@/assets/games/gameAssets/brianboru/mine.gif";
 
 import Church from "./Church.vue";
 import Island from "./Island.vue";
@@ -19,81 +23,95 @@ const props = defineProps([
     "regions",
 ]);
 
+const showIcons = ref(true);
+
+const handleKeyPress = (event) => {
+    if (event.key === "h") showIcons.value = !showIcons.value;
+};
+
+onMounted(() => {
+    window.addEventListener("keydown", handleKeyPress);
+});
+
+onUnmounted(() => {
+    window.removeEventListener("keydown", handleKeyPress);
+});
+
 const buildings = ref([
     {
         id: 3,
         name: "Pole uprawne 1",
-        src: "/src/assets/games/gameAssets/brianboru/farmland.gif",
+        src: Farmland,
         x: 657,
         y: 642,
     },
     {
         id: 4,
         name: "Pole uprawne 2",
-        src: "/src/assets/games/gameAssets/brianboru/farmland.gif",
+        src: Farmland,
         x: 675,
         y: 657,
     },
     {
         id: 5,
         name: "Pole uprawne 3",
-        src: "/src/assets/games/gameAssets/brianboru/farmland.gif",
+        src: Farmland,
         x: 651,
         y: 665,
     },
     {
         id: 6,
         name: "Pole uprawne 4",
-        src: "/src/assets/games/gameAssets/brianboru/farmland.gif",
+        src: Farmland,
         x: 800,
         y: 731,
     },
     {
         id: 7,
         name: "Pole uprawne 5",
-        src: "/src/assets/games/gameAssets/brianboru/farmland.gif",
+        src: Farmland,
         x: 822,
         y: 748,
     },
     {
         id: 8,
         name: "Młyn 1",
-        src: "/src/assets/games/gameAssets/brianboru/mill.gif",
+        src: Mill,
         x: 690,
         y: 615,
     },
     {
         id: 9,
         name: "Młyn 2",
-        src: "/src/assets/games/gameAssets/brianboru/mill.gif",
+        src: Mill,
         x: 596,
         y: 751,
     },
     {
         id: 10,
         name: "Młyn 3",
-        src: "/src/assets/games/gameAssets/brianboru/mill.gif",
+        src: Mill,
         x: 629,
         y: 796,
     },
     {
         id: 11,
         name: "Kopalnia Północna 1",
-        src: "/src/assets/games/gameAssets/brianboru/mine.gif",
+        src: Mine,
         x: 1139,
         y: 101,
     },
     {
         id: 12,
         name: "Kopalnia Północna 2",
-        src: "/src/assets/games/gameAssets/brianboru/mine.gif",
+        src: Mine,
         x: 1198,
         y: 215,
     },
     {
         id: 13,
         name: "Kopalnia Północna 3",
-        src: "/src/assets/games/gameAssets/brianboru/mine.gif",
+        src: Mine,
         x: 1169,
         y: 347,
     },
@@ -107,16 +125,18 @@ const buildings = ref([
         <Players :players="props.players" :you="props.you" />
         <Church :church="props.church" :marriage="marriage" />
         <Regions />
-        <slot />
+        <slot :hide="!showIcons" />
         <Points :regions="props.regions" />
-        <img
-            v-for="building in buildings"
-            :key="building.id"
-            :src="building.src"
-            class="map-building"
-            :style="{ top: building.y + 'px', left: building.x + 'px' }"
-            :alt="building.name"
-        />
+        <div v-if="showIcons">
+            <img
+                v-for="building in buildings"
+                :key="building.id"
+                :src="building.src"
+                class="map-building"
+                :style="{ top: building.y + 'px', left: building.x + 'px' }"
+                :alt="building.name"
+            />
+        </div>
     </div>
 </template>
 

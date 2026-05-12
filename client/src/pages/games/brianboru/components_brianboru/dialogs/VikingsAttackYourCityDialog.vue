@@ -40,7 +40,7 @@ const props = defineProps(["closeDialog"]);
 
     z-index: 30;
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_red.jpg");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_red.webp");
     background-size: cover;
     gap: 2rem;
 

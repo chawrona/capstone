@@ -6,9 +6,15 @@ export default class Ludo extends Game {
     }
 
     initializeGameData() {
-        this.gameData.gameMap = Array.from({ length: 40 }, () => 0);
-        this.gameData.startingPositionArea = this._setPawns("start");
-        this.gameData.finishPositions = this._setPawns("finish");
+        // --- WEWNĘTRZNE ŹRÓDŁO PRAWDY (NOWY SILNIK) ---
+        // Słownik graczy: -1 (baza), 0-39 (mapa), 40-43 (meta)
+        this.internalPawns = {};
+        for (const pId of this.playersQueue) {
+            this.internalPawns[pId] = { 1: -1, 2: -1, 3: -1, 4: -1 };
+        }
+
+        // --- ZMIENNE STANU DLA FRONTENDU (STARY KONTRAKT) ---
+        this.gameData = {};
         this.gameData.timesThrown = 0;
         this.gameData.diceThrowResult = 0;
         this.gameData.playersStartingPoints = this._setPlayersStartingPoints();
@@ -16,71 +22,15 @@ export default class Ludo extends Game {
         this.gameData.currentAction = `Rzut kością`;
         this.gameData.isPaused = this.paused;
         this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością.`;
+
+        this._syncFrontendState();
     }
 
-    _getCompactMap() {
-        return Object.fromEntries(
-            this.gameData.gameMap
-                .map((value, index) => [index, value])
-                .filter((item) => item[1] !== 0),
-        );
-    }
-
-    _getCurrentPlayerUsername() {
-        return this._currentPlayer().username;
-    }
-
-    setGameMap(data) {
-        this.gameData.gameMap = JSON.parse(data.map);
-        return this._dataWithPlayersTarget();
-    }
-
-    setFinished(data) {
-        this.gameData.finishPositions = JSON.parse(data.finished);
-        return this._dataWithPlayersTarget();
-    }
-
-    _setPlayersStartingPoints() {
-        const playersStartingPoints = [];
-        let mapStartPoint = 0;
-        for (const pId of this.playersQueue) {
-            //ustawiamy punkt startowy na który trafiają pionki gracza,
-            // gracz pierwszy w kolejce ma indeks tablicy 0 tak więc
-            // startuje na polu 0, drugi ma indeks 1 więc 10 itd.
-            // if (pId === this._currentPlayer().publicId) {
-            if (this.playersQueue.length == 2) {
-                mapStartPoint = this.playersQueue.indexOf(pId) * 20;
-                playersStartingPoints.push([pId, mapStartPoint]);
-            } else {
-                mapStartPoint = this.playersQueue.indexOf(pId) * 10;
-                playersStartingPoints.push([pId, mapStartPoint]);
-            }
-            this.players.get(pId).setData("startingField", () => mapStartPoint);
-        }
-        return playersStartingPoints;
-    }
-
-    _newPosition(pawnId) {
-        const publicId = this.playersQueue[this.currentPlayerIndex];
-        let newPosition = null;
-        let currentPosition = null;
-        for (const element of this.gameData.gameMap) {
-            if (!element) {
-                if (element[0] === publicId && element[1] == pawnId) {
-                    currentPosition = this.gameData.gameMap.indexOf(element);
-                }
-            }
-        }
-        if (currentPosition + this.gameData.diceThrowResult > 39) {
-            newPosition = currentPosition + this.gameData.diceThrowResult - 40;
-        } else {
-            newPosition = currentPosition + this.gameData.diceThrowResult;
-        }
-        return newPosition;
-    }
+    // ==========================================
+    // METODY WYMAGANE PRZEZ SERWER/FRONTEND
+    // ==========================================
 
     gameDataRequest(data) {
-        // bierze wszystkie dane dot. gry i odsyla
         return [
             this._dataWithPlayerTarget(data.publicId),
             {
@@ -92,55 +42,111 @@ export default class Ludo extends Game {
     }
 
     getPlayersData() {
-        // wyciaga instancje klasy player
         const players = [];
         for (const [, player] of this.players) {
             players.push(player);
         }
         return players
-            .sort((a, b) => {
-                return a.getData("turnOrder") - b.getData("turnOrder");
-            })
-            .map((player) => {
-                return player.getPlayerData();
-            });
+            .sort((a, b) => a.getData("turnOrder") - b.getData("turnOrder"))
+            .map((player) => player.getPlayerData());
     }
 
-    _setPawns(startOrFinish) {
-        const pawns = [];
-        if (startOrFinish === "start") {
-            for (const [, player] of this.players) {
-                let index = 0;
-                while (index !== 4) {
-                    index++;
-                    pawns.push([player.publicId, index]); // [[niebieski,1],
-                    // [niebieski,2],...,[czerwony,1],...,[zolty,4]] - zamysl
+    setGameMap(data) {
+        this.gameData.gameMap = JSON.parse(data.map);
+        this._loadStateFromOldFormat(
+            this.gameData.gameMap,
+            this.gameData.finishPositions || [],
+        );
+        return this._dataWithPlayersTarget();
+    }
+
+    setFinished(data) {
+        this.gameData.finishPositions = JSON.parse(data.finished);
+        this._loadStateFromOldFormat(
+            this.gameData.gameMap || Array.from({ length: 40 }, () => 0),
+            this.gameData.finishPositions,
+        );
+        return this._dataWithPlayersTarget();
+    }
+
+    // ==========================================
+    // PRZYWRACANIE STANU Z BAZY DANYCH
+    // ==========================================
+
+    _loadStateFromOldFormat(gameMap, finishPositions) {
+        // Resetujemy wewnętrzny stan
+        for (const pId of this.playersQueue) {
+            this.internalPawns[pId] = { 1: -1, 2: -1, 3: -1, 4: -1 };
+        }
+
+        // Wczytywanie z mapy
+        gameMap.forEach((pawn, mapIdx) => {
+            if (Array.isArray(pawn)) {
+                const pId = pawn[0];
+                const pawnId = pawn[1];
+                const startPoint = this._getPlayerStartPoint(pId);
+                const dist = (mapIdx - startPoint + 40) % 40;
+                if (this.internalPawns[pId]) {
+                    this.internalPawns[pId][pawnId] = dist;
                 }
             }
-            return pawns;
-        } else {
-            for (const [, player] of this.players) {
-                pawns.push([[player.publicId, 99]]);
+        });
+
+        // Wczytywanie z mety
+        for (const playerPawns of finishPositions) {
+            if (playerPawns && playerPawns.length > 0) {
+                const pId = playerPawns[0][0];
+
+                // Szukamy, które ID pionków są wolne
+                const usedPawnIds = new Set();
+                if (this.internalPawns[pId]) {
+                    for (const [idStr, dist] of Object.entries(
+                        this.internalPawns[pId],
+                    )) {
+                        if (dist !== -1) usedPawnIds.add(parseInt(idStr));
+                    }
+                }
+
+                for (let i = 1; i < playerPawns.length; i++) {
+                    const finishPos = playerPawns[i][1];
+                    const dist = 39 + finishPos;
+
+                    let freePawnId = null;
+                    for (let pid = 1; pid <= 4; pid++) {
+                        if (!usedPawnIds.has(pid)) {
+                            freePawnId = pid;
+                            usedPawnIds.add(pid);
+                            break;
+                        }
+                    }
+
+                    if (freePawnId !== null && this.internalPawns[pId]) {
+                        this.internalPawns[pId][freePawnId] = dist;
+                    }
+                }
             }
-            return pawns;
         }
+        this._syncFrontendState();
     }
+
+    // ==========================================
+    // METODY POMOCNICZE WYSYŁAJĄCE DANE
+    // ==========================================
 
     _dataWithPlayersTarget() {
         const targets = [];
         const possiblePawnMoves = this._possibleMoves();
-        for (const [, player] of this.players) {
+        for (const [pId] of this.players) {
             targets.push({
-                target: player.publicId,
+                target: pId,
                 eventName: "gameData",
                 data: {
                     ...this.gameData,
                     yourTurn:
-                        player.publicId ===
-                        this.playersQueue[this.currentPlayerIndex],
+                        pId === this.playersQueue[this.currentPlayerIndex],
                     currentPlayerIndex: this.currentPlayerIndex,
-                    possiblePawnMoves, // pamiętać żeby zerować
-                    yourPublicId: player.publicId,
+                    possiblePawnMoves: possiblePawnMoves,
+                    yourPublicId: pId,
                 },
             });
         }
@@ -149,7 +155,6 @@ export default class Ludo extends Game {
 
     _dataWithPlayerTarget(publicId) {
         const possiblePawnMoves = this._possibleMoves();
-
         return {
             target: publicId,
             eventName: "gameData",
@@ -168,31 +173,126 @@ export default class Ludo extends Game {
     _gameEndWithTarget() {
         const gameEndStats = [];
         for (const pawns of this.gameData.finishPositions) {
-            let howManyFinished = 0;
-            for (const pawn of pawns) {
-                if (pawn[1] !== 0) {
-                    howManyFinished += 1;
-                }
-            }
+            let howManyFinished = pawns.length - 1;
             gameEndStats.push([pawns[0][0], howManyFinished]);
         }
         gameEndStats.sort((a, b) => b[1] - a[1]);
+
         const targets = [];
         for (const [, player] of this.players) {
             targets.push({
                 target: player.publicId,
                 eventName: "gameEnd",
-                data: {
-                    ...gameEndStats,
-                },
+                data: { ...gameEndStats },
             });
         }
         return targets;
     }
 
+    // ==========================================
+    // LOGIKA GENEROWANIA STANU
+    // ==========================================
+
+    _setPlayersStartingPoints() {
+        const playersStartingPoints = [];
+        let mapStartPoint = 0;
+        for (const pId of this.playersQueue) {
+            if (this.playersQueue.length == 2) {
+                mapStartPoint = this.playersQueue.indexOf(pId) * 20;
+            } else {
+                mapStartPoint = this.playersQueue.indexOf(pId) * 10;
+            }
+            playersStartingPoints.push([pId, mapStartPoint]);
+            this.players.get(pId).setData("startingField", () => mapStartPoint);
+        }
+        return playersStartingPoints;
+    }
+
+    _getPlayerStartPoint(publicId) {
+        const field = this.players.get(publicId).getData("startingField");
+        return typeof field === "function" ? field() : field;
+    }
+
+    _getMapIndex(publicId, distance) {
+        if (distance < 0 || distance > 39) return null;
+        const startPoint = this._getPlayerStartPoint(publicId);
+        return (startPoint + distance) % 40;
+    }
+
+    _getCurrentPlayerUsername() {
+        return this._currentPlayer().username;
+    }
+
     _currentPlayer() {
         return this.players.get(this.playersQueue[this.currentPlayerIndex]);
     }
+
+    _syncFrontendState() {
+        const gameMap = Array.from({ length: 40 }, () => 0);
+        const startingPositionArea = [];
+        const finishMap = new Map();
+
+        // Używamy playersQueue, aby mieć gwarancję poprawnego typu danych klucza
+        for (const pId of this.playersQueue) {
+            finishMap.set(pId, [[pId, 99]]);
+        }
+
+        // Iterujemy po playersQueue zamiast po kluczach obiektu,
+        // aby uniknąć problemu z parsowaniem String -> Int
+        for (const publicId of this.playersQueue) {
+            const pawns = this.internalPawns[publicId];
+            if (!pawns) continue;
+
+            for (const [pawnIdStr, dist] of Object.entries(pawns)) {
+                const pawnId = parseInt(pawnIdStr); // ID pionków zawsze są od 1 do 4
+
+                if (dist === -1) {
+                    startingPositionArea.push([publicId, pawnId]);
+                } else if (dist >= 0 && dist <= 39) {
+                    const mapIdx = this._getMapIndex(publicId, dist);
+                    gameMap[mapIdx] = [publicId, pawnId];
+                } else if (dist >= 40) {
+                    const finishPos = dist - 39;
+                    finishMap.get(publicId).push([publicId, finishPos]);
+                }
+            }
+        }
+
+        this.gameData.gameMap = gameMap;
+        this.gameData.startingPositionArea = startingPositionArea;
+        this.gameData.finishPositions = Array.from(finishMap.values());
+    }
+
+    // ==========================================
+    // METODY DEBUGUJĄCE ZE STAREGO PLIKU
+    // ==========================================
+
+    _getCompactMap() {
+        return Object.fromEntries(
+            this.gameData.gameMap
+                .map((value, index) => [index, value])
+                .filter((item) => item[1] !== 0),
+        );
+    }
+
+    printGameState(end) {
+        if (typeof this.log === "function") {
+            this.log(
+                JSON.stringify({
+                    mapa: this._getCompactMap(),
+                    startingPositionArea: this.gameData.startingPositionArea,
+                    finishPositions: this.gameData.finishPositions,
+                    diceThrowResult: this.gameData.diceThrowResult,
+                    action: this.gameData.currentAction,
+                    possibleMoves: end ? "end" : this._possibleMoves(),
+                }),
+            );
+        }
+    }
+
+    // ==========================================
+    // GŁÓWNA LOGIKA GRY
+    // ==========================================
 
     rollDice(data) {
         if (data.publicId !== this.playersQueue[this.currentPlayerIndex]) {
@@ -202,255 +302,208 @@ export default class Ludo extends Game {
             throw new Error("Nieprawidłowa akcja.");
         }
 
-        this.log(
-            "-------------------------ROLL DICE - START-----------------------------------",
-        );
-        this.printGameState();
+        if (typeof this.log === "function") {
+            this.log(
+                "-------------------------ROLL DICE - START-----------------------------------",
+            );
+            this.printGameState();
+        }
 
         this.gameData.timesThrown += 1;
+        const currentPlayer = this._currentPlayer();
+
+        let pawnsInStartingArea = 0;
+        for (const d of Object.values(
+            this.internalPawns[currentPlayer.publicId],
+        )) {
+            if (d === -1) pawnsInStartingArea++;
+        }
+
         if (this.gameData.timesThrown < 3) {
-            const currentPlayer = this._currentPlayer();
             this.gameData.diceThrowResult = Math.floor(Math.random() * 6) + 1;
             const possibleMoves = this._possibleMoves();
+
             if (
                 this.gameData.diceThrowResult === 6 ||
                 this.gameData.diceThrowResult === 1
             ) {
-                this.gameData.timesThrown = 0; // reset ile razy wyrzucono kosci
-                if (possibleMoves === false) {
-                    // jezeli possibleMoves wynosi false to oznacza, ze gracz nie
-                    // moze sie ruszyc zadnym pionkiem, nawet tymi na starcie,
-                    // przez co traci ture, nie ma kolejnego rzutu bo to nie jest tura startowa
-
+                this.gameData.timesThrown = 0;
+                if (!possibleMoves) {
                     this.gameData.currentAction = "Rzut kością";
                     this.nextTurn();
                     this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością.`;
-                    this.printGameState();
-                    this.log(
-                        "-------------------------ROLL DICE - END -----------------------------------",
-                    );
-
-                    return this._dataWithPlayersTarget();
                 } else {
                     this.gameData.currentAction = "Ruch pionka";
                     this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} wybiera pionek.`;
-                    this.printGameState();
-                    this.log(
-                        "-------------------------ROLL DICE - END -----------------------------------",
-                    );
-                    return this._dataWithPlayersTarget();
                 }
             } else {
-                // rzut od 2 do 5
-
-                if (possibleMoves !== false) {
-                    // w tych tabelach długość ponad 1 oznacza, że są możliwe ruchy do wykonania
+                if (possibleMoves) {
                     this.gameData.currentAction = "Ruch pionka";
                     this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} wybiera pionek.`;
                     this.gameData.timesThrown = 0;
-                    this.printGameState();
-                    this.log(
-                        "-------------------------ROLL DICE - END -----------------------------------",
-                    );
-                    return this._dataWithPlayersTarget();
-                }
-                let pawnsInStartingArea = 0;
-                for (const pawn of this.gameData.startingPositionArea) {
-                    if (pawn[0] === currentPlayer.publicId) {
-                        pawnsInStartingArea += 1;
+                } else {
+                    if (pawnsInStartingArea === 4) {
+                        this.gameData.currentAction = "Rzut kością";
+                        this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością ponownie (${this.gameData.timesThrown}/3)`;
+                    } else {
+                        this.gameData.timesThrown = 0;
+                        this.gameData.currentAction = "Rzut kością";
+                        this.nextTurn();
+                        this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością.`;
                     }
-                }
-                if (pawnsInStartingArea === 4) {
-                    this.gameData.currentAction = "Rzut kością";
-                    this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością ponownie (${this.gameData.timesThrown}/3)`;
-                    this.printGameState();
-                    this.log(
-                        "-------------------------ROLL DICE - END -----------------------------------",
-                    );
-                    return this._dataWithPlayersTarget();
-                }
-
-                if (possibleMoves === false) {
-                    this.gameData.timesThrown = 0;
-                    this.gameData.currentAction = "Rzut kością";
-                    this.nextTurn();
-                    this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością.`;
-                    this.printGameState();
-                    this.log(
-                        "-------------------------ROLL DICE - END -----------------------------------",
-                    );
-                    return this._dataWithPlayersTarget();
                 }
             }
         } else {
-            // jeżeli użytkownik próbuje rzucić kością 4 raz to tura przechodzi do innego gracza
             this.gameData.timesThrown = 0;
             this.gameData.currentAction = "Rzut kością";
             this.nextTurn();
             this.gameData.actionMessage = `Poprzedni gracz nie mógł wyjść z bazy. ${this._getCurrentPlayerUsername()} rzuca kością.`;
+        }
+
+        if (typeof this.log === "function") {
             this.printGameState();
             this.log(
                 "-------------------------ROLL DICE - END -----------------------------------",
             );
-            return this._dataWithPlayersTarget();
         }
+
+        return this._dataWithPlayersTarget();
     }
 
-    // _possibleMoves(currentPlayer) {
     _possibleMoves() {
-        const currentPlayerPublicId =
-            this.playersQueue[this.currentPlayerIndex];
         this.gameData.anyPossibleMoves = false;
-        let possibleMoves = [
-            [], // "PionkiNaPlanszy"
-            [], // "PionkiNaStarcie"
-            [], // "PionkiNaFinishu"
-        ];
-        const currentPlayerMapStartPoint = this._getPlayerStartPoint(
-            currentPlayerPublicId,
-        );
-        const rollResult = this.gameData.diceThrowResult;
-        const pawnOnStartingField =
-            this.gameData.gameMap[currentPlayerMapStartPoint];
+        const pId = this.playersQueue[this.currentPlayerIndex];
+        const roll = this.gameData.diceThrowResult;
+        const pawns = this.internalPawns[pId];
+        const possible = [[], [], []];
 
-        // Dodawanie pionków z bazy
-        const thrownOneOrSix = rollResult === 6 || rollResult === 1;
-        const isStartingFieldClear = !pawnOnStartingField;
-        const isOurPawnOnStartingField =
-            pawnOnStartingField[0] === currentPlayerPublicId;
-        if (
-            thrownOneOrSix &&
-            (isStartingFieldClear || !isOurPawnOnStartingField)
-        ) {
-            for (const [publicId, pawnId] of this.gameData
-                .startingPositionArea) {
-                if (publicId === currentPlayerPublicId) {
-                    possibleMoves[1].push([publicId, pawnId]);
+        const myOccupiedMap = new Set();
+        const myOccupiedFinish = new Set();
+        for (const d of Object.values(pawns)) {
+            if (d >= 0 && d <= 39) myOccupiedMap.add(this._getMapIndex(pId, d));
+            if (d >= 40) myOccupiedFinish.add(d);
+        }
+
+        for (const [idStr, dist] of Object.entries(pawns)) {
+            const pawnId = parseInt(idStr);
+
+            if (dist === -1 && (roll === 1 || roll === 6)) {
+                if (!myOccupiedMap.has(this._getMapIndex(pId, 0))) {
+                    possible[1].push([pId, pawnId]);
+                }
+            } else if (dist >= 0 && dist <= 39) {
+                const nDist = dist + roll;
+                if (nDist <= 39) {
+                    if (!myOccupiedMap.has(this._getMapIndex(pId, nDist))) {
+                        possible[0].push([pId, pawnId]);
+                    }
+                } else if (nDist >= 40 && nDist <= 43) {
+                    if (!myOccupiedFinish.has(nDist)) {
+                        possible[0].push([pId, pawnId]);
+                    }
+                }
+            } else if (dist >= 40 && dist <= 42) {
+                const nDist = dist + roll;
+                if (nDist <= 43 && !myOccupiedFinish.has(nDist)) {
+                    const finishPos = dist - 39;
+                    possible[2].push([pId, finishPos]);
                 }
             }
         }
 
-        // Dodawanie pionków z mapy
-        this.gameData.gameMap.forEach((pawn, currentPosition) => {
-            if (!Number.isInteger(pawn) && pawn[0] === currentPlayerPublicId) {
-                const newPosition =
-                    this.gameData.diceThrowResult + currentPosition;
-                let lapDone =
-                    currentPosition < currentPlayerMapStartPoint &&
-                    newPosition >= currentPlayerMapStartPoint;
-                // specjalny warunek dla startingPoint równe 0
-
-                if (currentPlayerMapStartPoint === 0) {
-                    lapDone =
-                        [39, 38, 37, 36, 35, 34].includes(currentPosition) &&
-                        newPosition >= currentPlayerMapStartPoint;
-
-                    //                     this.log(`
-                    // Aktualna pozycja: ${currentPosition}
-                    // Edge case dla 0: ${[39, 38, 37, 36, 35, 34].includes(currentPosition)}
-                    // Nowa pozycja: ${newPosition}
-                    // Starting Field: ${currentPlayerMapStartPoint}
-                    //                         `);
-                }
-
-                if (lapDone) {
-                    // this.log(
-                    //     "OKRĄŻENIE SIĘ WYKONA. PIONEK POWINIEN WEJŚC NA FINISH",
-                    // );
-                    // @TO-DO sprawdzić czy napewno dobrze obliczamy finiszowe pozycje
-                    let finishPosition =
-                        newPosition - currentPlayerMapStartPoint + 1;
-
-                    if (currentPlayerMapStartPoint === 0) {
-                        finishPosition = (newPosition % 10) + 1;
-                    }
-
-                    if (finishPosition <= 4) {
-                        for (const playerPawns of this.gameData
-                            .finishPositions) {
-                            if (playerPawns[0][0] === currentPlayerPublicId) {
-                                let isPawnOnFinishPosition = false;
-                                for (const finishPawn of playerPawns) {
-                                    if (finishPawn[1] === finishPosition) {
-                                        isPawnOnFinishPosition = true;
-                                    }
-                                }
-
-                                if (!isPawnOnFinishPosition) {
-                                    possibleMoves[0].push(this._copyPawn(pawn));
-                                    // this.log(
-                                    //     "Dodajemy pionek do possible moves, który może wejść na finish",
-                                    // );
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    // this.log(
-                    //     "OKRĄŻENIE SIĘ NIE WYKONA, WIĘC PIONEK NORMALNIE RUSZA SIĘ PO MAPIE",
-                    // );
-                    const pawnOnNewPosition =
-                        this.gameData.gameMap[newPosition];
-
-                    // this.log("newPosition");
-                    // this.log(newPosition);
-                    // this.log("pawnOnNewPosition");
-                    // this.log(JSON.stringify(pawnOnNewPosition));
-                    if (
-                        !pawnOnNewPosition ||
-                        pawnOnNewPosition[0] !== currentPlayerPublicId
-                    ) {
-                        // this.log("Pionek może się ruszyć");
-                        possibleMoves[0].push(this._copyPawn(pawn));
-                    }
-                }
-            }
-        });
-
-        // Dodawanie pionków z finiszu
-        if ([1, 2, 3].includes(rollResult)) {
-            for (const playerPawns of this.gameData.finishPositions) {
-                if (playerPawns[0][0] === currentPlayerPublicId) {
-                    for (const finishPawn of playerPawns) {
-                        const currentFinishPosition = finishPawn[1];
-                        const newFinishPosition =
-                            currentFinishPosition + rollResult;
-
-                        if (newFinishPosition < 4) {
-                            let isPawnOnFinishPosition = false;
-
-                            for (const checkedFinishPawn of playerPawns) {
-                                if (
-                                    checkedFinishPawn[1] === newFinishPosition
-                                ) {
-                                    isPawnOnFinishPosition = true;
-                                }
-                            }
-
-                            if (!isPawnOnFinishPosition) {
-                                possibleMoves[2].push(finishPawn);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (
-            possibleMoves[0].length ||
-            possibleMoves[1].length ||
-            possibleMoves[2].length
-        )
-            return possibleMoves;
-
-        return false;
+        const hasMoves = possible.some((c) => c.length > 0);
+        return hasMoves ? possible : false;
     }
 
-    _finishTurn(skip) {
-        this.printGameState(true);
-        this.log(
-            "--------------------------END----------------------------------",
+    pawnMovement(data) {
+        if (typeof this.log === "function") {
+            this.log(
+                "-------------------------START-----------------------------------",
+            );
+            this.printGameState();
+        }
+
+        const currentPlayerId = this.playersQueue[this.currentPlayerIndex];
+        if (data.publicId !== currentPlayerId)
+            throw new Error("Poczekaj na swoją turę.");
+        if (this.gameData.currentAction !== "Ruch pionka")
+            throw new Error("Nieprawidłowa akcja.");
+
+        const roll = this.gameData.diceThrowResult;
+        const moves = this._possibleMoves(); // Tutaj mamy kompletną listę co wolno kliknąć
+        if (!moves) throw new Error("Brak możliwych ruchów.");
+
+        let internalPawnIdToMove = null;
+
+        // 1. Sprawdzamy ruchy z mapy/bazy (moves[0] i [1])
+        // Tutaj data.pawnId to bezpośrednio ID pionka (1-4)
+        const baseMapMove = [...moves[0], ...moves[1]].find(
+            (p) => p[1] === data.pawnId,
         );
+
+        // 2. Sprawdzamy ruchy na finiszu (moves[2])
+        // Tutaj data.pawnId to numer pola (1-4) przysłany z frontu
+        const finishMove = moves[2].find((p) => p[1] === data.pawnId);
+
+        if (baseMapMove) {
+            internalPawnIdToMove = data.pawnId;
+        } else if (finishMove) {
+            // Jeśli to ruch na finiszu, musimy znaleźć KLUCZ pionka (1-4),
+            // który aktualnie stoi na tym polu (dist = 39 + numer pola)
+            const currentFieldOnFinish = 39 + data.pawnId;
+            const pawns = this.internalPawns[currentPlayerId];
+
+            for (const [pIdKey, dist] of Object.entries(pawns)) {
+                if (dist === currentFieldOnFinish) {
+                    internalPawnIdToMove = parseInt(pIdKey);
+                    break;
+                }
+            }
+        }
+
+        // Jeśli po przeszukaniu obu kategorii nadal nie mamy ID, rzucamy błąd
+        if (internalPawnIdToMove === null) {
+            throw new Error(
+                "Nie możesz się ruszyć tym pionkiem - nie znaleziono dopasowania.",
+            );
+        }
+
+        const currentDist =
+            this.internalPawns[currentPlayerId][internalPawnIdToMove];
+        let isStartMove = currentDist === -1;
+        let newDist = isStartMove ? 0 : currentDist + roll;
+
+        // Mechanika bicia (tylko na mapie głównej 0-39)
+        if (newDist >= 0 && newDist <= 39) {
+            const targetIdx = this._getMapIndex(currentPlayerId, newDist);
+            for (const opponentId of this.playersQueue) {
+                if (opponentId === currentPlayerId) continue;
+
+                const opponentPawns = this.internalPawns[opponentId];
+                for (const [pIdKey, dist] of Object.entries(opponentPawns)) {
+                    if (
+                        dist >= 0 &&
+                        dist <= 39 &&
+                        this._getMapIndex(opponentId, dist) === targetIdx
+                    ) {
+                        this.internalPawns[opponentId][pIdKey] = -1;
+                    }
+                }
+            }
+        }
+
+        // Aktualizacja stanu
+        this.internalPawns[currentPlayerId][internalPawnIdToMove] = newDist;
+        this._syncFrontendState();
+
+        return this._finishTurn(isStartMove);
+    }
+    _finishTurn(skip) {
+        if (this._checkWin()) {
+            this.endGame(this._currentPlayer());
+            return this._gameEndWithTarget();
+        }
+
         this.gameData.currentAction = "Rzut kością";
         this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} ponownie rzuca kością.`;
 
@@ -459,240 +512,19 @@ export default class Ludo extends Game {
             this.gameData.actionMessage = `${this._getCurrentPlayerUsername()} rzuca kością.`;
         }
 
+        if (typeof this.log === "function") {
+            this.printGameState(true);
+            this.log(
+                "--------------------------END----------------------------------",
+            );
+        }
+
         return this._dataWithPlayersTarget();
     }
 
-    _copyPawn(pawn) {
-        return [pawn[0], pawn[1]];
-    }
-
-    _getPlayerStartPoint(publicId) {
-        return this.players.get(publicId).getData("startingField");
-    }
-
-    printGameState(end) {
-        this.log(
-            JSON.stringify({
-                mapa: this._getCompactMap(),
-                startingPositionArea: this.gameData.startingPositionArea,
-                finishPositions: this.gameData.finishPositions,
-                diceThrowResult: this.gameData.diceThrowResult,
-                action: this.gameData.currentAction,
-                possibleMoves: end ? "end" : this._possibleMoves(),
-            }),
-        );
-    }
-
-    pawnMovement(data) {
-        this.log(
-            "-------------------------START-----------------------------------",
-        );
-        this.printGameState();
-        const currentPlayerPublicId =
-            this.playersQueue[this.currentPlayerIndex];
-
-        if (data.publicId !== currentPlayerPublicId) {
-            throw new Error("Poczekaj na swoją turę.");
-        }
-
-        if (this.gameData.currentAction !== "Ruch pionka") {
-            throw new Error("Nieprawidłowa akcja.");
-        }
-
-        const currentPlayerMapStartPoint = this._getPlayerStartPoint(
-            currentPlayerPublicId,
-        );
-        let currentPawnPosition = ["map", "starting", "finish"];
-        let currentPawn = null;
-
-        this._possibleMoves().forEach((pawns, index) => {
-            for (const pawn of pawns) {
-                if (pawn[1] === data.pawnId) {
-                    currentPawn = this._copyPawn(pawn);
-                    currentPawnPosition = currentPawnPosition[index];
-                }
-            }
-        });
-
-        if (!currentPawn) {
-            throw new Error("Nie możesz się ruszyć tym pionkiem");
-        }
-
-        // this.log("Możliwe ruchy w momencie ruchu pionka:");
-        // this.log(JSON.stringify(this._possibleMoves()));
-        // this.log("Id pionka, którym gracz chce się ruszyć");
-        // this.log(`${data.pawnId}`);
-
-        // this.log(
-        //     "Pionek, którym gracz chce się ruszyć znajduje się na polu: " +
-        //         currentPawnPosition,
-        // );
-        if (currentPawnPosition === "starting") {
-            const pawnOnStartingField =
-                this.gameData.gameMap[currentPlayerMapStartPoint];
-            // gdy puste pole na pozycji startowej
-            // this.log("Wybrałeś pionek do ruszenia się znajdujący się w bazie.");
-            if (!pawnOnStartingField) {
-                // this.log("Na polu startowym nie było żadnego pionka");
-                this.gameData.gameMap[currentPlayerMapStartPoint] =
-                    this._copyPawn(currentPawn);
-                this.gameData.startingPositionArea =
-                    this.gameData.startingPositionArea.filter((pawn) => {
-                        return !(
-                            pawn[0] === currentPawn[0] &&
-                            pawn[1] === currentPawn[1]
-                        );
-                    });
-                // this.log("Wszedłeś pionkiem na pole startowe");
-
-                return this._finishTurn(true);
-            }
-            // gdy pionek znajduje sie na pozycji startowej
-            else {
-                // this.log("Znajduje się już pionek na polu startowym");
-                if (pawnOnStartingField[0] === currentPlayerPublicId) {
-                    throw new Error("Na tym polu znajduje się już Twój pionek");
-                }
-                this.log("Zbijasz czyjś pionek na swoim polu startowym");
-                this.gameData.startingPositionArea.push(
-                    this._copyPawn(pawnOnStartingField),
-                );
-                this.gameData.gameMap[currentPlayerMapStartPoint] =
-                    this._copyPawn(currentPawn);
-
-                this.gameData.startingPositionArea =
-                    this.gameData.startingPositionArea.filter((pawn) => {
-                        return (
-                            pawn[0] !== currentPawn[0] ||
-                            pawn[1] !== currentPawn[1]
-                        );
-                    });
-
-                const returnedTarget = this._finishTurn(true);
-                return returnedTarget;
-            }
-        } else if (currentPawnPosition === "map") {
-            const currentPosition = this.gameData.gameMap.findIndex((pawn) => {
-                return pawn[0] === currentPawn[0] && pawn[1] === currentPawn[1];
-            });
-
-            // this.log(`Aktualna pozycja pionka: ${currentPosition}`);
-
-            let newPosition = this.gameData.diceThrowResult + currentPosition;
-            // this.log(`Nowa pozycja pionka: ${newPosition}`);
-            let lapDone =
-                currentPosition < currentPlayerMapStartPoint &&
-                newPosition >= currentPlayerMapStartPoint;
-            // specjalny warunek dla startingPoint równe 0
-            if (currentPlayerMapStartPoint === 0) {
-                lapDone =
-                    [39, 38, 37, 36, 35, 34].includes(currentPosition) &&
-                    newPosition >= currentPlayerMapStartPoint;
-            }
-            // Ruszanie się pionkiem w momencie gdy idziesz na finisz
-            // this.log("Sprawdzanie okrążenia");
-
-            if (lapDone) {
-                // this.log("Okrążenie się wykonało");
-                // @TO-DO sprawdzić czy napewno dobrze obliczamy finiszowe pozycje
-                let finishPosition =
-                    newPosition - currentPlayerMapStartPoint + 1;
-
-                if (currentPlayerMapStartPoint === 0) {
-                    finishPosition = (newPosition % 10) + 1;
-
-                    // this.log("Finiszowa pozycja");
-                    // this.log(finishPosition);
-                }
-
-                for (const playerPawns of this.gameData.finishPositions) {
-                    if (playerPawns[0][0] === currentPlayerPublicId) {
-                        let isPawnOnFinishPosition = false;
-                        for (const finishPawn of playerPawns) {
-                            if (finishPawn[1] === finishPosition) {
-                                isPawnOnFinishPosition = true;
-                            }
-                        }
-
-                        if (isPawnOnFinishPosition) {
-                            throw new Error(
-                                "Na tym polu końcowym znajduje się już Twój pionek",
-                            );
-                        }
-
-                        // wrzuć currentPawn na finishPosition
-                        for (const playerPawns of this.gameData
-                            .finishPositions) {
-                            if (playerPawns[0][0] === currentPlayerPublicId) {
-                                playerPawns.push([
-                                    currentPawn[0],
-                                    finishPosition,
-                                ]);
-                                break;
-                            }
-                        }
-                        this.gameData.gameMap[currentPosition] = 0;
-
-                        return this._finishTurn();
-                    }
-                }
-                // Tutaj będzie ruszanie się pionkiem po mapie normalnie
-            } else {
-                newPosition = newPosition % 40;
-                const pawnOnNewPosition = this.gameData.gameMap[newPosition];
-                // this.log(
-                //     JSON.stringify({
-                //         "PIONEK NA NOWYM POLU":
-                //             this.gameData.gameMap[newPosition],
-                //     }),
-                // );
-
-                if (!pawnOnNewPosition) {
-                    this.gameData.gameMap[newPosition] =
-                        this._copyPawn(currentPawn);
-                    this.gameData.gameMap[currentPosition] = 0;
-                    const returnedTarget = this._finishTurn();
-                    return returnedTarget;
-                } else if (pawnOnNewPosition[0] !== currentPlayerPublicId) {
-                    this.log("Zbijasz czyjś pionek");
-                    this.gameData.startingPositionArea.push(
-                        this._copyPawn(pawnOnNewPosition),
-                    );
-                    this.gameData.gameMap[newPosition] =
-                        this._copyPawn(currentPawn);
-
-                    this.gameData.gameMap[currentPosition] = 0;
-                    return this._finishTurn();
-                } else {
-                    throw new Error("Na tym polu znajduje się już Twój pionek");
-                }
-            }
-            // this.log("Koniec sprawdzania okrążenia");
-        } else if (
-            currentPawnPosition === "finish" &&
-            ![1, 2, 3].includes(this.gameData.diceThrowResult)
-        ) {
-            for (const playerPawns of this.gameData.finishPositions) {
-                if (playerPawns[0][0] === currentPlayerPublicId) {
-                    const newFinishPosition =
-                        currentPawn[1] + this.gameData.diceThrowResult;
-                    for (const pawn of playerPawns) {
-                        if (pawn[1] === newFinishPosition) {
-                            throw new Error(
-                                "Na tym polu końcowym znajduje się już Twój pionek",
-                            );
-                        }
-                    }
-                    for (const pawn of playerPawns) {
-                        if (pawn[1] === currentPawn[1]) {
-                            pawn[1] = newFinishPosition;
-                            return this._finishTurn();
-                        }
-                    }
-                }
-            }
-        } else if (currentPawnPosition === "finish") {
-            throw new Error("Pionek musiałby wyjść poza mapę. Spokojnie");
-        }
+    _checkWin() {
+        return Object.values(
+            this.internalPawns[this.playersQueue[this.currentPlayerIndex]],
+        ).every((dist) => dist >= 40);
     }
 }

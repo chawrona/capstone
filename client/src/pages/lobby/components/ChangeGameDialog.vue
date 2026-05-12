@@ -16,6 +16,7 @@ const props = defineProps(["isAdmin", "availableGames", "currentGame"]);
 const store = useAppStore();
 
 const dialogRef = ref(null);
+const gamesList = ref(null);
 
 const closeDialog = () => dialogRef.value.close();
 const openDialog = () => dialogRef.value.showModal();
@@ -24,6 +25,13 @@ defineExpose({
     closeDialog,
     openDialog,
 });
+
+const handleBackdropClick = (event) => {
+    if (event.target === dialogRef.value || event.target === gamesList.value) {
+        soundBus.playEffect("click");
+        closeDialog();
+    }
+};
 
 const changeGame = (gameTitle) => {
     if (!props.isAdmin) return;
@@ -36,10 +44,12 @@ const changeGame = (gameTitle) => {
 </script>
 
 <template>
-    <dialog ref="dialogRef" class="theme-dialog change-game-dialog">
-        <DialogHeader title="Lista gier" :close-dialog-callback="closeDialog" />
-
-        <ul class="games">
+    <dialog
+        ref="dialogRef"
+        class="theme-dialog change-game-dialog"
+        @click="handleBackdropClick"
+    >
+        <ul ref="gamesList" class="games">
             <li
                 v-for="game in props.availableGames"
                 :key="game.title"
@@ -64,27 +74,34 @@ const changeGame = (gameTitle) => {
                         class="game-info-wrapper"
                         :data-choosing="props.isAdmin"
                     >
-                        <p class="game-title">{{ game.polishTitle }}</p>
+                        <div class="container">
+                            <p class="game-title">{{ game.polishTitle }}</p>
 
-                        <div class="game-info">
-                            <p class="game-difficulty">
-                                <img class="game-info-icon" :src="Target" />
-                                <span class="value">{{ game.difficulty }}</span>
-                            </p>
-                            <p class="game-players-count">
-                                <img class="game-info-icon" :src="Players" />
-                                <span class="value">
-                                    {{
-                                        game.minPlayers === game.maxPlayers
-                                            ? game.minPlayers
-                                            : `${game.minPlayers}-${game.maxPlayers}`
-                                    }}
-                                </span>
-                            </p>
-                            <p class="game-time">
-                                <img class="game-info-icon" :src="Clock" />
-                                <span class="value">{{ game.time }}</span>
-                            </p>
+                            <div class="game-info">
+                                <p class="game-difficulty">
+                                    <img class="game-info-icon" :src="Target" />
+                                    <span class="value">{{
+                                        game.difficulty
+                                    }}</span>
+                                </p>
+                                <p class="game-players-count">
+                                    <img
+                                        class="game-info-icon"
+                                        :src="Players"
+                                    />
+                                    <span class="value">
+                                        {{
+                                            game.minPlayers === game.maxPlayers
+                                                ? game.minPlayers
+                                                : `${game.minPlayers}-${game.maxPlayers}`
+                                        }}
+                                    </span>
+                                </p>
+                                <p class="game-time">
+                                    <img class="game-info-icon" :src="Clock" />
+                                    <span class="value">{{ game.time }}</span>
+                                </p>
+                            </div>
                         </div>
 
                         <p class="game-description">
@@ -102,11 +119,11 @@ const changeGame = (gameTitle) => {
     top: 0;
     display: none;
     flex-direction: column;
-    gap: 0.85rem;
     width: 100%;
     min-height: 100vh;
     transform: none;
     user-select: none;
+    padding: 4rem 3rem;
     border: none;
     background-image: none;
     background: none;
@@ -149,24 +166,31 @@ const changeGame = (gameTitle) => {
 }
 
 .games {
+    margin-inline: auto;
     display: flex;
-    flex-direction: column;
+    justify-content: start;
+    width: 90%;
+
+    flex-wrap: wrap;
     list-style: none;
-    gap: 2rem;
+    gap: 3rem;
 }
 
 .game {
     border-radius: 3px;
     margin-left: 0.25rem;
-    width: 600px;
-    height: 200px;
+    max-width: 600px;
+    width: 100%;
+    min-height: 325px;
+    height: auto;
     background-position: center;
     background-size: cover;
     display: flex;
     flex-direction: column;
     font-weight: bold;
     text-align: left;
-    align-items: left;
+    container-type: inline-size;
+
     position: relative;
 
     & > p {
@@ -190,13 +214,17 @@ const changeGame = (gameTitle) => {
         position: absolute;
         inset: 0;
 
-        padding: 1.5rem;
+        padding: 2rem 2rem;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-
-        transition: background-color 0.1s;
         background-color: rgba(0, 0, 0, 0.7);
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
 
         .game-title {
             color: #ffffff;
@@ -206,6 +234,7 @@ const changeGame = (gameTitle) => {
 
         .game-info {
             display: flex;
+            gap: 1rem;
             justify-content: space-between;
         }
 
@@ -230,7 +259,7 @@ const changeGame = (gameTitle) => {
             justify-self: start;
             grid-column: -1 / 1;
             font-size: 1rem;
-            color: #d4d4d4;
+            color: #ffffff;
         }
     }
 }
@@ -241,56 +270,31 @@ const changeGame = (gameTitle) => {
     }
 }
 
-@media (width < 700px) {
-    .game {
-        width: 420px;
-        margin-inline: auto;
-        height: auto;
+@media (width < 800px) {
+    .container {
+        flex-direction: column;
     }
 
     .boardgame-image {
         .game-info-wrapper {
-            background-color: #000;
             position: relative;
+            background-color: #ffffff00;
             .game-info {
-                gap: 0.5rem;
                 flex-direction: column;
             }
         }
 
         .game-bgImage {
-            position: relative;
+            position: absolute;
+            filter: brightness(0.26);
+            width: 100%;
+            height: 100%;
         }
     }
 
     .boardgame-image:hover {
         .game-info-wrapper[data-choosing="true"] {
             background-color: hsl(39, 77%, 3%);
-        }
-    }
-}
-
-@media (width < 500px) {
-    .change-game-dialog .close-icon {
-        width: 1.5rem;
-    }
-
-    .game {
-        width: 100%;
-        height: auto;
-    }
-
-    .boardgame-image .game-info-wrapper {
-        .game-title {
-            font-size: 1.2rem;
-        }
-
-        .game-time,
-        .game-players-count,
-        .game-difficulty {
-            font-size: 0.8rem;
-            display: flex;
-            flex-direction: column;
         }
     }
 }

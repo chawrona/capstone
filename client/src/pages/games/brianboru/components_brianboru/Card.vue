@@ -1,5 +1,28 @@
 <script setup>
+import Axe from "@/assets/games/gameAssets/brianboru/axe.png";
+import Church from "@/assets/games/gameAssets/brianboru/church.png";
+import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
+import MoneyMinus from "@/assets/games/gameAssets/brianboru/money_minus.png";
+import MoneyPlus from "@/assets/games/gameAssets/brianboru/money_plus.png";
+import Money from "@/assets/games/gameAssets/brianboru/money.png";
 import Rysa from "@/assets/games/gameAssets/brianboru/rysa.png";
+import Triquetra5 from "@/assets/games/gameAssets/brianboru/triquetra_5.png";
+import Triquetra from "@/assets/games/gameAssets/brianboru/triquetra.png";
+import VikingShield from "@/assets/games/gameAssets/brianboru/viking_shield.png";
+
+const assetsMap = {
+    axe: Axe,
+    church: Church,
+    letter: Letter,
+    money: Money,
+    money_minus: MoneyMinus,
+    money_plus: MoneyPlus,
+    rysa: Rysa,
+    triquetra: Triquetra,
+    triquetra_5: Triquetra5,
+    viking_shield: VikingShield,
+};
+
 const props = defineProps([
     "card",
     "canChoose",
@@ -37,7 +60,7 @@ const props = defineProps([
                     <span v-for="(value, index) in props.card.top" :key="index">
                         <img
                             class="resource-image"
-                            :src="`/src/assets/games/gameAssets/brianboru/${value}.png`"
+                            :src="assetsMap[value]"
                             alt=""
                         />
                     </span>
@@ -59,7 +82,7 @@ const props = defineProps([
                     >
                         <img
                             class="resource-image"
-                            :src="`/src/assets/games/gameAssets/brianboru/${value}.png`"
+                            :src="assetsMap[value]"
                             alt=""
                         />
                     </span>
@@ -76,7 +99,7 @@ const props = defineProps([
                     >
                         <img
                             class="resource-image"
-                            :src="`/src/assets/games/gameAssets/brianboru/${value}.png`"
+                            :src="assetsMap[value]"
                             alt=""
                         />
                     </span>
@@ -103,7 +126,7 @@ const props = defineProps([
 
     &[type="red"] {
         background-color: rgb(138, 0, 0);
-        background-image: url("/src/assets/games/gameAssets/brianboru/red_card.png");
+        background-image: url("/src/assets/games/gameAssets/brianboru/red_card.webp");
 
         &::after {
             content: "";
@@ -131,7 +154,7 @@ const props = defineProps([
     }
     &[type="blue"] {
         background-color: rgb(0, 64, 142);
-        background-image: url("/src/assets/games/gameAssets/brianboru/blue_card.png");
+        background-image: url("/src/assets/games/gameAssets/brianboru/blue_card.webp");
 
         &::after {
             content: "";
@@ -160,7 +183,7 @@ const props = defineProps([
     }
     &[type="yellow"] {
         background-color: rgb(136, 118, 0);
-        background-image: url("/src/assets/games/gameAssets/brianboru/yellow_card.png");
+        background-image: url("/src/assets/games/gameAssets/brianboru/yellow_card.webp");
 
         &::after {
             content: "";
@@ -191,7 +214,7 @@ const props = defineProps([
     }
     &[type="gray"] {
         background-color: rgb(119, 119, 119);
-        background-image: url("/src/assets/games/gameAssets/brianboru/gray_card.png");
+        background-image: url("/src/assets/games/gameAssets/brianboru/gray_card.webp");
 
         &::after {
             content: "";

@@ -55,7 +55,7 @@ onUnmounted(() => {
                 :current-user="currentUser"
                 :ready-users="readyUsers"
                 :available-games="data.availableGames"
-                :available-colors="data.availableColors"
+                :available-colors="data.currentGame.colors"
             />
             <TopCenterPanel :username="currentUser.username" />
             <CenterPanel

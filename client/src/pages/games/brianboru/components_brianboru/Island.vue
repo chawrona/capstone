@@ -1,7 +1,8 @@
 <script setup>
 import { computed } from "vue";
 
-import Island from "@/assets/games/gameAssets/brianboru/MAPA.png";
+import Island from "@/assets/games/gameAssets/brianboru/mapa.png";
+import IslandNoIcons from "@/assets/games/gameAssets/brianboru/mapaBez.png";
 import "@/styles/brianBoru.scss";
 
 import {
@@ -35,6 +36,7 @@ const props = defineProps([
     "status",
     "cards",
     "you",
+    "hide",
 ]);
 
 const mapWidth = 1100 * 1.08;
@@ -99,8 +101,8 @@ const isImageVisible = (cityId) => {
                 />
             </div>
         </template>
-
-        <img :src="Island" alt="" class="map" />
+        <img v-if="!props.hide" :src="Island" class="map" />
+        <img v-else :src="IslandNoIcons" class="map" />
     </div>
 </template>
 

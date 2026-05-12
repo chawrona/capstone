@@ -1,10 +1,33 @@
 <script setup>
 import { computed, ref } from "vue";
 
+import Axe from "@/assets/games/gameAssets/brianboru/axe.png";
+import Church from "@/assets/games/gameAssets/brianboru/church.png";
+import Letter from "@/assets/games/gameAssets/brianboru/letter.png";
+import MoneyMinus from "@/assets/games/gameAssets/brianboru/money_minus.png";
+import MoneyPlus from "@/assets/games/gameAssets/brianboru/money_plus.png";
+import Money from "@/assets/games/gameAssets/brianboru/money.png";
+import Rysa from "@/assets/games/gameAssets/brianboru/rysa.png";
+import Triquetra5 from "@/assets/games/gameAssets/brianboru/triquetra_5.png";
+import Triquetra from "@/assets/games/gameAssets/brianboru/triquetra.png";
+import VikingShield from "@/assets/games/gameAssets/brianboru/viking_shield.png";
+
 import statuses from "../../../../../../../server/models/games/brianboru/config/statuses";
 import { soundBus } from "../../../../../audio/soundBus";
 import { useAppStore } from "../../../../../store/useAppStore";
 import Card from "../Card.vue";
+
+const assetsMap = {
+    axe: Axe,
+    church: Church,
+    letter: Letter,
+    money: Money,
+    money_minus: MoneyMinus,
+    money_plus: MoneyPlus,
+    triquetra: Triquetra,
+    triquetra_5: Triquetra5,
+    viking_shield: VikingShield,
+};
 
 const props = defineProps(["chosenCards", "you", "status"]);
 const store = useAppStore();
@@ -167,10 +190,7 @@ const activateCardEffect = () => {
                             ) in canManipulate.howManySubstractMoneyShow"
                             :key="index"
                         >
-                            <img
-                                class="resource-image"
-                                :src="`/src/assets/games/gameAssets/brianboru/money_minus.png`"
-                            />
+                            <img class="resource-image" :src="MoneyMinus" />
                         </span>
                     </span>
 
@@ -182,13 +202,13 @@ const activateCardEffect = () => {
                         >
                             <img
                                 class="resource-image"
-                                :src="`/src/assets/games/gameAssets/brianboru/${bottomResources[0]}.png`"
+                                :src="assetsMap[bottomResources[0]]"
                             />
                         </span>
                         <img
                             v-if="bottomResources.includes('viking_shield')"
                             class="resource-image"
-                            :src="`/src/assets/games/gameAssets/brianboru/viking_shield.png`"
+                            :src="VikingShield"
                         />
                     </span>
 
@@ -204,7 +224,7 @@ const activateCardEffect = () => {
                         >
                             <img
                                 class="resource-image"
-                                :src="`/src/assets/games/gameAssets/brianboru/${containedResource}.png`"
+                                :src="assetsMap[containedResource]"
                             />
                         </span>
                     </span>
@@ -218,18 +238,12 @@ const activateCardEffect = () => {
                             v-for="(value, index) in canManipulate.money"
                             :key="index"
                         >
-                            <img
-                                class="resource-image"
-                                :src="`/src/assets/games/gameAssets/brianboru/money.png`"
-                            />
+                            <img class="resource-image" :src="Money" />
                         </span>
                     </span>
 
                     <span v-if="chosenBottom === 'top'">
-                        <img
-                            class="resource-image"
-                            :src="`/src/assets/games/gameAssets/brianboru/triquetra.png`"
-                        />
+                        <img class="resource-image" :src="Triquetra" />
                     </span>
 
                     <!-- BOTTOM 1 -->
@@ -247,7 +261,7 @@ const activateCardEffect = () => {
                         >
                             <img
                                 class="resource-image"
-                                :src="`/src/assets/games/gameAssets/brianboru/${bottomResources[0]}.png`"
+                                :src="assetsMap[bottomResources[0]]"
                             />
                         </span>
                     </span>
@@ -265,7 +279,7 @@ const activateCardEffect = () => {
                         >
                             <img
                                 class="resource-image"
-                                :src="`/src/assets/games/gameAssets/brianboru/${bottomResources[0]}.png`"
+                                :src="assetsMap[bottomResources[0]]"
                             />
                         </span>
                     </span>
@@ -286,7 +300,7 @@ const activateCardEffect = () => {
                             <img
                                 class="resource-image"
                                 style="scale: 0.84"
-                                :src="`/src/assets/games/gameAssets/brianboru/money_minus.png`"
+                                :src="MoneyMinus"
                             />
                         </span>
                     </span>
@@ -298,7 +312,7 @@ const activateCardEffect = () => {
                     >
                         <img
                             class="resource-image"
-                            :src="`/src/assets/games/gameAssets/brianboru/triquetra_5.png`"
+                            :src="Triquetra5"
                             :style="`opacity: ${buyingCity ? 1 : 0.4}`"
                         />
                     </span>
@@ -459,16 +473,16 @@ const activateCardEffect = () => {
 
     z-index: 30;
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_grey.jpg");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_grey.webp");
 
     &[data-type="red"] {
-        background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_red.jpg");
+        background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_red.webp");
     }
     &[data-type="blue"] {
-        background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_blue.jpg");
+        background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_blue.webp");
     }
     &[data-type="yellow"] {
-        background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_yellow.jpg");
+        background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_yellow.webp");
     }
 
     background-size: cover;

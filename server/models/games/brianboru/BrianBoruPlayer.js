@@ -12,7 +12,7 @@ export default class BrianBoruPlayer extends Player {
         this.setData("points", () => 10);
         this.setData("vikings", () => 0);
         this.setData("suns", () => 1);
-        this.setData("money", () => 5);
+        this.setData("money", () => 3);
         this.setData("firstPlayer", () => false);
         this.setData("lockedCards", () => new Set());
         this.setData("cards", () => []);

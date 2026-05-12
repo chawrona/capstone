@@ -44,7 +44,7 @@ const infoSwitch = ref(true);
     font-size: 0.9rem;
 
     border-radius: 0.15rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/brownTexture.png");
+    background-image: url("/src/assets/games/gameAssets/brianboru/brownTexture.webp");
     box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.358);
     cursor: pointer;
 

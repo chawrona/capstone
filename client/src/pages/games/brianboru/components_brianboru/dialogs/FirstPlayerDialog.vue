@@ -43,7 +43,7 @@ const props = defineProps(["firstPlayer", "closeDialog"]);
     font-weight: normal;
 
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_grey.jpg");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_grey.webp");
     background-size: cover;
     gap: 2rem;
     box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);

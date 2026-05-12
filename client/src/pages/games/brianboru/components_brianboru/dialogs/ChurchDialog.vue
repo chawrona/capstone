@@ -2,7 +2,7 @@
 const props = defineProps(["churchDialogInfo", "closeDialog"]);
 import { computed } from "vue";
 
-import Church from "@/assets/games/gameAssets/brianboru/no_church.png";
+import Church from "@/assets/games/gameAssets/brianboru/no_church.webp";
 import Points from "@/assets/games/gameAssets/brianboru/points.png";
 
 import PlayerIcon from "../PlayerIcon.vue";
@@ -122,7 +122,7 @@ const rewardsAvailable = computed(() => {
     color: white;
     font-weight: normal;
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_blue.jpg");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_blue.webp");
     background-size: cover;
     gap: 0.5rem;
     box-shadow: 0px 2px 5px 3px rgba(0, 0, 0, 0.685);

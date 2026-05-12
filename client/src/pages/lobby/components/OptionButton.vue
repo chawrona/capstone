@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps(["icon", "content"]);
+const props = defineProps(["icon", "content", "disabled"]);
 import { soundBus } from "../../../audio/soundBus";
 </script>
 

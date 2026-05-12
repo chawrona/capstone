@@ -76,7 +76,7 @@ const chooseEstridReward = (reward) => {
     font-weight: normal;
     text-shadow: 0 0 4px rgba(0, 0, 0, 0.74);
     border-radius: 0.5rem;
-    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_yellow.jpg");
+    background-image: url("/src/assets/games/gameAssets/brianboru/pergamin_yellow.webp");
     background-size: cover;
     gap: 0rem;
 

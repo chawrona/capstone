@@ -3,36 +3,20 @@
     "title": "brianboru",
     "polishTitle": "Brian Boru",
     "maxPlayers": 5,
-    "minPlayers": 2,
+    "minPlayers": 3,
     "description": "Strategiczna gra planszowa o kontrolę Irlandii w średniowieczu poprzez budowanie, politykę i walki z Wikingami.",
     "time": "20-30 min.",
     "difficulty": "średni",
     "colors": [
-      {
-        "name": "crimson",
-        "hex": "#d72638"
-      },
-      {
-        "name": "blue",
-        "hex": "#3b82f6"
-      },
-      {
-        "name": "green",
-        "hex": "#22c55e"
-      },
-      {
-        "name": "yellow",
-        "hex": "#facc15"
-      },
-      {
-        "name": "purple",
-        "hex": "#9333ea"
-      },
-      {
-        "name": "orange",
-        "hex": "#f97316"
-      }
-    ]
+  { "name": "pink",     "hex": "#ec4899" },
+  { "name": "red",      "hex": "#ef4444" },
+  { "name": "yellow",   "hex": "#eab308" },
+  { "name": "teal",     "hex": "#14b8a6" },
+  { "name": "blue",     "hex": "#2563eb" },
+  { "name": "green",    "hex": "#22c55e" },
+  { "name": "orange",   "hex": "#f97316" },
+  { "name": "violet",   "hex": "#8b5cf6" }
+]
   },
   {
     "title": "philanthropists",
@@ -42,32 +26,7 @@
     "description": "Ekonomiczna gra planszowa, w której inwestujesz, handlujesz zasobami i dzielisz się majątkiem, by zdobyć zwycięstwo",
     "time": "25-35 min.",
     "difficulty": "Trudny",
-    "colors": [
-      {
-        "name": "crimson",
-        "hex": "#d72638"
-      },
-      {
-        "name": "blue",
-        "hex": "#3b82f6"
-      },
-      {
-        "name": "green",
-        "hex": "#22c55e"
-      },
-      {
-        "name": "yellow",
-        "hex": "#facc15"
-      },
-      {
-        "name": "purple",
-        "hex": "#9333ea"
-      },
-      {
-        "name": "orange",
-        "hex": "#f97316"
-      }
-    ]
+    "colors": null
   },
   {
     "title": "eurobusiness",
@@ -78,30 +37,10 @@
     "time": "45-75 min.",
     "difficulty": "średni",
     "colors": [
-      {
-        "name": "crimson",
-        "hex": "#d72638"
-      },
-      {
-        "name": "blue",
-        "hex": "#3b82f6"
-      },
-      {
-        "name": "green",
-        "hex": "#22c55e"
-      },
-      {
-        "name": "yellow",
-        "hex": "#facc15"
-      },
-      {
-        "name": "purple",
-        "hex": "#9333ea"
-      },
-      {
-        "name": "orange",
-        "hex": "#f97316"
-      }
+      { "name": "black", "hex": "#111827" },
+      { "name": "white", "hex": "#f9fafb" },
+      { "name": "red", "hex": "#ef4444" },
+      { "name": "green", "hex": "#10b981" }
     ]
   },
   {
@@ -113,30 +52,10 @@
     "time": "10-25 min.",
     "difficulty": "łatwy",
     "colors": [
-      {
-        "name": "crimson",
-        "hex": "#d72638"
-      },
-      {
-        "name": "blue",
-        "hex": "#3b82f6"
-      },
-      {
-        "name": "green",
-        "hex": "#22c55e"
-      },
-      {
-        "name": "yellow",
-        "hex": "#facc15"
-      },
-      {
-        "name": "purple",
-        "hex": "#9333ea"
-      },
-      {
-        "name": "orange",
-        "hex": "#f97316"
-      }
+      { "name": "red", "hex": "#dc2626" },
+      { "name": "blue", "hex": "#2563eb" },
+      { "name": "green", "hex": "#16a34a" },
+      { "name": "yellow", "hex": "#eab308" }
     ]
   }
 ]
