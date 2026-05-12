@@ -288,6 +288,9 @@ export default class Cards {
 
     // @event
     chooseCardEffect(data) {
+        if (data.data.chosenBottom === "top" && this.chosenCards.length > 1)
+            return;
+
         // { chosenBottom: 'top', buyAdditional: 0, buildCity: false }
         const [card, player] = this.chosenCards.shift();
         player.setStatus(statuses.WAITING);

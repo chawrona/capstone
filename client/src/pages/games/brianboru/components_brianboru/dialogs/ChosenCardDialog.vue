@@ -74,6 +74,7 @@ const canYouBuyACity = computed(() => {
 });
 
 const useCardEffect = (bottom, card) => {
+    if (props.chosenCards.length > 1 && chosenBottom.value === "top") return;
     if (props.status !== statuses.CHOOSE_CARD_EFFECT) return;
     chosenCard.value = card;
     chosenBottom.value = bottom;
