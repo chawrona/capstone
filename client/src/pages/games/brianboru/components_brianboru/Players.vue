@@ -2,7 +2,7 @@
 import FirstPlayer from "@/assets/games/gameAssets/brianboru/first_player_icon.png";
 import Money from "@/assets/games/gameAssets/brianboru/money.png";
 import Money5 from "@/assets/games/gameAssets/brianboru/money5.png";
-import Points from "@/assets/games/gameAssets/brianboru/Points.png";
+import Points from "@/assets/games/gameAssets/brianboru/points.png";
 import BigSun from "@/assets/games/gameAssets/brianboru/sun_big.png";
 import Sun from "@/assets/games/gameAssets/brianboru/sun.png";
 import Vikings from "@/assets/games/gameAssets/brianboru/vikings.png";
@@ -307,7 +307,7 @@ const sortPlayers = (playerA, playerB) => {
         background-repeat: no-repeat;
         background-position: center;
         transform: translateY(-1.5px);
-        background-image: url("/src/assets/games/gameAssets/brianboru/Points.png");
+        background-image: url("/src/assets/games/gameAssets/brianboru/points.png");
         filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.589));
     }
 }
