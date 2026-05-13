@@ -7,7 +7,8 @@
     "test": "node server/tests/test.js",
     "format-eslint": "npx eslint ./server/ --fix",
     "fix": "npm run format-prettier && npm run format-eslint",
-    "build-front": "cd client && npm run build && cd .."
+    "build-front": "cd client && npm run build && cd ..",
+    "run": "npm run build-front && node ./server/app.js"
   },
   "devDependencies": {
     "@eslint/js": "9.30.1",
