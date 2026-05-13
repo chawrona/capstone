@@ -1,6 +1,7 @@
 <script setup>
 import PauseScreen from "../../../components/common/PauseScreen.vue";
 import PlaySoundtrack from "../../../components/common/PlaySoundtrack.vue";
+import Settings from "../../../components/common/Settings.vue";
 import { usePageSounds } from "../../../composables/usePageSounds";
 import { useGamePause } from "../composables_games/useGamePause";
 import { useGameResize } from "../composables_games/useGameResize";
@@ -54,6 +55,7 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
 </script>
 
 <template>
+    <Settings />
     <PauseScreen v-if="isPaused" />
     <PlaySoundtrack :url="SOUNDTRACK_URL" />
     <div class="background">

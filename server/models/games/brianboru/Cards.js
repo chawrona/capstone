@@ -303,7 +303,9 @@ export default class Cards {
 
     // @event
     chooseCardEffect(data) {
-        if (player.getStatus() !== statuses.CHOOSE_CARD_EFFECT) {
+        const p = this.game.getPlayer(data.publicId);
+
+        if (p.getStatus() !== statuses.CHOOSE_CARD_EFFECT) {
             throw new Error("To nie twoja kolej na wybór efektu karty.");
         }
 

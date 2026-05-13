@@ -34,7 +34,16 @@ export default function useGameDialogs() {
         if (!store.socket) return;
 
         store.socket.on("dialogs", (dialogs) => {
-            dialogsQueue.value.set(dialogs);
+            let newQueue = [...dialogs];
+
+            if (
+                openedDialog.value !== null &&
+                newQueue[0] === openedDialog.value
+            ) {
+                newQueue.shift();
+            }
+
+            dialogsQueue.value.set(newQueue);
             allDialogs.value = dialogs;
             if (openedDialog.value === null) {
                 openedDialog.value = dialogsQueue.value.get();
@@ -59,7 +68,6 @@ export default function useGameDialogs() {
 
         if (!endGame.value) {
             store.emit("gameData", { eventName: "closeDialog" });
-            console.log("WHY");
 
             soundBus.playEffect("click");
         }

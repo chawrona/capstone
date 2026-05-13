@@ -33,4 +33,10 @@ export default class Logger {
         const logLine = `[ERROR] [${timestamp}] ${message}`;
         return this.enqueueWrite(logLine);
     }
+
+    bugReport(report) {
+        const timestamp = new Date().toISOString();
+        const logLine = `[${report.userId}] [${timestamp}] ${report.message}`;
+        return this.enqueueWrite(logLine);
+    }
 }

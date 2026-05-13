@@ -3,6 +3,7 @@ import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
+import Logger from "../services/Logger.js";
 
 export default class GameEvents {
     constructor(socket) {
@@ -11,10 +12,16 @@ export default class GameEvents {
         this.userManager = new UserManager();
         this.lobbyManager = new LobbyManager();
         this.eventEmmiter = new EventEmmiter();
+        this.logger = new Logger();
     }
 
     registerEvents() {
         this.socket.on("gameData", (payload) => this.onGameData(payload));
+        this.socket.on("onBugReport", (payload) => this.onBugReport(payload));
+    }
+
+    onBugReport({ userId, data }) {
+        this.logger.bugReport({ userId, message: data });
     }
 
     onGameData({ userId, data }) {

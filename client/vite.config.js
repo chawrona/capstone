@@ -7,6 +7,7 @@ export default defineConfig({
         emptyOutDir: true,
         outDir: "../public",
     },
+    envDir: "../",
     plugins: [vue()],
     resolve: {
         alias: {

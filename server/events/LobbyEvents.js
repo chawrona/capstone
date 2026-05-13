@@ -34,6 +34,7 @@ export default class LobbyEvents {
         this.socket.on("removeUser", (payload) => this.onRemoveUser(payload));
         this.socket.on("gameStart", (payload) => this.onGameStart(payload));
         this.socket.on("changeGame", (payload) => this.onChangeGame(payload));
+        this.socket.on("onEndGame", (payload) => this.onEndGame(payload));
     }
 
     onCreateLobby({ userId }) {
@@ -46,7 +47,7 @@ export default class LobbyEvents {
 
             user.lobbyId = lobbyId;
 
-            if (process.env.DEVELOPMENT === "true") {
+            if (process.env.DEVELOPMENT) {
                 user.color = {
                     name: "crimson",
                     hex: "#d72638",
@@ -236,7 +237,7 @@ export default class LobbyEvents {
 
             this.eventHelper.checkIfLobbyActive(lobby);
 
-            if (userId != lobby.admin) {
+            if (userId !== lobby.admin) {
                 throw new UserNotAdminError();
             }
             const userIdToKick =
@@ -249,6 +250,26 @@ export default class LobbyEvents {
             this.eventEmmiter.toUser(userIdToKick, "homepage", {
                 error: `Zostałeś wyrzucony z pokoju`,
             });
+
+            this.eventHelper.sendLobbyData(lobby.id);
+        } catch (error) {
+            this.eventEmmiter.toUserError(userId, error);
+        }
+    }
+
+    onEndGame({ userId }) {
+        try {
+            const user = this.userManager.getUser(userId);
+            const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
+            // Póki niewiadomo czy działają gry to każdy może skończyć
+            // if (userId !== lobby.admin) {
+            //     throw new UserNotAdminError();
+            // }
+
+            lobby.endGame();
+
+            this.eventEmmiter.toUser(userId, "lobby", lobby.id);
 
             this.eventHelper.sendLobbyData(lobby.id);
         } catch (error) {

@@ -14,7 +14,8 @@ export function usePageSounds(options = {}) {
         });
 
         music.forEach((m) => {
-            // Użyj resetSoundtrack zamiast stopMusic + preload + playMusic
+            console.log("Hello?????", m);
+
             soundBus.resetSoundtrack(m.url);
             loadedResources.push({ name: m.name, type: "music" });
         });

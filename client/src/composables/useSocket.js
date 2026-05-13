@@ -13,8 +13,9 @@ export default function useSocket() {
     const route = useRoute();
     const toast = useToast();
     const reconnectAttemptCount = ref(0);
+    const VITE_APP_IP = import.meta.env.VITE_APP_IP;
     // const socket = io("http://localhost:3000");
-    const socket = io("http://194.110.5.243");
+    const socket = io(`${VITE_APP_IP}`);
 
     let userId = getUserId();
 

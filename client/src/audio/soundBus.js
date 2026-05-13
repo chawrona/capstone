@@ -124,6 +124,8 @@ class SoundBus {
     }
 
     stopMusic() {
+        console.log("Zatrzymano muzykę");
+
         if (this.currentMusic) {
             this.currentMusic.pause();
 

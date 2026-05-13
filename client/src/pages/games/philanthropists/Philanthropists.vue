@@ -13,6 +13,7 @@ import useGameData from "./composables_philanthropists/useGameData";
 import Mid from "./Mid/Mid.vue";
 import PodsumowanieFazy from "./PodsumowanieFazy.vue";
 import Top from "./Top/Top.vue";
+import Settings from "../../../components/common/Settings.vue";
 
 usePageSounds({
     effects: [
@@ -57,6 +58,7 @@ watch(
 </script>
 
 <template>
+        <Settings />
     <PauseScreen v-if="isPaused" />
     <PodsumowanieFazy v-if="gameData" :game-data="gameData" />
     <div class="background">

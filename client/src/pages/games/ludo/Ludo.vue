@@ -10,6 +10,7 @@ import PlaySoundtrack from "../../../components/common/PlaySoundtrack.vue";
 import { usePageSounds } from "../../../composables/usePageSounds";
 import { useGameResize } from "../composables_games/useGameResize";
 import Dice from "../eurobusiness/components_eurobusiness/Dice.vue";
+import Settings from "../../../components/common/Settings.vue";
 
 const store = useAppStore();
 
@@ -282,6 +283,7 @@ const getPublicIdFromFieldFinish = (field) => {
 
 <template>
     <div class="background">
+            <Settings />
         <PauseScreen v-if="gameData && isPaused" />
         <PlaySoundtrack :url="SOUNDTRACK_URL" />
         <div

@@ -23,6 +23,7 @@ import PlayersData from "./components_eurobusiness/PlayersData.vue";
 import { useGameData } from "./composables_eurobusiness/useGameData";
 import { useGameDialogs } from "./composables_eurobusiness/useGameDialogs";
 import useGameInfo from "./composables_eurobusiness/useGameInfo";
+import Settings from "../../../components/common/Settings.vue";
 
 const store = useAppStore();
 const SOUNDTRACK_URL = "/sounds/eurobusiness_soundtrack.mp3";
@@ -106,6 +107,7 @@ usePageSounds({
 
 <template>
     <div class="background">
+            <Settings />
         <PlaySoundtrack :url="SOUNDTRACK_URL" />
         <PauseScreen v-if="gameMap && isPaused" />
         <EndGame
