@@ -47,7 +47,7 @@ export default class LobbyEvents {
 
             user.lobbyId = lobbyId;
 
-            if (process.env.DEVELOPMENT) {
+            if (process.env.DEVELOPMENT === "true") {
                 user.color = {
                     name: "crimson",
                     hex: "#d72638",
@@ -69,7 +69,7 @@ export default class LobbyEvents {
 
     onJoinLobby({ userId, data: { lobbyId } }) {
         try {
-            if (process.env.DEVELOPMENT) {
+            if (process.env.DEVELOPMENT === "true") {
                 lobbyId = this.lobbyManager.lobbies.entries().next().value[0];
             }
 
@@ -79,7 +79,7 @@ export default class LobbyEvents {
 
             const user = this.userManager.getUser(userId);
 
-            if (process.env.DEVELOPMENT) {
+            if (process.env.DEVELOPMENT === "true") {
                 user.color = {
                     name:
                         lobby.users.size === 1
