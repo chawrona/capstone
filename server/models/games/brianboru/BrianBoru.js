@@ -30,7 +30,7 @@ export default class BrianBoru extends Game {
                 current: 1,
                 total:
                     this.players.size === 5
-                        ? 4
+                        ? 5
                         : this.players.size === 4
                           ? 5
                           : 7,

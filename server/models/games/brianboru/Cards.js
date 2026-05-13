@@ -121,9 +121,16 @@ export default class Cards {
 
     // @event
     selectCardsToPass(data) {
-        console.log(data);
-
         const player = this.game.getPlayer(data.publicId);
+
+        if (player.getStatus() === statuses.REJECT_CARDS_WAITING) {
+            throw new Error("Już przekazałeś karty w tej rundzie.");
+        }
+
+        if (player.getStatus() !== statuses.REJECT_CARDS) {
+            throw new Error("To nie jest faza odrzucania kart.");
+        }
+
         const cardsIdToSave = data.data;
 
         if (
@@ -188,6 +195,10 @@ export default class Cards {
         const cardType = cards[cardId - 1].type; // cards to tablica, nie mapa
         const player = this.game.getPlayer(data.publicId);
 
+        if (player.getStatus() !== statuses.CHOOSE_FIRST_CARD) {
+            throw new Error("To nie twoja kolej na wybór pierwszej karty.");
+        }
+
         if (
             cardType !== "gray" &&
             cardType !== this.game.regions.cityUnderAttackType
@@ -226,6 +237,10 @@ export default class Cards {
     chooseCard(data) {
         const cardId = data.data;
         const player = this.game.getPlayer(data.publicId);
+
+        if (player.getStatus() !== statuses.CHOOSE_CARD) {
+            throw new Error("To nie twoja kolej na wybór karty.");
+        }
 
         const chosenCard = player
             .getData("cards")
@@ -288,8 +303,19 @@ export default class Cards {
 
     // @event
     chooseCardEffect(data) {
-        if (data.data.chosenBottom === "top" && this.chosenCards.length > 1)
-            return;
+        if (player.getStatus() !== statuses.CHOOSE_CARD_EFFECT) {
+            throw new Error("To nie twoja kolej na wybór efektu karty.");
+        }
+
+        if (data.data.chosenBottom === "top" && this.chosenCards.length > 1) {
+            throw new Error(
+                "Nie możesz wybrać górnej akcji, jeśli nie wygrałeś lewy.",
+            );
+        }
+
+        if (this.chosenCards.length === 0) {
+            throw new Error("Brak kart do rozpatrzenia.");
+        }
 
         // { chosenBottom: 'top', buyAdditional: 0, buildCity: false }
         const [card, player] = this.chosenCards.shift();

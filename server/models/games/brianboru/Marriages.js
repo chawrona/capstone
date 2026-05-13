@@ -241,7 +241,7 @@ export default class Marriages {
     // @event
     marriageCityReward(data) {
         const cityId = data.data;
-        const cityWinner = this.getPlayer(data.publicId);
+        const cityWinner = this.game.getPlayer(data.publicId);
 
         this.game.regions.buildCity(cityId, cityWinner);
 
