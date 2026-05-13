@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from "vue";
 
-import Island from "@/assets/games/gameAssets/brianboru/mapa.png";
+import Island from "@/assets/games/gameAssets/brianboru/MAPA.png";
 import IslandNoIcons from "@/assets/games/gameAssets/brianboru/mapaBez.png";
 import "@/styles/brianBoru.scss";
 

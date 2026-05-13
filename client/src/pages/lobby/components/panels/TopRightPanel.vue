@@ -1,6 +1,6 @@
 user-color
 <script setup>
-import ReadyWhite from "@/assets/ReadyWhite.svg";
+import ReadyWhite from "@/assets/readyWhite.svg";
 
 const props = defineProps([
     "currentUser",
