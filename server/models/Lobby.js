@@ -2,6 +2,8 @@ import games from "../config/games.json" with { type: "json" };
 import generateShortId from "../utils/generateShortId.js";
 import BrianBoru from "./games/brianboru/BrianBoru.js";
 import BrianBoruPlayer from "./games/brianboru/BrianBoruPlayer.js";
+import Craftsmen from "./games/craftsmen/Craftsmen.js";
+import CraftsmenPlayer from "./games/craftsmen/CraftsmenPlayer.js";
 import Eurobusiness from "./games/eurobusiness/Eurobusiness.js";
 import Ludo from "./games/Ludo.js";
 import Philanthropists from "./games/philantropists/Philanthropists.js";
@@ -22,6 +24,14 @@ export default class Lobby {
         switch (this.gameInfo.title) {
             case "ludo":
                 this.game = new Ludo(players, () => this.endGame(), this.id);
+                break;
+            case "craftsmen":
+                this.game = new Craftsmen(
+                    players,
+                    () => this.endGame(),
+                    this.id,
+                    CraftsmenPlayer,
+                );
                 break;
             case "brianboru":
                 this.game = new BrianBoru(

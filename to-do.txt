@@ -1,3 +1,160 @@
-PODSUMOWANIE:
-muzyka i dźwięki
-reset devowych ustawień np. miasta
+INSTRUKCJA:
+
+1. Plansza
+
+Środkowy Okrąg (Nieruchomy): Tor wartości. Zewnętrzny: 3, 2, 2, 1, 1, 1, 1, 1. Wewnętrzny: 2, 1, 1.
+Zewnętrzny Pierścień (Obrotowy): 8 dzielnic zwykłych (Drewno, Drewno/Zboże, Kamień, Kamień/Zboże, Złoto, Zboże, Cegła, Żelazo).
+Wewnętrzny Pierścień (Obrotowy): 3 dzielnice luksusowe (Szkło, Bursztyn, Jedwab). Kręci się w przeciwnym kierunku do zewnętrznego.
+
+2. Zasoby i Pionki (per Gracz)
+
+Rzemieślnicy: Startujesz z 1 (max 4).
+Handlarz: Musisz go kupić (max 1).
+Zasoby: Startujesz z 5 Zboża + taki surowiec jaki Ci się wylosuje na starcie x3.
+Udźwig (Magazyn): Startujesz z limitem 6 surowców (Złoto nie zajmuje miejsca).
+
+3. Przygotowanie (Setup)
+Gracze ustawiają pionki na polach.
+Losowe przetasowanie kolejności dzielnic w obu pierścieniach.
+Obrót Zewnętrznego Pierścienia o wynik rzutu 2k6.
+Wystawienie 3 Kontraktów Królewskich (ogólnodostępne).
+Wystawienie 3 Kontraktów Miejskich (ogólnodostępne).
+
+STRUKTURA RUNDY I TURY
+Gra trwa X Rund (równa liczbie graczy) lub do momentu, gdy ktoś zdobędzie 100 Złota. Każda runda to 5 Tur każdego gracza.
+
+1. Faza Początku Rundy
+Przetasowanie kolejności dzielnic (nowe losowe ułożenie w pierścieniu).
+Obrót pierścieni o losową wartość (rzut kostką).
+
+2. Faza Tury (Sekwencja działań gracza)
+Automatyczny Obrót: Zewnętrzny pierścień przesuwa się o 1 pole (CW), Wewnętrzny o 1 pole (CCW). Pionki graczy zostają na swoich polach wartości (zmienia się surowiec pod nimi).
+Gildie pozostają na polach surowców.
+
+Ruch Rzemieślników (1-2 pola): Musisz się ruszyć, aby zebrać surowce. Ilość = Wartość Pola. Zmiana pierścienia na Wewnętrzny i poruszanie po wewnętrznym kosztuje określoną ilośc surowców.
+
+Ruch Handlarzem (1-2 pola): Możesz przesunąć Handlarza. Handlarz może sprzedaż surowiec za (4 - ilość surowca na polu) lub kupić za ilość surowca na polu. Tylko ten surowiec.
+
+Akcje Darmowe: W dowolnym momencie tury:
+
+Wypełnienie Kontraktu (oddanie surowców za złoto).
+
+Zakup ulepszeń (Wózek, Zasięg, Gildia, Nowy Rzemieślnik).
+
+Wyżywienie: Na koniec tury płacisz 1 Zboże za każdego rzemieślnika lub handlarza. Brak zboża = -4 złota za każde brakujące zboże a jak brak śmierć pionka (najpierw z luksusów). Zawsze minimum jeden pionek musi jednak zostać.
+
+III. MECHANIKA EKONOMII (KLUCZOWE WZORY)
+W grze obowiązuje pływająca cena zależna od miejsca, w którym stoi Twój Handlarz:
+
+Zbiór surowca: Liczba na polu (3, 2 lub 1).
+
+Sprzedaż surowca: 4 - Liczba na polu.
+
+Na polu "3": sprzedajesz za 1.
+
+Na polu "1": sprzedajesz za 3.
+
+Kupno surowca: Liczba na polu.
+
+Na polu "3": kupujesz za 3.
+
+Na polu "1": kupujesz za 1.
+
+
+IV. INWESTYCJE I ROZWÓJ
+Gracz może wydać surowce na następujące ulepszenia:
+
+Nowy Rzemieślnik: (Koszt progresywny w zwykłych surowcach). Zwiększa produkcję, ale kosztuje 1 Zboże/turę. Drewno + żelazo najprawdopodobniej. 2/1 i potem 4/2 6/3
+
+Handlarz: (Koszt: Drewno + Kamień). Niezbędny do akcji sprzedaży i kupna. 2 złota + 2 cegły (na start 0 złota, więc trzeba iść na pole ze złotem przynajmniej raz)
+
+Wózek (+4 Udźwigu): (Koszt: Drewno 4/6/8). Zwiększa limit magazynu z 6 do 10, potem 14, 18
+
+Zasięg (Ruch 1-2 -> 1-3): (Koszt: Luksusowe surowce). Kupowany osobno dla handlarza i rzemieślników. Handlarz jedwab 3, rzemieślnik szkło 3
+
+Gildia: Budowana na konkretnej dzielnicy (np. Cegielnia). Kręci się wraz z nią. Daje 1 surowiec właścicielowi, gdy inny gracz tam wejdzie. 4 cegły, 2 kamienia -> +1 za każde
+
+Przesunięcie planszy o 1: (Koszt: Żelazo + Złoto 1/1). Pozwala manualnie obrócić planszę.
+
+
+V. INTERAKCJA I ZASADY POLA
+Limit pionków: Na jednym polu mogą stać max 3 pionki (łącznie rzemieślnicy i handlarze wszystkich graczy).
+
+Opłata za wejście: Jeśli wchodzisz na pole, gdzie stoi już rzemieślnik innego gracza, to płacisz innemu graczowi 1 złota za każdy jego pionek
+handlarze się nie liczą.
+
+Pola Mieszane:
+
+Pole "3": Bierzesz 2 surowiec główny i 1 zboże.
+
+Pole "2": Bierzesz 1 surowiec główny i 1 zboże.
+
+Pole "1": Bierzesz surowiec główny
+
+VI. KONIEC GRY I ZWYCIĘSTWO
+Gra kończy się po upływie rund lub gdy ktoś osiągnie 100 Złota. Wszyscy gracze kończą wtedy bieżącą rundę.
+
+Zwycięzca: Osoba z największą ilością Złota.
+
+Remis: Rozstrzygany liczbą posiadanych surowców luksusowych.
+
+
+
+
+
+
+Koło - Przesuń planszę 
+
+Czapka ładna - kup handlarza
+
+Narzędzia - dodatkowy rzemieślnik
+
+Wózek - większe capacity
+
+Postaw gildię
+
+
+
+żywy rynek - zawsze 3 karty kontraktów na stole.
+ukryty cel 
+
+
+reset karty za 3 golda.
+
+Baron Logistyki: Zdobądź maksymalny poziom udźwigu (wymaksowane wózki). Zmusza gracza do ciągłego kupowania ulepszeń za drewno.
+
+Szara Eminencja: Miej wybudowane minimum 3 Gildie na planszy. Zmusza gracza do wchodzenia w interakcję i pobierania podatków.
+
+Kolekcjoner Luksusów: Miej w magazynie (na wózku) 5 sztuk Szkła. Wymaga posiadania dużego wózka i blokowania wewnętrznego pierścienia.
+
+Król Kupców: Miej w banku dokładnie 40 Złota w momencie wygranej. Zmusza gracza do ostrego handlowania w końcówce gry, zamiast skupiania się tylko na kontraktach.
+
+
+SUROWCE LUKSUOWE
+
+jedwab bym dodał do kupienia handlarza czyli bez jednego luksusu (a za wejście na pole luksusowe się płaci) handlarza ni ma.
+
+To jedno zastosowanie. Drugie to że jak robisz łóżko to potrzebujesz i drewna, i jedwabiu. marmurowe lustro - > szkło i kamień. Czyli w małych ilościach, ale będą niezbędne.
+
+Kolejna rzecz -> luksusowych rzeczy nie można kupować handlarzem. Tylko sprzedawać. Tutaj skorzystam ze wzoru 5 (albo nawet 6) - liczba (czyli albo 3 za jedno albo 4 za jedno) zamiast standardowego 4 - liczba.
+
+runda - resetuje karty (NIE RESETUJE KART), kręci planszą, wymaga zboża
+
+
+gildia - kamień i cegła
+
+wózek - drewno
+
+rzemieślnik - zboże i żelazo
+
+
+@TO-DO:
+- wygląd gildii gracza
+- po kliknięciu na gildię - czy chcesz postawić gildię (dialog tak/nie)
+- wygląd graczy na polach z betonu (prawdopodobnie też punkty na stałe)
+
+- pionki na mapie
+- możliwe ruchy dla każdego z pionków oraz blokada jak się nim ruszyło
+
+
+- zebranie całości jako jeden obiekt otrzymywany przez backend w craftsmen

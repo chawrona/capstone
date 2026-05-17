@@ -14,6 +14,11 @@ const routes = [
         path: "/:id/ludo",
     },
     {
+        component: () => import("@/pages/games/craftsmen/Craftsmen.vue"),
+        name: "craftsmen",
+        path: "/:id/craftsmen",
+    },
+    {
         component: () => import("@/pages/games/eurobusiness/Eurobusiness.vue"),
         name: "eurobusiness",
         path: "/:id/eurobusiness",
@@ -40,10 +45,5 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
 });
-
-// router.beforeEach(() => {
-//     soundBus.unloadAll();
-//     soundBus.stopMusic();
-// });
 
 export default router;

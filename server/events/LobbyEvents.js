@@ -156,6 +156,8 @@ export default class LobbyEvents {
 
             if (!lobby.isAdmin(userId)) throw new UserNotAdminError();
 
+            console.log(process.env.DEVELOPMENT);
+
             if (
                 process.env.DEVELOPMENT !== "true" &&
                 (userCount < minPlayers || userCount > maxPlayers)
