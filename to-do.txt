@@ -100,61 +100,66 @@ Remis: Rozstrzygany liczbą posiadanych surowców luksusowych.
 
 
 
-
-
-
-Koło - Przesuń planszę 
-
-Czapka ładna - kup handlarza
-
-Narzędzia - dodatkowy rzemieślnik
-
-Wózek - większe capacity
-
-Postaw gildię
-
-
-
-żywy rynek - zawsze 3 karty kontraktów na stole.
-ukryty cel 
-
-
-reset karty za 3 golda.
-
-Baron Logistyki: Zdobądź maksymalny poziom udźwigu (wymaksowane wózki). Zmusza gracza do ciągłego kupowania ulepszeń za drewno.
-
-Szara Eminencja: Miej wybudowane minimum 3 Gildie na planszy. Zmusza gracza do wchodzenia w interakcję i pobierania podatków.
-
-Kolekcjoner Luksusów: Miej w magazynie (na wózku) 5 sztuk Szkła. Wymaga posiadania dużego wózka i blokowania wewnętrznego pierścienia.
-
-Król Kupców: Miej w banku dokładnie 40 Złota w momencie wygranej. Zmusza gracza do ostrego handlowania w końcówce gry, zamiast skupiania się tylko na kontraktach.
-
-
 SUROWCE LUKSUOWE
-
-jedwab bym dodał do kupienia handlarza czyli bez jednego luksusu (a za wejście na pole luksusowe się płaci) handlarza ni ma.
-
-To jedno zastosowanie. Drugie to że jak robisz łóżko to potrzebujesz i drewna, i jedwabiu. marmurowe lustro - > szkło i kamień. Czyli w małych ilościach, ale będą niezbędne.
-
-Kolejna rzecz -> luksusowych rzeczy nie można kupować handlarzem. Tylko sprzedawać. Tutaj skorzystam ze wzoru 5 (albo nawet 6) - liczba (czyli albo 3 za jedno albo 4 za jedno) zamiast standardowego 4 - liczba.
-
-runda - resetuje karty (NIE RESETUJE KART), kręci planszą, wymaga zboża
-
-
-gildia - kamień i cegła
-
-wózek - drewno
-
-rzemieślnik - zboże i żelazo
+1. może robić wszystko poza handlem jak się nie ruszył handlarzem
+2. nie może zakończyć ruchu dopóki chociaż raz się nie ruszył i ma możliwe ruchy
+3. jak już kupuje handlarza albo rzemieślnika to może go tylko i wyłącznie postawić na jakiejś strzałce
 
 
 @TO-DO:
-- wygląd gildii gracza
-- po kliknięciu na gildię - czy chcesz postawić gildię (dialog tak/nie)
-- wygląd graczy na polach z betonu (prawdopodobnie też punkty na stałe)
 
-- pionki na mapie
-- możliwe ruchy dla każdego z pionków oraz blokada jak się nim ruszyło
+UI:
+- wygląd kontraktów DONE
+- dopasować handlarza DONE
+- ikony luksusowych surowców DONE
+- kontrakty DONE
+- background  DONE
+- informacja o stanie hasju i itemów innych graczy DONE
+- wygląd planszy DONE
+- ściąć 3 do 2 DONE
+- kontrakty na 3 grupy podzielić po 12 kontraktów. DONE
+- dodać pola łączone dla żelaza i cegieł oraz zboża - losować to. DONE
+
+- rzeczywiste pola gdzie możesz iść -> opłaty za graczy i gildie
+* poruszanie się po środku - tyle zboża ile liczba na polu.
+* zasięg pionków - 1
 
 
-- zebranie całości jako jeden obiekt otrzymywany przez backend w craftsmen
+
+- mechanika handlarza
+* różny wygląd handlarzy
+* luksusowe surowce tylko do sprzedaży
+* sprzedajesz i kupujesz tylko tam gdzie stoisz, ale musisz się ruszyć
+
+
+- amber - luksusowa mechanika
+- pobieranie zboża i zabijanie rzemieślników co 4 tury
+- co jak jakiś debil się zablokuje z surowcami i nie ma jak wózka zrobić i jak ich wydać (?)
+
+
+Koszty:
+gildia - kamień i cegła
+Handlarz - jedwab 
+wózek - drewno
+rzemieślnik - zboże i żelazo
+obrót - żelazo
+reroll - złoto
+handlowanie - surowce i złoto
+
+
+luksusy kosztują 2 zboża (koszt wejścia na środek, i dostaje się 1-2 luksusy). Są też droższe do sprzedania i nie da się ich kupić.
+Każdy z luksusów, może być jako ukryty quest - zebranie danej ilości.
+
+jedwab - odblokowanie handlarza (jednorazowe, 1 wymagane) | element kontraktu
+amber - dowolny surowiec. Dosłownie każdy, jak czegoś Ci brakuje, a masz amber to amber będzie wzięty. Nie zastępuje luksusowych surowców.
+szkło - rezerwacja i zablokowanie kontraktu | element kontraktu
+
+karty surowców -> limitowane
+3 pule kart ->
+1 z tanimi surowcami, ale jak się wykorzysta kartę to wlatuje do niej ta z drugiej póli.
+potem jak się skończą te z drugiej póli to wlatują te z trzeciej;
+30-40 kart łącznie będzie dla graczy, więc musi być to
+
+12 kart zwykłych, 12 kart średnich, 12 kart bogatych.
+bogate to nie tylko luksusy, to również więcej zasobów.
+ale trzeba to przemyśleć dobrze

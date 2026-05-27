@@ -51,7 +51,7 @@ const cards = computed(() => {
 
 const rejectCards = () => {
     console.log(selectedCards.value);
-    
+
     props.closeDialog();
     store.emit("gameData", {
         data: Array.from(selectedCards.value),

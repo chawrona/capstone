@@ -1,15 +1,16 @@
 <script setup>
-import { ref } from 'vue';
-import { useGameSettings } from '../../pages/games/composables_games/useGameSettings';
+import { ref } from "vue";
 
-const { endGame, showEndGameButton, sendBugReport } = useGameSettings();
+import { useGameSettings } from "../../pages/games/composables_games/useGameSettings";
 
-const bugMessage = ref('');
+const { endGame, sendBugReport, showEndGameButton } = useGameSettings();
+
+const bugMessage = ref("");
 
 const handleSendBugReport = () => {
     if (bugMessage.value) {
         sendBugReport(bugMessage.value);
-        bugMessage.value = '';
+        bugMessage.value = "";
     }
 };
 </script>
@@ -52,7 +53,6 @@ const handleSendBugReport = () => {
     }
 }
 
-
 .bug-report {
     position: absolute;
     top: 4rem;
@@ -86,7 +86,4 @@ const handleSendBugReport = () => {
         outline: 2px solid black;
     }
 }
-
-
-
 </style>

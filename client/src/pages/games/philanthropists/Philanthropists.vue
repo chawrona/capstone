@@ -5,6 +5,7 @@ import { watch } from "vue";
 
 import { soundBus } from "../../../audio/soundBus";
 import PauseScreen from "../../../components/common/PauseScreen.vue";
+import Settings from "../../../components/common/Settings.vue";
 import { usePageSounds } from "../../../composables/usePageSounds";
 import { useGamePause } from "../composables_games/useGamePause";
 import { useGameResize } from "../composables_games/useGameResize";
@@ -13,7 +14,6 @@ import useGameData from "./composables_philanthropists/useGameData";
 import Mid from "./Mid/Mid.vue";
 import PodsumowanieFazy from "./PodsumowanieFazy.vue";
 import Top from "./Top/Top.vue";
-import Settings from "../../../components/common/Settings.vue";
 
 usePageSounds({
     effects: [
@@ -58,7 +58,7 @@ watch(
 </script>
 
 <template>
-        <Settings />
+    <Settings />
     <PauseScreen v-if="isPaused" />
     <PodsumowanieFazy v-if="gameData" :game-data="gameData" />
     <div class="background">

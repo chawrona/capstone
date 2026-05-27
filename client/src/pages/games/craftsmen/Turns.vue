@@ -1,17 +1,22 @@
 <script setup>
-
-const props = defineProps(["player", "round", "turn"])
-
+const props = defineProps(["player", "round", "turn"]);
 </script>
 
 <template>
-<div class="turns">
+    <div class="turns">
         <div class="info">
-            <h1>Runda {{ props.round }}</h1>
-            <h1>Tura {{props.turn}}/3</h1>
+            <h1>Dni do poboru zboża: {{ 5 - props.turn }}</h1>
+          
         </div>
-        <h2>Tura gracza <span  class="username" :style="`--color: ${props.player.color.hex}`">{{ props.player.username }}</span></h2>
-</div>
+        <h2>
+            Tura gracza
+            <span
+                class="username"
+                :style="`--color: ${props.player.color.hex}`"
+                >{{ props.player.username }}</span
+            >
+        </h2>
+    </div>
 </template>
 
 <style scoped>
@@ -25,15 +30,14 @@ const props = defineProps(["player", "round", "turn"])
     flex-direction: column;
     align-items: end;
 
+    color: #e3edfd;
 
-            color: #e3edfd; 
-  
-  /* 2. Odpowiednie pogrubienie fontu pomaga na wzorzystym tle */
-  font-weight: 800; 
+    /* 2. Odpowiednie pogrubienie fontu pomaga na wzorzystym tle */
+    font-weight: 800;
 
-  /* 3. Wyraźny cień (Drop Shadow) */
-  /* Składnia: przesunięcie-X | przesunięcie-Y | rozmycie | kolor */
-  text-shadow: 2px 3px 3px rgba(0, 0, 0, 0.85);
+    /* 3. Wyraźny cień (Drop Shadow) */
+    /* Składnia: przesunięcie-X | przesunięcie-Y | rozmycie | kolor */
+    text-shadow: 2px 3px 3px rgba(0, 0, 0, 0.85);
 }
 
 .username::before {
@@ -45,9 +49,8 @@ const props = defineProps(["player", "round", "turn"])
     margin-left: 0.25rem;
     border-radius: 50%;
     transform: translateY(4px);
-    background-color:var(--color);
+    background-color: var(--color);
     border: 2px solid rgba(0, 0, 0, 0.719);
-
 }
 
 .info {

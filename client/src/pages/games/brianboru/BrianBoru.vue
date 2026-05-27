@@ -72,6 +72,7 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
             />
             <TurnInfo :phases="gameData.phases" :message="gameData.message" />
             <Map
+                v-slot="{ hide }"
                 :current-vikings="gameData.currentVikings"
                 :marriages="gameData.marriages"
                 :players="gameData.players"
@@ -79,8 +80,8 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
                 :marriage="gameData.marriage"
                 :you="gameData.you"
                 :regions="gameData.regions"
-                v-slot="{ hide }">
             >
+                >
                 <Island
                     :hide="hide"
                     :city-under-attack="gameData.cityUnderAttack"

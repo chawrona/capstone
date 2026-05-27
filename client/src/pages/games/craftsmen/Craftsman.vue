@@ -1,17 +1,27 @@
 <script setup>
-
-const props = defineProps(["color"])
-
+const props = defineProps(["color"]);
 </script>
 
 <template>
-<div>
-    <svg version="1.0" xmlns="http://www.w3.org/2000/svg" :style="`--color: ${props.color}`" class="svg"
- width="252.000000pt" height="243.000000pt" viewBox="0 0 252.000000 243.000000"
- preserveAspectRatio="xMidYMid meet">
-    <g transform="translate(0.000000,243.000000) scale(0.100000,-0.100000)"
-    fill="currentColor" stroke="none">
-    <path class="path" d="M1143 2276 c-33 -13 -83 -38 -110 -58 -93 -67 -163 -203 -163 -320 0
+    <div>
+        <svg
+            version="1.0"
+            xmlns="http://www.w3.org/2000/svg"
+            :style="`--color: ${props.color}`"
+            class="svg"
+            width="252.000000pt"
+            height="243.000000pt"
+            viewBox="0 0 252.000000 243.000000"
+            preserveAspectRatio="xMidYMid meet"
+        >
+            <g
+                transform="translate(0.000000,243.000000) scale(0.100000,-0.100000)"
+                fill="currentColor"
+                stroke="none"
+            >
+                <path
+                    class="path"
+                    d="M1143 2276 c-33 -13 -83 -38 -110 -58 -93 -67 -163 -203 -163 -320 0
     -68 3 -66 -131 -103 -58 -17 -162 -61 -275 -117 -163 -80 -188 -96 -249 -158
     -55 -55 -69 -76 -75 -111 -11 -60 23 -119 99 -167 92 -59 265 -112 367 -112
     19 0 34 -5 34 -11 0 -5 -31 -58 -68 -117 -61 -96 -161 -257 -236 -382 -14 -25
@@ -22,14 +32,11 @@ const props = defineProps(["color"])
     46 -63 104 -77 129 -75 125 -175 286 -236 382 -37 59 -68 112 -68 117 0 6 15
     11 34 11 102 0 275 53 367 112 76 48 110 107 99 167 -6 35 -20 56 -75 111 -61
     62 -86 78 -249 158 -113 56 -217 100 -275 117 -134 37 -131 35 -131 103 0 168
-    -117 325 -283 381 -78 27 -136 26 -214 -3z"/>
-    </g>
-</svg>
-</div>
-
-
-
-
+    -117 325 -283 381 -78 27 -136 26 -214 -3z"
+                />
+            </g>
+        </svg>
+    </div>
 </template>
 
 <style>
@@ -37,7 +44,7 @@ const props = defineProps(["color"])
     color: var(--color);
     stroke: black;
     stroke-width: 300px;
-    stroke-linejoin: round; 
+    stroke-linejoin: round;
     paint-order: stroke fill;
 }
 
@@ -45,5 +52,4 @@ const props = defineProps(["color"])
     height: 100%;
     width: 100%;
 }
-
 </style>

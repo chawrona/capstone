@@ -1,160 +1,587 @@
 <script setup>
+import { ref, onMounted, onUnmounted, computed } from "vue";
+
+import { pathImages } from "./composables_craftsmen/pathImages";
+import { resourceImages } from "./composables_craftsmen/pathImages";
 import Arrow from "@/assets/games/gameAssets/craftsmen/Arrow.png";
-import Coins from "@/assets/games/gameAssets/craftsmen/Coins.png";
-import Iron from "@/assets/games/gameAssets/craftsmen/iron_bar.png";
+
+import Craftsman from "./Craftsman.vue";
+import { useGameActions } from "./composables_craftsmen/useGameActions";
+import actions from "../../../../../server/models/games/craftsmen/config.js/actions";
+
+const props = defineProps(
+    [
+        "innerCircleRotation", 
+        "outerCircleRotation",
+        "outerPositions", 
+        "innerPositions", 
+        "availableActions",
+        "outerPathCraftsmen",
+        "innerPathCraftsmen",
+        "guilds",
+        "availableMovement",
+        "you",
+        "guildCost"
+    ]
+);
+
+const { rotate, moveCraftsman, buildGuild } = useGameActions(() => props.availableActions);
 
 
-import Silk from "@/assets/games/gameAssets/craftsmen/Silk.png";
-import Amber from "@/assets/games/gameAssets/craftsmen/Amber.png";
-import Glass from "@/assets/games/gameAssets/craftsmen/Glass.png";
+const selectedCraftsman = ref(null)
 
-import Wood from "@/assets/games/gameAssets/craftsmen/path_wood.png";
-import WoodWheat from "@/assets/games/gameAssets/craftsmen/path_wood_wheat.png";
-import Stone from "@/assets/games/gameAssets/craftsmen/path_stone.png";
-import StoneWheat from "@/assets/games/gameAssets/craftsmen/path_stone_wheat.png";
-import Gold from "@/assets/games/gameAssets/craftsmen/path_gold.png";
-import IronPath from "@/assets/games/gameAssets/craftsmen/path_iron.png";
-import Bricks from "@/assets/games/gameAssets/craftsmen/path_bricks.png";
-import Wheat from "@/assets/games/gameAssets/craftsmen/path_wheat.png";
+const selectCraftsmanToMove = (id) => {
+    if (!Object.keys(props.availableMovement).includes(String(id))) return
+    if (id === selectedCraftsman.value) return selectedCraftsman.value = null;
+    selectedCraftsman.value = id;
+    console.log("Wybrano: ", selectedCraftsman.value);
+}
 
-
-import { ref, onMounted, onUnmounted } from "vue"
-
-const props = defineProps(["innerPositions"])
+const localmoveCraftsman = (ringType, fieldId) => {
+    moveCraftsman(ringType, fieldId, selectedCraftsman.value)
+    selectedCraftsman.value = null;
+}
 
 
-const innerPositions = ref({
-  glass: 0,
-  silk: 1,
-  amber: 2,
+const canRotate = computed(() => {
+    if (!props.availableActions.includes(actions.ROTATE)) return false;
+    const rotateCost = props.you.rotateCost;
+    const inventory = props.you.inventory;
+
+    for (const [resource, cost] of rotateCost) {
+        if (inventory[resource] < cost) return false;
+    }
+
+    return true;
 })
 
 
-const outerPositions = ref({
-  wood: 0,
-  wood_wheat: 1,
-  gold: 2,
-  wheat: 3,
-  stone: 4,
-  stone_wheat: 5,
-  iron: 6,
-  bricks: 7,
+
+const dialogOpened = ref(false)
+const guildToBuild = ref(null);
+
+const canBuildInnerGuild = computed(() => {
+    if (!props.availableActions.includes(actions.BUILD_GUILD)) return false;
+    const inventory = props.you.inventory;
+
+    for (const [resource, cost] of props.guildCost.inner) {
+        if (inventory[resource] < cost) return false;
+    }
+
+    return true;
 })
 
+const canBuildOuterGuild = computed(() => {
+    console.log("XD 1");
+    
+    if (!props.availableActions.includes(actions.BUILD_GUILD)) return false;
+    const inventory = props.you.inventory;
+        console.log("XD 2");
+    for (const [resource, cost] of props.guildCost.outer) {
+        if (inventory[resource] < cost) return false;
+    }
 
-
-let innerCircleRotation = ref(1);
-let outerCircleRotation = ref(8);
-
-let interval
-
-onMounted(() => {
-  interval = setInterval(() => {
-    innerCircleRotation.value += 1;
-    outerCircleRotation.value += 1;
-  }, 4000)
+        console.log("XD 3");
+    return true;
 })
 
-onUnmounted(() => {
-  clearInterval(interval)
-})
+const openBuildGuildDialog = (ringType, id, resource) => {
+    if (dialogOpened.value === true) return
+    if (props.guilds[ringType][id]) return
+    
+    guildToBuild.value = [ringType, id, resource]
+    dialogOpened.value = true;
+}
 
+const closeBuildGuildDialog = () => {
+    dialogOpened.value = false;
+    guildToBuild.value = null
+}
+
+const fields = {
+    bricks: "Cegieł",
+    gold: "Bankowej",
+    iron: "Żelaza",
+    stone: "Kamienia",
+    stone_wheat: "Kamienia i Zboża",
+    wheat: "Zboża",
+    wood: "Drewna",
+    wood_wheat: "Drewna i Zboża",
+    glass: "Szkła",
+    silk: "Jedwabiu",
+    amber: "Bursztynu",
+}
+
+
+const localBuildGuild = () => {
+    buildGuild(guildToBuild.value);
+    closeBuildGuildDialog()
+}
+
+const isSelectingPlace = computed(() => {
+    return props.availableActions.includes(actions.PLACE_CRAFTSMAN) || props.availableActions.includes(actions.PLACE_TRADER)
+})
 
 </script>
 
 <template>
-<div class="border"></div>
-<div class="board">
+    <div class="dialog" v-if="dialogOpened && guildToBuild">
+        <h1>Budowa Gildii</h1>
+      
+   
+        <p>Czy chcesz wybudować gildię w dzielnicy <br><span class="sector-name">{{ fields[guildToBuild[2]] }}</span> za
 
-    <<div class="outerCircle" :style="`transform: rotate(calc(45deg * ${outerCircleRotation}))`">
-    <div class="path" :style="`transform: rotate(calc(45deg * ${outerPositions.wood}))`">
-        <img :src="Wood" alt="" class="silk">
-        <div class="guild"></div>
-    </div>
-    
-    <div class="path" :style="`transform: rotate(calc(45deg * ${outerPositions.wood_wheat}))`">
-        <img :src="WoodWheat" alt="" class="glass">
-        <div class="guild"></div>
-    </div>
-    
-    <div class="path" :style="`transform: rotate(calc(45deg * ${outerPositions.gold}))`">
-        <img :src="Gold" alt="" class="amber">
-        <div class="guild"></div>
-    </div>
-    
-    <div class="path" :style="`transform: rotate(calc(45deg * ${outerPositions.wheat}))`">
-        <img :src="Wheat" alt="" class="amber">
-        <div class="guild"></div>
-    </div>
-    
-    <div class="path" :style="`transform: rotate(calc(45deg * ${outerPositions.stone}))`">
-        <img :src="Stone" alt="" class="silk">
-        <div class="guild"></div>
-    </div>
-    
-    <div class="path" :style="`transform: rotate(calc(45deg * ${outerPositions.stone_wheat}))`">
-        <img :src="StoneWheat" alt="" class="glass">
-        <div class="guild"></div>
-    </div>
-    
-    <div class="path" :style="`transform: rotate(calc(45deg * ${outerPositions.iron}))`">
-        <img :src="IronPath" alt="" class="amber">
-        <div class="guild"></div>
-    </div>
-    
-    <div class="path" :style="`transform: rotate(calc(45deg * ${outerPositions.bricks}))`">
-        <img :src="Bricks" alt="" class="amber">
-        <div class="guild"></div>
-    </div>
-</div>
-    
-    <div class="innerCircle" :style="`transform: rotate(calc(-120deg * ${innerCircleRotation}))`">
-    <div class="path" :style="`transform: rotate(calc(120deg * ${innerPositions.silk}))`">
-        <img :src="Silk" alt="" class="silk">
-        <div class="guild"></div>
-    </div>
-    
-    <div class="path" :style="`transform: rotate(calc(120deg * ${innerPositions.glass}))`">
-        <img :src="Glass" alt="" class="glass">
-        <div class="guild"></div>
-    </div>
-    
-    <div class="path" :style="`transform: rotate(calc(120deg * ${innerPositions.amber}))`">
-        <img :src="Amber" alt="" class="amber">
-        <div class="guild"></div>
-    </div>
-</div>
-    
-    
-    
-    <div class="outerPath"></div>
-    <div class="innerPath"> </div>
+                <div class="guild-cost" v-if="guildToBuild[0] === 'outer'">
+                 <template v-for="[resource, amount] in props.guildCost.outer" :key="resource">
+                        <span>{{ amount }}</span>
+                        <img :src="resourceImages[resource]"/>
+                    </template>
+                </div>
 
-    <div class="cost">
-        <span>2</span>
-        <img :src="Coins" alt="">
+
+                <div class="guild-cost" v-else>
+                    <template v-for="[resource, amount] in props.guildCost.inner" :key="resource">
+                        <span>{{ amount }}</span>
+                        <img :src="resourceImages[resource]"/>
+                    </template>
+                </div>?
+        </p>
+        <div class="buttons">
+            <button @click="closeBuildGuildDialog">Przemyślę to</button>
+            <button @click="localBuildGuild" v-if="guildToBuild[0] === 'outer'" :disabled="!canBuildOuterGuild">Zbuduj</button>
+            <button @click="localBuildGuild" v-if="guildToBuild[0] === 'inner'" :disabled="!canBuildInnerGuild">Zbuduj</button>
+        </div>
+    </div>
+
+    <button class="cost" @click="rotate" :disabled="!canRotate">
         <span class="one">1</span>
-        <img :src="Iron" alt="">
+        <img :src="resourceImages['iron']" alt="" />
+    </button>
+    <img :src="Arrow" class="arrow" />
+
+
+    <div class="border"></div>
+
+    <div class="board">
+        <!-- Sklepy rzemieślnicze -->
+
+        <div
+            class="outerCircle"
+            :style="`transform: rotate(calc(45deg * ${outerCircleRotation}))`"
+        >
+            <div
+                v-for="(value, key) in props.outerPositions"
+                :key="key"
+                class="path"
+                :style="`transform: rotate(calc(45deg * ${value}))`"
+            >
+                <img :src="pathImages[key]" alt="" />
+            </div>
+
+            <div
+                v-for="(value, index) in props.outerPositions"
+                :key="index"
+                class="guild"
+                :class="{
+                    guildHover: !props.guilds.outer[value], 
+                    guildShow: guildToBuild && guildToBuild[1] === value && guildToBuild[0] === 'outer'
+                }"
+
+                :style="`
+                    --color: ${props.guilds.outer[value]?.hex};
+                    transform: translate(-50%, -50%) rotate(${-45 * props.outerCircleRotation}deg);
+                    top: calc(50% + 45% * sin(45deg * ${value} - 68deg));
+                    left: calc(50% + 45% * cos(45deg * ${value} - 68deg));
+                `"
+
+                @click="() => openBuildGuildDialog('outer', value, index)"
+                :data-guild="`outer-${value}`"
+                :data-occupied="props.guilds.outer[value] !== null"
+            >
+            </div>
+        </div>
+
+
+    <div class="outerPathBackground">
+
     </div>
-    <img :src="Arrow" class="arrow">
-</div>
+
+       <div class="outerPath">
+            <div
+                v-for="(craftsmen, index) in props.outerPathCraftsmen"
+                :key="index"
+                class="point lowIndex"
+                
+                :style="`
+                    transform: translate(-50%, -50%);
+                    top: calc(50% + 42.8% * sin(45deg * ${index} - 56deg));
+                    left: calc(50% + 42.8% * cos(45deg * ${index} - 56deg));
+                `"
+            > 
+    
+                <Craftsman 
+                    v-for="craftsman in craftsmen" 
+                    :color="craftsman.color" 
+                    class="innerPathCraftsman" 
+                    :class="{hover: Object.keys(props.availableMovement).includes(String(craftsman.id))}"
+                    @click.stop="() => selectCraftsmanToMove(craftsman.id)"
+                />
+
+               
+             
+            </div>
+
+             <div
+                v-for="(craftsmen, index) in 8"
+                :key="index"
+                class="point highIndex invisiblePoint"
+                
+                :style="`
+            
+                  
+                    transform: translate(-50%, -50%);
+                    top: calc(50% + 42.5% * sin(45deg * ${index} - 56deg));
+                    left: calc(50% + 42.5% * cos(45deg * ${index} - 56deg));
+                `"
+            > 
+            
+                <div 
+                    class="pointing-arrow" 
+                    :class="{
+                        upsideDownArrow: [2,3,4].includes(index),
+                        show: (selectedCraftsman !== null && props.availableMovement[selectedCraftsman]?.outer[index]) || isSelectingPlace,
+                    }" 
+                    @click="() => localmoveCraftsman('outer', index)"
+                />
+            </div>
+
+        </div>
+
+
+
+
+
+        <!-- Sklepu luksusowe -->
+
+        <div
+            class="innerCircle"
+            :style="`transform: rotate(calc(-120deg * ${innerCircleRotation}))`"
+        >
+            <div
+                v-for="(value, key) in props.innerPositions"
+                :key="key"
+                class="path"
+                :style="`transform: rotate(calc(120deg * ${value}))`"
+            >
+                <img :src="pathImages[key]" alt="" />
+            </div>
+        </div>
+
+        <div
+            class="innerCircle innerGuilds"
+            :style="`transform: rotate(calc(-120deg * ${innerCircleRotation}))`"
+        >
+            <div
+                v-for="(value, index) in props.innerPositions"
+                :key="index"
+                class="guild"
+                :class="{guildHover: !props.guilds.inner[value]}"
+
+                :style="`
+                    transform: translate(-50%, -50%) rotate(${120 * props.innerCircleRotation}deg);
+                    top: calc(50% + 41% * sin(120deg * ${value} - 30deg));
+                    left: calc(50% + 41% * cos(120deg * ${value} - 30deg));
+                `"
+
+                 @click="() => openBuildGuildDialog('inner', value, index)"
+                :data-guild="`outer-${value}`"
+            >
+            </div>
+        </div>
+
+       
+        <div class="innerPath">
+             <div
+                v-for="(craftsmen, index) in props.innerPathCraftsmen"
+                :key="index"
+                class="point lowIndex"
+                
+                :style="`
+                    transform: translate(-50%, -50%);
+                    top: calc(50% + 26% * sin(120deg * ${index} - 30deg));
+                    left: calc(50% + 26% * cos(120deg * ${index} - 30deg));
+                `"
+            > 
+    
+                <Craftsman 
+                    v-for="craftsman in craftsmen" 
+                    :color="craftsman.color" 
+                    class="innerPathCraftsman" 
+                    :class="{hover: Object.keys(props.availableMovement).includes(String(craftsman.id))}"
+                    @click.stop="() => selectCraftsmanToMove(craftsman.id)"
+                />
+            </div>
+
+             <div
+                v-for="(craftsmen, index) in 3"
+                :key="index"
+                class="point highIndex invisiblePoint"
+                
+                :style="`
+                    transform: translate(-50%, -50%);
+                    top: calc(50% + 26% * sin(120deg * ${index} - 30deg));
+                    left: calc(50% + 26% * cos(120deg * ${index} - 30deg));
+                `"
+            > 
+                <div 
+                    class="pointing-arrow" 
+                    :class="{
+                        upsideDownArrow: index === '1',
+                        show: (selectedCraftsman !== null && props.availableMovement[selectedCraftsman]?.inner[index]),
+                    }" 
+                    @click="() => localmoveCraftsman('inner', index)"
+                />
+            </div>
+
+
+
+        </div>
+    </div>
 </template>
 
 <style scoped>
-.board, .outerCircle, .outerPath, .innerCircle, .innerPath {
+@keyframes upAndDown {
+
+        from {
+             transform: translateX(-50%) translateY(calc(-25% + 0.5rem));
+        }
+
+        to {
+             transform: translateX(-50%) translateY(calc(-25% - 0.5rem));
+        }
+    }
+
+
+@keyframes UpsideUpAndDown {
+
+        from {
+             transform: translateX(-50%) translateY(calc(125% + 0.5rem));
+        }
+
+        to {
+             transform: translateX(-50%) translateY(calc(125% - 0.5rem));
+        }
+    }
+
+
+
+
+.dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    z-index: 200;
+    width: 500px;
+    height: 250px;
+    color: white;
+    top: 35%;
+
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    position: absolute;
+    justify-content: space-between;
+    padding: 2rem 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 3px 3px 3px 0px rgba(51, 48, 48, 0.671);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url("/src/assets/games/gameAssets/craftsmen/black1.jpg");
+
+    button {
+          padding: 0.5rem 1.5rem;
+        font-size: 1.15rem;
+        font-weight: bold;
+        --background: #f4ecd0;
+        background-color: var(--background);
+        filter: drop-shadow(2px 2px 5px black);
+            border: none;
+        border-radius: 0.25rem;
+            
+        &[disabled] {
+            opacity: 0.5;
+        }
+
+        &:not([disabled]) {
+            cursor: pointer;
+            &:hover {
+                background-color: #e4b975;
+            }
+        }
+    }
+
+    p {
+        line-height: 2;
+        margin-top: 0.5rem;
+        max-width: 90%;
+        margin-inline: auto;
+        text-align: center
+    }
+
+    .guild-cost {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.15rem;
+        
+    
+        img {
+            width: 2rem;
+        }
+    }
+
+    .buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: auto;
+    }
+
+    .sector-name {
+        font-weight: bold;
+    }
+}
+
+.board,
+.outerCircle,
+.outerPath,
+.outerPathBackground,
+.innerCircle,
+.innerPath {
     position: absolute;
     inset: 0;
     place-self: center;
     aspect-ratio: 1 / 1;
-    border-radius:  50%;
-     transition: transform 1s linear;
+    border-radius: 50%;
+    transition: transform 1s linear;
 }
 
+.path {
+    position: absolute;
+    inset: 0;
+    place-self: center;
+}
 
- .path {
+/* Region Guild */
+
+
+.point {
+
+
+    &.invisiblePoint {
+        width: 1px;
+        height: 1px;
+        padding: 0;
+    }
+
+   width: 7.5rem;
+    height: 7.5rem;
+    z-index: 300;
+    &.smaller {
+        width: 7.5rem;
+        height: 7.5rem;
+        padding: 1rem;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &.evenSmaller {
+          width: 6rem;
+        height: 6rem;
+    }
+
+    &.lowIndex {
+        z-index: 4;
+    }
+
+    &.highIndex {
+        z-index: 5;
+    }
+
+
+
+       padding: 1rem;
+    border-radius: 50%;
+    
+    position: absolute;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+
+
+
+    background-size: contain;
+    z-index: 200;
+
+
+    .pointing-arrow {
+        display: none;
+
+        width: 4em;
+        height: 6rem;
+        z-index: 320;
+        left: calc(35% - 0.1rem);
+        top: -6rem;
         position: absolute;
-        inset: 0;
-        place-self: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+        background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_down.png");
+        animation: upAndDown 0.8s linear infinite alternate;
+
+&:hover {
+     background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_down_hover.png");
+}
+
+        &.upsideDownArrow {
+            animation: UpsideUpAndDown 0.8s linear infinite alternate;
+              background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_up.png");
+              &:hover {
+background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_up_hover.png");
+              }
+        }
+    }
+
+    
+
+    .show {
+       display: block; 
+
+       &:hover {
+        filter: brightness(0.7);
+       }
+    }
+
+
+    .innerPathCraftsman {
+        width: 2.5rem;
+
+        &.hover {
+            cursor: pointer;
+        }
+
+        &.hover:hover {
+            filter: brightness(1.2) drop-shadow(0 0 5px rgb(255, 255, 255));
+
+        }
+    }
+
+ 
+
+    
 }
 
 .guild {
@@ -163,93 +590,138 @@ onUnmounted(() => {
     border-radius: 50%;
     background-color: red;
     position: absolute;
-    left: 64%;;
-     background-image: url("/src/assets/games/gameAssets/craftsmen/board.png");
-     background-size: contain;
-     border: 4px solid black;
-    top: 5.5%;
+    background-image: url("/src/assets/games/gameAssets/craftsmen/black1.jpg");
+    background-color: black;
+    background-size: contain;
+    z-index: 200;
+    transition: transform 1s;
+    border: 4px solid black;
+  
+
+    &[data-occupied="true"] {
+        &::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: url("/src/assets/games/gameAssets/craftsmen/hammer.png"), linear-gradient(150deg,
+                var(--color), hsl(from var(--color) h s calc(l * 0.6))     
+            );
+            background-position: center;
+           
+           background-size: contain;
+            border-radius: 50%;
+            
+        }
+    }
+    &.guildShow,
+    &.guildHover:hover {
+        background-size: 60%;
+        background-repeat: no-repeat;
+        background-position: center;
+         background-image: url("/src/assets/games/gameAssets/craftsmen/hammer_icon.png");
+        background-color: #ffffff98;
+  
+        cursor: pointer;
+        
+    }
 }
 
 .innerCircle .guild {
-  top: 23%;
-  left: 79%;;
+    top: 23%;
+    left: 79%;
 }
 
 .board {
     overflow: hidden;
     height: calc(100% - 2rem);
     z-index: 1;
- box-shadow:
-            inset 0px 0px 8px rgba(218, 139, 75, 0.203), /* jasne wnętrze */
-            inset 0px 0px 20px rgba(0, 0, 0, 0.2),   /* delikatny cień wewnątrz */
-            0px 0px 10px rgba(0, 0, 0, 0.863);           /* cień na zewnątrz */
-   
+    box-shadow:
+        inset 0px 0px 8px rgba(218, 139, 75, 0.203),
+        /* jasne wnętrze */ inset 0px 0px 20px rgba(0, 0, 0, 0.2),
+        /* delikatny cień wewnątrz */ 0px 0px 10px rgba(0, 0, 0, 0.863); /* cień na zewnątrz */
 }
 
-
 .border {
-        position: absolute;
+    position: absolute;
     inset: 0;
     place-self: center;
     aspect-ratio: 1 / 1;
-    border-radius:  50%;
-     transition: transform 0.5s;
-     z-index: 0;
+    border-radius: 50%;
+    transition: transform 0.5s;
+    z-index: 0;
 
-        height: 100%;
-        aspect-ratio: 1 / 1;
-        position: absolute;
-   
-        border-radius: 50%;
-        z-index: 1;
-        background-image: url("/src/assets/games/gameAssets/craftsmen/board.png");
-        box-shadow:
-            inset 0px 0px 8px rgba(218, 139, 75, 0.203), /* jasne wnętrze */
-            inset 0px 0px 20px rgba(0, 0, 0, 0.2),   /* delikatny cień wewnątrz */
-            0px 0px 10px rgba(0, 0, 0, 0.863);           /* cień na zewnątrz */
-   
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    position: absolute;
+
+    border-radius: 50%;
+    z-index: 1;
+   background-color: black;
+   opacity: 0.5;
+    /* background-image: url("/src/assets/games/gameAssets/craftsmen/background.jpg"); */
+    background-size: contain;
+  
+    box-shadow:
+        inset 0px 0px 8px rgb(218, 163, 118),
+        /* jasne wnętrze */ inset 0px 0px 20px rgba(0, 0, 0, 0.2),
+        /* delikatny cień wewnątrz */ 0px 0px 10px rgba(0, 0, 0, 0.863); /* cień na zewnątrz */
 }
+
+
 .outerCircle {
     height: 100%;
     background: blue;
     z-index: 1;
+
+ 
 }
-.outerPath {
+
+.outerPathBackground {
     height: 80%;
-
     z-index: 2;
-     background-image: url("/src/assets/games/gameAssets/craftsmen/outerPath.png");
-
-   background-size: contain;
+    background-image: url("/src/assets/games/gameAssets/craftsmen/outerPath.png");
+    background-size: contain;
     background-repeat: repeat;
     border: 5px solid black;
 }
 
+
+.outerPath {
+    height: 80%;
+
+    z-index: 4;
+ 
+
+    
+}
+
+.innerGuilds {
+    z-index: 5!important;
+}
+
 .innerCircle {
+    overflow: hidden;
     height: 55%;
-   
+border-radius: 50%;
     z-index: 3;
     overflow: hidden;
     border: 6px solid black;
-   
 }
 
 .innerPath {
     height: 35%;
-   
-    z-index: 4;
+
+    z-index: 6;
     background-image: url("/src/assets/games/gameAssets/craftsmen/innerPath.png");
     background-size: contain;
     background-repeat: repeat;
-
-  
 }
 
 .arrow {
     z-index: 5;
     position: absolute;
-    right: 0rem;
-    top: -2rem;
+    right: 30rem;
+    top: 0rem;
     width: 10rem;
     rotate: -25deg;
 
@@ -260,62 +732,59 @@ onUnmounted(() => {
     display: flex;
     color: white;
     font-weight: bold;
-    padding: 0rem 0.75rem;
-
+    padding: 0rem 1.5rem;
+border-radius: 0.25rem;
+gap: 0.25rem;
     font-size: 1.5rem;
     align-items: center;
     justify-content: center;
     position: absolute;
     z-index: 6;
 
-    right: 1.25rem;
-    top: 0rem;
+    right: 29.9rem;
+    top: 3.9rem;
     /* right: -.5rem;
     top: 1.2rem;
 
     rotate: 34deg; */
-           cursor: pointer;
-    color: #000000; 
+    cursor: pointer;
+    color: #000000;
     font-size: 1.15rem;
     background-size: contain;
     /* background-image: url("/src/assets/games/gameAssets/craftsmen/board.png"); */
 
+    --background: #f4ecd0;
+    background-color: var(--background);
+    filter: drop-shadow(2px 2px 5px black);
+    border: none;
 
-
-    --background: #f2dcb5;
-        background-color: var(--background);
-        filter: drop-shadow(2px 2px 5px black);
-        border: none;
-       
     &[disabled] {
         opacity: 0.5;
     }
 
     &:not([disabled]) {
-          cursor: pointer;
+        cursor: pointer;
         &:hover {
             background-color: #e4b975;
-        } 
+        }
     }
 
-        font-weight: bold;
- padding: 0.3rem 1.25rem;
+    font-weight: bold;
+    padding: 0.3rem 2.25rem;
     font-size: 1.5rem;
     color: rgb(0, 0, 0);
     padding-left: 1.5rem;
     img {
         width: 2rem;
-       transform: translateY(2px);
+        transform: translateY(0px);
     }
 
-     &:hover {
+    &:hover {
         filter: brightness(1.1) drop-shadow(2px 2px 5px black);
     }
-    
 }
 
 .one {
     margin-left: 1rem;
 }
-
 </style>

@@ -10,12 +10,11 @@ export default function useGameData() {
         if (!store.socket) return;
 
         store.socket.on("gameData", (data) => {
-            console.log("got data");
+            console.log(data);
+
             gameData.value = data;
             store.setLoading(false);
         });
-
-        console.log("Emmited");
 
         store.emit("gameData", {
             eventName: "gameDataRequest",
