@@ -2,10 +2,14 @@
 import { ref } from "vue";
 
 import Rules from "@/assets/games/gameAssets/craftsmen/Book.png";
+import { soundBus } from "../../../audio/soundBus";
 
 const dialogOpened = ref(false);
 
-const toggleDialog = () => (dialogOpened.value = !dialogOpened.value);
+const toggleDialog = () => {
+    if (!dialogOpened.value)   soundBus.playEffect("openBook");
+    dialogOpened.value = !dialogOpened.value;
+    };
 </script>
 
 <template>

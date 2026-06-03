@@ -23,8 +23,8 @@ import Wood from "@/assets/games/gameAssets/craftsmen/Wood.png";
 
 const pathImages = {
     amber: AmberPath,
-    bricks: BricksPath,
-    bricks_wheat: BricksWheat,
+    brick: BricksPath,
+    brick_wheat: BricksWheat,
     glass: GlassPath,
     gold: GoldPath,
     iron: IronPath,

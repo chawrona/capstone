@@ -40,7 +40,7 @@ export default class Craftsmen extends Game {
 
         this.craftsmenOwners = new Map(); // publicId -> new Set(id rzemieślnika)
         this.craftsmen = new Map(); // id -> rzemieślnik
-
+        this.movedCraftsmen = new Set();
         /* 
             id
             fieldId
@@ -76,18 +76,12 @@ export default class Craftsmen extends Game {
         this.maxCraftsman = 3;
         this.outerFieldsResourcesAmount = [1, 2, 2, 1, 1, 2, 1, 2];
         this.innerFieldsResourcesAmount = [1, 1, 2];
-        this.guildCost = {
-            outer: [
-                ["stone", 2],
-                ["brick", 2],
-            ],
-            inner: [
-                ["stone", 3],
-                ["brick", 3],
-            ],
-        };
+        this.innerFieldMovementWheatCost = 2;
         this.rerollCost = 3;
         this.tradeUnlockCost = [["silk", 3]];
+
+        //
+        this.AVAILABLE_ID = 0;
 
         this.initialSetup();
     }
@@ -103,13 +97,13 @@ export default class Craftsmen extends Game {
         }
 
         const innerKeys = ["glass", "silk", "amber"];
-        const outerKeys = ["bricks", "gold", "iron", "stone", "wheat", "wood"];
+        const outerKeys = ["brick", "gold", "iron", "stone", "wheat", "wood"];
 
         const additionalOuterKeys = [
             "stone_wheat",
             "wood_wheat",
             "iron_wheat",
-            "bricks_wheat",
+            "brick_wheat",
         ];
 
         shuffleArray(additionalOuterKeys);
@@ -137,9 +131,8 @@ export default class Craftsmen extends Game {
 
         // Stwórz po jednym craftsmanie dla każdego gracza
         // Ustawiamy własności
-        let id = 0;
         for (const [publicId, player] of this.players) {
-            const craftsmanId = id++;
+            const craftsmanId = this.AVAILABLE_ID++;
             const craftsman = new Craftsman(
                 publicId,
                 player.color,
@@ -231,7 +224,7 @@ export default class Craftsmen extends Game {
         return outerPath;
     }
 
-    // region GENERATE START
+    // region GENERATE DATA
 
     generateGameData(publicId) {
         const player = this.getPlayer(publicId);
@@ -245,6 +238,7 @@ export default class Craftsmen extends Game {
                 ),
                 round: this.round,
                 turn: this.turn,
+                currentPlayerIndex: this.currentPlayerIndex,
                 guilds: this.guilds,
                 contracts: this.currentContracts,
                 rerollCost: this.rerollCost,
@@ -256,7 +250,6 @@ export default class Craftsmen extends Game {
                 innerPositions: this.innerPositions,
                 outerPositions: this.outerPositions,
                 players: this.getPlayersData(),
-                guildCost: this.guildCost,
                 tradeUnlockCost: this.tradeUnlockCost,
                 canReroll: this.contracts[0].length > 0,
                 availableActions:
@@ -264,6 +257,7 @@ export default class Craftsmen extends Game {
                         ? this.availableActions
                         : [],
                 you: player.getPlayerData(),
+                lobbyId: this.lobbyId,
                 isYourTurn:
                     publicId === this.playersQueue[this.currentPlayerIndex],
             },
@@ -277,6 +271,40 @@ export default class Craftsmen extends Game {
         this.innerCircleRotation += getRandomNumber(1, 3);
     }
 
+    payWithAmber(player, costArray) {
+        const inventory = player.getData("inventory");
+        let missingResources = 0;
+
+        for (const [resource, cost] of costArray) {
+            const available = inventory[resource] || 0;
+            if (available < cost) {
+                missingResources += cost - available;
+            }
+        }
+
+        if (missingResources > inventory.amber) {
+            throw new Error("Nie masz wystarczająco surowców.");
+        }
+
+        player.setData("inventory", (inv) => {
+            for (const [resource, cost] of costArray) {
+                if (inv[resource] >= cost) {
+                    inv[resource] -= cost;
+                } else {
+                    const deficit = cost - inv[resource];
+                    inv[resource] = 0;
+                    inv.amber -= deficit;
+                    player.setData("stats", (stats) => {
+                        stats.amberSpent += deficit;
+                        return stats;
+                    });
+                }
+            }
+
+            return inv;
+        });
+    }
+
     gameDataRequest(data) {
         const dataToSend = this.generateGameData(data.publicId);
 
@@ -285,6 +313,51 @@ export default class Craftsmen extends Game {
         // };
 
         return [dataToSend];
+    }
+
+    // region HIDDEN TASK CHECK
+    checkHiddenTask(player) {
+        const hiddenTask = player.getData("hiddenTask");
+
+        // Baron logistyki
+        if (hiddenTask.id === 0) {
+            return (
+                player.getData("maxInventorySpace") ===
+                this.maxPlayersInventorySpace
+            );
+        }
+
+        // Szara Eminencja
+        if (hiddenTask.id === 1) {
+            let guildCount = 0;
+            let everyGuildTaken = true;
+            for (const guild of this.guilds.outer) {
+                if (guild === null) {
+                    everyGuildTaken = false;
+                } else if (guild.publicId === player.publicId) {
+                    guildCount++;
+                }
+            }
+
+            if (guildCount >= 3 || everyGuildTaken) return true;
+
+            return false;
+        }
+
+        // Kolekcjoner Luksusów
+        if (hiddenTask.id === 2) {
+            return player.getData("inventory").glass >= 7;
+        }
+
+        // Król Kupców
+        if (hiddenTask.id === 3) {
+            return player.getData("coins") > 30;
+        }
+
+        // Bóg RNG
+        if (hiddenTask.id === 4) {
+            return player.getData("stats").rotations >= 10;
+        }
     }
 
     sendGameDataToAll() {
@@ -323,7 +396,63 @@ export default class Craftsmen extends Game {
             actions.BUILD_GUILD,
             actions.REROLL_CONTRACT,
             actions.COMPLETE_CONTRACT,
+            actions.TRADE,
+            actions.BUY_TRADER,
+            actions.SELL_INVENTORY,
         ];
+    }
+
+    aggregateEndGameStats() {
+        const result = {};
+
+        for (const [publicId, player] of this.players) {
+            const stats = player.getData("stats");
+            const contracts = player.getData("contracts");
+            const username = player.username;
+
+            result[publicId] = {
+                username,
+                color: player.color,
+                contracts,
+                stats: {
+                    resourcesGained: { ...stats.resourcesGained },
+                    coinsFromGuild: stats.coinsFromGuild,
+                    coinsFromStanding: stats.coinsFromStanding,
+                    coinsPaidToOthers: stats.coinsPaidToOthers,
+                    rotations: stats.rotations,
+                    rerolls: stats.rerolls,
+                    amberSpent: stats.amberSpent,
+                    tradesBought: stats.tradesBought,
+                    tradesBoughtAmount: stats.tradesBoughtAmount,
+                    tradesSold: stats.tradesSold,
+                    tradeSoldAmount: stats.tradeSoldAmount,
+                    coins: player.getData("coins"),
+                    hiddenTask: player.getData("hiddenTask").title,
+                },
+            };
+        }
+
+        // Statystyki globalne całej gry
+        result.global = {
+            totalTurns: this.round * this.maxTurn + this.turn,
+            totalWheatTaking: this.round,
+            mostValuableResource: (() => {
+                const totals = {};
+                for (const { stats } of Object.values(result)) {
+                    if (!stats) continue;
+                    for (const [res, val] of Object.entries(
+                        stats.resourcesGained,
+                    )) {
+                        totals[res] = (totals[res] || 0) + val;
+                    }
+                }
+                return Object.entries(totals).sort(
+                    (a, b) => b[1] - a[1],
+                )[0]?.[0];
+            })(),
+        };
+
+        return result;
     }
 
     setAvailableMovementsForCraftsman(craftsmanId, reset = false) {
@@ -331,7 +460,18 @@ export default class Craftsmen extends Game {
             this.availableMovement = {};
         }
 
-        if (this.craftsmen.get(craftsmanId).getFieldId() === null) {
+        if (this.movedCraftsmen.has(craftsmanId)) {
+            return;
+        }
+
+        const craftsman = this.craftsmen.get(craftsmanId);
+
+        const currentField = craftsman.getFieldId();
+
+        const owner = this.getPlayer(craftsman.publicId);
+
+        // Stawiamy craftsmana
+        if (currentField === null) {
             this.availableMovement[craftsmanId] = {
                 inner: [false, false, false],
                 outer: [true, true, true, true, true, true, true, true],
@@ -339,15 +479,262 @@ export default class Craftsmen extends Game {
         } else {
             // Normalnie wyliczamy jego dostępne pola
             // koszt gildii, koszt innych graczy, koszt luksuwowej dzielnicy, czy już stoi tam gdzie stoi
+
             this.availableMovement[craftsmanId] = {
                 inner: [false, false, false],
-                outer: [true, true, true, true, true, true, true, true],
+                outer: [false, false, false, false, false, false, false, false],
             };
+
+            // region pionek na outer
+            if (craftsman.ringType === "outer" && craftsman.type !== "trader") {
+                // Wyliczamy indeks pola po lewej (Clock Wise) i po prawej (Counter Clock Wise)
+                const goClockWise = currentField === 0 ? 7 : currentField - 1;
+                const goCounterClockWise =
+                    currentField === 7 ? 0 : currentField + 1;
+
+                // Wyliczamy indeksy pól w środku, na które gracz może iść
+                const availableInnerFields =
+                    currentField === 2
+                        ? [0, 1]
+                        : currentField === 5
+                          ? [1, 2]
+                          : currentField < 2
+                            ? [0]
+                            : currentField < 5
+                              ? [1]
+                              : [2];
+
+                // Sprawdzamy czy można iść na pole po lewej (Clock Wise)
+                // Wyliczamy wymagane pieniądze
+                let moneyToPay = 0;
+                let hasOtherCraftsman = false;
+                // [id, new Set()]
+                let localCraftsmenIds =
+                    this.outerPathCraftsmen.get(goClockWise);
+                for (const localCraftsmanId of localCraftsmenIds) {
+                    const localCraftsman = this.craftsmen.get(localCraftsmanId);
+                    if (localCraftsman.publicId === owner.publicId) {
+                        hasOtherCraftsman = true;
+                        moneyToPay = 0;
+                        break;
+                    }
+
+                    if (localCraftsman.publicId !== owner.publicId) {
+                        moneyToPay += 1;
+                    }
+                }
+
+                // Gildia, jeżeli czyjaś to dodatkowa opłata.
+                // Jeżeli Twoja to masz darmowy ruch tam
+                if (this.guilds.outer[goClockWise]) {
+                    if (
+                        this.guilds.outer[goClockWise].publicId !==
+                            owner.publicId &&
+                        !hasOtherCraftsman
+                    ) {
+                        moneyToPay++;
+                    } else {
+                        moneyToPay = 0;
+                    }
+                }
+
+                if (moneyToPay <= owner.getData("coins")) {
+                    this.availableMovement[craftsmanId].outer[goClockWise] =
+                        true;
+                }
+
+                // Sprawdzamy czy można iść na pole po prawej (Counter Clock Wise)
+                // Wyliczamy wymagane pieniądze
+                moneyToPay = 0;
+                hasOtherCraftsman = false;
+                // [id, new Set()]
+                localCraftsmenIds =
+                    this.outerPathCraftsmen.get(goCounterClockWise);
+                for (const localCraftsmanId of localCraftsmenIds) {
+                    const localCraftsman = this.craftsmen.get(localCraftsmanId);
+                    if (
+                        localCraftsman.publicId === owner.publicId &&
+                        localCraftsman.type !== "trader"
+                    ) {
+                        hasOtherCraftsman = true;
+                        moneyToPay = 0;
+                        break;
+                    }
+
+                    if (
+                        localCraftsman.publicId !== owner.publicId &&
+                        localCraftsman.type !== "trader"
+                    ) {
+                        moneyToPay += 1;
+                    }
+                }
+
+                // Gildia - Twoja - nic nie płacisz
+                if (this.guilds.outer[goCounterClockWise]) {
+                    if (
+                        this.guilds.outer[goCounterClockWise].publicId !==
+                            owner.publicId &&
+                        !hasOtherCraftsman
+                    ) {
+                        moneyToPay++;
+                    } else {
+                        moneyToPay = 0;
+                    }
+                }
+
+                if (moneyToPay <= owner.getData("coins")) {
+                    this.availableMovement[craftsmanId].outer[
+                        goCounterClockWise
+                    ] = true;
+                }
+
+                // Jeżeli ma zboże
+
+                for (const innerField of availableInnerFields) {
+                    if (
+                        owner.getData("inventory").wheat >=
+                        this.innerFieldMovementWheatCost
+                    ) {
+                        this.availableMovement[craftsmanId].inner[innerField] =
+                            true;
+                    }
+                }
+            }
+
+            // region pionek na inner
+            if (craftsman.ringType === "inner" && craftsman.type !== "trader") {
+                const goClockWise =
+                    currentField === 0 ? 2 : currentField === 1 ? 0 : 1;
+                const goCounterClockWise =
+                    currentField === 0 ? 1 : currentField === 1 ? 2 : 0;
+
+                const availableOuterFields =
+                    currentField === 0
+                        ? [0, 1, 2]
+                        : currentField === 1
+                          ? [2, 3, 4, 5]
+                          : [5, 6, 7];
+
+                // Czy ktoś tam stoi i ma kasę
+                if (
+                    owner.getData("inventory").wheat >=
+                    this.innerFieldMovementWheatCost
+                ) {
+                    this.availableMovement[craftsmanId].inner[goClockWise] =
+                        true;
+                }
+                if (
+                    owner.getData("inventory").wheat >=
+                    this.innerFieldMovementWheatCost
+                ) {
+                    this.availableMovement[craftsmanId].inner[
+                        goCounterClockWise
+                    ] = true;
+                }
+
+                // Jeżeli ma zboże
+
+                for (const outerField of availableOuterFields) {
+                    let moneyToPay = 0;
+                    let hasOtherCraftsman = false;
+                    let localCraftsmenIds =
+                        this.outerPathCraftsmen.get(outerField);
+                    for (const localCraftsmanId of localCraftsmenIds) {
+                        const localCraftsman =
+                            this.craftsmen.get(localCraftsmanId);
+                        if (
+                            localCraftsman.publicId === owner.publicId &&
+                            localCraftsman.type !== "trader"
+                        ) {
+                            hasOtherCraftsman = true;
+                            moneyToPay = 0;
+                            break;
+                        }
+
+                        if (
+                            localCraftsman.publicId !== owner.publicId &&
+                            localCraftsman.type !== "trader"
+                        ) {
+                            moneyToPay += 1;
+                        }
+                    }
+
+                    if (this.guilds.outer[outerField]) {
+                        if (
+                            this.guilds.outer[outerField].publicId !==
+                                owner.publicId &&
+                            !hasOtherCraftsman
+                        ) {
+                            moneyToPay++;
+                        } else {
+                            moneyToPay = 0;
+                        }
+                    }
+
+                    if (moneyToPay <= owner.getData("coins")) {
+                        this.availableMovement[craftsmanId].outer[outerField] =
+                            true;
+                    }
+                }
+            }
+
+            if (craftsman.ringType === "outer" && craftsman.type === "trader") {
+                const goClockWise = currentField === 0 ? 7 : currentField - 1;
+                const goCounterClockWise =
+                    currentField === 7 ? 0 : currentField + 1;
+
+                const availableInnerFields =
+                    currentField === 2
+                        ? [0, 1]
+                        : currentField === 5
+                          ? [1, 2]
+                          : currentField < 2
+                            ? [0]
+                            : currentField < 5
+                              ? [1]
+                              : [2];
+
+                this.availableMovement[craftsmanId].outer[goClockWise] = true;
+                this.availableMovement[craftsmanId].outer[goCounterClockWise] =
+                    true;
+
+                for (const innerField of availableInnerFields) {
+                    this.availableMovement[craftsmanId].inner[innerField] =
+                        true;
+                }
+            }
+            if (craftsman.ringType === "inner" && craftsman.type === "trader") {
+                const goClockWise =
+                    currentField === 0 ? 2 : currentField === 1 ? 0 : 1;
+                const goCounterClockWise =
+                    currentField === 0 ? 1 : currentField === 1 ? 2 : 0;
+
+                const availableOuterFields =
+                    currentField === 0
+                        ? [0, 1, 2]
+                        : currentField === 1
+                          ? [2, 3, 4, 5]
+                          : [5, 6, 7];
+
+                this.availableMovement[craftsmanId].inner[goClockWise] = true;
+                this.availableMovement[craftsmanId].inner[goCounterClockWise] =
+                    true;
+
+                for (const outerField of availableOuterFields) {
+                    this.availableMovement[craftsmanId].outer[outerField] =
+                        true;
+                }
+            }
         }
     }
 
     setAvailableMovementsForCraftsmen(publicId) {
         const playersCraftsMan = this.craftsmenOwners.get(publicId);
+
+        console.log({
+            publicId,
+            playersCraftsMan,
+        });
 
         this.availableMovement = {};
         playersCraftsMan.forEach((craftsmanId) => {
@@ -384,14 +771,182 @@ export default class Craftsmen extends Game {
             // Zabieramy zboża graczom.
 
             if (this.round === 1) {
-                this.maxTurn = 4;
+                this.maxTurn = 5;
                 this.resetCircle();
+            }
+
+            if (this.round > 1) {
+                console.log("POBRANO ZBOŻE");
+
+                for (const [playerPublicId, player] of this.players) {
+                    const craftsmanCount =
+                        player.getData("craftsmen") +
+                        Number(player.getData("trader"));
+
+                    console.log("ILOŚĆ LUDZI NA MAPIE: ", craftsmanCount);
+
+                    const wheatRequired = craftsmanCount;
+                    const playersWheat = player.getData("inventory").wheat;
+
+                    console.log("WYMAGANE ZBOŻE: ", wheatRequired);
+                    console.log("ZBOŻE GRACZA: ", playersWheat);
+
+                    let craftsmanToKill = Math.ceil(
+                        (wheatRequired - playersWheat) / 2,
+                    );
+
+                    console.log("RZEMIEŚLNICY DO ZABICIA: ", craftsmanToKill);
+
+                    if (craftsmanToKill > 0) {
+                        console.log("ZABIERAMY CAŁE ZBOŻE XD");
+
+                        player.setData("inventory", (inv) => {
+                            inv.wheat = 0;
+                            return inv;
+                        });
+                    } else {
+                        console.log(
+                            `ZABIERAMY ZBOŻE. MIAŁEŚ ${player.getData("inventory").wheat}, ZABIERAMY ${wheatRequired} ZOSTAJE ${player.getData("inventory").wheat - wheatRequired}`,
+                        );
+
+                        player.setData("inventory", (inv) => {
+                            inv.wheat = inv.wheat - wheatRequired;
+                            return inv;
+                        });
+                    }
+
+                    // Zabijamy najpierw tradera. Potem innych rzemieślników
+                    let maxIter = 5;
+                    while (
+                        craftsmanToKill > 0 &&
+                        (player.getData("craftsmen") > 1 ||
+                            player.getData("trader"))
+                    ) {
+                        if (!maxIter--) throw new Error("Max iter error");
+                        if (player.getData("trader")) {
+                            console.log("MORDUJEMY CI TRADERA");
+
+                            player.setData("trader", () => false);
+                            craftsmanToKill--;
+                            // Znajdź trader'a i go usuń
+                            let traderId = null;
+                            let traderRingType = "outer";
+                            let traderFieldId = 0;
+
+                            for (const craftsmanId of this.craftsmenOwners.get(
+                                playerPublicId,
+                            )) {
+                                const craftsman =
+                                    this.craftsmen.get(craftsmanId);
+                                if (craftsman.type === "trader") {
+                                    traderId = craftsmanId;
+                                    traderRingType = craftsman.ringType;
+                                    traderFieldId = craftsman.fieldId;
+                                    break;
+                                }
+                            }
+
+                            this.craftsmenOwners
+                                .get(playerPublicId)
+                                .delete(traderId);
+                            this.movedCraftsmen.delete(traderId);
+                            this.craftsmen.delete(traderId);
+
+                            if (traderRingType === "outer") {
+                                this.outerPathCraftsmen
+                                    .get(traderFieldId)
+                                    .delete(traderId);
+                            } else {
+                                this.innerPathCraftsmen
+                                    .get(traderFieldId)
+                                    .delete(traderId);
+                            }
+                        } else {
+                            console.log("MORDUJEMY CI RZEMIEŚLNIKA");
+                            player.setData(
+                                "craftsmen",
+                                (craftsmen) => craftsmen - 1,
+                            );
+
+                            player.setData("canBuyCraftsman", () => true);
+
+                            player.setData("craftsmanCost", (old) => {
+                                return [
+                                    ["wheat", old[0][1] - 2],
+                                    ["iron", old[1][1] - 1],
+                                ];
+                            });
+
+                            const ownerCraftsmanId = [
+                                ...this.craftsmenOwners.get(playerPublicId),
+                            ].pop();
+
+                            const craftsman =
+                                this.craftsmen.get(ownerCraftsmanId);
+
+                            let craftsmanId = ownerCraftsmanId;
+                            let craftsmanRingType = craftsman.ringType;
+                            let craftsmanFieldId = craftsman.fieldId;
+
+                            this.craftsmenOwners
+                                .get(playerPublicId)
+                                .delete(craftsmanId);
+                            this.movedCraftsmen.delete(craftsmanId);
+                            this.craftsmen.delete(craftsmanId);
+
+                            if (craftsmanRingType === "outer") {
+                                this.outerPathCraftsmen
+                                    .get(craftsmanFieldId)
+                                    .delete(craftsmanId);
+                            } else {
+                                this.innerPathCraftsmen
+                                    .get(craftsmanFieldId)
+                                    .delete(craftsmanId);
+                            }
+                        }
+                    }
+                }
             }
         }
 
+        // region killing craftsman
+
+        // region setting next player
         if (this.round !== 0) {
+            this.movedCraftsmen.clear();
             this.setDefaultActions();
-            this.setAvailableMovementsForCraftsmen(publicId);
+            this.setAvailableMovementsForCraftsmen(
+                this.playersQueue[this.currentPlayerIndex],
+            );
+
+            const nextPlayer = this.getPlayer(
+                this.playersQueue[this.currentPlayerIndex],
+            );
+
+            const newTrade = {
+                buyAmount: 0,
+                sellAmount: 0,
+                allowBuying: false,
+                allowSelling: false,
+                resource: "undefined",
+            };
+
+            nextPlayer.setData("trading", () => newTrade);
+        }
+
+        const player = this.getPlayer(publicId);
+        if (player.getData("contracts") >= 10) {
+            if (this.checkHiddenTask(player)) {
+                this.endGame();
+                return [
+                    {
+                        target: "lobby",
+                        eventName: "endGame",
+                        data: this.aggregateEndGameStats(),
+                    },
+                    ...this.sendGameDataToAll(),
+                ];
+            }
         }
 
         return this.sendGameDataToAll();
@@ -402,20 +957,8 @@ export default class Craftsmen extends Game {
     rotate({ publicId }) {
         this.eventChecker(publicId, actions.ROTATE);
         const player = this.getPlayer(publicId);
-        const inventory = player.getData("inventory");
 
-        for (const [resource, cost] of this.rotateCost.resources) {
-            if (inventory[resource] < cost) {
-                throw new Error("Nie masz wystarczająco surowców");
-            }
-        }
-
-        player.setData("inventory", (oldResources) => {
-            for (const [resource, cost] of this.rotateCost.resources) {
-                oldResources[resource] -= cost;
-            }
-            return oldResources;
-        });
+        this.payWithAmber(player, this.rotateCost.resources);
 
         const randomChance = getRandomNumber(0, 10);
         if (randomChance === 1) {
@@ -424,6 +967,20 @@ export default class Craftsmen extends Game {
             this.innerCircleRotation += 1;
             this.outerCircleRotation += 1;
         }
+
+        player.setData("stats", (stats) => {
+            stats.rotations += 1;
+            return stats;
+        });
+
+        player.setData("trading", (oldTrade) => {
+            oldTrade.allowBuying = false;
+            oldTrade.allowSelling = false;
+            oldTrade.resource = "undefined";
+            oldTrade.buyAmount = 0;
+            oldTrade.sellAmount = 0;
+            return oldTrade;
+        });
 
         return this.sendGameDataToAll();
     }
@@ -440,20 +997,7 @@ export default class Craftsmen extends Game {
             throw new Error("Nie możesz dokupić więcej wózków");
         }
 
-        const inventory = player.getData("inventory");
-
-        for (const [resource, cost] of player.getData("cartCost")) {
-            if (inventory[resource] < cost) {
-                throw new Error("Nie masz wystarczająco surowców");
-            }
-        }
-
-        player.setData("inventory", (oldResources) => {
-            for (const [resource, cost] of player.getData("cartCost")) {
-                oldResources[resource] -= cost;
-            }
-            return oldResources;
-        });
+        this.payWithAmber(player, player.getData("cartCost"));
 
         player.setData("maxInventorySpace", (oldMax) => oldMax + 1);
 
@@ -473,6 +1017,14 @@ export default class Craftsmen extends Game {
         this.eventChecker(publicId, actions.MOVE_CRAFTSMAN);
         const player = this.getPlayer(publicId);
 
+        const trackGain = (resource, amount) => {
+            player.setData("stats", (stats) => {
+                stats.resourcesGained[resource] =
+                    (stats.resourcesGained[resource] || 0) + amount;
+                return stats;
+            });
+        };
+
         let { ringType, fieldId, craftsmanId } = data;
         console.log("DANE Z KLIENTA: ", ringType, fieldId);
 
@@ -483,6 +1035,10 @@ export default class Craftsmen extends Game {
         }
 
         const craftsman = this.craftsmen.get(craftsmanId);
+        const isTrader = craftsman.type === "trader";
+        const isNotTrader = craftsman.type !== "trader";
+
+        console.log("CZY JEST HANDLARZEM?", isTrader);
 
         if (craftsman.getFieldId() !== null) {
             if (craftsman.ringType === "outer")
@@ -495,11 +1051,114 @@ export default class Craftsmen extends Game {
                     .delete(craftsman.id);
         }
 
+        if (ringType === "outer" && isNotTrader) {
+            // Opłata za gildie
+            console.log("Zewnętrzne Koło");
+
+            // Sprawdzamy czy stoisz na swojej gildii
+            let playersGuild = false;
+            if (
+                this.guilds.outer[fieldId] &&
+                this.guilds.outer[fieldId].publicId === publicId
+            ) {
+                playersGuild = true;
+                console.log("Gracz stoi na swojej gildii");
+            }
+
+            // Opłata jeżeli to gildia kogoś innego
+            if (
+                this.guilds.outer[fieldId] &&
+                this.guilds.outer[fieldId].publicId !== publicId &&
+                !playersGuild
+            ) {
+                console.log("Gracz stoi na czyjejś gildii");
+                const guildOwner = this.getPlayer(
+                    this.guilds.outer[fieldId].publicId,
+                );
+
+                player.setData("coins", (coins) => coins - 1);
+                player.setData("stats", (stats) => {
+                    stats.coinsPaidToOthers += 1;
+                    return stats;
+                });
+                guildOwner.setData("coins", (coins) => coins + 1);
+                guildOwner.setData("stats", (stats) => {
+                    stats.coinsFromGuild += 1;
+                    return stats;
+                });
+            }
+
+            // Sprawdzamy czy są tam pionki innych graczy
+            // [id, new Set()]
+            let playersCraftsmanPresent = false;
+            let localCraftsmenIds = this.outerPathCraftsmen.get(fieldId);
+            for (const localCraftsmanId of localCraftsmenIds) {
+                const localCraftsman = this.craftsmen.get(localCraftsmanId);
+                if (localCraftsman.publicId === publicId) {
+                    playersCraftsmanPresent = true;
+                    console.log(
+                        "Gracz nie ma innego pionka na polu na które idzie",
+                    );
+                    break;
+                }
+            }
+
+            if (!playersCraftsmanPresent && !playersGuild) {
+                console.log(
+                    "Gracz nie ma gildii i nie ma pionka - pobieramy monety",
+                );
+                let index = 1;
+                for (const localCraftsmanId of localCraftsmenIds) {
+                    console.log("Pionek innego gracza nr: #", index++);
+
+                    const localCraftsman = this.craftsmen.get(localCraftsmanId);
+
+                    console.log(`Gracz ${publicId} ma zabraną monetę`);
+                    console.log("PRZED: ", player.getData("coins"));
+                    player.setData("coins", (coins) => coins - 1);
+                    player.setData("stats", (stats) => {
+                        stats.coinsPaidToOthers += 1;
+                        return stats;
+                    });
+                    console.log("PO: ", player.getData("coins"));
+
+                    console.log(
+                        `Gracz ${localCraftsman.publicId} otrzymuje monetę`,
+                    );
+                    const localCraftsmanOwner = this.getPlayer(
+                        localCraftsman.publicId,
+                    );
+                    console.log(
+                        "PRZED: ",
+                        localCraftsmanOwner.getData("coins"),
+                    );
+                    localCraftsmanOwner.setData("coins", (coins) => coins + 1);
+                    localCraftsmanOwner.setData("stats", (stats) => {
+                        stats.coinsFromStanding += 1;
+                        return stats;
+                    });
+                    console.log("PO: ", localCraftsmanOwner.getData("coins"));
+                }
+            }
+        } else if (isNotTrader) {
+            console.log(
+                "Gracz porusza się po wewnętrznym kole. Zabieramy mu zboże w wysokości: ",
+                this.innerFieldMovementWheatCost,
+            );
+
+            console.log("PRZED: ", player.getData("inventory").wheat);
+
+            player.setData("inventory", (inventory) => {
+                inventory.wheat -= this.innerFieldMovementWheatCost;
+                return inventory;
+            });
+
+            console.log("PO: ", player.getData("inventory").wheat);
+        }
+
         if (ringType === "outer") {
-            // złoto jak ktoś tam stoi lub gildia
             this.outerPathCraftsmen.get(fieldId).add(craftsmanId);
         } else {
-            // 2 zboża za wejście rzemieślnikiem
             this.innerPathCraftsmen.get(fieldId).add(craftsmanId);
         }
 
@@ -519,10 +1178,13 @@ export default class Craftsmen extends Game {
         */
 
         // Otrzymanie surowca
-        // region SUROWCE
-        if (!this.availableActions.includes(actions.PLACE_CRAFTSMAN)) {
+        // region move - surowce
+        if (
+            !this.availableActions.includes(actions.PLACE_CRAFTSMAN) &&
+            isNotTrader
+        ) {
             if (ringType !== "outer") {
-                let rotatedIndex = (this.innerCircleRotation % 3) + fieldId;
+                let rotatedIndex = (this.innerCircleRotation + fieldId) % 3;
                 let amount = Math.min(
                     this.innerFieldsResourcesAmount[fieldId],
                     player.getFreeInventorySpace(),
@@ -538,6 +1200,7 @@ export default class Craftsmen extends Game {
                           : rotatedIndex;
                 player.setData("inventory", (inv) => {
                     inv[this.innerPositionsIds[rotatedIndex]] += amount;
+                    trackGain(this.innerPositionsIds[rotatedIndex], amount);
                     return inv;
                 });
             } else {
@@ -561,7 +1224,7 @@ export default class Craftsmen extends Game {
                     );
                 } else {
                     const resourceMap = {
-                        bricks: { brick: amount },
+                        brick: { brick: amount },
 
                         stone_wheat: {
                             stone: amount < 3 ? 1 : 2,
@@ -575,7 +1238,7 @@ export default class Craftsmen extends Game {
                             iron: amount < 3 ? 1 : 2,
                             ...(amount > 1 && { wheat: 1 }),
                         },
-                        bricks_wheat: {
+                        brick_wheat: {
                             brick: amount < 3 ? 1 : 2,
                             ...(amount > 1 && { wheat: 1 }),
                         },
@@ -589,6 +1252,9 @@ export default class Craftsmen extends Game {
                         for (const [resource, value] of Object.entries(gains)) {
                             inv[resource] += value;
                         }
+                        for (const [resource, value] of Object.entries(gains)) {
+                            trackGain(resource, value);
+                        }
                         return inv;
                     });
                 }
@@ -597,14 +1263,82 @@ export default class Craftsmen extends Game {
 
         // Rzemieślnik nie może się już ruszać
         delete this.availableMovement[craftsmanId];
+        this.movedCraftsmen.add(craftsmanId);
 
         if (this.round === 0) {
             return this.newTurn({ publicId }, true);
         }
 
+        // region move - trade
+        if (isTrader) {
+            // Zaaktualizuj bank
+
+            let resource;
+
+            if (ringType === "outer") {
+                let rotatedIndex = fieldId - (this.outerCircleRotation % 8);
+                rotatedIndex =
+                    rotatedIndex < 0 ? 8 + rotatedIndex : rotatedIndex;
+                resource = this.outerPositionsIds[rotatedIndex].split("_")[0];
+            } else {
+                resource =
+                    this.innerPositionsIds[
+                        (this.innerCircleRotation + fieldId) % 3
+                    ];
+
+                console.log(this.innerPositionsIds);
+
+                console.log("Resource: ", resource);
+
+                console.log(
+                    "Index: ",
+                    (this.innerCircleRotation + fieldId) % 3,
+                );
+            }
+
+            const fieldAmount =
+                ringType === "outer"
+                    ? this.outerFieldsResourcesAmount[fieldId]
+                    : this.innerFieldsResourcesAmount[fieldId];
+
+            if (resource === "gold") {
+                const newTrade = {
+                    buyAmount: 0,
+                    sellAmount: 0,
+                    allowBuying: false,
+                    allowSelling: false,
+                    resource: "coins",
+                };
+                player.setData("trading", () => newTrade);
+            } else {
+                const buyAmount = 4 - fieldAmount;
+                const canBuy =
+                    ringType === "outer" &&
+                    player.getData("coins") >= buyAmount;
+
+                const sellAmount =
+                    ringType === "outer"
+                        ? 2
+                        : 8 - 2 * fieldAmount + Number(resource === "glass");
+                const canSell = player.getData("inventory")[resource] > 0;
+
+                const newTrade = {
+                    buyAmount: ringType === "outer" ? buyAmount : 0,
+                    sellAmount,
+                    allowBuying: canBuy,
+                    allowSelling: canSell,
+                    resource,
+                };
+
+                player.setData("trading", () => newTrade);
+            }
+        }
+
         if (this.availableActions.includes(actions.PLACE_CRAFTSMAN)) {
             this.setDefaultActions();
         }
+
+        this.setAvailableMovementsForCraftsmen(publicId);
 
         return this.sendGameDataToAll();
     }
@@ -619,20 +1353,12 @@ export default class Craftsmen extends Game {
         if (!canBuyCraftsmann)
             throw new Error("Osiągnięto maksymalną liczbę rzemieślników");
 
-        const playerResources = player.getData("inventory");
         const craftsmanCost = player.getData("craftsmanCost");
 
-        for (const [resource, cost] of craftsmanCost) {
-            if (playerResources[resource] < cost)
-                throw new Error("Nie masz wystarczająco surowców.");
-        }
-
-        for (const [resource, cost] of craftsmanCost) {
-            playerResources[resource] -= cost;
-        }
+        this.payWithAmber(player, craftsmanCost);
 
         // Dodanie craftsman'a
-        const craftsmanId = this.craftsmen.size + 1;
+        let craftsmanId = this.AVAILABLE_ID++;
         const craftsman = new Craftsman(publicId, player.color, craftsmanId);
         this.craftsmen.set(craftsmanId, craftsman);
         this.craftsmenOwners.get(publicId).add(craftsmanId);
@@ -643,11 +1369,68 @@ export default class Craftsmen extends Game {
             player.setData("canBuyCraftsman", () => false);
         }
 
+        player.setData("craftsmanCost", (old) => {
+            return [
+                ["wheat", old[0][1] + 2],
+                ["iron", old[1][1] + 1],
+            ];
+        });
+
         this.availableActions = [
             actions.PLACE_CRAFTSMAN,
             actions.MOVE_CRAFTSMAN,
         ];
         return this.sendGameDataToAll();
+    }
+
+    // region BUY TRADER
+    // @event
+    buyTrader({ publicId }) {
+        this.eventChecker(publicId, actions.BUY_CRAFTSMAN);
+        const player = this.getPlayer(publicId);
+        const hasTrader = player.getData("trader");
+
+        if (hasTrader)
+            throw new Error("Możesz posiadać tylko jednego handlarza");
+
+        this.payWithAmber(player, this.tradeUnlockCost);
+
+        const traderId = this.AVAILABLE_ID++;
+        const trader = new Craftsman(
+            publicId,
+            player.color,
+            traderId,
+            "trader",
+        );
+        this.craftsmen.set(traderId, trader);
+        this.craftsmenOwners.get(publicId).add(traderId);
+
+        player.setData("trader", () => true);
+
+        this.availableActions = [
+            actions.PLACE_CRAFTSMAN,
+            actions.MOVE_CRAFTSMAN,
+        ];
+
+        /*
+
+        gold jest na pozycji indeksi 4 [0-7]
+
+        11 obrotu = 7
+
+        */
+        const goldResourceIndex = this.outerPositions["gold"];
+        const visibleGoldField =
+            (goldResourceIndex + (this.outerCircleRotation % 8)) % 8;
+
+        return this.moveCraftsman({
+            publicId,
+            data: {
+                ringType: "outer",
+                fieldId: visibleGoldField,
+                craftsmanId: traderId,
+            },
+        });
     }
 
     // region BUILD GUILD
@@ -661,22 +1444,21 @@ export default class Craftsmen extends Game {
             throw new Error("W tej dzielnicy już znajduje się gildia");
         }
         const player = this.getPlayer(publicId);
-        const playerResources = player.getData("inventory");
 
-        for (const [resource, cost] of this.guildCost[ringType]) {
-            if (playerResources[resource] < cost)
-                throw new Error("Nie masz wystarczająco surowców.");
-        }
+        this.payWithAmber(player, player.getData("guildCost"));
 
-        for (const [resource, cost] of this.guildCost[ringType]) {
-            playerResources[resource] -= cost;
-        }
-
-        this.guilds[ringType][fieldId] = { hex: player.color.hex };
+        this.guilds[ringType][fieldId] = { hex: player.color.hex, publicId };
 
         this.availableActions = this.availableActions.filter(
             (action) => action !== actions.BUILD_GUILD,
         );
+
+        player.setData("guildCost", (oldGuildCost) => {
+            return [
+                ["stone", oldGuildCost[0][1] + 1],
+                ["brick", oldGuildCost[1][1] + 1],
+            ];
+        });
 
         return this.sendGameDataToAll();
     }
@@ -693,23 +1475,11 @@ export default class Craftsmen extends Game {
         }
 
         const player = this.getPlayer(publicId);
-        const playerResources = player.getData("inventory");
         const contractCost = contract.requirements;
 
-        for (const [resource, cost] of contractCost) {
-            if (playerResources[resource] < cost)
-                throw new Error("Nie masz wystarczająco surowców.");
-        }
-
-        for (const [resource, cost] of contractCost) {
-            playerResources[resource] -= cost;
-        }
+        this.payWithAmber(player, contractCost);
 
         player.setData("contracts", (contracts) => contracts + 1);
-
-        if (player.getData("contracts") >= 10) {
-            console.log("KONIEC GRY");
-        }
 
         contract.available = false;
 
@@ -721,10 +1491,25 @@ export default class Craftsmen extends Game {
             this.drawContracts();
         }
 
+        if (player.getData("contracts") >= 10) {
+            if (this.checkHiddenTask(player)) {
+                this.endGame();
+                return [
+                    {
+                        target: "lobby",
+                        eventName: "endGame",
+                        data: this.aggregateEndGameStats(),
+                    },
+                    ...this.sendGameDataToAll(),
+                ];
+            }
+        }
+
         return this.sendGameDataToAll();
     }
 
     //@event
+    // region REROLL
     rerollContract({ publicId, data: contractId }) {
         this.eventChecker(publicId, actions.REROLL_CONTRACT);
         const contract = this.currentContracts[contractId];
@@ -742,6 +1527,238 @@ export default class Craftsmen extends Game {
         player.setData("coins", (coins) => coins - 3);
 
         this.reroll(contractId);
+
+        player.setData("stats", (stats) => {
+            stats.rerolls += 1;
+            return stats;
+        });
+
+        return this.sendGameDataToAll();
+    }
+    //@event
+    // region sellInventoryItem
+    sellInventoryItem({ publicId, data: resource }) {
+        this.eventChecker(publicId, actions.SELL_INVENTORY);
+
+        const player = this.getPlayer(publicId);
+
+        if (player.getData("inventory")[resource] < 1) {
+            throw new Error("Nie posiadasz surowca do sprzedania");
+        }
+
+        player.setData("inventory", (inv) => {
+            inv[resource] -= 1;
+            return inv;
+        });
+
+        player.setData("coins", (coins) => coins + 1);
+
+        player.setData("stats", (stats) => {
+            stats.tradeSoldAmount += 1;
+            stats.tradesSold += 1;
+            return stats;
+        });
+
+        return this.sendGameDataToAll();
+    }
+
+    // @event
+    // region BUY RESOURCR
+    buyTrade({ publicId }) {
+        this.eventChecker(publicId, actions.TRADE);
+        const player = this.getPlayer(publicId);
+
+        if (!player.getData("trader")) {
+            throw new Error("Nie możesz handlować bez handlarza");
+        }
+
+        if (!player.getFreeInventorySpace()) {
+            throw new Error("Nie masz wystarczająco miejsca");
+        }
+
+        if (!player.getData("trading").allowBuying) {
+            throw new Error("Nie możesz kupować");
+        }
+
+        // znajdź handlarza
+        let ringType;
+        let fieldId;
+
+        const craftsmen = this.craftsmenOwners.get(publicId);
+
+        for (const craftstmanId of craftsmen) {
+            const craftsman = this.craftsmen.get(craftstmanId);
+            if (craftsman.type === "trader") {
+                fieldId = craftsman.fieldId;
+                ringType = craftsman.ringType;
+                break;
+            }
+        }
+
+        if (!ringType || !fieldId) {
+            throw new Error("Nie znaleziono handlarza");
+        }
+
+        let resource;
+
+        if (ringType === "outer") {
+            let rotatedIndex = fieldId - (this.outerCircleRotation % 8);
+            rotatedIndex = rotatedIndex < 0 ? 8 + rotatedIndex : rotatedIndex;
+            resource = this.outerPositionsIds[rotatedIndex].split("_")[0];
+        } else {
+            resource =
+                this.innerPositionsIds[
+                    (this.innerCircleRotation + fieldId) % 3
+                ];
+        }
+
+        const fieldAmount =
+            ringType === "outer"
+                ? this.outerFieldsResourcesAmount[fieldId]
+                : this.innerFieldsResourcesAmount[fieldId];
+
+        const buyAmount = 4 - fieldAmount;
+        const sellAmount =
+            ringType === "outer"
+                ? 2
+                : 8 - 2 * fieldAmount + Number(resource === "glass");
+
+        // sprawdź czy może kupić
+        if (ringType !== "outer")
+            throw new Error("Nie możesz kupować na tym polu");
+        if (player.getData("coins") < buyAmount)
+            throw new Error("Nie masz wystarczająco pieniędzy");
+
+        // kup
+        player.setData("coins", (coins) => coins - buyAmount);
+        player.setData("inventory", (inventory) => {
+            inventory[resource] += 1;
+            return inventory;
+        });
+
+        // Zaaktualizuj możliwość
+        let canBuy =
+            ringType === "outer" && player.getData("coins") >= buyAmount;
+
+        let canSell = player.getData("inventory")[resource] > 0;
+
+        const newTrade = {
+            buyAmount: ringType === "outer" ? buyAmount : 0,
+            sellAmount,
+            allowBuying: canBuy,
+            allowSelling: canSell,
+            resource,
+        };
+
+        player.setData("trading", () => newTrade);
+
+        player.setData("stats", (stats) => {
+            stats.tradesBought += 1;
+            stats.tradesBoughtAmount += buyAmount;
+            return stats;
+        });
+
+        return this.sendGameDataToAll();
+    }
+    // @event
+    // region SELL RESOURCR
+    sellTrade({ publicId }) {
+        this.eventChecker(publicId, actions.TRADE);
+        const player = this.getPlayer(publicId);
+
+        if (!player.getData("trader")) {
+            throw new Error("Nie możesz handlować bez handlarza");
+        }
+
+        if (!player.getData("trading").allowSelling) {
+            throw new Error("Nie możesz sprzedawać");
+        }
+
+        // znajdź handlarza
+        let ringType;
+        let fieldId;
+        console.log("==========================");
+        console.log("======szukamy handlarza========");
+        console.log("==========================");
+
+        console.log({ publicId });
+
+        const craftsmen = this.craftsmenOwners.get(publicId);
+
+        for (const craftstmanId of craftsmen) {
+            console.log("ID:");
+            console.log({ craftstmanId });
+
+            const craftsman = this.craftsmen.get(craftstmanId);
+            console.log(craftsman);
+
+            if (craftsman.type === "trader") {
+                fieldId = craftsman.fieldId;
+                ringType = craftsman.ringType;
+                break;
+            }
+        }
+
+        if (!ringType || !fieldId) {
+            throw new Error("Nie znaleziono handlarza");
+        }
+
+        let resource;
+
+        if (ringType === "outer") {
+            let rotatedIndex = fieldId - (this.outerCircleRotation % 8);
+            rotatedIndex = rotatedIndex < 0 ? 8 + rotatedIndex : rotatedIndex;
+            resource = this.outerPositionsIds[rotatedIndex].split("_")[0];
+        } else {
+            resource =
+                this.innerPositionsIds[
+                    (this.innerCircleRotation + fieldId) % 3
+                ];
+        }
+
+        const fieldAmount =
+            ringType === "outer"
+                ? this.outerFieldsResourcesAmount[fieldId]
+                : this.innerFieldsResourcesAmount[fieldId];
+
+        const buyAmount = 4 - fieldAmount;
+        const sellAmount =
+            ringType === "outer"
+                ? 2
+                : 8 - 2 * fieldAmount + Number(resource === "glass");
+
+        // sprawdź czy może sprzedać
+        if (player.getData("inventory")[resource] <= 0)
+            throw new Error("Nie masz wymaganego surowca");
+
+        // sprzedaj
+        player.setData("coins", (coins) => coins + sellAmount);
+        player.setData("inventory", (inventory) => {
+            inventory[resource] -= 1;
+            return inventory;
+        });
+
+        // Zaaktualizuj możliwość
+        let canBuy =
+            ringType === "outer" && player.getData("coins") >= buyAmount;
+
+        let canSell = player.getData("inventory")[resource] > 0;
+
+        const newTrade = {
+            buyAmount: ringType === "outer" ? buyAmount : 0,
+            sellAmount,
+            allowBuying: canBuy,
+            allowSelling: canSell,
+            resource,
+        };
+
+        player.setData("trading", () => newTrade);
+
+        player.setData("stats", (stats) => {
+            stats.tradesSold += 1;
+            stats.tradeSoldAmount += sellAmount;
+            return stats;
+        });
 
         return this.sendGameDataToAll();
     }

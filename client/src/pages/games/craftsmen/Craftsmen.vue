@@ -8,7 +8,7 @@ import { useGameResize } from "../composables_games/useGameResize";
 import Board from "./Board.vue";
 import useGameData from "./composables_craftsmen/useGameData";
 import Contracts from "./Contracts.vue";
-
+import EndGame from "./EndGame.vue";
 import HiddenGoal from "./HiddenGoal.vue";
 import Inventory from "./Inventory.vue";
 import NewTurn from "./NewTurn.vue";
@@ -16,11 +16,31 @@ import Players from "./Players.vue";
 import Rules from "./Rules.vue";
 import Trade from "./Trade.vue";
 import Turns from "./Turns.vue";
+import YourTurn from "./YourTurn.vue";
 
-const SOUNDTRACK_URL = "/sounds/brianboru/brian_boru_soundtrack.opus";
+const SOUNDTRACK_URL = "/sounds/craftsmen/soundtrack.mp3";
 usePageSounds({
     effects: [
-        { name: "click", poolSize: 3, url: "/sounds/brianboru/click.mp3" },
+        { name: "buttonPress1", poolSize: 2, url: "/sounds/craftsmen/buttonPress1.mp3" },
+        { name: "craft", poolSize: 2, url: "/sounds/craftsmen/craft.mp3" },
+        { name: "getResource", poolSize: 2, url: "/sounds/craftsmen/getResource.mp3" },
+        { name: "getResource2", poolSize: 2, url: "/sounds/craftsmen/getResource2.mp3" },
+        { name: "nextlevel", poolSize: 2, url: "/sounds/craftsmen/nextlevel.mp3" },
+        { name: "openBook", poolSize: 2, url: "/sounds/craftsmen/openBook.mp3" },
+        { name: "placeCard1", poolSize: 2, url: "/sounds/craftsmen/placeCard1.mp3" },
+        { name: "rocks", poolSize: 2, url: "/sounds/craftsmen/rocks.mp3" },
+        { name: "selectCraftsman", poolSize: 2, url: "/sounds/craftsmen/selectCraftsman.mp3" },
+        { name: "sell", poolSize: 7, url: "/sounds/craftsmen/sell.mp3" },
+        { name: "spendMoney", poolSize: 7, url: "/sounds/craftsmen/spendMoney.mp3" },
+        { name: "takeResource", poolSize: 3, url: "/sounds/craftsmen/takeResource.mp3" },
+        { name: "takeResource2", poolSize: 2, url: "/sounds/craftsmen/takeResource2.mp3" },
+        { name: "takeResource3", poolSize: 2, url: "/sounds/craftsmen/takeResource3.mp3" },
+        { name: "takeResource4", poolSize: 2, url: "/sounds/craftsmen/takeResource4.mp3" },
+        { name: "takeResource5", poolSize: 2, url: "/sounds/craftsmen/takeResource5.mp3" },
+        { name: "takeResource6", poolSize: 2, url: "/sounds/craftsmen/takeResource6.mp3" },
+        { name: "takeResource7", poolSize: 2, url: "/sounds/craftsmen/takeResource7.mp3" },
+        { name: "takeResource8", poolSize: 2, url: "/sounds/craftsmen/takeResource8.mp3" },
+
     ],
     music: [{ name: "soundtrack", url: SOUNDTRACK_URL }],
 });
@@ -28,7 +48,7 @@ usePageSounds({
 const { scale } = useGameResize();
 const { isPaused } = useGamePause();
 
-const { gameData } = useGameData();
+const { gameData, endGameData } = useGameData();
 
 const turnInfo = {
     player: {
@@ -45,37 +65,76 @@ const turnInfo = {
     <Settings />
     <PauseScreen v-if="isPaused" />
     <PlaySoundtrack :url="SOUNDTRACK_URL" />
+    
     <div class="background">
         <div
             v-if="gameData"
             class="game"
             :style="{ transform: `scale(${scale}) translate(-50%, -50%)` }"
         >
-            <HiddenGoal
-                :hiddenTask="gameData.you.hiddenTask"
-            />
+           <EndGame v-if="endGameData" :endGameData="endGameData" :lobby-id="gameData.lobbyId"/>
+            <HiddenGoal 
+            v-if="!endGameData":hidden-task="gameData.you.hiddenTask" />
+            <YourTurn 
+            v-if="!endGameData":is-your-turn="gameData.isYourTurn" />
+          
             <div class="board-wrap">
-                <Board 
-                    :outerCircleRotation="gameData.outerCircleRotation" 
-                    :innerCircleRotation="gameData.innerCircleRotation"
-                    :innerPositions="gameData.innerPositions"
-                    :outerPositions="gameData.outerPositions"
-                    :availableActions="gameData.availableActions"
-                    :availableMovement="gameData.availableMovement"
+                <Board
+                v-if="!endGameData"
+                    :outer-circle-rotation="gameData.outerCircleRotation"
+                    :inner-circle-rotation="gameData.innerCircleRotation"
+                    :inner-positions="gameData.innerPositions"
+                    :outer-positions="gameData.outerPositions"
+                    :available-actions="gameData.availableActions"
+                    :available-movement="gameData.availableMovement"
                     :guilds="gameData.guilds"
-                    :outerPathCraftsmen="gameData.outerPathCraftsmen"
-                    :innerPathCraftsmen="gameData.innerPathCraftsmen"
+                    :outer-path-craftsmen="gameData.outerPathCraftsmen"
+                    :inner-path-craftsmen="gameData.innerPathCraftsmen"
                     :you="gameData.you"
                     :guild-cost="gameData.guildCost"
+                    :is-your-turn="gameData.isYourTurn"
                 />
             </div>
-            <Inventory :you="gameData.you" :available-actions="gameData.availableActions"/>
-            <Trade :you="gameData.you" :tradeUnlockCost="gameData.tradeUnlockCost"/>
-            <Contracts :contracts="gameData.contracts" :reroll-cost="gameData.rerollCost" :you="gameData.you" :availableActions="gameData.availableActions" :canReroll="gameData.canReroll"/>
-            <Players :players="gameData.players" :you="gameData.you"/>
-            <Turns :player="gameData.currentPlayer" :round="gameData.round" :turn="gameData.turn" />
-            <Rules />
-            <NewTurn :availableActions="gameData.availableActions" :is-your-turn="gameData.isYourTurn"/>
+            <Inventory
+            v-if="!endGameData"
+                :you="gameData.you"
+                :available-actions="gameData.availableActions"
+            />
+            <Trade
+            v-if="!endGameData"
+                :you="gameData.you"
+                :trade-unlock-cost="gameData.tradeUnlockCost"
+                :available-actions="gameData.availableActions"
+                :is-your-turn="gameData.isYourTurn"
+            />
+            <Contracts
+            v-if="!endGameData"
+                :contracts="gameData.contracts"
+                :reroll-cost="gameData.rerollCost"
+                :you="gameData.you"
+                :available-actions="gameData.availableActions"
+                :can-reroll="gameData.canReroll"
+            />
+            <Players
+            v-if="!endGameData"
+                :current-player-index="gameData.currentPlayerIndex"
+                :players="gameData.players"
+                :you="gameData.you"
+            />
+            <Turns
+            v-if="!endGameData"
+                :is-your-turn="gameData.isYourTurn"
+                :player="gameData.currentPlayer"
+                :round="gameData.round"
+                :turn="gameData.turn"
+            />
+            <Rules 
+            v-if="!endGameData"/>
+            <NewTurn
+            v-if="!endGameData"
+                :available-actions="gameData.availableActions"
+                :is-your-turn="gameData.isYourTurn"
+            />
         </div>
     </div>
 </template>
@@ -125,17 +184,12 @@ const turnInfo = {
     width: 100%;
     height: 100%;
 }
-
 </style>
 <style>
 .v-toast__item--error {
     border: 3px solid #ffffff;
 
-    background: linear-gradient(
-        180deg,
-        rgb(17, 17, 17) 0%,
-        rgb(3, 3, 3) 100%
-    );
+    background: linear-gradient(180deg, rgb(17, 17, 17) 0%, rgb(3, 3, 3) 100%);
 
     border-radius: 0.5rem;
     color: #f4ecd0;
@@ -144,7 +198,6 @@ const turnInfo = {
     font-size: clamp(0.25rem, 0rem + 1vw, 1.5rem);
 
     padding: 0rem clamp(0.75em, 0.45em + 1.5vw, 2.25em);
-
 
     .v-toast__icon {
         display: none;

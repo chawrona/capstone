@@ -80,6 +80,10 @@ export default class LobbyEvents {
             const user = this.userManager.getUser(userId);
 
             if (process.env.DEVELOPMENT === "true") {
+                console.log(process.env.DEVELOPMENT);
+
+                console.log("Hello?");
+
                 user.color = {
                     name:
                         lobby.users.size === 1

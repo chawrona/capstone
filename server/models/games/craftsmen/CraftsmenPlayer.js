@@ -21,35 +21,41 @@ export default class CraftsmenPlayer extends Player {
         });
         this.setData("craftsmanCost", () => {
             return [
-                ["wheat", 2],
-                ["iron", 1],
+                ["wheat", 3],
+                ["iron", 2],
             ];
         });
         this.setData("cartCost", () => {
             return [["wood", 1]];
         });
+        this.setData("guildCost", () => {
+            return [
+                ["stone", 1],
+                ["brick", 2],
+            ];
+        });
         this.setData("rotateCost", () => [["iron", 1]]);
-        this.setData("coins", () => 15);
-        this.setData("maxInventorySpace", () => 8);
+        this.setData("coins", () => 135);
+        this.setData("maxInventorySpace", () => 6);
         this.setData("canBuyCraftsman", () => true);
         this.setData("canBuyCart", () => true);
         this.setData("inventory", () => {
             const resources = {
-                wood: 1,
-                stone: 3,
+                wood: 2,
+                stone: 2,
                 wheat: 2,
-                brick: 3,
+                brick: 2,
                 iron: 2,
-                glass: 0,
-                amber: 0,
-                silk: 0,
+                glass: 2,
+                amber: 2,
+                silk: 4,
             };
-            if (this.turnOrder === 1) resources.wheat = 1;
-            if (this.turnOrder === 2) resources.wood = 1;
-            if (this.turnOrder === 3) {
-                resources.wood = 1;
-                resources.wheat = 1;
-            }
+            // if (this.data.turnOrder === 1) resources.wheat = 1;
+            // if (this.data.turnOrder === 2) resources.wood = 1;
+            // if (this.data.turnOrder === 3) {
+            //     resources.wood = 1;
+            //     resources.wheat = 1;
+            // }
             return resources;
         });
 
@@ -58,6 +64,29 @@ export default class CraftsmenPlayer extends Player {
                 () => Math.random() - 0.5,
             )[0];
         });
+
+        this.setData("stats", () => ({
+            resourcesGained: {
+                wood: 0,
+                stone: 0,
+                wheat: 0,
+                brick: 0,
+                iron: 0,
+                glass: 0,
+                amber: 0,
+                silk: 0,
+            },
+            coinsFromGuild: 0,
+            coinsFromStanding: 0,
+            coinsPaidToOthers: 0,
+            rotations: 0,
+            rerolls: 0,
+            amberSpent: 0,
+            tradesBought: 0,
+            tradeSoldAmount: 0,
+            tradesBoughtAmount: 0,
+            tradesSold: 0,
+        }));
     }
 
     getFreeInventorySpace() {

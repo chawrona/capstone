@@ -2,319 +2,283 @@ const contracts = [
     // EARLY GAME
     [
         {
-            title: "Proste narzędzia",
-            requirements: [
-                ["iron", 2],
-                ["wood", 1],
-            ],
+            title: "Świerkowa szafa",
+            requirements: [["wood", 3]],
             available: true,
-            icon: "proste_narzedzia",
+            icon: "1.png",
         },
         {
-            title: "Ceglany piec",
+            title: "Kamienna ścieżka",
+            requirements: [["stone", 3]],
+            available: true,
+            icon: "2.png",
+        },
+        {
+            title: "Kamienne fundamenty",
+            requirements: [["stone", 4]],
+            available: true,
+            icon: "3.png",
+        },
+        {
+            title: "Ceglany mur",
             requirements: [["brick", 4]],
             available: true,
-            icon: "ceglany_piec",
+            icon: "4.png",
         },
         {
-            title: "Kamienna studnia",
-            requirements: [
-                ["stone", 3],
-                ["wood", 1],
-            ],
+            title: "Żeliwne zawiasy",
+            requirements: [["iron", 3]],
             available: true,
-            icon: "kamienna_studnia",
+            icon: "5.png",
         },
         {
-            title: "Wóz z prowiantem",
-            requirements: [
-                ["wood", 2],
-                ["wheat", 2],
-            ],
-            available: true,
-            icon: "woz_z_prowiantem",
-        },
-        {
-            title: "Dębowy stół",
-            requirements: [["wood", 4]],
-            available: true,
-            icon: "debowy_stol",
-        },
-        {
-            title: "Drewniany płot",
+            title: "Wózek",
             requirements: [
                 ["wood", 3],
                 ["iron", 1],
             ],
             available: true,
-            icon: "drewniany_plot",
+            icon: "6.png",
         },
         {
-            title: "Kamienne palenisko",
-            requirements: [["stone", 4]],
-            available: true,
-            icon: "kamienne_palenisko",
-        },
-        {
-            title: "Mała stodoła",
+            title: "Studnia",
             requirements: [
-                ["wood", 3],
-                ["brick", 2],
+                ["wood", 2],
+                ["stone", 2],
             ],
             available: true,
-            icon: "mala_stodola",
+            icon: "7.png",
         },
         {
-            title: "Żelazne okucia",
+            title: "Dębowa szafa",
+            requirements: [["wood", 5]],
+            available: true,
+            icon: "8.png",
+        },
+        {
+            title: "Palenisko",
+            requirements: [
+                ["stone", 2],
+                ["wood", 2],
+            ],
+            available: true,
+            icon: "9.png",
+        },
+        {
+            title: "Jesionowy stół",
+            requirements: [["wood", 4]],
+            available: true,
+            icon: "10.png",
+        },
+        {
+            title: "Narzędzia",
             requirements: [
                 ["iron", 3],
-                ["brick", 1],
-            ],
-            available: true,
-            icon: "zelazne_okucia",
-        },
-        {
-            title: "Zapasy na zimę",
-            requirements: [
-                ["wheat", 4],
                 ["wood", 1],
             ],
             available: true,
-            icon: "zapasy_na_zime",
+            icon: "11.png",
         },
         {
-            title: "Solidne fundamenty",
-            requirements: [
-                ["stone", 3],
-                ["brick", 2],
-            ],
+            title: "Kupka drewna",
+            requirements: [["wood", 2]],
             available: true,
-            icon: "solidne_fundamenty",
-        },
-        {
-            title: "Drewniany mostek",
-            requirements: [
-                ["wood", 4],
-                ["stone", 1],
-            ],
-            available: true,
-            icon: "drewniany_mostek",
+            icon: "12.png",
         },
     ],
     // MID GAME
     [
         {
-            title: "Dębowa szafa",
-            requirements: [
-                ["wood", 5],
-                ["iron", 1],
-            ],
+            title: "Żelazny pług",
+            requirements: [["iron", 5]],
             available: true,
-            icon: "debowa_szafa",
+            icon: "13.png",
         },
         {
-            title: "Ceglany mur",
-            requirements: [
-                ["brick", 5],
-                ["stone", 2],
-            ],
-            available: true,
-            icon: "ceglany_mur",
-        },
-        {
-            title: "Żelazna brama",
-            requirements: [
-                ["iron", 4],
-                ["stone", 2],
-            ],
-            available: true,
-            icon: "zelazna_brama",
-        },
-        {
-            title: "Wygodne łoże",
+            title: "Most",
             requirements: [
                 ["wood", 4],
+                ["iron", 2],
+            ],
+            available: true,
+            icon: "14.png",
+        },
+        {
+            title: "Stoisko",
+            requirements: [
                 ["silk", 1],
-            ],
-            available: true,
-            icon: "wygodne_loze",
-        },
-        {
-            title: "Warsztat kowala",
-            requirements: [
-                ["brick", 4],
-                ["iron", 3],
-            ],
-            available: true,
-            icon: "warsztat_kowala",
-        },
-        {
-            title: "Kamienny pomnik",
-            requirements: [["stone", 6]],
-            available: true,
-            icon: "kamienny_pomnik",
-        },
-        {
-            title: "Stragan kupiecki",
-            requirements: [
-                ["wood", 5],
-                ["silk", 1],
-            ],
-            available: true,
-            icon: "stragan_kupiecki",
-        },
-        {
-            title: "Miejski spichlerz",
-            requirements: [
-                ["brick", 5],
-                ["wheat", 3],
-            ],
-            available: true,
-            icon: "miejski_spichlerz",
-        },
-        {
-            title: "Żelazny pług",
-            requirements: [
-                ["iron", 5],
                 ["wood", 2],
             ],
             available: true,
-            icon: "zelazny_plug",
+            icon: "15.png",
         },
         {
-            title: "Brukowana ulica",
+            title: "Parter gospody",
+            requirements: [["stone", 6]],
+            available: true,
+            icon: "16.png",
+        },
+        {
+            title: "Ceglany dach",
             requirements: [
-                ["stone", 5],
+                ["brick", 4],
+                ["stone", 2],
+            ],
+            available: true,
+            icon: "17.png",
+        },
+        {
+            title: "Stodoła",
+            requirements: [["wood", 8]],
+            available: true,
+            icon: "18.png",
+        },
+        {
+            title: "Dzwon",
+            requirements: [
+                ["iron", 4],
+                ["wood", 3],
+            ],
+            available: true,
+            icon: "19.png",
+        },
+        {
+            title: "Ceglany piec",
+            requirements: [
+                ["brick", 6],
+                ["stone", 1],
+            ],
+            available: true,
+            icon: "20.png",
+        },
+        {
+            title: "Żelazna brama",
+            requirements: [["iron", 4]],
+            available: true,
+            icon: "21.png",
+        },
+        {
+            title: "Piec",
+            requirements: [
+                ["stone", 4],
                 ["iron", 1],
             ],
             available: true,
-            icon: "brukowana_ulica",
+            icon: "22.png",
         },
         {
-            title: "Solidna karczma",
-            requirements: [
-                ["wood", 4],
-                ["brick", 4],
-            ],
+            title: "Obelisk",
+            requirements: [["stone", 6]],
             available: true,
-            icon: "solidna_karczma",
+            icon: "23.png",
         },
         {
-            title: "Miedziany dzwon",
+            title: "Łóżko",
             requirements: [
-                ["iron", 4],
-                ["brick", 3],
+                ["silk", 2],
+                ["wood", 2],
             ],
             available: true,
-            icon: "miedziany_dzwon",
+            icon: "24.png",
         },
     ],
     // LATE GAME
     [
         {
-            title: "Marmurowa łazienka",
+            title: "Fontanna",
             requirements: [
-                ["stone", 4],
-                ["glass", 1],
-            ],
-            available: true,
-            icon: "marmurowa_lazienka",
-        },
-        {
-            title: "Katedralny witraż",
-            requirements: [
+                ["stone", 8],
                 ["glass", 2],
-                ["iron", 3],
             ],
             available: true,
-            icon: "katedralny_witraz",
+            icon: "25.png",
         },
         {
-            title: "Jedwabny gobelin",
+            title: "Tron",
             requirements: [
-                ["silk", 3],
-                ["wood", 3],
+                ["silk", 4],
+                ["iron", 2],
             ],
             available: true,
-            icon: "jedwabny_gobelin",
+            icon: "26.png",
         },
         {
-            title: "Pałacowa fontanna",
+            title: "Szklarnia",
             requirements: [
-                ["stone", 6],
-                ["glass", 1],
+                ["glass", 5],
+                ["stone", 4],
             ],
             available: true,
-            icon: "palacowa_fontanna",
+            icon: "27.png",
         },
         {
-            title: "Królewski tron",
-            requirements: [["silk", 5]],
-            available: true,
-            icon: "krolewski_tron",
-        },
-        {
-            title: "Szklarnia herbowa",
+            title: "Królewskie łoże",
             requirements: [
-                ["glass", 3],
-                ["silk", 3],
-            ],
-            available: true,
-            icon: "szklarnia_herbowa",
-        },
-        {
-            title: "Dworska sypialnia",
-            requirements: [
+                ["wood", 8],
                 ["silk", 2],
-                ["wood", 6],
             ],
             available: true,
-            icon: "dworska_sypialnia",
+            icon: "28.png",
         },
         {
             title: "Obserwatorium",
             requirements: [
-                ["glass", 2],
-                ["stone", 5],
-            ],
-            available: true,
-            icon: "obserwatorium",
-        },
-        {
-            title: "Lustrzana sala",
-            requirements: [
-                ["glass", 3],
-                ["stone", 4],
-            ],
-            available: true,
-            icon: "lustrzana_sala",
-        },
-        {
-            title: "Złocony powóz",
-            requirements: [
-                ["wood", 6],
-                ["iron", 4],
-            ],
-            available: true,
-            icon: "zlocony_powoz",
-        },
-        {
-            title: "Wielka katedra",
-            requirements: [
-                ["stone", 7],
+                ["stone", 8],
                 ["glass", 2],
             ],
             available: true,
-            icon: "wielka_katedra",
+            icon: "29.png",
+        },
+        {
+            title: "Szlacheckie lustro",
+            requirements: [["glass", 8]],
+            available: true,
+            icon: "30.png",
+        },
+        {
+            title: "Witraż",
+            requirements: [
+                ["glass", 4],
+                ["amber", 4],
+            ],
+            available: true,
+            icon: "31.png",
         },
         {
             title: "Królewskie szaty",
+            requirements: [["silk", 7]],
+            available: true,
+            icon: "32.png",
+        },
+        {
+            title: "Odnowa katedry",
+            requirements: [["stone", 10]],
+            available: true,
+            icon: "33.png",
+        },
+        {
+            title: "Marmurowa wanna",
             requirements: [
-                ["silk", 4],
-                ["iron", 1],
+                ["stone", 6],
+                ["amber", 4],
             ],
             available: true,
-            icon: "krolewskie_szaty",
+            icon: "34.png",
+        },
+        {
+            title: "Gobelin",
+            requirements: [
+                ["silk", 6],
+                ["amber", 3],
+            ],
+            available: true,
+            icon: "35.png",
+        },
+        {
+            title: "Karoca",
+            requirements: [["iron", 12]],
+            available: true,
+            icon: "36.png",
         },
     ],
 ];

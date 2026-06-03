@@ -119,22 +119,57 @@ UI:
 - ściąć 3 do 2 DONE
 - kontrakty na 3 grupy podzielić po 12 kontraktów. DONE
 - dodać pola łączone dla żelaza i cegieł oraz zboża - losować to. DONE
-
+1. w nowej turze obliczane są dostępne ruchy dla każdego z graczy
+* zasięg pionków - 1
 - rzeczywiste pola gdzie możesz iść -> opłaty za graczy i gildie
 * poruszanie się po środku - tyle zboża ile liczba na polu.
-* zasięg pionków - 1
-
-
-
+pobieranie monet i zboża za chodzenie. Dawanie tego innym graczom.
 - mechanika handlarza
-* różny wygląd handlarzy
 * luksusowe surowce tylko do sprzedaży
 * sprzedajesz i kupujesz tylko tam gdzie stoisz, ale musisz się ruszyć
-
-
+* różny wygląd handlarzy(DONE)
+- DOBITNIE POKAZAĆ, ŻE JEST TWOJA TURA 
+- progresywne koszty gildii DONE
 - amber - luksusowa mechanika
 - pobieranie zboża i zabijanie rzemieślników co 4 tury
-- co jak jakiś debil się zablokuje z surowcami i nie ma jak wózka zrobić i jak ich wydać (?)
+- dokończyć usuwanie craftsmanów z gry
+- animacja wymiany kart
+- fajne statystykami
+- UKRYTE KONTAKTY MUSZĄ BYĆ SPEŁNIONE
+- zakończenie gry
+1. Co dokładnie odsyła backend po zakończeniu gry
+2. Co się wyświetla na froncie po zakończeniu gry
+3. ładne wyświetlanie statystyk i tego kto wygrał
+- szkło troszeńkę droższe do sprzedaży
+- handlarze lekko ciemniejsi (?)
+- dźwięki
+    soundtrack
+    kup rzemieślnika
+    kup miejsce w eq
+    otwórz książkę
+    sprzedaj/kup
+    kliknij na osadnika
+
+    dźwięk obrotu planszy
+    reroll kontraktu
+    użyj kontraktu
+    wymiana wszystkich kontraktów
+    Zakończ ruch
+    nowa tura
+    dostajesz surowiec
+    zabierają Ci surowiec
+    rusz się osadnikiem:
+    - tartak
+    - kopalnia
+    - żelazo
+    - cegły
+    - zboże
+    - handlowa
+    - szkło
+    - bursztyn
+    - jedwab
+- ikony dla kontraktów
+- w dowolnej chwili klikasz na eq na item i sprzedajesz go za 1 monetę.
 
 
 Koszty:

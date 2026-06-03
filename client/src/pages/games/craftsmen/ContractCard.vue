@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch, nextTick } from "vue";
 
 import Brick from "@/assets/games/gameAssets/craftsmen/Brick.png";
 import Coins from "@/assets/games/gameAssets/craftsmen/coins.png";
@@ -7,49 +7,112 @@ import Reroll from "@/assets/games/gameAssets/craftsmen/Reroll.png";
 import Stone from "@/assets/games/gameAssets/craftsmen/Stone.png";
 import Wheat from "@/assets/games/gameAssets/craftsmen/wheat.png";
 import Wood from "@/assets/games/gameAssets/craftsmen/Wood.png";
+
 import { resourceImages } from "./composables_craftsmen/pathImages";
 import { useGameActions } from "./composables_craftsmen/useGameActions";
+import { soundBus } from "../../../audio/soundBus";
 
-const props = defineProps(["contract", "availableActions", "you", "rerollCost", "id", "canReroll"]);
+const props = defineProps([
+    "contract",
+    "availableActions",
+    "you",
+    "rerollCost",
+    "id",
+    "canReroll",
+]);
 
-const { rerollContract, completeContract } = useGameActions(() => props.availableActions)
+const { completeContract, rerollContract } = useGameActions(
+    () => props.availableActions,
+);
+
+const icons = import.meta.glob('@/assets/games/gameAssets/craftsmen/contracts/*.png', { 
+  eager: true, 
+  import: 'default' 
+});
+
+const getIconPath = (iconName) => {
+  const path = `/src/assets/games/gameAssets/craftsmen/contracts/${iconName}`;
+  return icons[path] || '';
+};
+
+
+const animClass = ref('');
+const displayContract = ref({ ...props.contract });
+
+watch(() => props.contract, async (newVal, oldVal) => {
+  if (newVal.title === oldVal?.title && newVal.available === oldVal?.available) {
+    displayContract.value = { ...newVal };
+    return;
+  }
+  
+  if (!newVal.available) {
+    soundBus.playEffect("craft");
+    displayContract.value = { ...newVal };
+    return;
+  }
+
+  animClass.value = 'fly-out';
+  await new Promise(r => setTimeout(r, 320));
+  displayContract.value = { ...newVal };
+  animClass.value = '';
+  await nextTick();
+  animClass.value = 'fly-in';
+
+  const FLY_IN_DURATION = 320;
+  setTimeout(() => {
+    soundBus.playEffect("placeCard");
+  }, FLY_IN_DURATION * 0.8);
+});
 
 const canReroll = computed(() => {
     return props.you.coins >= props.rerollCost;
-})
+});
 
 const canCompleteContract = computed(() => {
+    let missingResources = 0;
+    const inventory = props.you.inventory;
+
     for (const [resource, cost] of props.contract.requirements) {
-        if (props.you.inventory[resource] < cost) {
-            return false;
+        const available = inventory[resource] || 0;
+        if (available < cost) {
+            missingResources += cost - available;
         }
     }
-    return true;
-})
+
+    return missingResources <= (inventory.amber || 0);
+});
 
 const localCompleteContract = () => {
-    if (!canCompleteContract.value) return
-    completeContract(props.id)
-}
-
+    if (!canCompleteContract.value) return;
+    completeContract(props.id);
+};
 </script>
 
 <template>
-    <div class="card" :class="{ hidden: !props.contract.available }">
-        <button v-if="props.canReroll" class="reroll" @click="() => rerollContract(props.id)" :disabled="!canReroll">
-            <img :src="Reroll" alt="" class="reroll-icon"/>
+  <div class="card" :class="[animClass, { hidden: !displayContract.available }]">
+        <button
+            v-if="props.canReroll"
+            class="reroll"
+            :disabled="!canReroll"
+            @click="() => rerollContract(props.id)"
+        >
+            <img :src="Reroll" alt="" class="reroll-icon" />
             {{ props.rerollCost }}
             <img :src="Coins" alt="" />
         </button>
 
-        <div class="wrap" :class="{disable: !canCompleteContract}" @click="localCompleteContract">
-            <h1 class="title">{{ props.contract.title }}</h1>
+        <div
+            class="wrap"
+            :class="[animClass, { disable: !canCompleteContract }]"
+            @click="localCompleteContract"
+        >
+            <h1 class="title">{{ displayContract.title }}</h1>
 
-            <img :src="Wood" alt="" class="cardIcon" />
+            <img :src="getIconPath(displayContract.icon)" alt="" class="cardIcon" />
 
             <div class="top">
                 <div
-                    v-for="([resource, amount]) in props.contract.requirements"
+                    v-for="[resource, amount] in displayContract.requirements"
                     :key="resource"
                     :class="{ smallerImg: true }"
                 >
@@ -73,7 +136,6 @@ const localCompleteContract = () => {
 
     aspect-ratio: 5 / 7;
 
-
     font-size: 1.8rem;
     font-weight: bold;
     color: white;
@@ -89,23 +151,20 @@ const localCompleteContract = () => {
     justify-content: space-between;
     align-items: center;
     height: 100%;
-   
+
     box-shadow: 3px 3px 3px 0px rgba(51, 48, 48, 0.671);
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
 
-    
-
     background-image: url("/src/assets/games/gameAssets/craftsmen/board2.png");
 
     &.disable {
-       
-         cursor: not-allowed;
+        cursor: not-allowed;
 
-         .cardIcon {
+        .cardIcon {
             opacity: 0.5;
-         }
+        }
     }
 
     &:not(.disable):hover {
@@ -127,8 +186,6 @@ const localCompleteContract = () => {
 .za {
     font-size: 1.25rem;
 }
-
-
 
 .top {
     display: flex;
@@ -153,7 +210,7 @@ const localCompleteContract = () => {
 .top .smallerImg {
     display: flex;
     gap: 0.25rem;
-     transform: translateY(-px);
+    transform: translateY(-px);
     img {
         transform: translateY(2px);
         width: 2rem;
@@ -165,12 +222,10 @@ const localCompleteContract = () => {
     justify-content: center;
     position: absolute;
     align-items: center;
-    
     top: -3.25rem;
     border: none;
     height: 2.75rem;
-     aspect-ratio: 671 / 205;
-    
+    aspect-ratio: 671 / 205;
     padding: 0.75rem;
     font-size: 1.3rem;
     font-weight: bold;
@@ -201,4 +256,19 @@ const localCompleteContract = () => {
         transform: translateY(-0.5px);
     }
 }
+
+@keyframes flyOut {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  20%  { transform: translate(6px, -20px) rotate(1deg); opacity: 1; }
+  100% { transform: translate(120vw, -30px) rotate(8deg); opacity: 0; }
+}
+@keyframes flyIn {
+  0%   { transform: translate(120vw, -30px) rotate(8deg); opacity: 0; }
+  80%  { transform: translate(6px, -20px) rotate(1deg); opacity: 1; }
+  100% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+}
+
+.wrap.fly-out { animation: flyOut 0.32s cubic-bezier(.4, 0, .6, 1) forwards; }
+.wrap.fly-in  { animation: flyIn  0.32s cubic-bezier(.4, 0, .6, 1) forwards; }
+
 </style>

@@ -1,22 +1,31 @@
 <script setup>
-import { resourceImages } from "./composables_craftsmen/pathImages";
+import { resourceImages } from "./composables_craftsmen/pathImages.js";
+import { useResourceFlyIn } from "./composables_craftsmen/useResourceFlyIn.js";
 import Craftsman from "./Craftsman.vue";
 
-const props = defineProps(["players", "you"]);
+const props = defineProps(["players", "you", "currentPlayerIndex"]);
+const { flyingIn } = useResourceFlyIn(() => props.players);
 
-
-const resources = (resources) => {
-     const items = Object.entries(resources)
-        .flatMap(([name, count]) => Array(count).fill(name));
-    return [...items];
-}
-
-
+const resourcesWithKeys = (inv, publicId) =>
+    Object.entries(inv).flatMap(([name, count]) =>
+        Array.from({ length: count }, (_, i) => ({
+            key: `${publicId}:${name}:${i}`,
+            name,
+        })),
+    );
 </script>
+
 <template>
     <div class="players">
-   
-        <div v-for="(player, index) in props.players" :key="index" class="player">
+        <div
+            class="point"
+            :style="`--index: ${props.currentPlayerIndex}`"
+        ></div>
+        <div
+            v-for="(player, index) in props.players"
+            :key="index"
+            class="player"
+        >
             <div class="player-name">
                 <div class="contracts">
                     <div
@@ -26,9 +35,9 @@ const resources = (resources) => {
                     />
                 </div>
 
+                <span class="coins-amount">{{ player.coins }}</span>
+                <img :src="resourceImages['coins']" alt="" class="coins" />
                 <span v-if="player.publicId === props.you.publicId">(Ty)</span>
-                <span class="coins-amount" v-if="player.publicId !== props.you.publicId">{{ player.coins }}</span>
-                <img :src="resourceImages['coins']" alt="" class="coins" v-if="player.publicId !== props.you.publicId">
                 <h1>{{ player.username }}</h1>
                 <Craftsman
                     v-for="(craftsmen, c) in player.craftsmen"
@@ -38,15 +47,22 @@ const resources = (resources) => {
                     :clickable="true"
                 />
             </div>
-          
-            <div class="inventory" v-if="player.publicId !== props.you.publicId">
-                <div
-                    v-for="(resource, i) in resources(player.inventory)"
-                    :key="i"
-                    class="resource"
-                    :data-resource="resource"
-                />
-            </div>  
+
+            <div class="inventory">
+                <TransitionGroup name="res">
+                    <div
+                        v-for="{ name, key } in resourcesWithKeys(
+                            player.inventory,
+                            player.publicId,
+                        )"
+                        :key="key"
+                        class="resource"
+                        :data-fly-key="key"
+                        :data-resource="name"
+                        :class="{ 'fly-in': flyingIn.has(key) }"
+                    />
+                </TransitionGroup>
+            </div>
         </div>
     </div>
 </template>
@@ -59,13 +75,13 @@ const resources = (resources) => {
     justify-content: center;
 
     gap: 1.5rem;
-    padding-block: 1rem;
+
     position: absolute;
-    top: 20rem;
-    right: 1rem;
+    top: 20%;
+
+    right: 2.6rem;
 
     color: rgb(0, 0, 0);
-    height: 9rem;
 
     .player {
         display: flex;
@@ -74,7 +90,6 @@ const resources = (resources) => {
         justify-content: center;
         gap: 0.25rem;
         font-size: 1.5rem;
-     
 
         &-name {
             display: flex;
@@ -105,7 +120,7 @@ const resources = (resources) => {
 
         .coins {
             margin-left: -0.15rem;
-             width: 1.6rem;
+            width: 1.6rem;
             height: 1.6rem;
         }
     }
@@ -120,7 +135,6 @@ const resources = (resources) => {
     }
 
     .contract {
-        
         height: 1.8rem;
         aspect-ratio: 5 / 7;
         background-color: white;
@@ -170,5 +184,47 @@ const resources = (resources) => {
     &[data-resource="glass"] {
         background-image: url("/src/assets/games/gameAssets/craftsmen/glass.png");
     }
+}
+
+.point {
+    position: absolute;
+    top: 0;
+    right: -0.25rem;
+    transform: translateX(100%)
+        translateY(calc(0.35rem + var(--index) * 5.5rem));
+    width: 2rem;
+    height: 2rem;
+
+    transition: transform 0.2s;
+    background-image: url("/src/assets/games/gameAssets/craftsmen/glasshour.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+@keyframes resource-fly-in {
+    0% {
+        transform: translate(var(--ox, 0px), var(--oy, 0px)) scale(2.5);
+        opacity: 0.9;
+        filter: drop-shadow(0 0 10px gold) brightness(1.5);
+        z-index: 999;
+    }
+    30% {
+        opacity: 1;
+    }
+    80% {
+        transform: translate(0, 0) scale(1.1);
+        filter: drop-shadow(2px 2px 5px black);
+    }
+    100% {
+        transform: translate(0, 0) scale(1);
+        filter: drop-shadow(2px 2px 5px black);
+    }
+}
+
+.resource.fly-in {
+    animation: resource-fly-in 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    position: relative;
+    z-index: 100;
 }
 </style>

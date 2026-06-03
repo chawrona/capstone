@@ -1,164 +1,200 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 
-import { pathImages } from "./composables_craftsmen/pathImages";
-import { resourceImages } from "./composables_craftsmen/pathImages";
 import Arrow from "@/assets/games/gameAssets/craftsmen/Arrow.png";
 
-import Craftsman from "./Craftsman.vue";
-import { useGameActions } from "./composables_craftsmen/useGameActions";
 import actions from "../../../../../server/models/games/craftsmen/config.js/actions";
+import { pathImages } from "./composables_craftsmen/pathImages";
+import { resourceImages } from "./composables_craftsmen/pathImages";
+import { useGameActions } from "./composables_craftsmen/useGameActions";
+import Craftsman from "./Craftsman.vue";
+import { soundBus } from "../../../audio/soundBus";
 
-const props = defineProps(
-    [
-        "innerCircleRotation", 
-        "outerCircleRotation",
-        "outerPositions", 
-        "innerPositions", 
-        "availableActions",
-        "outerPathCraftsmen",
-        "innerPathCraftsmen",
-        "guilds",
-        "availableMovement",
-        "you",
-        "guildCost"
-    ]
+const props = defineProps([
+    "innerCircleRotation",
+    "outerCircleRotation",
+    "outerPositions",
+    "innerPositions",
+    "availableActions",
+    "outerPathCraftsmen",
+    "innerPathCraftsmen",
+    "guilds",
+    "availableMovement",
+    "you",
+    "isYourTurn",
+]);
+
+const { buildGuild, moveCraftsman, rotate } = useGameActions(
+    () => props.availableActions,
 );
 
-const { rotate, moveCraftsman, buildGuild } = useGameActions(() => props.availableActions);
-
-
-const selectedCraftsman = ref(null)
+const selectedCraftsman = ref(null);
 
 const selectCraftsmanToMove = (id) => {
-    if (!Object.keys(props.availableMovement).includes(String(id))) return
-    if (id === selectedCraftsman.value) return selectedCraftsman.value = null;
+    if (
+        !Object.keys(props.availableMovement).includes(String(id)) ||
+        !props.isYourTurn
+    )
+        return;
+    if (id === selectedCraftsman.value) return (selectedCraftsman.value = null);
     selectedCraftsman.value = id;
+    soundBus.playEffect("selectCraftsman");
     console.log("Wybrano: ", selectedCraftsman.value);
-}
+};
 
 const localmoveCraftsman = (ringType, fieldId) => {
-    moveCraftsman(ringType, fieldId, selectedCraftsman.value)
+    moveCraftsman(ringType, fieldId, selectedCraftsman.value);
     selectedCraftsman.value = null;
-}
-
+};
 
 const canRotate = computed(() => {
     if (!props.availableActions.includes(actions.ROTATE)) return false;
+
     const rotateCost = props.you.rotateCost;
     const inventory = props.you.inventory;
+    let missingResources = 0;
 
     for (const [resource, cost] of rotateCost) {
-        if (inventory[resource] < cost) return false;
+        const available = inventory[resource] || 0;
+        if (available < cost) {
+            missingResources += cost - available;
+        }
     }
 
-    return true;
-})
+    return missingResources <= (inventory.amber || 0);
+});
 
+// --- DŹWIĘK ROTACJI ZEWNĘTRZNEGO KOŁA ---
+watch(
+    () => props.outerCircleRotation,
+    (newVal, oldVal) => {
+        if (oldVal !== undefined && newVal !== oldVal) {
+            soundBus.playEffect("rocks");
+        }
+    }
+);
 
+// --- DŹWIĘK BUDOWY GILDII ---
+const totalGuildsCount = computed(() => {
+    if (!props.guilds) return 0;
+    let count = 0;
+    for (const ring in props.guilds) {
+        if (props.guilds[ring]) {
+            for (const id in props.guilds[ring]) {
+                if (props.guilds[ring][id]) {
+                    count++;
+                }
+            }
+        }
+    }
+    return count;
+});
 
-const dialogOpened = ref(false)
+watch(totalGuildsCount, (newCount, oldCount) => {
+    if (oldCount !== undefined && newCount > oldCount) {
+        soundBus.playEffect("craft");
+    }
+});
+// ----------------------------
+
+const dialogOpened = ref(false);
 const guildToBuild = ref(null);
 
-const canBuildInnerGuild = computed(() => {
-    if (!props.availableActions.includes(actions.BUILD_GUILD)) return false;
-    const inventory = props.you.inventory;
-
-    for (const [resource, cost] of props.guildCost.inner) {
-        if (inventory[resource] < cost) return false;
-    }
-
-    return true;
-})
-
 const canBuildOuterGuild = computed(() => {
-    console.log("XD 1");
-    
     if (!props.availableActions.includes(actions.BUILD_GUILD)) return false;
+
     const inventory = props.you.inventory;
-        console.log("XD 2");
-    for (const [resource, cost] of props.guildCost.outer) {
-        if (inventory[resource] < cost) return false;
+    let missingResources = 0;
+
+    for (const [resource, cost] of props.you.guildCost) {
+        const available = inventory[resource] || 0;
+        if (available < cost) {
+            missingResources += cost - available;
+        }
     }
 
-        console.log("XD 3");
-    return true;
-})
+    return missingResources <= (inventory.amber || 0);
+});
 
 const openBuildGuildDialog = (ringType, id, resource) => {
-    if (dialogOpened.value === true) return
-    if (props.guilds[ringType][id]) return
-    
-    guildToBuild.value = [ringType, id, resource]
+    if (dialogOpened.value === true) return;
+    if (props.guilds[ringType][id]) return;
+    soundBus.playEffect("buttonPress1");
+    guildToBuild.value = [ringType, id, resource];
     dialogOpened.value = true;
-}
+};
 
 const closeBuildGuildDialog = () => {
+     soundBus.playEffect("buttonPress1");
     dialogOpened.value = false;
-    guildToBuild.value = null
-}
+    guildToBuild.value = null;
+};
 
 const fields = {
-    bricks: "Cegieł",
+    amber: "Bursztynu",
+    brick: "Cegieł",
+    glass: "Szkła",
     gold: "Bankowej",
     iron: "Żelaza",
+    silk: "Jedwabiu",
     stone: "Kamienia",
     stone_wheat: "Kamienia i Zboża",
     wheat: "Zboża",
     wood: "Drewna",
     wood_wheat: "Drewna i Zboża",
-    glass: "Szkła",
-    silk: "Jedwabiu",
-    amber: "Bursztynu",
-}
-
+};
 
 const localBuildGuild = () => {
     buildGuild(guildToBuild.value);
-    closeBuildGuildDialog()
-}
+    closeBuildGuildDialog();
+};
 
 const isSelectingPlace = computed(() => {
-    return props.availableActions.includes(actions.PLACE_CRAFTSMAN) || props.availableActions.includes(actions.PLACE_TRADER)
-})
-
+    return (
+        props.availableActions.includes(actions.PLACE_CRAFTSMAN) ||
+        props.availableActions.includes(actions.PLACE_TRADER)
+    );
+});
 </script>
 
 <template>
-    <div class="dialog" v-if="dialogOpened && guildToBuild">
+    <div v-if="dialogOpened && guildToBuild" class="dialog">
         <h1>Budowa Gildii</h1>
-      
-   
-        <p>Czy chcesz wybudować gildię w dzielnicy <br><span class="sector-name">{{ fields[guildToBuild[2]] }}</span> za
 
-                <div class="guild-cost" v-if="guildToBuild[0] === 'outer'">
-                 <template v-for="[resource, amount] in props.guildCost.outer" :key="resource">
-                        <span>{{ amount }}</span>
-                        <img :src="resourceImages[resource]"/>
-                    </template>
-                </div>
+        <div>
+            Czy chcesz wybudować gildię w dzielnicy <br /><span
+                class="sector-name"
+                >{{ fields[guildToBuild[2]] }}</span
+            >
+            za
 
-
-                <div class="guild-cost" v-else>
-                    <template v-for="[resource, amount] in props.guildCost.inner" :key="resource">
-                        <span>{{ amount }}</span>
-                        <img :src="resourceImages[resource]"/>
-                    </template>
-                </div>?
-        </p>
+            <div class="guild-cost">
+                <template
+                    v-for="[resource, amount] in props.you.guildCost"
+                    :key="resource"
+                >
+                    <span>{{ amount }}</span>
+                    <img :src="resourceImages[resource]" />
+                </template>
+            </div>
+        </div>
         <div class="buttons">
             <button @click="closeBuildGuildDialog">Przemyślę to</button>
-            <button @click="localBuildGuild" v-if="guildToBuild[0] === 'outer'" :disabled="!canBuildOuterGuild">Zbuduj</button>
-            <button @click="localBuildGuild" v-if="guildToBuild[0] === 'inner'" :disabled="!canBuildInnerGuild">Zbuduj</button>
+            <button
+                v-if="guildToBuild[0] === 'outer'"
+                :disabled="!canBuildOuterGuild"
+                @click="localBuildGuild"
+            >
+                Zbuduj
+            </button>
         </div>
     </div>
 
-    <button class="cost" @click="rotate" :disabled="!canRotate">
+    <button class="cost" :disabled="!canRotate" @click="rotate">
         <span class="one">1</span>
         <img :src="resourceImages['iron']" alt="" />
     </button>
     <img :src="Arrow" class="arrow" />
-
 
     <div class="border"></div>
 
@@ -183,59 +219,57 @@ const isSelectingPlace = computed(() => {
                 :key="index"
                 class="guild"
                 :class="{
-                    guildHover: !props.guilds.outer[value], 
-                    guildShow: guildToBuild && guildToBuild[1] === value && guildToBuild[0] === 'outer'
+                    guildHover: !props.guilds.outer[value],
+                    guildShow:
+                        guildToBuild &&
+                        guildToBuild[1] === value &&
+                        guildToBuild[0] === 'outer',
                 }"
-
                 :style="`
                     --color: ${props.guilds.outer[value]?.hex};
                     transform: translate(-50%, -50%) rotate(${-45 * props.outerCircleRotation}deg);
                     top: calc(50% + 45% * sin(45deg * ${value} - 68deg));
                     left: calc(50% + 45% * cos(45deg * ${value} - 68deg));
                 `"
-
-                @click="() => openBuildGuildDialog('outer', value, index)"
                 :data-guild="`outer-${value}`"
                 :data-occupied="props.guilds.outer[value] !== null"
-            >
-            </div>
+                @click="() => openBuildGuildDialog('outer', value, index)"
+            ></div>
         </div>
 
+        <div class="outerPathBackground"></div>
 
-    <div class="outerPathBackground">
-
-    </div>
-
-       <div class="outerPath">
+        <div class="outerPath">
             <div
                 v-for="(craftsmen, index) in props.outerPathCraftsmen"
                 :key="index"
                 class="point lowIndex"
-                
                 :style="`
                     transform: translate(-50%, -50%);
                     top: calc(50% + 42.8% * sin(45deg * ${index} - 56deg));
                     left: calc(50% + 42.8% * cos(45deg * ${index} - 56deg));
                 `"
-            > 
-    
-                <Craftsman 
-                    v-for="craftsman in craftsmen" 
-                    :color="craftsman.color" 
-                    class="innerPathCraftsman" 
-                    :class="{hover: Object.keys(props.availableMovement).includes(String(craftsman.id))}"
+            >
+                <Craftsman
+                    v-for="craftsman in craftsmen"
+                    :key="craftsman.id"
+                    :color="craftsman.color"
+                    :type="craftsman.type"
+                    class="innerPathCraftsman"
+                    :class="{
+                        hover:
+                            Object.keys(props.availableMovement).includes(
+                                String(craftsman.id),
+                            ) && props.isYourTurn,
+                    }"
                     @click.stop="() => selectCraftsmanToMove(craftsman.id)"
                 />
-
-               
-             
             </div>
 
-             <div
+            <div
                 v-for="(craftsmen, index) in 8"
                 :key="index"
                 class="point highIndex invisiblePoint"
-                
                 :style="`
             
                   
@@ -243,23 +277,21 @@ const isSelectingPlace = computed(() => {
                     top: calc(50% + 42.5% * sin(45deg * ${index} - 56deg));
                     left: calc(50% + 42.5% * cos(45deg * ${index} - 56deg));
                 `"
-            > 
-            
-                <div 
-                    class="pointing-arrow" 
+            >
+                <div
+                    class="pointing-arrow"
                     :class="{
-                        upsideDownArrow: [2,3,4].includes(index),
-                        show: (selectedCraftsman !== null && props.availableMovement[selectedCraftsman]?.outer[index]) || isSelectingPlace,
-                    }" 
+                        upsideDownArrow: [2, 3, 4].includes(index),
+                        show:
+                            (selectedCraftsman !== null &&
+                                props.availableMovement[selectedCraftsman]
+                                    ?.outer[index]) ||
+                            isSelectingPlace,
+                    }"
                     @click="() => localmoveCraftsman('outer', index)"
                 />
             </div>
-
         </div>
-
-
-
-
 
         <!-- Sklepu luksusowe -->
 
@@ -277,104 +309,80 @@ const isSelectingPlace = computed(() => {
             </div>
         </div>
 
-        <div
-            class="innerCircle innerGuilds"
-            :style="`transform: rotate(calc(-120deg * ${innerCircleRotation}))`"
-        >
-            <div
-                v-for="(value, index) in props.innerPositions"
-                :key="index"
-                class="guild"
-                :class="{guildHover: !props.guilds.inner[value]}"
-
-                :style="`
-                    transform: translate(-50%, -50%) rotate(${120 * props.innerCircleRotation}deg);
-                    top: calc(50% + 41% * sin(120deg * ${value} - 30deg));
-                    left: calc(50% + 41% * cos(120deg * ${value} - 30deg));
-                `"
-
-                 @click="() => openBuildGuildDialog('inner', value, index)"
-                :data-guild="`outer-${value}`"
-            >
-            </div>
-        </div>
-
-       
         <div class="innerPath">
-             <div
+            <div
                 v-for="(craftsmen, index) in props.innerPathCraftsmen"
                 :key="index"
                 class="point lowIndex"
-                
                 :style="`
                     transform: translate(-50%, -50%);
                     top: calc(50% + 26% * sin(120deg * ${index} - 30deg));
                     left: calc(50% + 26% * cos(120deg * ${index} - 30deg));
                 `"
-            > 
-    
-                <Craftsman 
-                    v-for="craftsman in craftsmen" 
-                    :color="craftsman.color" 
-                    class="innerPathCraftsman" 
-                    :class="{hover: Object.keys(props.availableMovement).includes(String(craftsman.id))}"
+            >
+                <Craftsman
+                    v-for="craftsman in craftsmen"
+                    :key="craftsman.id"
+                    :color="craftsman.color"
+                    :type="craftsman.type"
+                    class="innerPathCraftsman"
+                    :class="{
+                        hover:
+                            Object.keys(props.availableMovement).includes(
+                                String(craftsman.id),
+                            ) && props.isYourTurn,
+                    }"
                     @click.stop="() => selectCraftsmanToMove(craftsman.id)"
                 />
             </div>
 
-             <div
+            <div
                 v-for="(craftsmen, index) in 3"
                 :key="index"
                 class="point highIndex invisiblePoint"
-                
                 :style="`
                     transform: translate(-50%, -50%);
                     top: calc(50% + 26% * sin(120deg * ${index} - 30deg));
                     left: calc(50% + 26% * cos(120deg * ${index} - 30deg));
                 `"
-            > 
-                <div 
-                    class="pointing-arrow" 
+            >
+                <div
+                    class="pointing-arrow"
                     :class="{
                         upsideDownArrow: index === '1',
-                        show: (selectedCraftsman !== null && props.availableMovement[selectedCraftsman]?.inner[index]),
-                    }" 
+                        show:
+                            selectedCraftsman !== null &&
+                            props.availableMovement[selectedCraftsman]?.inner[
+                                index
+                            ],
+                    }"
                     @click="() => localmoveCraftsman('inner', index)"
                 />
             </div>
-
-
-
         </div>
     </div>
 </template>
 
 <style scoped>
 @keyframes upAndDown {
-
-        from {
-             transform: translateX(-50%) translateY(calc(-25% + 0.5rem));
-        }
-
-        to {
-             transform: translateX(-50%) translateY(calc(-25% - 0.5rem));
-        }
+    from {
+        transform: translateX(-50%) translateY(calc(-25% + 0.5rem));
     }
 
+    to {
+        transform: translateX(-50%) translateY(calc(-25% - 0.5rem));
+    }
+}
 
 @keyframes UpsideUpAndDown {
-
-        from {
-             transform: translateX(-50%) translateY(calc(125% + 0.5rem));
-        }
-
-        to {
-             transform: translateX(-50%) translateY(calc(125% - 0.5rem));
-        }
+    from {
+        transform: translateX(-50%) translateY(calc(125% + 0.5rem));
     }
 
-
-
+    to {
+        transform: translateX(-50%) translateY(calc(125% - 0.5rem));
+    }
+}
 
 .dialog {
     position: absolute;
@@ -401,15 +409,15 @@ const isSelectingPlace = computed(() => {
     background-image: url("/src/assets/games/gameAssets/craftsmen/black1.jpg");
 
     button {
-          padding: 0.5rem 1.5rem;
+        padding: 0.5rem 1.5rem;
         font-size: 1.15rem;
         font-weight: bold;
         --background: #f4ecd0;
         background-color: var(--background);
         filter: drop-shadow(2px 2px 5px black);
-            border: none;
+        border: none;
         border-radius: 0.25rem;
-            
+
         &[disabled] {
             opacity: 0.5;
         }
@@ -422,20 +430,19 @@ const isSelectingPlace = computed(() => {
         }
     }
 
-    p {
+    & > div {
         line-height: 2;
         margin-top: 0.5rem;
         max-width: 90%;
         margin-inline: auto;
-        text-align: center
+        text-align: center;
     }
 
     .guild-cost {
         display: inline-flex;
         align-items: center;
         gap: 0.15rem;
-        
-    
+
         img {
             width: 2rem;
         }
@@ -475,17 +482,14 @@ const isSelectingPlace = computed(() => {
 
 /* Region Guild */
 
-
 .point {
-
-
     &.invisiblePoint {
         width: 1px;
         height: 1px;
         padding: 0;
     }
 
-   width: 7.5rem;
+    width: 7.5rem;
     height: 7.5rem;
     z-index: 300;
     &.smaller {
@@ -497,7 +501,7 @@ const isSelectingPlace = computed(() => {
     }
 
     &.evenSmaller {
-          width: 6rem;
+        width: 6rem;
         height: 6rem;
     }
 
@@ -509,22 +513,17 @@ const isSelectingPlace = computed(() => {
         z-index: 5;
     }
 
-
-
-       padding: 1rem;
+    padding: 1rem;
     border-radius: 50%;
-    
+
     position: absolute;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
 
-
-
     background-size: contain;
     z-index: 200;
-
 
     .pointing-arrow {
         display: none;
@@ -535,53 +534,54 @@ const isSelectingPlace = computed(() => {
         left: calc(35% - 0.1rem);
         top: -6rem;
         position: absolute;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  cursor: pointer;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        cursor: pointer;
         background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_down.png");
         animation: upAndDown 0.8s linear infinite alternate;
 
-&:hover {
-     background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_down_hover.png");
-}
+        &:hover {
+            background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_down_hover.png");
+        }
 
         &.upsideDownArrow {
             animation: UpsideUpAndDown 0.8s linear infinite alternate;
-              background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_up.png");
-              &:hover {
-background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_up_hover.png");
-              }
+            background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_up.png");
+            &:hover {
+                background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_up_hover.png");
+            }
         }
     }
 
-    
-
     .show {
-       display: block; 
+        display: block;
 
-       &:hover {
-        filter: brightness(0.7);
-       }
+        &:hover {
+            filter: brightness(0.7);
+        }
     }
-
 
     .innerPathCraftsman {
         width: 2.5rem;
 
         &.hover {
             cursor: pointer;
+           filter: brightness(1.2);
+            animation: upAndDown 1.4s ease-in-out infinite;
+
         }
 
         &.hover:hover {
-            filter: brightness(1.2) drop-shadow(0 0 5px rgb(255, 255, 255));
-
+            filter: brightness(1.3) drop-shadow(0 0 7px rgb(255, 255, 255));
         }
     }
+}
 
- 
-
-    
+@keyframes upAndDown {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-0.4rem); }
+    100% { transform: translateY(0); }
 }
 
 .guild {
@@ -596,21 +596,23 @@ background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_up_hover.png
     z-index: 200;
     transition: transform 1s;
     border: 4px solid black;
-  
 
     &[data-occupied="true"] {
         &::before {
             content: "";
             position: absolute;
             inset: 0;
-            background: url("/src/assets/games/gameAssets/craftsmen/hammer.png"), linear-gradient(150deg,
-                var(--color), hsl(from var(--color) h s calc(l * 0.6))     
-            );
+            background:
+                url("/src/assets/games/gameAssets/craftsmen/hammer.png"),
+                linear-gradient(
+                    150deg,
+                    var(--color),
+                    hsl(from var(--color) h s calc(l * 0.6))
+                );
             background-position: center;
-           
-           background-size: contain;
+
+            background-size: contain;
             border-radius: 50%;
-            
         }
     }
     &.guildShow,
@@ -618,11 +620,10 @@ background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_up_hover.png
         background-size: 60%;
         background-repeat: no-repeat;
         background-position: center;
-         background-image: url("/src/assets/games/gameAssets/craftsmen/hammer_icon.png");
+        background-image: url("/src/assets/games/gameAssets/craftsmen/hammer_icon.png");
         background-color: #ffffff98;
-  
+
         cursor: pointer;
-        
     }
 }
 
@@ -656,24 +657,21 @@ background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_up_hover.png
 
     border-radius: 50%;
     z-index: 1;
-   background-color: black;
-   opacity: 0.5;
+    background-color: black;
+    opacity: 0.5;
     /* background-image: url("/src/assets/games/gameAssets/craftsmen/background.jpg"); */
     background-size: contain;
-  
+
     box-shadow:
         inset 0px 0px 8px rgb(218, 163, 118),
         /* jasne wnętrze */ inset 0px 0px 20px rgba(0, 0, 0, 0.2),
         /* delikatny cień wewnątrz */ 0px 0px 10px rgba(0, 0, 0, 0.863); /* cień na zewnątrz */
 }
 
-
 .outerCircle {
     height: 100%;
-    background: blue;
+    background: rgb(0, 0, 0);
     z-index: 1;
-
- 
 }
 
 .outerPathBackground {
@@ -685,24 +683,16 @@ background-image: url("/src/assets/games/gameAssets/craftsmen/arrow_up_hover.png
     border: 5px solid black;
 }
 
-
 .outerPath {
     height: 80%;
 
     z-index: 4;
- 
-
-    
-}
-
-.innerGuilds {
-    z-index: 5!important;
 }
 
 .innerCircle {
     overflow: hidden;
     height: 55%;
-border-radius: 50%;
+    border-radius: 50%;
     z-index: 3;
     overflow: hidden;
     border: 6px solid black;
@@ -733,8 +723,8 @@ border-radius: 50%;
     color: white;
     font-weight: bold;
     padding: 0rem 1.5rem;
-border-radius: 0.25rem;
-gap: 0.25rem;
+    border-radius: 0.25rem;
+    gap: 0.25rem;
     font-size: 1.5rem;
     align-items: center;
     justify-content: center;

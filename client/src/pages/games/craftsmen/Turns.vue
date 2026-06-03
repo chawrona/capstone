@@ -1,15 +1,20 @@
 <script setup>
-const props = defineProps(["player", "round", "turn"]);
+import { resourceImages } from "./composables_craftsmen/pathImages";
+
+const props = defineProps(["player", "round", "turn", "isYourTurn"]);
 </script>
 
 <template>
     <div class="turns">
         <div class="info">
-            <h1>Dni do poboru zboża: {{ 5 - props.turn }}</h1>
-          
+            <div class="wheatWrap">
+                <img :src="resourceImages['wheat']" alt="" class="wheatIcon" />
+                <h1>
+                    {{ 6 - props.turn === 1 ? "Pobór zboża" : 6 - props.turn }}
+                </h1>
+            </div>
         </div>
-        <h2>
-            Tura gracza
+        <h2 v-if="!props.isYourTurn">
             <span
                 class="username"
                 :style="`--color: ${props.player.color.hex}`"
@@ -57,5 +62,19 @@ const props = defineProps(["player", "round", "turn"]);
     display: flex;
     gap: 2rem;
     justify-content: end;
+}
+
+.wheatIcon {
+    width: 2.25rem;
+    height: 2.25rem;
+    transform: translateY(1px);
+}
+
+.wheatWrap {
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: center;
 }
 </style>

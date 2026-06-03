@@ -7,6 +7,7 @@ export default class Craftsman {
         ringType = null,
         fieldId = null,
     ) {
+        this.publicId = publicId;
         this.id = id;
         this.type = type;
         this.ringType = ringType;

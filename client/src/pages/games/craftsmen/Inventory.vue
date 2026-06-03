@@ -8,58 +8,88 @@ import Iron from "@/assets/games/gameAssets/craftsmen/iron_bar.png";
 import Wheat from "@/assets/games/gameAssets/craftsmen/wheat.png";
 import Wood from "@/assets/games/gameAssets/craftsmen/Wood.png";
 
-import Craftsman from "./Craftsman.vue";
+import actions from "../../../../../server/models/games/craftsmen/config.js/actions";
 import { resourceImages } from "./composables_craftsmen/pathImages";
 import { useGameActions } from "./composables_craftsmen/useGameActions";
-import actions from "../../../../../server/models/games/craftsmen/config.js/actions";
+import { useInventoryAnimation } from "./composables_craftsmen/useInventoryAnimation.js";
+import Craftsman from "./Craftsman.vue";
 
-const props = defineProps(["you", "availableActions"])
+const props = defineProps(["you", "availableActions"]);
 
-const { buyCart, buyCraftsman } = useGameActions(() => props.availableActions);
+const { buyCart, buyCraftsman, sellInventoryItem } = useGameActions(() => props.availableActions);
+const { coinsAnimating, flyingIn, flyingOut } = useInventoryAnimation(
+    () => props.you,
+);
 
 const resources = computed(() => {
-    console.log(props.you.inventory);
-    
-     const items = Object.entries(props.you.inventory)
-        .flatMap(([name, count]) => Array(count).fill(name));
-    
+    // Zbieramy wszystkie nazwy surowców (te w ekwipunku + te znikające)
+    const resourceNames = new Set([
+        ...Object.keys(props.you.inventory),
+        ...flyingOut.value.values()
+    ]);
+
+    const items = Array.from(resourceNames).flatMap((name) => {
+        const count = props.you.inventory[name] || 0;
+        
+        // Zwykłe surowce tego typu
+        const regular = Array.from({ length: count }, (_, i) => ({
+            key: `${name}:${i}`,
+            name,
+        }));
+
+        // Znikające "duchy" TYLKO dla tego typu (lądują od razu po zwykłych)
+        const ghosts = [...flyingOut.value.entries()]
+            .filter(([_, ghostName]) => ghostName === name)
+            .map(([key, ghostName]) => ({ ghost: true, key, name: ghostName }));
+
+        return [...regular, ...ghosts];
+    });
+
     const nullsNeeded = props.you.maxInventorySpace - items.length;
-    
-    console.log("ile nulli", props.you.maxInventorySpace, items.length, nullsNeeded);
-    
 
-    return [...items, ...Array(Math.max(0, nullsNeeded)).fill("empty")];
-})
+    const empties = Array.from(
+        { length: Math.max(0, nullsNeeded) },
+        (_, i) => ({ key: `empty:${i}`, name: "empty" }),
+    );
 
+    return [...items, ...empties];
+});
 
 const canBuyCraftsman = computed(() => {
-    if (!props.you.canBuyCraftsman) return false
+    if (!props.you.canBuyCraftsman) return false;
     if (!props.availableActions.includes(actions.BUY_CRAFTSMAN)) return false;
+
     const craftsmanCost = props.you.craftsmanCost;
     const inventory = props.you.inventory;
+    let missingResources = 0;
 
     for (const [resource, cost] of craftsmanCost) {
-        console.log(inventory[resource], cost, inventory[resource] < cost);
-        
-        if (inventory[resource] < cost) return false;
+        const available = inventory[resource] || 0;
+        if (available < cost) {
+            missingResources += cost - available;
+        }
     }
 
-    return true;
-})
+    return missingResources <= (inventory.amber || 0);
+});
 
 const canBuyCart = computed(() => {
-    if (!props.you.canBuyCart) return false
+    if (!props.you.canBuyCart) return false;
     if (!props.availableActions.includes(actions.BUY_CART)) return false;
+
     const cartCost = props.you.cartCost;
     const inventory = props.you.inventory;
+    let missingResources = 0;
 
     for (const [resource, cost] of cartCost) {
-        if (inventory[resource] < cost) return false;
+        const available = inventory[resource] || 0;
+        if (available < cost) {
+            missingResources += cost - available;
+        }
     }
 
-    return true;
-})
-
+    return missingResources <= (inventory.amber || 0);
+});
 </script>
 
 <template>
@@ -69,28 +99,42 @@ const canBuyCart = computed(() => {
             <div class="wheat">
                 {{ props.you.craftsmen + Number(props.you.trader) }}
                 <img :src="Wheat" alt="" />
-               
             </div>
-            <div class="wallet">
+            <div class="wallet" :class="{ 'coins-pop': coinsAnimating }">
                 {{ props.you.coins }}
                 <img :src="Coins" alt="" />
             </div>
         </div>
+
         <div class="inventory">
             <div
-                v-for="(resource, index) in resources"
-                :key="index"
+                v-for="{ name, key, ghost } in resources"
+                :key="key"
                 class="resource"
-                :data-resource="resource"
+                :data-resource="name"
+                :data-fly-key="key"
+                @click="name !== 'empty' && !ghost && sellInventoryItem(name) && props.availableActions.includes(actions.SELL_INVENTORY)"
+                :class="{
+                    'fly-in': flyingIn.has(key),
+                    'fly-out': ghost,
+                }"
             />
         </div>
         <div class="upgrades">
-            <button class="buyCraftsman" v-if="props.you.canBuyCraftsman" :disabled="!canBuyCraftsman" @click="buyCraftsman">
+            <button
+                v-if="props.you.canBuyCraftsman"
+                class="buyCraftsman"
+                :disabled="!canBuyCraftsman"
+                @click="buyCraftsman"
+            >
                 <div class="spacing">
-                    <template v-for="[resource, amount] in props.you.craftsmanCost" :key="resource">
+                    <template
+                        v-for="[resource, amount] in props.you.craftsmanCost"
+                        :key="resource"
+                    >
                         <div>
                             <span>{{ amount }}</span>
-                            <img :src="resourceImages[resource]"/>
+                            <img :src="resourceImages[resource]" />
                         </div>
                     </template>
                 </div>
@@ -98,12 +142,20 @@ const canBuyCart = computed(() => {
                 <Craftsman :color="props.you.color.hex" class="icon" />
             </button>
 
-            <button class="buyCart" v-if="props.you.canBuyCart" :disabled="!canBuyCart" @click="buyCart">
+            <button
+                v-if="props.you.canBuyCart"
+                class="buyCart"
+                :disabled="!canBuyCart"
+                @click="buyCart"
+            >
                 <div class="spacing">
-                    <template v-for="[resource, amount] in props.you.cartCost" :key="resource">
+                    <template
+                        v-for="[resource, amount] in props.you.cartCost"
+                        :key="resource"
+                    >
                         <div>
                             <span>{{ amount }}</span>
-                            <img :src="resourceImages[resource]"/>
+                            <img :src="resourceImages[resource]" />
                         </div>
                     </template>
                 </div>
@@ -124,7 +176,7 @@ const canBuyCart = computed(() => {
     width: 400px;
     height: 360px;
     border-radius: 0.5rem;
-   z-index: 11;
+    z-index: 11;
     background-size: contain;
     background-position: center;
 
@@ -135,7 +187,6 @@ const canBuyCart = computed(() => {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    
 }
 
 .resource {
@@ -146,8 +197,12 @@ const canBuyCart = computed(() => {
     background-position: center;
     background-repeat: no-repeat;
 
-    filter: drop-shadow(2px 2px 5px black);
 
+    &:not([data-resource="empty"]) {
+        cursor: url("/src/assets/games/gameAssets/craftsmen/coinsCursor.png") 8 8, pointer;
+    }
+
+    filter: drop-shadow(2px 2px 5px black);
     &[data-resource="empty"] {
         background-image: url("/src/assets/games/gameAssets/craftsmen/cart.png");
         opacity: 0.5;
@@ -176,6 +231,31 @@ const canBuyCart = computed(() => {
     &[data-resource="glass"] {
         background-image: url("/src/assets/games/gameAssets/craftsmen/glass.png");
     }
+
+    &.fly-in {
+        animation: resource-fly-in 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        position: relative;
+        z-index: 100;
+    }
+
+    &.fly-out {
+        animation: resource-fly-out 0.85s cubic-bezier(0.4, 0, 1, 1) forwards;
+        position: relative;
+        z-index: 100;
+        pointer-events: none;
+    }
+
+    transition: transform 0.12s ease, filter 0.12s ease;
+
+    &:not([data-resource="empty"]):not(.fly-out):hover {
+        transform: scale(1.1);
+        filter: drop-shadow(2px 2px 2px rgba(255, 210, 60, 0.65)) brightness(1.1);
+    }
+
+    &:not([data-resource="empty"]):not(.fly-out):active {
+        transform: scale(0.95);
+        transition-duration: 0.06s;
+    }
 }
 
 .info,
@@ -197,7 +277,7 @@ const canBuyCart = computed(() => {
     align-items: center;
     font-weight: bold;
     font-size: 1.3rem;
- transform: translateY(1px);
+    transform: translateY(1px);
     img {
         transform: translateY(2px);
         width: 2.25rem;
@@ -223,13 +303,11 @@ const canBuyCart = computed(() => {
     }
 }
 
-
-
 .buyCart {
     display: flex;
     align-items: center;
     justify-content: space-around;
-  
+
     font-size: 1.5rem;
     font-weight: bold;
     padding: 0 1rem;
@@ -238,7 +316,7 @@ const canBuyCart = computed(() => {
     background-color: var(--background);
     filter: drop-shadow(2px 2px 5px black);
     border: none;
-  
+
     font-weight: bold;
     padding: 0.3rem 1.25rem;
     font-size: 1.5rem;
@@ -262,7 +340,6 @@ const canBuyCart = computed(() => {
         display: flex;
         align-items: center;
         gap: 0.25rem;
-
     }
 }
 
@@ -270,15 +347,15 @@ const canBuyCart = computed(() => {
     display: flex;
     align-items: center;
     justify-content: space-around;
-  
-    font-size: 1.rem;
+
+    font-size: 1rem;
     font-weight: bold;
     padding: 0 1rem;
     --background: #f4ecd0;
     background-color: var(--background);
     filter: drop-shadow(2px 2px 5px black);
     border: none;
-border-radius: 0.25rem;
+    border-radius: 0.25rem;
     font-weight: bold;
     padding: 0.3rem 1.25rem;
     font-size: 1.5rem;
@@ -307,8 +384,6 @@ border-radius: 0.25rem;
         display: flex;
         align-items: center;
         gap: 0.25rem;
-
-      
     }
 
     .spacing {
@@ -323,5 +398,70 @@ border-radius: 0.25rem;
     font-size: 1.25em;
 }
 
+@keyframes resource-fly-in {
+    0% {
+        transform: translate(var(--ox, 0px), var(--oy, 0px)) scale(2.8);
+        opacity: 0.85;
+        filter: drop-shadow(0 0 12px gold) brightness(1.6);
+    }
+    20% {
+        opacity: 1;
+    }
+    60% {
+        transform: translate(0, 0) scale(1.12);
+        filter: drop-shadow(2px 2px 5px black);
+    }
+    100% {
+        transform: translate(0, 0) scale(1);
+        filter: drop-shadow(2px 2px 5px black);
+    }
+}
 
+@keyframes resource-fly-out {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+        filter: drop-shadow(2px 2px 5px black);
+    }
+    15% {
+        transform: translate(0, 0) scale(1.05);
+    }
+    55% {
+        transform: translate(
+                calc(var(--ox, 0px) * 0.05),
+                calc(var(--oy, 0px) * 0.05)
+            )
+            scale(2.4);
+        opacity: 1;
+        filter: drop-shadow(0 0 4px gold) brightness(1.2);
+    }
+
+    100% {
+        transform: translate(var(--ox, 0px), var(--oy, 0px)) scale(0.15);
+        opacity: 0;
+        filter: drop-shadow(0 0 2px gold);
+    }
+}
+
+@keyframes coins-pop {
+    0% {
+        transform: scale(1);
+    }
+    40% {
+        transform: scale(1.35);
+        color: #f0d060;
+    }
+    70% {
+        transform: scale(0.95);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.wallet {
+    &.coins-pop {
+        animation: coins-pop 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+}
 </style>

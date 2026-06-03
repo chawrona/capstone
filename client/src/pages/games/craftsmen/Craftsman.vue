@@ -1,14 +1,17 @@
 <script setup>
-const props = defineProps(["color"]);
+import Hat from "@/assets/games/gameAssets/craftsmen/trader_hat.png";
+import Purse from "@/assets/games/gameAssets/craftsmen/trader_purse.png";
+const props = defineProps(["color", "type"]);
 </script>
 
 <template>
-    <div>
+    <div class="craftsman">
         <svg
             version="1.0"
             xmlns="http://www.w3.org/2000/svg"
             :style="`--color: ${props.color}`"
             class="svg"
+           
             width="252.000000pt"
             height="243.000000pt"
             viewBox="0 0 252.000000 243.000000"
@@ -20,6 +23,7 @@ const props = defineProps(["color"]);
                 stroke="none"
             >
                 <path
+                 :data-type="props.type"
                     class="path"
                     d="M1143 2276 c-33 -13 -83 -38 -110 -58 -93 -67 -163 -203 -163 -320 0
     -68 3 -66 -131 -103 -58 -17 -162 -61 -275 -117 -163 -80 -188 -96 -249 -158
@@ -36,17 +40,44 @@ const props = defineProps(["color"]);
                 />
             </g>
         </svg>
+        <img v-if="props.type === 'trader'" :src="Hat" alt="" class="hat" />
+        <img v-if="props.type === 'trader'" :src="Purse" alt="" class="purse" />
     </div>
 </template>
 
-<style>
+<style scoped lang="scss">
+.craftsman {
+    position: relative;
+}
+
+.purse {
+    position: absolute;
+    width: 15px;
+    top: 0.4rem;
+    left: -0.1rem;
+    filter: drop-shadow(0 0 1px rgb(0, 0, 0));
+}
+
+.hat {
+    width: 24px;
+    top: -0.44rem;
+    left: 0.5rem;
+    position: absolute;
+    filter: drop-shadow(0 0 1px rgb(0, 0, 0));
+}
+
 .path {
     color: var(--color);
     stroke: black;
     stroke-width: 300px;
     stroke-linejoin: round;
     paint-order: stroke fill;
+
+    &[data-type="trader"] {
+        color: hsl(from var(--color) calc(h * 0.96) calc(s * 1) calc(l * 1.05))
+    }
 }
+
 
 .svg {
     height: 100%;

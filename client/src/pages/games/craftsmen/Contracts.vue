@@ -1,22 +1,27 @@
 <script setup>
 import ContractCard from "./ContractCard.vue";
 
-const props = defineProps(["rerollCost", "contracts", "availableActions", "you", "canReroll"])
-
-
+const props = defineProps([
+    "rerollCost",
+    "contracts",
+    "availableActions",
+    "you",
+    "canReroll",
+]);
 </script>
 
 <template>
     <div class="contracts">
         <ContractCard
             v-for="(contract, index) in props.contracts"
-            :key="index"
-            :canReroll="props.canReroll"
-            :contract="contract"
-            :rerollCost="props.rerollCost"
-            :availableActions="props.availableActions"
-            :you="props.you"
             :id="index"
+            :key="index"
+            :can-reroll="props.canReroll"
+            :contract="contract"
+            :reroll-cost="props.rerollCost"
+            :available-actions="props.availableActions"
+            :you="props.you"
+            :style="`z-index: -${index}`"
         />
     </div>
 </template>
@@ -28,7 +33,7 @@ const props = defineProps(["rerollCost", "contracts", "availableActions", "you",
     justify-content: space-between;
     bottom: 1rem;
     right: 1rem;
-    
+    isolation: isolate;
     height: 250px;
 }
 </style>

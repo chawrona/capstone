@@ -9,6 +9,9 @@ const actions = {
     BUILD_GUILD: 7,
     COMPLETE_CONTRACT: 8,
     REROLL_CONTRACT: 9,
+    TRADE: 10,
+    BUY_TRADER: 11,
+    SELL_INVENTORY: 12,
 };
 
 export default actions;

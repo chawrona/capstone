@@ -22,7 +22,7 @@ const props = defineProps(["hiddenTask"]);
     width: 400px;
     padding: 1rem;
     color: white;
-    
+
     aspect-ratio: 671 / 205;
     border-radius: 0.5rem;
     background-size: contain;

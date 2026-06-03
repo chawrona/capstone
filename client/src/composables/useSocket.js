@@ -43,6 +43,8 @@ export default function useSocket() {
     });
 
     socket.on("lobby", (lobbyId) => {
+        console.log("Request, idź do lobby");
+
         store.setLoading(true);
         setTimeout(() => {
             router.push(`/${lobbyId}`);

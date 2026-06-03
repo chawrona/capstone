@@ -19,18 +19,26 @@ export function useGameActions(availableActions) {
 
     const newTurn = () => {
         if (!canEmit(actions.NEW_TURN)) return;
+        soundBus.playEffect("buttonPress1");
         store.emit("gameData", { eventName: "newTurn" });
     };
 
     const buyCart = () => {
         if (!canEmit(actions.BUY_CART)) return;
-
         store.emit("gameData", { eventName: "buyCart" });
     };
 
     const rotate = () => {
         if (!canEmit(actions.ROTATE)) return;
         store.emit("gameData", { eventName: "rotate" });
+    };
+
+    const sellInventoryItem = (resource) => {
+        if (!canEmit(actions.SELL_INVENTORY)) return;
+        store.emit("gameData", {
+            data: resource,
+            eventName: "sellInventoryItem",
+        });
     };
 
     const buyCraftsman = () => {
@@ -79,14 +87,40 @@ export function useGameActions(availableActions) {
         });
     };
 
+    const buyTrader = () => {
+        if (!canEmit(actions.BUY_TRADER)) return;
+
+        store.emit("gameData", {
+            eventName: "buyTrader",
+        });
+    };
+
+    const buyTrade = () => {
+        if (!canEmit(actions.TRADE)) return;
+        store.emit("gameData", {
+            eventName: "buyTrade",
+        });
+    };
+
+    const sellTrade = () => {
+        if (!canEmit(actions.TRADE)) return;
+        store.emit("gameData", {
+            eventName: "sellTrade",
+        });
+    };
+
     return {
         buildGuild,
         buyCart,
         buyCraftsman,
+        buyTrade,
+        buyTrader,
         completeContract,
         moveCraftsman,
         newTurn,
         rerollContract,
         rotate,
+        sellInventoryItem,
+        sellTrade,
     };
 }
