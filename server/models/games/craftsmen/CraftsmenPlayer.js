@@ -35,27 +35,27 @@ export default class CraftsmenPlayer extends Player {
             ];
         });
         this.setData("rotateCost", () => [["iron", 1]]);
-        this.setData("coins", () => 135);
+        this.setData("coins", () => 5);
         this.setData("maxInventorySpace", () => 6);
         this.setData("canBuyCraftsman", () => true);
         this.setData("canBuyCart", () => true);
         this.setData("inventory", () => {
             const resources = {
-                wood: 2,
-                stone: 2,
-                wheat: 2,
-                brick: 2,
-                iron: 2,
-                glass: 2,
-                amber: 2,
-                silk: 4,
+                wood: 0,
+                stone: 0,
+                wheat: 0,
+                brick: 0,
+                iron: 0,
+                glass: 0,
+                amber: 0,
+                silk: 0,
             };
-            // if (this.data.turnOrder === 1) resources.wheat = 1;
-            // if (this.data.turnOrder === 2) resources.wood = 1;
-            // if (this.data.turnOrder === 3) {
-            //     resources.wood = 1;
-            //     resources.wheat = 1;
-            // }
+            if (this.data.turnOrder === 1) resources.wheat = 1;
+            if (this.data.turnOrder === 2) resources.wood = 1;
+            if (this.data.turnOrder === 3) {
+                resources.wood = 1;
+                resources.wheat = 1;
+            }
             return resources;
         });
 
