@@ -1227,19 +1227,19 @@ export default class Craftsmen extends Game {
                         brick: { brick: amount },
 
                         stone_wheat: {
-                            stone: amount < 3 ? 1 : 2,
+                            stone: amount === 0 ? 0 : amount < 3 ? 1 : 2,
                             ...(amount > 1 && { wheat: 1 }),
                         },
                         wood_wheat: {
-                            wood: amount < 3 ? 1 : 2,
+                            wood: amount === 0 ? 0 : amount < 3 ? 1 : 2,
                             ...(amount > 1 && { wheat: 1 }),
                         },
                         iron_wheat: {
-                            iron: amount < 3 ? 1 : 2,
+                            iron: amount === 0 ? 0 : amount < 3 ? 1 : 2,
                             ...(amount > 1 && { wheat: 1 }),
                         },
                         brick_wheat: {
-                            brick: amount < 3 ? 1 : 2,
+                            brick: amount === 0 ? 0 : amount < 3 ? 1 : 2,
                             ...(amount > 1 && { wheat: 1 }),
                         },
                     };
@@ -1469,12 +1469,15 @@ export default class Craftsmen extends Game {
         this.eventChecker(publicId, actions.COMPLETE_CONTRACT);
 
         const contract = this.currentContracts[contractId];
-
+        const player = this.getPlayer(publicId);
         if (!contract.available) {
             throw new Error("Ten kontrakt został już wypełniony");
         }
 
-        const player = this.getPlayer(publicId);
+        if (player.getData("contracts") >= 10) {
+            throw new Error("Nie możesz wypełnić więcej kontraktów");
+        }
+
         const contractCost = contract.requirements;
 
         this.payWithAmber(player, contractCost);
@@ -1595,7 +1598,7 @@ export default class Craftsmen extends Game {
             }
         }
 
-        if (!ringType || !fieldId) {
+        if (!ringType || fieldId === undefined) {
             throw new Error("Nie znaleziono handlarza");
         }
 
@@ -1699,7 +1702,7 @@ export default class Craftsmen extends Game {
             }
         }
 
-        if (!ringType || !fieldId) {
+        if (!ringType || fieldId === undefined) {
             throw new Error("Nie znaleziono handlarza");
         }
 

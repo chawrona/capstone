@@ -17,42 +17,60 @@ import Craftsman from "./Craftsman.vue";
 const props = defineProps(["you", "availableActions"]);
 
 const { buyCart, buyCraftsman, sellInventoryItem } = useGameActions(() => props.availableActions);
-const { coinsAnimating, flyingIn, flyingOut } = useInventoryAnimation(
+const { coinsAnimating, flyingIn, flyingOut, explicitFlyOut } = useInventoryAnimation(
     () => props.you,
 );
 
-const resources = computed(() => {
-    // Zbieramy wszystkie nazwy surowców (te w ekwipunku + te znikające)
-    const resourceNames = new Set([
-        ...Object.keys(props.you.inventory),
-        ...flyingOut.value.values()
-    ]);
+const handleSell = (name, key, ghost) => {
+    if (name === 'empty' || ghost || !props.availableActions.includes(actions.SELL_INVENTORY)) return;
+    explicitFlyOut.value = key; // Zapisujemy konkretny kliknięty klucz
+    sellInventoryItem(name);
+};
 
-    const items = Array.from(resourceNames).flatMap((name) => {
+const resources = computed(() => {
+    const result = [];
+    const resourceNames = new Set([...Object.keys(props.you.inventory), ...flyingOut.value.values()]);
+
+    for (const name of resourceNames) {
         const count = props.you.inventory[name] || 0;
         
-        // Zwykłe surowce tego typu
-        const regular = Array.from({ length: count }, (_, i) => ({
-            key: `${name}:${i}`,
-            name,
-        }));
-
-        // Znikające "duchy" TYLKO dla tego typu (lądują od razu po zwykłych)
-        const ghosts = [...flyingOut.value.entries()]
+        const ghostsForName = [...flyingOut.value.entries()]
             .filter(([_, ghostName]) => ghostName === name)
             .map(([key, ghostName]) => ({ ghost: true, key, name: ghostName }));
+            
+        const ghostKeys = ghostsForName.map(g => g.key);
+        const typeItems = [];
+        
+        let rendered = 0;
+        let i = 0;
+        
+        // Generuj zwykłe surowce, przeskakując te klucze, które właśnie znikają
+        while (rendered < count) {
+            const key = `${name}:${i}`;
+            if (!ghostKeys.includes(key)) {
+                typeItems.push({ key, name });
+                rendered++;
+            }
+            i++;
+        }
+        
+        // Sortuj po oryginalnym numerze (np. 0, 1, 2), by kliknięty surowiec nie skakał
+        const combinedType = [...typeItems, ...ghostsForName].sort((a, b) => {
+            const idxA = parseInt(a.key.split(':')[1]) || 0;
+            const idxB = parseInt(b.key.split(':')[1]) || 0;
+            return idxA - idxB;
+        });
+        
+        result.push(...combinedType);
+    }
 
-        return [...regular, ...ghosts];
-    });
-
-    const nullsNeeded = props.you.maxInventorySpace - items.length;
-
+    const nullsNeeded = props.you.maxInventorySpace - result.length;
     const empties = Array.from(
         { length: Math.max(0, nullsNeeded) },
-        (_, i) => ({ key: `empty:${i}`, name: "empty" }),
+        (_, i) => ({ key: `empty:${i}`, name: "empty" })
     );
 
-    return [...items, ...empties];
+    return [...result, ...empties];
 });
 
 const canBuyCraftsman = computed(() => {
@@ -113,7 +131,7 @@ const canBuyCart = computed(() => {
                 class="resource"
                 :data-resource="name"
                 :data-fly-key="key"
-                @click="name !== 'empty' && !ghost && sellInventoryItem(name) && props.availableActions.includes(actions.SELL_INVENTORY)"
+               @click="handleSell(name, key, ghost)"
                 :class="{
                     'fly-in': flyingIn.has(key),
                     'fly-out': ghost,

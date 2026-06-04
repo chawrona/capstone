@@ -3,6 +3,7 @@ import { ref, watch, nextTick } from "vue";
 import { soundBus } from "../../../../audio/soundBus.js";
 
 export function useInventoryAnimation(youRef) {
+    const explicitFlyOut = ref(null);
     const flyingIn = ref(new Set()); // klucze nowych surowców
     const flyingOut = ref(new Map()); // klucz → {name} surowców które znikają
     const coinsAnimating = ref(false);
@@ -135,23 +136,35 @@ export function useInventoryAnimation(youRef) {
                     addedInThisTick++;
                 }
             } else if (newCount < oldCount) {
-                // Znikają stare
+                const takeSounds = [
+                    "takeResource",
+                    "takeResource2",
+                    "takeResource3",
+                    "takeResource4",
+                    "takeResource5",
+                    "takeResource6",
+                    "takeResource7",
+                    "takeResource8",
+                ];
+
                 for (let i = newCount; i < oldCount; i++) {
-                    triggerFlyOut(`${resource}:${i}`, resource);
+                    let key = `${resource}:${i}`;
 
-                    // Cykl od 1 do 7
-                    const soundIndex = (removedInThisTick % 8) + 1;
-                    const soundName =
-                        soundIndex === 1
-                            ? "takeResource"
-                            : `takeResource${soundIndex}`;
+                    if (explicitFlyOut.value?.startsWith(resource)) {
+                        key = explicitFlyOut.value;
+                        explicitFlyOut.value = null;
+                    }
 
-                    enqueueSound(soundName);
+                    triggerFlyOut(key, resource);
+
+                    enqueueSound(
+                        takeSounds[removedInThisTick % takeSounds.length],
+                    );
                     removedInThisTick++;
                 }
             }
         }
     });
 
-    return { coinsAnimating, flyingIn, flyingOut };
+    return { coinsAnimating, explicitFlyOut, flyingIn, flyingOut };
 }

@@ -10,7 +10,10 @@
     "colors": [
       { "name": "black", "hex": "#000000" },
       { "name": "white", "hex": "#ffffff" },
-      { "name": "green", "hex": "#22c55e" }
+      { "name": "green", "hex": "#00ff00" },
+      { "name": "red", "hex": "#ff0000" },
+      { "name": "blue", "hex": "royalblue" },
+      { "name": "yellow", "hex": "#ffff00" }
     ]
   },
   {
