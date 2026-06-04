@@ -50,9 +50,9 @@ export default class CraftsmenPlayer extends Player {
                 amber: 0,
                 silk: 0,
             };
-            if (this.data.turnOrder === 1) resources.wheat = 1;
-            if (this.data.turnOrder === 2) resources.wood = 1;
-            if (this.data.turnOrder === 3) {
+            if (this.data.turnOrder === 2) resources.wheat = 1;
+            if (this.data.turnOrder === 3) resources.wood = 1;
+            if (this.data.turnOrder === 4) {
                 resources.wood = 1;
                 resources.wheat = 1;
             }
