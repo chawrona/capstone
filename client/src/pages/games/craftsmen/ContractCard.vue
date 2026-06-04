@@ -1,12 +1,12 @@
 <script setup>
 import { computed, ref, watch, nextTick } from "vue";
 
-import Brick from "@/assets/games/gameAssets/craftsmen/Brick.png";
+import Brick from "@/assets/games/gameAssets/craftsmen/brick.png";
 import Coins from "@/assets/games/gameAssets/craftsmen/coins.png";
-import Reroll from "@/assets/games/gameAssets/craftsmen/Reroll.png";
-import Stone from "@/assets/games/gameAssets/craftsmen/Stone.png";
+import Reroll from "@/assets/games/gameAssets/craftsmen/reroll.png";
+import Stone from "@/assets/games/gameAssets/craftsmen/stone.png";
 import Wheat from "@/assets/games/gameAssets/craftsmen/wheat.png";
-import Wood from "@/assets/games/gameAssets/craftsmen/Wood.png";
+import Wood from "@/assets/games/gameAssets/craftsmen/wood.png";
 
 import { resourceImages } from "./composables_craftsmen/pathImages";
 import { useGameActions } from "./composables_craftsmen/useGameActions";

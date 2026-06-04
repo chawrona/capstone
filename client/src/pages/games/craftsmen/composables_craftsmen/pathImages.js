@@ -16,10 +16,10 @@ import StonePath from "@/assets/games/gameAssets/craftsmen/path_stone.png";
 import WheatPath from "@/assets/games/gameAssets/craftsmen/path_wheat.png";
 import WoodWheat from "@/assets/games/gameAssets/craftsmen/path_wood_wheat.png";
 import WoodPath from "@/assets/games/gameAssets/craftsmen/path_wood.png";
-import Silk from "@/assets/games/gameAssets/craftsmen/Silk.png";
+import Silk from "@/assets/games/gameAssets/craftsmen/silk.png";
 import Stone from "@/assets/games/gameAssets/craftsmen/stone.png";
-import Wheat from "@/assets/games/gameAssets/craftsmen/Wheat.png";
-import Wood from "@/assets/games/gameAssets/craftsmen/Wood.png";
+import Wheat from "@/assets/games/gameAssets/craftsmen/wheat.png";
+import Wood from "@/assets/games/gameAssets/craftsmen/wood.png";
 
 const pathImages = {
     amber: AmberPath,

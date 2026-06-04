@@ -1,12 +1,12 @@
 <script setup>
 import { computed, ref } from "vue";
 
-import Cart from "@/assets/games/gameAssets/craftsmen/Cart.png";
+import Cart from "@/assets/games/gameAssets/craftsmen/cart.png";
 import Coins from "@/assets/games/gameAssets/craftsmen/coins.png";
 import Hourglass from "@/assets/games/gameAssets/craftsmen/hourglass.svg";
 import Iron from "@/assets/games/gameAssets/craftsmen/iron_bar.png";
 import Wheat from "@/assets/games/gameAssets/craftsmen/wheat.png";
-import Wood from "@/assets/games/gameAssets/craftsmen/Wood.png";
+import Wood from "@/assets/games/gameAssets/craftsmen/wood.png";
 
 import actions from "../../../../../server/models/games/craftsmen/config.js/actions";
 import { resourceImages } from "./composables_craftsmen/pathImages";

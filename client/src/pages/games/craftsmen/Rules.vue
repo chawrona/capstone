@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 
-import Rules from "@/assets/games/gameAssets/craftsmen/Book.png";
+import Rules from "@/assets/games/gameAssets/craftsmen/book.png";
 import { soundBus } from "../../../audio/soundBus";
 
 const dialogOpened = ref(false);

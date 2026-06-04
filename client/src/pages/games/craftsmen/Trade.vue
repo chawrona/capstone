@@ -1,8 +1,8 @@
 <script setup>
 import { computed, ref } from "vue";
 
-import Stone from "@/assets/games/gameAssets/craftsmen/Stone.png";
-import Wood from "@/assets/games/gameAssets/craftsmen/Wood.png";
+import Stone from "@/assets/games/gameAssets/craftsmen/stone.png";
+import Wood from "@/assets/games/gameAssets/craftsmen/wood.png";
 
 import actions from "../../../../../server/models/games/craftsmen/config.js/actions";
 import { resourceImages } from "./composables_craftsmen/pathImages";
