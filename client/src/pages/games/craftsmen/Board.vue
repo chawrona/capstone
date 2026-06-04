@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 
-import Arrow from "@/assets/games/gameAssets/craftsmen/Arrow.png";
+import Arrow from "@/assets/games/gameAssets/craftsmen/arrow.png";
 
 import actions from "../../../../../server/models/games/craftsmen/config.js/actions";
 import { pathImages } from "./composables_craftsmen/pathImages";
