@@ -82,6 +82,7 @@ export default class Craftsmen extends Game {
 
         //
         this.AVAILABLE_ID = 0;
+        this.resetedTrader = false;
 
         this.initialSetup();
     }
@@ -731,11 +732,6 @@ export default class Craftsmen extends Game {
     setAvailableMovementsForCraftsmen(publicId) {
         const playersCraftsMan = this.craftsmenOwners.get(publicId);
 
-        console.log({
-            publicId,
-            playersCraftsMan,
-        });
-
         this.availableMovement = {};
         playersCraftsMan.forEach((craftsmanId) => {
             this.setAvailableMovementsForCraftsman(craftsmanId);
@@ -918,20 +914,19 @@ export default class Craftsmen extends Game {
             this.setAvailableMovementsForCraftsmen(
                 this.playersQueue[this.currentPlayerIndex],
             );
+            // usuwamy zakaz odnawiania tradera, aktualizujemy tradera,
+            // na trade undefined i potem znowu ustawiamy, że można go odświeżyć.
+            // to dlatego, że reset w updaeTrader blokuje potem odświeżanie tradera
+            // mechanika przewidziana dla obracania planszy
+            // ale reset jest również w przypadku nowej tury
+            // i tam nie powinno być resetedTrader na true
 
-            const nextPlayer = this.getPlayer(
-                this.playersQueue[this.currentPlayerIndex],
-            );
-
-            const newTrade = {
-                buyAmount: 0,
-                sellAmount: 0,
-                allowBuying: false,
-                allowSelling: false,
-                resource: "undefined",
-            };
-
-            nextPlayer.setData("trading", () => newTrade);
+            this.resetedTrader = false;
+            this.updateTrader({
+                publicId: this.playersQueue[this.currentPlayerIndex],
+                reset: true,
+            });
+            this.resetedTrader = false;
         }
 
         const player = this.getPlayer(publicId);
@@ -973,16 +968,93 @@ export default class Craftsmen extends Game {
             return stats;
         });
 
-        player.setData("trading", (oldTrade) => {
-            oldTrade.allowBuying = false;
-            oldTrade.allowSelling = false;
-            oldTrade.resource = "undefined";
-            oldTrade.buyAmount = 0;
-            oldTrade.sellAmount = 0;
-            return oldTrade;
-        });
+        this.updateTrader({ publicId, reset: true });
 
         return this.sendGameDataToAll();
+    }
+
+    // region UPDATE TRADER
+    updateTrader({ publicId, ringType, fieldId, reset }) {
+        const player = this.getPlayer(publicId);
+        let newTrade;
+        if (this.resetedTrader) {
+            return;
+        }
+        if (reset) {
+            newTrade = {
+                buyAmount: 0,
+                sellAmount: 0,
+                allowBuying: false,
+                allowSelling: false,
+                resource: "undefined",
+            };
+            this.resetedTrader = true;
+        } else {
+            if (!ringType || fieldId === undefined) {
+                const craftsmen = this.craftsmenOwners.get(publicId);
+                for (const craftstmanId of craftsmen) {
+                    const craftsman = this.craftsmen.get(craftstmanId);
+                    if (craftsman.type === "trader") {
+                        fieldId = craftsman.fieldId;
+                        ringType = craftsman.ringType;
+                        break;
+                    }
+                }
+            }
+
+            if (!ringType || fieldId === undefined) {
+                throw new Error("Nie znaleziono handlarza");
+            }
+
+            let resource;
+
+            if (ringType === "outer") {
+                let rotatedIndex = fieldId - (this.outerCircleRotation % 8);
+                rotatedIndex =
+                    rotatedIndex < 0 ? 8 + rotatedIndex : rotatedIndex;
+                resource = this.outerPositionsIds[rotatedIndex].split("_")[0];
+            } else {
+                resource =
+                    this.innerPositionsIds[
+                        (this.innerCircleRotation + fieldId) % 3
+                    ];
+            }
+
+            if (resource === "gold") {
+                newTrade = {
+                    buyAmount: 0,
+                    sellAmount: 0,
+                    allowBuying: false,
+                    allowSelling: false,
+                    resource: "coins",
+                };
+            } else {
+                const fieldAmount =
+                    ringType === "outer"
+                        ? this.outerFieldsResourcesAmount[fieldId]
+                        : this.innerFieldsResourcesAmount[fieldId];
+
+                const buyAmount = 4 - fieldAmount;
+                const canBuy =
+                    ringType === "outer" &&
+                    player.getData("coins") >= buyAmount;
+
+                const sellAmount =
+                    ringType === "outer"
+                        ? 2
+                        : 8 - 2 * fieldAmount + Number(resource === "glass");
+                const canSell = player.getData("inventory")[resource] > 0;
+
+                newTrade = {
+                    buyAmount: ringType === "outer" ? buyAmount : 0,
+                    sellAmount,
+                    allowBuying: canBuy,
+                    allowSelling: canSell,
+                    resource,
+                };
+            }
+        }
+        player.setData("trading", () => newTrade);
     }
 
     // region BUY CART
@@ -1272,66 +1344,7 @@ export default class Craftsmen extends Game {
         // region move - trade
         if (isTrader) {
             // Zaaktualizuj bank
-
-            let resource;
-
-            if (ringType === "outer") {
-                let rotatedIndex = fieldId - (this.outerCircleRotation % 8);
-                rotatedIndex =
-                    rotatedIndex < 0 ? 8 + rotatedIndex : rotatedIndex;
-                resource = this.outerPositionsIds[rotatedIndex].split("_")[0];
-            } else {
-                resource =
-                    this.innerPositionsIds[
-                        (this.innerCircleRotation + fieldId) % 3
-                    ];
-
-                console.log(this.innerPositionsIds);
-
-                console.log("Resource: ", resource);
-
-                console.log(
-                    "Index: ",
-                    (this.innerCircleRotation + fieldId) % 3,
-                );
-            }
-
-            const fieldAmount =
-                ringType === "outer"
-                    ? this.outerFieldsResourcesAmount[fieldId]
-                    : this.innerFieldsResourcesAmount[fieldId];
-
-            if (resource === "gold") {
-                const newTrade = {
-                    buyAmount: 0,
-                    sellAmount: 0,
-                    allowBuying: false,
-                    allowSelling: false,
-                    resource: "coins",
-                };
-                player.setData("trading", () => newTrade);
-            } else {
-                const buyAmount = 4 - fieldAmount;
-                const canBuy =
-                    ringType === "outer" &&
-                    player.getData("coins") >= buyAmount;
-
-                const sellAmount =
-                    ringType === "outer"
-                        ? 2
-                        : 8 - 2 * fieldAmount + Number(resource === "glass");
-                const canSell = player.getData("inventory")[resource] > 0;
-
-                const newTrade = {
-                    buyAmount: ringType === "outer" ? buyAmount : 0,
-                    sellAmount,
-                    allowBuying: canBuy,
-                    allowSelling: canSell,
-                    resource,
-                };
-
-                player.setData("trading", () => newTrade);
-            }
+            this.updateTrader({ publicId, ringType, fieldId });
         }
 
         if (this.availableActions.includes(actions.PLACE_CRAFTSMAN)) {
@@ -1380,6 +1393,8 @@ export default class Craftsmen extends Game {
             actions.PLACE_CRAFTSMAN,
             actions.MOVE_CRAFTSMAN,
         ];
+
+        this.setAvailableMovementsForCraftsmen(publicId);
         return this.sendGameDataToAll();
     }
 
@@ -1535,7 +1550,7 @@ export default class Craftsmen extends Game {
             stats.rerolls += 1;
             return stats;
         });
-
+        this.setAvailableMovementsForCraftsmen(publicId);
         return this.sendGameDataToAll();
     }
     //@event
@@ -1562,6 +1577,8 @@ export default class Craftsmen extends Game {
             return stats;
         });
 
+        this.updateTrader({ publicId });
+        this.setAvailableMovementsForCraftsmen(publicId);
         return this.sendGameDataToAll();
     }
 
@@ -1570,6 +1587,7 @@ export default class Craftsmen extends Game {
     buyTrade({ publicId }) {
         this.eventChecker(publicId, actions.TRADE);
         const player = this.getPlayer(publicId);
+        const currentTrade = player.getData("trading");
 
         if (!player.getData("trader")) {
             throw new Error("Nie możesz handlować bez handlarza");
@@ -1579,88 +1597,32 @@ export default class Craftsmen extends Game {
             throw new Error("Nie masz wystarczająco miejsca");
         }
 
-        if (!player.getData("trading").allowBuying) {
+        if (!currentTrade.allowBuying) {
             throw new Error("Nie możesz kupować");
         }
 
-        // znajdź handlarza
-        let ringType;
-        let fieldId;
-
-        const craftsmen = this.craftsmenOwners.get(publicId);
-
-        for (const craftstmanId of craftsmen) {
-            const craftsman = this.craftsmen.get(craftstmanId);
-            if (craftsman.type === "trader") {
-                fieldId = craftsman.fieldId;
-                ringType = craftsman.ringType;
-                break;
-            }
+        if (!currentTrade.allowSelling) {
+            throw new Error("Nie możesz sprzedawać");
         }
 
-        if (!ringType || fieldId === undefined) {
-            throw new Error("Nie znaleziono handlarza");
-        }
-
-        let resource;
-
-        if (ringType === "outer") {
-            let rotatedIndex = fieldId - (this.outerCircleRotation % 8);
-            rotatedIndex = rotatedIndex < 0 ? 8 + rotatedIndex : rotatedIndex;
-            resource = this.outerPositionsIds[rotatedIndex].split("_")[0];
-        } else {
-            resource =
-                this.innerPositionsIds[
-                    (this.innerCircleRotation + fieldId) % 3
-                ];
-        }
-
-        const fieldAmount =
-            ringType === "outer"
-                ? this.outerFieldsResourcesAmount[fieldId]
-                : this.innerFieldsResourcesAmount[fieldId];
-
-        const buyAmount = 4 - fieldAmount;
-        const sellAmount =
-            ringType === "outer"
-                ? 2
-                : 8 - 2 * fieldAmount + Number(resource === "glass");
-
-        // sprawdź czy może kupić
-        if (ringType !== "outer")
-            throw new Error("Nie możesz kupować na tym polu");
-        if (player.getData("coins") < buyAmount)
+        if (player.getData("coins") < currentTrade.buyAmount)
             throw new Error("Nie masz wystarczająco pieniędzy");
 
         // kup
-        player.setData("coins", (coins) => coins - buyAmount);
+        player.setData("coins", (coins) => coins - currentTrade.buyAmount);
         player.setData("inventory", (inventory) => {
-            inventory[resource] += 1;
+            inventory[currentTrade.resource] += 1;
             return inventory;
         });
 
-        // Zaaktualizuj możliwość
-        let canBuy =
-            ringType === "outer" && player.getData("coins") >= buyAmount;
-
-        let canSell = player.getData("inventory")[resource] > 0;
-
-        const newTrade = {
-            buyAmount: ringType === "outer" ? buyAmount : 0,
-            sellAmount,
-            allowBuying: canBuy,
-            allowSelling: canSell,
-            resource,
-        };
-
-        player.setData("trading", () => newTrade);
-
         player.setData("stats", (stats) => {
             stats.tradesBought += 1;
-            stats.tradesBoughtAmount += buyAmount;
+            stats.tradesBoughtAmount += currentTrade.buyAmount;
             return stats;
         });
 
+        this.updateTrader({ publicId });
+        this.setAvailableMovementsForCraftsmen(publicId);
         return this.sendGameDataToAll();
     }
     // @event
@@ -1668,6 +1630,7 @@ export default class Craftsmen extends Game {
     sellTrade({ publicId }) {
         this.eventChecker(publicId, actions.TRADE);
         const player = this.getPlayer(publicId);
+        const currentTrade = player.getData("trading");
 
         if (!player.getData("trader")) {
             throw new Error("Nie możesz handlować bez handlarza");
@@ -1677,92 +1640,25 @@ export default class Craftsmen extends Game {
             throw new Error("Nie możesz sprzedawać");
         }
 
-        // znajdź handlarza
-        let ringType;
-        let fieldId;
-        console.log("==========================");
-        console.log("======szukamy handlarza========");
-        console.log("==========================");
-
-        console.log({ publicId });
-
-        const craftsmen = this.craftsmenOwners.get(publicId);
-
-        for (const craftstmanId of craftsmen) {
-            console.log("ID:");
-            console.log({ craftstmanId });
-
-            const craftsman = this.craftsmen.get(craftstmanId);
-            console.log(craftsman);
-
-            if (craftsman.type === "trader") {
-                fieldId = craftsman.fieldId;
-                ringType = craftsman.ringType;
-                break;
-            }
-        }
-
-        if (!ringType || fieldId === undefined) {
-            throw new Error("Nie znaleziono handlarza");
-        }
-
-        let resource;
-
-        if (ringType === "outer") {
-            let rotatedIndex = fieldId - (this.outerCircleRotation % 8);
-            rotatedIndex = rotatedIndex < 0 ? 8 + rotatedIndex : rotatedIndex;
-            resource = this.outerPositionsIds[rotatedIndex].split("_")[0];
-        } else {
-            resource =
-                this.innerPositionsIds[
-                    (this.innerCircleRotation + fieldId) % 3
-                ];
-        }
-
-        const fieldAmount =
-            ringType === "outer"
-                ? this.outerFieldsResourcesAmount[fieldId]
-                : this.innerFieldsResourcesAmount[fieldId];
-
-        const buyAmount = 4 - fieldAmount;
-        const sellAmount =
-            ringType === "outer"
-                ? 2
-                : 8 - 2 * fieldAmount + Number(resource === "glass");
-
-        // sprawdź czy może sprzedać
-        if (player.getData("inventory")[resource] <= 0)
+        if (player.getData("inventory")[currentTrade.resource] <= 0) {
             throw new Error("Nie masz wymaganego surowca");
+        }
 
         // sprzedaj
-        player.setData("coins", (coins) => coins + sellAmount);
+        player.setData("coins", (coins) => coins + currentTrade.sellAmount);
         player.setData("inventory", (inventory) => {
-            inventory[resource] -= 1;
+            inventory[currentTrade.resource] -= 1;
             return inventory;
         });
 
-        // Zaaktualizuj możliwość
-        let canBuy =
-            ringType === "outer" && player.getData("coins") >= buyAmount;
-
-        let canSell = player.getData("inventory")[resource] > 0;
-
-        const newTrade = {
-            buyAmount: ringType === "outer" ? buyAmount : 0,
-            sellAmount,
-            allowBuying: canBuy,
-            allowSelling: canSell,
-            resource,
-        };
-
-        player.setData("trading", () => newTrade);
-
         player.setData("stats", (stats) => {
             stats.tradesSold += 1;
-            stats.tradeSoldAmount += sellAmount;
+            stats.tradeSoldAmount += currentTrade.sellAmount;
             return stats;
         });
 
+        this.updateTrader({ publicId });
+        this.setAvailableMovementsForCraftsmen(publicId);
         return this.sendGameDataToAll();
     }
 }
