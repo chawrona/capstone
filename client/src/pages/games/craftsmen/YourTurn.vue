@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from "vue";
+
 import { soundBus } from "../../../audio/soundBus";
 
 const props = defineProps({

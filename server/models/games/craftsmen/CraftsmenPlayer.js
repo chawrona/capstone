@@ -35,7 +35,9 @@ export default class CraftsmenPlayer extends Player {
             ];
         });
         this.setData("rotateCost", () => [["iron", 1]]);
-        this.setData("coins", () => 5);
+        this.setData("coins", () =>
+            process.env.DEVELOPMENT === "true" ? 100 : 5,
+        );
         this.setData("maxInventorySpace", () => 6);
         this.setData("canBuyCraftsman", () => true);
         this.setData("canBuyCart", () => true);
@@ -50,12 +52,19 @@ export default class CraftsmenPlayer extends Player {
                 amber: 0,
                 silk: 0,
             };
-            if (this.data.turnOrder === 2) resources.wheat = 1;
-            if (this.data.turnOrder === 3) resources.wood = 1;
-            if (this.data.turnOrder === 4) {
-                resources.wood = 1;
-                resources.wheat = 1;
+
+            if (process.env.DEVELOPMENT === "true") {
+                resources.stone = 10;
+                resources.brick = 10;
+            } else {
+                if (this.data.turnOrder === 2) resources.wheat = 1;
+                if (this.data.turnOrder === 3) resources.wood = 1;
+                if (this.data.turnOrder === 4) {
+                    resources.wood = 1;
+                    resources.wheat = 1;
+                }
             }
+
             return resources;
         });
 

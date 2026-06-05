@@ -4,11 +4,11 @@ import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import Arrow from "@/assets/games/gameAssets/craftsmen/arrow.png";
 
 import actions from "../../../../../server/models/games/craftsmen/config.js/actions";
+import { soundBus } from "../../../audio/soundBus";
 import { pathImages } from "./composables_craftsmen/pathImages";
 import { resourceImages } from "./composables_craftsmen/pathImages";
 import { useGameActions } from "./composables_craftsmen/useGameActions";
 import Craftsman from "./Craftsman.vue";
-import { soundBus } from "../../../audio/soundBus";
 
 const props = defineProps([
     "innerCircleRotation",
@@ -71,7 +71,7 @@ watch(
         if (oldVal !== undefined && newVal !== oldVal) {
             soundBus.playEffect("rocks");
         }
-    }
+    },
 );
 
 // --- DŹWIĘK BUDOWY GILDII ---
@@ -125,7 +125,7 @@ const openBuildGuildDialog = (ringType, id, resource) => {
 };
 
 const closeBuildGuildDialog = () => {
-     soundBus.playEffect("buttonPress1");
+    soundBus.playEffect("buttonPress1");
     dialogOpened.value = false;
     guildToBuild.value = null;
 };
@@ -567,9 +567,8 @@ const isSelectingPlace = computed(() => {
 
         &.hover {
             cursor: pointer;
-           filter: brightness(1.2);
+            filter: brightness(1.2);
             animation: upAndDown 1.4s ease-in-out infinite;
-
         }
 
         &.hover:hover {
@@ -579,9 +578,15 @@ const isSelectingPlace = computed(() => {
 }
 
 @keyframes upAndDown {
-    0%   { transform: translateY(0); }
-    50%  { transform: translateY(-0.4rem); }
-    100% { transform: translateY(0); }
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-0.4rem);
+    }
+    100% {
+        transform: translateY(0);
+    }
 }
 
 .guild {

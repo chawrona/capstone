@@ -8,9 +8,9 @@ import Stone from "@/assets/games/gameAssets/craftsmen/stone.png";
 import Wheat from "@/assets/games/gameAssets/craftsmen/wheat.png";
 import Wood from "@/assets/games/gameAssets/craftsmen/wood.png";
 
+import { soundBus } from "../../../audio/soundBus";
 import { resourceImages } from "./composables_craftsmen/pathImages";
 import { useGameActions } from "./composables_craftsmen/useGameActions";
-import { soundBus } from "../../../audio/soundBus";
 
 const props = defineProps([
     "contract",
@@ -25,44 +25,52 @@ const { completeContract, rerollContract } = useGameActions(
     () => props.availableActions,
 );
 
-const icons = import.meta.glob('@/assets/games/gameAssets/craftsmen/contracts/*.png', { 
-  eager: true, 
-  import: 'default' 
-});
+const icons = import.meta.glob(
+    "@/assets/games/gameAssets/craftsmen/contracts/*.png",
+    {
+        eager: true,
+        import: "default",
+    },
+);
 
 const getIconPath = (iconName) => {
-  const path = `/src/assets/games/gameAssets/craftsmen/contracts/${iconName}`;
-  return icons[path] || '';
+    const path = `/src/assets/games/gameAssets/craftsmen/contracts/${iconName}`;
+    return icons[path] || "";
 };
 
-
-const animClass = ref('');
+const animClass = ref("");
 const displayContract = ref({ ...props.contract });
 
-watch(() => props.contract, async (newVal, oldVal) => {
-  if (newVal.title === oldVal?.title && newVal.available === oldVal?.available) {
-    displayContract.value = { ...newVal };
-    return;
-  }
-  
-  if (!newVal.available) {
-    soundBus.playEffect("craft");
-    displayContract.value = { ...newVal };
-    return;
-  }
+watch(
+    () => props.contract,
+    async (newVal, oldVal) => {
+        if (
+            newVal.title === oldVal?.title &&
+            newVal.available === oldVal?.available
+        ) {
+            displayContract.value = { ...newVal };
+            return;
+        }
 
-  animClass.value = 'fly-out';
-  await new Promise(r => setTimeout(r, 320));
-  displayContract.value = { ...newVal };
-  animClass.value = '';
-  await nextTick();
-  animClass.value = 'fly-in';
+        if (!newVal.available) {
+            soundBus.playEffect("craft");
+            displayContract.value = { ...newVal };
+            return;
+        }
 
-  const FLY_IN_DURATION = 320;
-  setTimeout(() => {
-    soundBus.playEffect("placeCard");
-  }, FLY_IN_DURATION * 0.8);
-});
+        animClass.value = "fly-out";
+        await new Promise((r) => setTimeout(r, 320));
+        displayContract.value = { ...newVal };
+        animClass.value = "";
+        await nextTick();
+        animClass.value = "fly-in";
+
+        const FLY_IN_DURATION = 320;
+        setTimeout(() => {
+            soundBus.playEffect("placeCard");
+        }, FLY_IN_DURATION * 0.8);
+    },
+);
 
 const canReroll = computed(() => {
     return props.you.coins >= props.rerollCost;
@@ -89,7 +97,10 @@ const localCompleteContract = () => {
 </script>
 
 <template>
-  <div class="card" :class="[animClass, { hidden: !displayContract.available }]">
+    <div
+        class="card"
+        :class="[animClass, { hidden: !displayContract.available }]"
+    >
         <button
             v-if="props.canReroll"
             class="reroll"
@@ -108,7 +119,11 @@ const localCompleteContract = () => {
         >
             <h1 class="title">{{ displayContract.title }}</h1>
 
-            <img :src="getIconPath(displayContract.icon)" alt="" class="cardIcon" />
+            <img
+                :src="getIconPath(displayContract.icon)"
+                alt=""
+                class="cardIcon"
+            />
 
             <div class="top">
                 <div
@@ -258,17 +273,38 @@ const localCompleteContract = () => {
 }
 
 @keyframes flyOut {
-  0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-  20%  { transform: translate(6px, -20px) rotate(1deg); opacity: 1; }
-  100% { transform: translate(120vw, -30px) rotate(8deg); opacity: 0; }
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 1;
+    }
+    20% {
+        transform: translate(6px, -20px) rotate(1deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(120vw, -30px) rotate(8deg);
+        opacity: 0;
+    }
 }
 @keyframes flyIn {
-  0%   { transform: translate(120vw, -30px) rotate(8deg); opacity: 0; }
-  80%  { transform: translate(6px, -20px) rotate(1deg); opacity: 1; }
-  100% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    0% {
+        transform: translate(120vw, -30px) rotate(8deg);
+        opacity: 0;
+    }
+    80% {
+        transform: translate(6px, -20px) rotate(1deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 1;
+    }
 }
 
-.wrap.fly-out { animation: flyOut 0.32s cubic-bezier(.4, 0, .6, 1) forwards; }
-.wrap.fly-in  { animation: flyIn  0.32s cubic-bezier(.4, 0, .6, 1) forwards; }
-
+.wrap.fly-out {
+    animation: flyOut 0.32s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+.wrap.fly-in {
+    animation: flyIn 0.32s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
 </style>

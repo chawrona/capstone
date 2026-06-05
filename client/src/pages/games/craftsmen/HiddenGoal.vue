@@ -1,10 +1,17 @@
 <script setup>
-const props = defineProps(["hiddenTask"]);
+const props = defineProps(["hiddenTask", "hiddenTaskInfo"]);
+const showInfo = ref(false);
 </script>
 <template>
-    <div class="goalCard">
-        <h1>{{ props.hiddenTask.title }}</h1>
-        <p>{{ props.hiddenTask.description }}</p>
+    <div class="goalCard" @click="showInfo = !showInfo">
+        <template v-if="!showInfo">
+            <h1>{{ props.hiddenTask.title }}</h1>
+            <p>{{ props.hiddenTask.description }}</p>
+        </template>
+
+        <template v-else>
+            <h1>{{ props.hiddenTaskInfo }}</h1>
+        </template>
     </div>
 </template>
 

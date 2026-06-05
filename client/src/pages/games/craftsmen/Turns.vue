@@ -10,7 +10,7 @@ const props = defineProps(["player", "round", "turn", "isYourTurn"]);
             <div class="wheatWrap">
                 <img :src="resourceImages['wheat']" alt="" class="wheatIcon" />
                 <h1>
-                    {{ 6 - props.turn === 1 ? "Pobór zboża" : 6 - props.turn }}
+                    {{ 7 - props.turn === 1 ? "Pobór zboża" : 7 - props.turn }}
                 </h1>
             </div>
         </div>

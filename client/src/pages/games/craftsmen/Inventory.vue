@@ -16,34 +16,43 @@ import Craftsman from "./Craftsman.vue";
 
 const props = defineProps(["you", "availableActions"]);
 
-const { buyCart, buyCraftsman, sellInventoryItem } = useGameActions(() => props.availableActions);
-const { coinsAnimating, flyingIn, flyingOut, explicitFlyOut } = useInventoryAnimation(
-    () => props.you,
+const { buyCart, buyCraftsman, sellInventoryItem } = useGameActions(
+    () => props.availableActions,
 );
+const { coinsAnimating, explicitFlyOut, flyingIn, flyingOut } =
+    useInventoryAnimation(() => props.you);
 
 const handleSell = (name, key, ghost) => {
-    if (name === 'empty' || ghost || !props.availableActions.includes(actions.SELL_INVENTORY)) return;
+    if (
+        name === "empty" ||
+        ghost ||
+        !props.availableActions.includes(actions.SELL_INVENTORY)
+    )
+        return;
     explicitFlyOut.value = key; // Zapisujemy konkretny kliknięty klucz
     sellInventoryItem(name);
 };
 
 const resources = computed(() => {
     const result = [];
-    const resourceNames = new Set([...Object.keys(props.you.inventory), ...flyingOut.value.values()]);
+    const resourceNames = new Set([
+        ...Object.keys(props.you.inventory),
+        ...flyingOut.value.values(),
+    ]);
 
     for (const name of resourceNames) {
         const count = props.you.inventory[name] || 0;
-        
+
         const ghostsForName = [...flyingOut.value.entries()]
             .filter(([_, ghostName]) => ghostName === name)
             .map(([key, ghostName]) => ({ ghost: true, key, name: ghostName }));
-            
-        const ghostKeys = ghostsForName.map(g => g.key);
+
+        const ghostKeys = ghostsForName.map((g) => g.key);
         const typeItems = [];
-        
+
         let rendered = 0;
         let i = 0;
-        
+
         // Generuj zwykłe surowce, przeskakując te klucze, które właśnie znikają
         while (rendered < count) {
             const key = `${name}:${i}`;
@@ -53,21 +62,21 @@ const resources = computed(() => {
             }
             i++;
         }
-        
+
         // Sortuj po oryginalnym numerze (np. 0, 1, 2), by kliknięty surowiec nie skakał
         const combinedType = [...typeItems, ...ghostsForName].sort((a, b) => {
-            const idxA = parseInt(a.key.split(':')[1]) || 0;
-            const idxB = parseInt(b.key.split(':')[1]) || 0;
+            const idxA = parseInt(a.key.split(":")[1]) || 0;
+            const idxB = parseInt(b.key.split(":")[1]) || 0;
             return idxA - idxB;
         });
-        
+
         result.push(...combinedType);
     }
 
     const nullsNeeded = props.you.maxInventorySpace - result.length;
     const empties = Array.from(
         { length: Math.max(0, nullsNeeded) },
-        (_, i) => ({ key: `empty:${i}`, name: "empty" })
+        (_, i) => ({ key: `empty:${i}`, name: "empty" }),
     );
 
     return [...result, ...empties];
@@ -131,11 +140,11 @@ const canBuyCart = computed(() => {
                 class="resource"
                 :data-resource="name"
                 :data-fly-key="key"
-               @click="handleSell(name, key, ghost)"
                 :class="{
                     'fly-in': flyingIn.has(key),
                     'fly-out': ghost,
                 }"
+                @click="handleSell(name, key, ghost)"
             />
         </div>
         <div class="upgrades">
@@ -215,9 +224,10 @@ const canBuyCart = computed(() => {
     background-position: center;
     background-repeat: no-repeat;
 
-
     &:not([data-resource="empty"]) {
-        cursor: url("/src/assets/games/gameAssets/craftsmen/coinsCursor.png") 8 8, pointer;
+        cursor:
+            url("/src/assets/games/gameAssets/craftsmen/coinsCursor.png") 8 8,
+            pointer;
     }
 
     filter: drop-shadow(2px 2px 5px black);
@@ -263,11 +273,14 @@ const canBuyCart = computed(() => {
         pointer-events: none;
     }
 
-    transition: transform 0.12s ease, filter 0.12s ease;
+    transition:
+        transform 0.12s ease,
+        filter 0.12s ease;
 
     &:not([data-resource="empty"]):not(.fly-out):hover {
         transform: scale(1.1);
-        filter: drop-shadow(2px 2px 2px rgba(255, 210, 60, 0.65)) brightness(1.1);
+        filter: drop-shadow(2px 2px 2px rgba(255, 210, 60, 0.65))
+            brightness(1.1);
     }
 
     &:not([data-resource="empty"]):not(.fly-out):active {

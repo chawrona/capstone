@@ -12,17 +12,17 @@ const hiddenTasks = [
     {
         title: "Kolekcjoner Luksusów",
         id: 2,
-        description: "Miej w inwentarzu 7 sztuk Szkła. ",
+        description: "Wydaj 12 bursztynu w ramach innego surowca",
     },
     {
         title: "Król Kupców",
         id: 3,
-        description: "Miej w banku ponad 30 złota ",
+        description: "Wydaj na kupno surowców 40 monet",
     },
     {
         title: "Bóg RNG",
         id: 4,
-        description: "Obróć planszę 10 razy",
+        description: "Obróć planszę 14 razy",
     },
 ];
 

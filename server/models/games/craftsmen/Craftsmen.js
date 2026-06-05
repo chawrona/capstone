@@ -83,6 +83,11 @@ export default class Craftsmen extends Game {
         //
         this.AVAILABLE_ID = 0;
         this.resetedTrader = false;
+        this.tradeCount = {
+            field: undefined,
+            currentSell: 0,
+            currentBuy: 0,
+        };
 
         this.initialSetup();
     }
@@ -261,6 +266,7 @@ export default class Craftsmen extends Game {
                 lobbyId: this.lobbyId,
                 isYourTurn:
                     publicId === this.playersQueue[this.currentPlayerIndex],
+                hiddenTaskInfo: this.getHiddenTaskProgress(player),
             },
         };
     }
@@ -306,6 +312,12 @@ export default class Craftsmen extends Game {
         });
     }
 
+    getOuterGuild(physicalFieldId) {
+        const baseIndex =
+            (physicalFieldId - (this.outerCircleRotation % 8) + 8) % 8;
+        return this.guilds.outer[baseIndex];
+    }
+
     gameDataRequest(data) {
         const dataToSend = this.generateGameData(data.publicId);
 
@@ -316,6 +328,56 @@ export default class Craftsmen extends Game {
         return [dataToSend];
     }
 
+    //region HIDDEN TASK INFO
+    getHiddenTaskProgress(player) {
+        const hiddenTask = player.getData("hiddenTask");
+
+        // Baron logistyki
+        if (hiddenTask.id === 0) {
+            const current = player.getData("maxInventorySpace");
+            const target = this.maxPlayersInventorySpace;
+
+            return `Pojemność magazynu: ${current}/${target}`;
+        }
+
+        // Szara Eminencja
+        if (hiddenTask.id === 1) {
+            let guildCount = 0;
+            let takenGuilds = 0;
+
+            for (const guild of this.guilds.outer) {
+                if (guild !== null) {
+                    takenGuilds++;
+
+                    if (guild.publicId === player.publicId) {
+                        guildCount++;
+                    }
+                }
+            }
+
+            return `Masz ${guildCount}/3 gildie (zajętych gildii: ${takenGuilds}/${this.guilds.outer.length})`;
+        }
+
+        // Kolekcjoner Luksusów
+        if (hiddenTask.id === 2) {
+            const current = player.getData("stats").amberSpent;
+            return `Wydałeś ${current}/12 bursztynów`;
+        }
+
+        // Król Kupców
+        if (hiddenTask.id === 3) {
+            const current = player.getData("stats").tradesBoughtAmount;
+            return `Kupiłeś ${current}/40 towarów`;
+        }
+
+        // Bóg RNG
+        if (hiddenTask.id === 4) {
+            const current = player.getData("stats").rotations;
+            return `Wykonałeś ${current}/14 rotacji`;
+        }
+
+        return "Nieznane zadanie";
+    }
     // region HIDDEN TASK CHECK
     checkHiddenTask(player) {
         const hiddenTask = player.getData("hiddenTask");
@@ -347,17 +409,17 @@ export default class Craftsmen extends Game {
 
         // Kolekcjoner Luksusów
         if (hiddenTask.id === 2) {
-            return player.getData("inventory").glass >= 7;
+            return player.getData("stats").amberSpent >= 12;
         }
 
         // Król Kupców
         if (hiddenTask.id === 3) {
-            return player.getData("coins") > 30;
+            return player.getData("stats").tradesBoughtAmount >= 40;
         }
 
         // Bóg RNG
         if (hiddenTask.id === 4) {
-            return player.getData("stats").rotations >= 10;
+            return player.getData("stats").rotations >= 14;
         }
     }
 
@@ -457,18 +519,11 @@ export default class Craftsmen extends Game {
     }
 
     setAvailableMovementsForCraftsman(craftsmanId, reset = false) {
-        if (reset) {
-            this.availableMovement = {};
-        }
-
-        if (this.movedCraftsmen.has(craftsmanId)) {
-            return;
-        }
+        if (reset) this.availableMovement = {};
+        if (this.movedCraftsmen.has(craftsmanId)) return;
 
         const craftsman = this.craftsmen.get(craftsmanId);
-
         const currentField = craftsman.getFieldId();
-
         const owner = this.getPlayer(craftsman.publicId);
 
         // Stawiamy craftsmana
@@ -477,80 +532,171 @@ export default class Craftsmen extends Game {
                 inner: [false, false, false],
                 outer: [true, true, true, true, true, true, true, true],
             };
-        } else {
-            // Normalnie wyliczamy jego dostępne pola
-            // koszt gildii, koszt innych graczy, koszt luksuwowej dzielnicy, czy już stoi tam gdzie stoi
+            return;
+        }
 
-            this.availableMovement[craftsmanId] = {
-                inner: [false, false, false],
-                outer: [false, false, false, false, false, false, false, false],
-            };
+        // Normalnie wyliczamy jego dostępne pola
+        this.availableMovement[craftsmanId] = {
+            inner: [false, false, false],
+            outer: [false, false, false, false, false, false, false, false],
+        };
 
-            // region pionek na outer
-            if (craftsman.ringType === "outer" && craftsman.type !== "trader") {
-                // Wyliczamy indeks pola po lewej (Clock Wise) i po prawej (Counter Clock Wise)
-                const goClockWise = currentField === 0 ? 7 : currentField - 1;
-                const goCounterClockWise =
-                    currentField === 7 ? 0 : currentField + 1;
+        // region pionek na outer
+        if (craftsman.ringType === "outer" && craftsman.type !== "trader") {
+            // Wyliczamy indeks pola po lewej (Clock Wise) i po prawej (Counter Clock Wise)
+            const goClockWise = currentField === 0 ? 7 : currentField - 1;
+            const goCounterClockWise =
+                currentField === 7 ? 0 : currentField + 1;
 
-                // Wyliczamy indeksy pól w środku, na które gracz może iść
-                const availableInnerFields =
-                    currentField === 2
-                        ? [0, 1]
-                        : currentField === 5
-                          ? [1, 2]
-                          : currentField < 2
-                            ? [0]
-                            : currentField < 5
-                              ? [1]
-                              : [2];
+            // Wyliczamy indeksy pól w środku, na które gracz może iść
+            const availableInnerFields =
+                currentField === 2
+                    ? [0, 1]
+                    : currentField === 5
+                      ? [1, 2]
+                      : currentField < 2
+                        ? [0]
+                        : currentField < 5
+                          ? [1]
+                          : [2];
 
-                // Sprawdzamy czy można iść na pole po lewej (Clock Wise)
-                // Wyliczamy wymagane pieniądze
-                let moneyToPay = 0;
-                let hasOtherCraftsman = false;
-                // [id, new Set()]
-                let localCraftsmenIds =
-                    this.outerPathCraftsmen.get(goClockWise);
-                for (const localCraftsmanId of localCraftsmenIds) {
-                    const localCraftsman = this.craftsmen.get(localCraftsmanId);
-                    if (localCraftsman.publicId === owner.publicId) {
-                        hasOtherCraftsman = true;
-                        moneyToPay = 0;
-                        break;
-                    }
-
-                    if (localCraftsman.publicId !== owner.publicId) {
-                        moneyToPay += 1;
-                    }
+            // Sprawdzamy czy można iść na pole po lewej (Clock Wise)
+            // Wyliczamy wymagane pieniądze
+            let moneyToPay = 0;
+            let hasOtherCraftsman = false;
+            // [id, new Set()]
+            let localCraftsmenIds = this.outerPathCraftsmen.get(goClockWise);
+            for (const localCraftsmanId of localCraftsmenIds) {
+                const localCraftsman = this.craftsmen.get(localCraftsmanId);
+                if (
+                    localCraftsman.publicId === owner.publicId &&
+                    localCraftsman.type !== "trader"
+                ) {
+                    hasOtherCraftsman = true;
+                    moneyToPay = 0;
+                    break;
                 }
 
-                // Gildia, jeżeli czyjaś to dodatkowa opłata.
-                // Jeżeli Twoja to masz darmowy ruch tam
-                if (this.guilds.outer[goClockWise]) {
-                    if (
-                        this.guilds.outer[goClockWise].publicId !==
-                            owner.publicId &&
-                        !hasOtherCraftsman
-                    ) {
-                        moneyToPay++;
-                    } else {
-                        moneyToPay = 0;
-                    }
+                if (
+                    localCraftsman.publicId !== owner.publicId &&
+                    localCraftsman.type !== "trader"
+                ) {
+                    moneyToPay += 1;
+                }
+            }
+
+            // Gildia, jeżeli czyjaś to dodatkowa opłata.
+            // Jeżeli Twoja to masz darmowy ruch tam
+            if (this.getOuterGuild(goClockWise)) {
+                this.log("CLOCKWISE - JEST TAM GILDIA");
+                if (
+                    this.getOuterGuild(goClockWise).publicId !==
+                        owner.publicId &&
+                    !hasOtherCraftsman
+                ) {
+                    moneyToPay++;
+                } else {
+                    moneyToPay = 0;
+                }
+            } else {
+                this.log("CLOCKWISE - NIE MA TAM GILDI");
+            }
+
+            if (moneyToPay <= owner.getData("coins")) {
+                this.availableMovement[craftsmanId].outer[goClockWise] = true;
+            }
+
+            // Sprawdzamy czy można iść na pole po prawej (Counter Clock Wise)
+            // Wyliczamy wymagane pieniądze
+            moneyToPay = 0;
+            hasOtherCraftsman = false;
+            // [id, new Set()]
+            localCraftsmenIds = this.outerPathCraftsmen.get(goCounterClockWise);
+            for (const localCraftsmanId of localCraftsmenIds) {
+                const localCraftsman = this.craftsmen.get(localCraftsmanId);
+                if (
+                    localCraftsman.publicId === owner.publicId &&
+                    localCraftsman.type !== "trader"
+                ) {
+                    hasOtherCraftsman = true;
+                    moneyToPay = 0;
+                    break;
                 }
 
-                if (moneyToPay <= owner.getData("coins")) {
-                    this.availableMovement[craftsmanId].outer[goClockWise] =
+                if (
+                    localCraftsman.publicId !== owner.publicId &&
+                    localCraftsman.type !== "trader"
+                ) {
+                    moneyToPay += 1;
+                }
+            }
+
+            // Gildia - Twoja - nic nie płacisz
+            if (this.getOuterGuild(goCounterClockWise)) {
+                if (
+                    this.getOuterGuild(goCounterClockWise).publicId !==
+                        owner.publicId &&
+                    !hasOtherCraftsman
+                ) {
+                    moneyToPay++;
+                } else {
+                    moneyToPay = 0;
+                }
+            }
+
+            if (moneyToPay <= owner.getData("coins")) {
+                this.availableMovement[craftsmanId].outer[goCounterClockWise] =
+                    true;
+            }
+
+            // Jeżeli ma zboże
+
+            for (const innerField of availableInnerFields) {
+                if (
+                    owner.getData("inventory").wheat >=
+                    this.innerFieldMovementWheatCost
+                ) {
+                    this.availableMovement[craftsmanId].inner[innerField] =
                         true;
                 }
+            }
+        }
 
-                // Sprawdzamy czy można iść na pole po prawej (Counter Clock Wise)
-                // Wyliczamy wymagane pieniądze
-                moneyToPay = 0;
-                hasOtherCraftsman = false;
-                // [id, new Set()]
-                localCraftsmenIds =
-                    this.outerPathCraftsmen.get(goCounterClockWise);
+        // region pionek na inner
+        if (craftsman.ringType === "inner" && craftsman.type !== "trader") {
+            const goClockWise =
+                currentField === 0 ? 2 : currentField === 1 ? 0 : 1;
+            const goCounterClockWise =
+                currentField === 0 ? 1 : currentField === 1 ? 2 : 0;
+
+            const availableOuterFields =
+                currentField === 0
+                    ? [0, 1, 2]
+                    : currentField === 1
+                      ? [2, 3, 4, 5]
+                      : [5, 6, 7];
+
+            // Czy ktoś tam stoi i ma kasę
+            if (
+                owner.getData("inventory").wheat >=
+                this.innerFieldMovementWheatCost
+            ) {
+                this.availableMovement[craftsmanId].inner[goClockWise] = true;
+            }
+            if (
+                owner.getData("inventory").wheat >=
+                this.innerFieldMovementWheatCost
+            ) {
+                this.availableMovement[craftsmanId].inner[goCounterClockWise] =
+                    true;
+            }
+
+            // Jeżeli ma zboże
+
+            for (const outerField of availableOuterFields) {
+                let moneyToPay = 0;
+                let hasOtherCraftsman = false;
+                let localCraftsmenIds = this.outerPathCraftsmen.get(outerField);
                 for (const localCraftsmanId of localCraftsmenIds) {
                     const localCraftsman = this.craftsmen.get(localCraftsmanId);
                     if (
@@ -570,10 +716,9 @@ export default class Craftsmen extends Game {
                     }
                 }
 
-                // Gildia - Twoja - nic nie płacisz
-                if (this.guilds.outer[goCounterClockWise]) {
+                if (this.getOuterGuild(outerField)) {
                     if (
-                        this.guilds.outer[goCounterClockWise].publicId !==
+                        this.getOuterGuild(outerField).publicId !==
                             owner.publicId &&
                         !hasOtherCraftsman
                     ) {
@@ -584,102 +729,14 @@ export default class Craftsmen extends Game {
                 }
 
                 if (moneyToPay <= owner.getData("coins")) {
-                    this.availableMovement[craftsmanId].outer[
-                        goCounterClockWise
-                    ] = true;
-                }
-
-                // Jeżeli ma zboże
-
-                for (const innerField of availableInnerFields) {
-                    if (
-                        owner.getData("inventory").wheat >=
-                        this.innerFieldMovementWheatCost
-                    ) {
-                        this.availableMovement[craftsmanId].inner[innerField] =
-                            true;
-                    }
-                }
-            }
-
-            // region pionek na inner
-            if (craftsman.ringType === "inner" && craftsman.type !== "trader") {
-                const goClockWise =
-                    currentField === 0 ? 2 : currentField === 1 ? 0 : 1;
-                const goCounterClockWise =
-                    currentField === 0 ? 1 : currentField === 1 ? 2 : 0;
-
-                const availableOuterFields =
-                    currentField === 0
-                        ? [0, 1, 2]
-                        : currentField === 1
-                          ? [2, 3, 4, 5]
-                          : [5, 6, 7];
-
-                // Czy ktoś tam stoi i ma kasę
-                if (
-                    owner.getData("inventory").wheat >=
-                    this.innerFieldMovementWheatCost
-                ) {
-                    this.availableMovement[craftsmanId].inner[goClockWise] =
+                    this.availableMovement[craftsmanId].outer[outerField] =
                         true;
                 }
-                if (
-                    owner.getData("inventory").wheat >=
-                    this.innerFieldMovementWheatCost
-                ) {
-                    this.availableMovement[craftsmanId].inner[
-                        goCounterClockWise
-                    ] = true;
-                }
-
-                // Jeżeli ma zboże
-
-                for (const outerField of availableOuterFields) {
-                    let moneyToPay = 0;
-                    let hasOtherCraftsman = false;
-                    let localCraftsmenIds =
-                        this.outerPathCraftsmen.get(outerField);
-                    for (const localCraftsmanId of localCraftsmenIds) {
-                        const localCraftsman =
-                            this.craftsmen.get(localCraftsmanId);
-                        if (
-                            localCraftsman.publicId === owner.publicId &&
-                            localCraftsman.type !== "trader"
-                        ) {
-                            hasOtherCraftsman = true;
-                            moneyToPay = 0;
-                            break;
-                        }
-
-                        if (
-                            localCraftsman.publicId !== owner.publicId &&
-                            localCraftsman.type !== "trader"
-                        ) {
-                            moneyToPay += 1;
-                        }
-                    }
-
-                    if (this.guilds.outer[outerField]) {
-                        if (
-                            this.guilds.outer[outerField].publicId !==
-                                owner.publicId &&
-                            !hasOtherCraftsman
-                        ) {
-                            moneyToPay++;
-                        } else {
-                            moneyToPay = 0;
-                        }
-                    }
-
-                    if (moneyToPay <= owner.getData("coins")) {
-                        this.availableMovement[craftsmanId].outer[outerField] =
-                            true;
-                    }
-                }
             }
+        }
 
-            if (craftsman.ringType === "outer" && craftsman.type === "trader") {
+        if (craftsman.type === "trader") {
+            if (craftsman.ringType === "outer") {
                 const goClockWise = currentField === 0 ? 7 : currentField - 1;
                 const goCounterClockWise =
                     currentField === 7 ? 0 : currentField + 1;
@@ -704,7 +761,8 @@ export default class Craftsmen extends Game {
                         true;
                 }
             }
-            if (craftsman.ringType === "inner" && craftsman.type === "trader") {
+
+            if (craftsman.ringType === "inner") {
                 const goClockWise =
                     currentField === 0 ? 2 : currentField === 1 ? 0 : 1;
                 const goCounterClockWise =
@@ -767,7 +825,7 @@ export default class Craftsmen extends Game {
             // Zabieramy zboża graczom.
 
             if (this.round === 1) {
-                this.maxTurn = 5;
+                this.maxTurn = 6;
                 this.resetCircle();
             }
 
@@ -779,13 +837,8 @@ export default class Craftsmen extends Game {
                         player.getData("craftsmen") +
                         Number(player.getData("trader"));
 
-                    console.log("ILOŚĆ LUDZI NA MAPIE: ", craftsmanCount);
-
                     const wheatRequired = craftsmanCount;
                     const playersWheat = player.getData("inventory").wheat;
-
-                    console.log("WYMAGANE ZBOŻE: ", wheatRequired);
-                    console.log("ZBOŻE GRACZA: ", playersWheat);
 
                     let craftsmanToKill = Math.ceil(
                         (wheatRequired - playersWheat) / 2,
@@ -927,6 +980,11 @@ export default class Craftsmen extends Game {
                 reset: true,
             });
             this.resetedTrader = false;
+            this.tradeCount = {
+                field: undefined,
+                currentSell: 0,
+                currentBuy: 0,
+            };
         }
 
         const player = this.getPlayer(publicId);
@@ -1029,6 +1087,11 @@ export default class Craftsmen extends Game {
                     resource: "coins",
                 };
             } else {
+                const blockSell =
+                    this.tradeCount.currentSell >= this.tradeCount.fieldNumber;
+                const blockBuy =
+                    this.tradeCount.currentBuy >= this.tradeCount.fieldNumber;
+
                 const fieldAmount =
                     ringType === "outer"
                         ? this.outerFieldsResourcesAmount[fieldId]
@@ -1037,19 +1100,22 @@ export default class Craftsmen extends Game {
                 const buyAmount = 4 - fieldAmount;
                 const canBuy =
                     ringType === "outer" &&
-                    player.getData("coins") >= buyAmount;
+                    player.getData("coins") >= buyAmount &&
+                    !blockBuy;
 
                 const sellAmount =
                     ringType === "outer"
                         ? 2
                         : 8 - 2 * fieldAmount + Number(resource === "glass");
-                const canSell = player.getData("inventory")[resource] > 0;
+
+                const canSell =
+                    player.getData("inventory")[resource] > 0 && !blockSell;
 
                 newTrade = {
                     buyAmount: ringType === "outer" ? buyAmount : 0,
                     sellAmount,
                     allowBuying: canBuy,
-                    allowSelling: canSell,
+                    allowSelling: this.tradeCount.currentSell >= canSell,
                     resource,
                 };
             }
@@ -1078,6 +1144,12 @@ export default class Craftsmen extends Game {
             this.maxPlayersInventorySpace
         ) {
             player.setData("canBuyCart", () => false);
+        }
+
+        if (player.getData("maxInventorySpace") === 12) {
+            player.setData("cartCost", () => {
+                return [["wood", 2]];
+            });
         }
 
         return this.sendGameDataToAll();
@@ -1130,24 +1202,57 @@ export default class Craftsmen extends Game {
             // Sprawdzamy czy stoisz na swojej gildii
             let playersGuild = false;
             if (
-                this.guilds.outer[fieldId] &&
-                this.guilds.outer[fieldId].publicId === publicId
+                this.getOuterGuild(fieldId) &&
+                this.getOuterGuild(fieldId).publicId === publicId
             ) {
                 playersGuild = true;
-                console.log("Gracz stoi na swojej gildii");
+                this.log(
+                    `Gracz chce iść na pole ze swoją gildią! [${(publicId, this.getOuterGuild(fieldId) !== null ? this.getOuterGuild(fieldId).publicId : "Brak")}]`,
+                );
+            }
+
+            this.log(`
+                    Aktualne gildie:
+                    Inner: ${this.guilds.inner.map((v, index) => (v ? "ID-" + index + ": " + v : "ID: empty")).join(", ")}
+                    Outer: ${this.guilds.outer.map((v, index) => (v ? "ID-" + index + ": " + v : "ID: empty")).join(", ")}
+                `);
+            this.log(
+                `Rzemieślnik [${craftsman.id}] gracza [${craftsman.publicId}] stoi na polu [${craftsman.getFieldId()}] chce iść na pole [${fieldId}].
+                    \nJest to dzielnica [${this.outerPositionsIds[fieldId]}] i znajduje się tam gildia gracza [${this.getOuterGuild(fieldId) === null ? "Brak" : this.getOuterGuild(fieldId).publicId}]`,
+            );
+
+            // Sprawdzamy czy są tam pionki innych graczy
+            // [id, new Set()]
+            let playersCraftsmanPresent = false;
+            let localCraftsmenIds = this.outerPathCraftsmen.get(fieldId);
+            for (const localCraftsmanId of localCraftsmenIds) {
+                const localCraftsman = this.craftsmen.get(localCraftsmanId);
+                if (
+                    localCraftsman.publicId === publicId &&
+                    localCraftsman.type !== "trader"
+                ) {
+                    playersCraftsmanPresent = true;
+                    console.log(
+                        "Gracz ma innego rzemieślnika na polu na które idzie",
+                    );
+                    break;
+                }
             }
 
             // Opłata jeżeli to gildia kogoś innego
             if (
-                this.guilds.outer[fieldId] &&
-                this.guilds.outer[fieldId].publicId !== publicId &&
-                !playersGuild
+                this.getOuterGuild(fieldId) &&
+                this.getOuterGuild(fieldId).publicId !== publicId &&
+                !playersGuild &&
+                !playersCraftsmanPresent
             ) {
-                console.log("Gracz stoi na czyjejś gildii");
+                this.log("GRACZ NIE STANĄŁ NA SWOJEJ GILDII");
                 const guildOwner = this.getPlayer(
-                    this.guilds.outer[fieldId].publicId,
+                    this.getOuterGuild(fieldId).publicId,
                 );
-
+                this.log(
+                    `Gracz ${publicId} stanął na gildii gracza ${this.getOuterGuild(fieldId) === null ? "Brak" : this.getOuterGuild(fieldId).publicId}. \nJest to dzielnica [${this.outerPositionsIds[fieldId]}]`,
+                );
                 player.setData("coins", (coins) => coins - 1);
                 player.setData("stats", (stats) => {
                     stats.coinsPaidToOthers += 1;
@@ -1160,30 +1265,18 @@ export default class Craftsmen extends Game {
                 });
             }
 
-            // Sprawdzamy czy są tam pionki innych graczy
-            // [id, new Set()]
-            let playersCraftsmanPresent = false;
-            let localCraftsmenIds = this.outerPathCraftsmen.get(fieldId);
-            for (const localCraftsmanId of localCraftsmenIds) {
-                const localCraftsman = this.craftsmen.get(localCraftsmanId);
-                if (localCraftsman.publicId === publicId) {
-                    playersCraftsmanPresent = true;
-                    console.log(
-                        "Gracz nie ma innego pionka na polu na które idzie",
-                    );
-                    break;
-                }
-            }
-
             if (!playersCraftsmanPresent && !playersGuild) {
                 console.log(
-                    "Gracz nie ma gildii i nie ma pionka - pobieramy monety",
+                    "Gracz nie ma swojej gildii lub rzemieślnika na polu, na które idzie - pobieramy monety",
                 );
                 let index = 1;
                 for (const localCraftsmanId of localCraftsmenIds) {
                     console.log("Pionek innego gracza nr: #", index++);
 
                     const localCraftsman = this.craftsmen.get(localCraftsmanId);
+
+                    // Nie pobieramy monety, gdy jest to handlarz
+                    if (localCraftsman.type === "trader") continue;
 
                     console.log(`Gracz ${publicId} ma zabraną monetę`);
                     console.log("PRZED: ", player.getData("coins"));
@@ -1344,6 +1437,16 @@ export default class Craftsmen extends Game {
         // region move - trade
         if (isTrader) {
             // Zaaktualizuj bank
+            const fieldNumber =
+                ringType === "outer"
+                    ? this.outerFieldsResourcesAmount[fieldId]
+                    : this.innerFieldsResourcesAmount[fieldId];
+
+            this.tradeCount = {
+                field: fieldNumber,
+                currentSell: 0,
+                currentBuy: 0,
+            };
             this.updateTrader({ publicId, ringType, fieldId });
         }
 
@@ -1458,6 +1561,7 @@ export default class Craftsmen extends Game {
         if (this.guilds[ringType][fieldId]) {
             throw new Error("W tej dzielnicy już znajduje się gildia");
         }
+
         const player = this.getPlayer(publicId);
 
         this.payWithAmber(player, player.getData("guildCost"));
@@ -1470,10 +1574,25 @@ export default class Craftsmen extends Game {
 
         player.setData("guildCost", (oldGuildCost) => {
             return [
-                ["stone", oldGuildCost[0][1] + 1],
+                [
+                    "stone",
+                    oldGuildCost[0][1] === 1
+                        ? oldGuildCost[0][1] + 2
+                        : oldGuildCost[0][1] + 1,
+                ],
                 ["brick", oldGuildCost[1][1] + 1],
             ];
         });
+
+        this.log(
+            `Gracz [${player.username}] w okręgu [${ringType}] na polu [${fieldId}] wybudował gildię.
+            \nJest to dzielnica [${ringType === "outer" ? this.outerPositionsIds[fieldId] : this.innerPositionsIds[fieldId]}]`,
+        );
+        this.log(`
+            Aktualne gildie:
+            Inner: ${this.guilds.inner.map((v, index) => (v ? "ID-" + index + ": " + v : "ID: empty")).join(", ")}
+            Outer: ${this.guilds.outer.map((v, index) => (v ? "ID-" + index + ": " + v : "ID: empty")).join(", ")}
+        `);
 
         return this.sendGameDataToAll();
     }
@@ -1621,6 +1740,8 @@ export default class Craftsmen extends Game {
             return stats;
         });
 
+        this.tradeCount.currentBuy++;
+
         this.updateTrader({ publicId });
         this.setAvailableMovementsForCraftsmen(publicId);
         return this.sendGameDataToAll();
@@ -1656,6 +1777,8 @@ export default class Craftsmen extends Game {
             stats.tradeSoldAmount += currentTrade.sellAmount;
             return stats;
         });
+
+        this.tradeCount.currentSell++;
 
         this.updateTrader({ publicId });
         this.setAvailableMovementsForCraftsmen(publicId);
