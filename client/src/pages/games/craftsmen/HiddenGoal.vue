@@ -3,7 +3,7 @@ const props = defineProps(["hiddenTask", "hiddenTaskInfo"]);
 const showInfo = ref(false);
 </script>
 <template>
-    <div class="goalCard" @click="showInfo = !showInfo">
+    <div class="goalCard" @click="showInfo = !showInfo" :data-id="props.hiddenTask.id">
         <template v-if="!showInfo">
             <h1>{{ props.hiddenTask.title }}</h1>
             <p>{{ props.hiddenTask.description }}</p>
@@ -15,7 +15,7 @@ const showInfo = ref(false);
     </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .goalCard {
     display: flex;
     justify-content: center;
@@ -38,6 +38,21 @@ const showInfo = ref(false);
     text-align: center;
     background-image: url("/src/assets/games/gameAssets/craftsmen/board.png");
 
+    &[data-id="0"] {
+        background-image: url("/src/assets/games/gameAssets/craftsmen/questBoard0.png");
+    }
+    &[data-id="1"] {
+        background-image: url("/src/assets/games/gameAssets/craftsmen/questBoard1.png");
+    }
+    &[data-id="2"] {
+        background-image: url("/src/assets/games/gameAssets/craftsmen/questBoard2.png");
+    }
+    &[data-id="3"] {
+        background-image: url("/src/assets/games/gameAssets/craftsmen/questBoard3.png");
+    }
+    &[data-id="4"] {
+        background-image: url("/src/assets/games/gameAssets/craftsmen/questBoard4.png");
+    }
     h1 {
         font-size: 1.8rem;
     }

@@ -84,7 +84,7 @@ export default class Craftsmen extends Game {
         this.AVAILABLE_ID = 0;
         this.resetedTrader = false;
         this.tradeCount = {
-            field: undefined,
+            fieldNumber: undefined,
             currentSell: 0,
             currentBuy: 0,
         };
@@ -981,7 +981,7 @@ export default class Craftsmen extends Game {
             });
             this.resetedTrader = false;
             this.tradeCount = {
-                field: undefined,
+                fieldNumber: undefined,
                 currentSell: 0,
                 currentBuy: 0,
             };
@@ -1061,7 +1061,9 @@ export default class Craftsmen extends Game {
             }
 
             if (!ringType || fieldId === undefined) {
-                throw new Error("Nie znaleziono handlarza");
+                this.log("Nie znaleziono handlarza");
+                console.error("Nie znaleziono handlarza");
+                return;
             }
 
             let resource;
@@ -1115,7 +1117,7 @@ export default class Craftsmen extends Game {
                     buyAmount: ringType === "outer" ? buyAmount : 0,
                     sellAmount,
                     allowBuying: canBuy,
-                    allowSelling: this.tradeCount.currentSell >= canSell,
+                    allowSelling: canSell,
                     resource,
                 };
             }
@@ -1443,7 +1445,7 @@ export default class Craftsmen extends Game {
                     : this.innerFieldsResourcesAmount[fieldId];
 
             this.tradeCount = {
-                field: fieldNumber,
+                fieldNumber,
                 currentSell: 0,
                 currentBuy: 0,
             };
@@ -1718,10 +1720,6 @@ export default class Craftsmen extends Game {
 
         if (!currentTrade.allowBuying) {
             throw new Error("Nie możesz kupować");
-        }
-
-        if (!currentTrade.allowSelling) {
-            throw new Error("Nie możesz sprzedawać");
         }
 
         if (player.getData("coins") < currentTrade.buyAmount)

@@ -14,7 +14,7 @@ const toggleDialog = () => {
 </script>
 
 <template>
-    <div v-if="dialogOpened" class="dialog">
+  <div v-if="dialogOpened" class="dialog">
         <h1>Rzemieślnicy - Instrukcja</h1>
 
         <h2>1. Cel gry</h2>
@@ -23,7 +23,7 @@ const toggleDialog = () => {
             kontraktów) oraz wypełnienie ukrytego celu. Kontrakty wykonuje się,
             oddając wymaganą liczbę surowców. Ukryte zadanie jest losowane na
             początku gry osobno dla każdego gracza i pozostaje tajemnicą dla
-            pozostałych.
+            pozostałych. Podgląd postępu ukrytego zadania możesz w każdej chwili sprawdzić, klikając na panel z jego nazwą.
         </p>
 
         <p>Gracz wygrywa w jednym z dwóch przypadków:</p>
@@ -154,7 +154,7 @@ const toggleDialog = () => {
 
         <h2>7. Pobór zboża</h2>
         <p>
-            Co 5 tur gra pobiera od gracza zboże w ilości odpowiadającej liczbie
+            Co 6 tur gra pobiera od gracza zboże w ilości odpowiadającej liczbie
             jego pionków (Rzemieślników i handlarzy) na mapie.
         </p>
         <ul>
@@ -194,14 +194,17 @@ const toggleDialog = () => {
                     <td>18 miejsc</td>
                 </tr>
                 <tr>
-                    <td>Koszt powiększenia</td>
-                    <td>1 Drewno = 1 dodatkowe miejsce</td>
+                    <td>Progresywny koszt powiększenia</td>
+                    <td>
+                        Miejsca 7-12: 1 Drewno = 1 miejsce<br>
+                        Miejsca 13-18: 2 Drewno = 1 miejsce
+                    </td>
                 </tr>
                 <tr>
                     <td>Szybka sprzedaż</td>
                     <td>
                         Dowolny surowiec można w każdej chwili sprzedać z
-                        ekwipunku za 1 monetę
+                        ekwipunku za 1 monetę.
                     </td>
                 </tr>
             </tbody>
@@ -259,7 +262,7 @@ const toggleDialog = () => {
         <p>
             Aby wejść rzemieślnikiem na pole zajęte przez obcego rzemieślnika,
             musisz zapłacić. Nie możesz wykonać ruchu, jeśli nie stać Cię na
-            opłatę.
+            opłatę. Opłata dotyczy również stawiania rzemieślnika, na zajętym polu, na początku gry lub jak dokupujesz kolejnego.
         </p>
         <ul>
             <li>
@@ -280,12 +283,13 @@ const toggleDialog = () => {
             </li>
         </ul>
         <p>Handlarze nie biorą udziału w opłatach i nie chronią przed nimi.</p>
+        <p>Na wewnętrznej ścieżce nie ma żadnych opłat za stawanie na tym samym polu co inny gracz.</p>
 
         <h2>12. Gildie</h2>
         <ul>
             <li>
                 Gildię można wybudować na dowolnej dzielnicy w zewnętrznym
-                pierścieniu.
+                pierścieniu. <strong>Uwaga: Wewnętrzne dzielnice nie posiadają gildii.</strong>
             </li>
             <li>
                 Gildia porusza się razem z dzielnicą (nie jest przypisana do
@@ -302,9 +306,43 @@ const toggleDialog = () => {
             </li>
             <li>
                 Jeśli Twój rzemieślnik stoi na polu z cudzą gildią, wejście tam
-                drugim rzemieślnikiem jest darmowe.
+                drugim rzemieślnikiem jest darmowe. 
+            </li>
+            <li>
+                Obce gildie nie pobierają już opłaty, jeśli na danym polu stoi Twój rzemieślnik.
             </li>
         </ul>
+
+        <h3>Cennik budowy gildii</h3>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Kolejna gildia gracza</th>
+                    <th>Wymagany Kamień</th>
+                    <th>Wymagane Cegły</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Pierwsza gildia</td>
+                    <td>1</td>
+                    <td>2</td>
+                  
+                </tr>
+                <tr>
+                    <td>Druga gildia</td>
+                    <td>3</td>
+                    <td>3</td>
+                   
+                </tr>
+                <tr>
+                    <td>Trzecia gildia</td>
+                    <td>4</td>
+                    <td>4</td>
+                    
+                </tr>
+            </tbody>
+        </table>
         <p>Handlarze nie biorą udziału w opłatach i nie chronią przed nimi.</p>
 
         <h2>13. Handlarze</h2>
@@ -322,8 +360,15 @@ const toggleDialog = () => {
                 aktualnym polu.
             </li>
             <li>
+                Może kupić oraz sprzedać surowiec tyle razy, ile wynosi cyfra przypisana do tego pola. 
+                Przykładowo, na polu 2 może 2 razy sprzedać i 2 razy kupić. Limit sprzedaży i kupna jest osobny.
+            </li>
+            <li>
                 Handel odbywa się dopiero PO ruchu. Obrót planszy odbiera mu
                 możliwość handlu w danej turze jeżeli już się ruszył.
+            </li>
+            <li>
+                Sprzedaż surowca podczas handlu z handlarzem odświeża dostępne ruchy.
             </li>
         </ul>
 
@@ -371,6 +416,16 @@ const toggleDialog = () => {
                 8 minus 2 razy numer pola + 1 jeżeli szkło)</em
             >
         </p>
+
+        <h2>14. Ukryte zadania</h2>
+        <p>Każdy gracz na początku gry losuje swój ukryty cel. Wymaga on spełnienia konkretnych założeń, aby zapewnić zwycięstwo. Ukryte cele mogą się powtarzać.</p>
+        <ul>
+            <li><strong>Baron Logistyki:</strong> Zdobądź maksymalny poziom udźwigu.</li>
+            <li><strong>Szara Eminencja:</strong> Wybuduj 3 Gildie lub 8 gildii będzie na planszy.</li>
+            <li><strong>Kolekcjoner Luksusów:</strong> Wydaj 12 bursztynu w ramach innego surowca.</li>
+            <li><strong>Król Kupców:</strong> Wydaj na kupno surowców 40 monet.</li>
+            <li><strong>Bóg RNG:</strong> Obróć planszę 14 razy.</li>
+        </ul>
     </div>
 
     <img :src="Rules" alt="" class="rules" @click="toggleDialog" />
