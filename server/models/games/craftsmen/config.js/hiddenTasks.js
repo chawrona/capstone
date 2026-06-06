@@ -22,7 +22,7 @@ const hiddenTasks = [
     {
         title: "Bóg RNG",
         id: 4,
-        description: "Obróć planszę 14 razy",
+        description: "Super-obróć planszę 4 razy",
     },
 ];
 

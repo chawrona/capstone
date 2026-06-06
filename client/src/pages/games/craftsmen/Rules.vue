@@ -14,7 +14,7 @@ const toggleDialog = () => {
 </script>
 
 <template>
-  <div v-if="dialogOpened" class="dialog">
+    <div v-if="dialogOpened" class="dialog">
         <h1>Rzemieślnicy - Instrukcja</h1>
 
         <h2>1. Cel gry</h2>
@@ -23,7 +23,8 @@ const toggleDialog = () => {
             kontraktów) oraz wypełnienie ukrytego celu. Kontrakty wykonuje się,
             oddając wymaganą liczbę surowców. Ukryte zadanie jest losowane na
             początku gry osobno dla każdego gracza i pozostaje tajemnicą dla
-            pozostałych. Podgląd postępu ukrytego zadania możesz w każdej chwili sprawdzić, klikając na panel z jego nazwą.
+            pozostałych. Podgląd postępu ukrytego zadania możesz w każdej chwili
+            sprawdzić, klikając na panel z jego nazwą.
         </p>
 
         <p>Gracz wygrywa w jednym z dwóch przypadków:</p>
@@ -145,6 +146,11 @@ const toggleDialog = () => {
             Można to robić dowolną ilość razy.
         </p>
         <p>
+            Istnieje 10% szansy na to, że po ręcznym obrocie plansza obróci się
+            w sposób losowy. Osoba z ukrytym zadaniem "Bóg RNG" posiada 20%
+            szans na to.
+        </p>
+        <p>
             <em
                 >Dla podglądu oznaczyłem dzielnice dodatkowo literkami.
                 Zauważcie, że ścieżki i liczby się nie zmieniają, tylko
@@ -196,7 +202,7 @@ const toggleDialog = () => {
                 <tr>
                     <td>Progresywny koszt powiększenia</td>
                     <td>
-                        Miejsca 7-12: 1 Drewno = 1 miejsce<br>
+                        Miejsca 7-12: 1 Drewno = 1 miejsce<br />
                         Miejsca 13-18: 2 Drewno = 1 miejsce
                     </td>
                 </tr>
@@ -262,7 +268,8 @@ const toggleDialog = () => {
         <p>
             Aby wejść rzemieślnikiem na pole zajęte przez obcego rzemieślnika,
             musisz zapłacić. Nie możesz wykonać ruchu, jeśli nie stać Cię na
-            opłatę. Opłata dotyczy również stawiania rzemieślnika, na zajętym polu, na początku gry lub jak dokupujesz kolejnego.
+            opłatę. Opłata dotyczy również stawiania rzemieślnika, na zajętym
+            polu, na początku gry lub jak dokupujesz kolejnego.
         </p>
         <ul>
             <li>
@@ -283,33 +290,35 @@ const toggleDialog = () => {
             </li>
         </ul>
         <p>Handlarze nie biorą udziału w opłatach i nie chronią przed nimi.</p>
-        <p>Na wewnętrznej ścieżce nie ma żadnych opłat za stawanie na tym samym polu co inny gracz.</p>
+        <p>
+            Na wewnętrznej ścieżce nie ma żadnych opłat za stawanie na tym samym
+            polu co inny gracz.
+        </p>
 
         <h2>12. Gildie</h2>
         <ul>
             <li>
                 Gildię można wybudować na dowolnej dzielnicy w zewnętrznym
-                pierścieniu. <strong>Uwaga: Wewnętrzne dzielnice nie posiadają gildii.</strong>
+                pierścieniu.
             </li>
+            <li>Można wybudować jedną gildię na turę</li>
             <li>
                 Gildia porusza się razem z dzielnicą (nie jest przypisana do
                 konkretnego pola ścieżki).
             </li>
             <li>
-                <strong>Gildia jako rzemieślnik:</strong> W kwestii opłat gildia
-                jest traktowana jak rzemieślnik.
-            </li>
-            <li>Wchodząc na własną gildię, nie płacisz nic.</li>
-            <li>
-                Inni gracze muszą zapłacić Ci 1 monetę, stając na polu z Twoją
-                gildią.
-            </li>
-            <li>
-                Jeśli Twój rzemieślnik stoi na polu z cudzą gildią, wejście tam
-                drugim rzemieślnikiem jest darmowe. 
-            </li>
-            <li>
-                Obce gildie nie pobierają już opłaty, jeśli na danym polu stoi Twój rzemieślnik.
+                W kwestii opłat gildia jest traktowana jak rzemieślnik:
+                <ul>
+                    <li>Wchodząc na własną gildię, nie płacisz nic.</li>
+                    <li>
+                        Inni gracze muszą zapłacić Ci 1 monetę, stając na polu z
+                        Twoją gildią.
+                    </li>
+                    <li>
+                        Jeśli Twój rzemieślnik stoi na polu z cudzą gildią,
+                        wejście tam drugim rzemieślnikiem jest darmowe.
+                    </li>
+                </ul>
             </li>
         </ul>
 
@@ -327,19 +336,16 @@ const toggleDialog = () => {
                     <td>Pierwsza gildia</td>
                     <td>1</td>
                     <td>2</td>
-                  
                 </tr>
                 <tr>
                     <td>Druga gildia</td>
                     <td>3</td>
                     <td>3</td>
-                   
                 </tr>
                 <tr>
                     <td>Trzecia gildia</td>
                     <td>4</td>
                     <td>4</td>
-                    
                 </tr>
             </tbody>
         </table>
@@ -360,15 +366,17 @@ const toggleDialog = () => {
                 aktualnym polu.
             </li>
             <li>
-                Może kupić oraz sprzedać surowiec tyle razy, ile wynosi cyfra przypisana do tego pola. 
-                Przykładowo, na polu 2 może 2 razy sprzedać i 2 razy kupić. Limit sprzedaży i kupna jest osobny.
+                Może kupić oraz sprzedać surowiec tyle razy, ile wynosi cyfra
+                przypisana do tego pola. Przykładowo, na polu 2 może 2 razy
+                sprzedać i 2 razy kupić. Limit sprzedaży i kupna jest osobny.
             </li>
             <li>
                 Handel odbywa się dopiero PO ruchu. Obrót planszy odbiera mu
                 możliwość handlu w danej turze jeżeli już się ruszył.
             </li>
             <li>
-                Sprzedaż surowca podczas handlu z handlarzem odświeża dostępne ruchy.
+                Sprzedaż surowca podczas handlu z handlarzem odświeża dostępne
+                ruchy.
             </li>
         </ul>
 
@@ -418,13 +426,28 @@ const toggleDialog = () => {
         </p>
 
         <h2>14. Ukryte zadania</h2>
-        <p>Każdy gracz na początku gry losuje swój ukryty cel. Wymaga on spełnienia konkretnych założeń, aby zapewnić zwycięstwo. Ukryte cele mogą się powtarzać.</p>
+        <p>
+            Każdy gracz na początku gry losuje swój ukryty cel. Wymaga on
+            spełnienia konkretnych założeń, aby zapewnić zwycięstwo. Ukryte cele
+            mogą się powtarzać.
+        </p>
         <ul>
-            <li><strong>Baron Logistyki:</strong> Zdobądź maksymalny poziom udźwigu.</li>
-            <li><strong>Szara Eminencja:</strong> Wybuduj 3 Gildie lub 8 gildii będzie na planszy.</li>
-            <li><strong>Kolekcjoner Luksusów:</strong> Wydaj 12 bursztynu w ramach innego surowca.</li>
-            <li><strong>Król Kupców:</strong> Wydaj na kupno surowców 40 monet.</li>
-            <li><strong>Bóg RNG:</strong> Obróć planszę 14 razy.</li>
+            <li>
+                <strong>Baron Logistyki:</strong> Zdobądź maksymalny poziom
+                udźwigu.
+            </li>
+            <li>
+                <strong>Szara Eminencja:</strong> Wybuduj 3 Gildie lub 8 gildii
+                będzie na planszy.
+            </li>
+            <li>
+                <strong>Kolekcjoner Luksusów:</strong> Wydaj 12 bursztynu w
+                ramach innego surowca.
+            </li>
+            <li>
+                <strong>Król Kupców:</strong> Wydaj na kupno surowców 40 monet.
+            </li>
+            <li><strong>Bóg RNG:</strong> Super-obróć planszę 4 razy.</li>
         </ul>
     </div>
 

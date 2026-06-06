@@ -1,16 +1,22 @@
 <script setup>
+import { ref } from "vue";
+
 const props = defineProps(["hiddenTask", "hiddenTaskInfo"]);
 const showInfo = ref(false);
 </script>
 <template>
-    <div class="goalCard" @click="showInfo = !showInfo" :data-id="props.hiddenTask.id">
+    <div
+        class="goalCard"
+        :data-id="props.hiddenTask.id"
+        @click="showInfo = !showInfo"
+    >
         <template v-if="!showInfo">
             <h1>{{ props.hiddenTask.title }}</h1>
             <p>{{ props.hiddenTask.description }}</p>
         </template>
 
         <template v-else>
-            <h1>{{ props.hiddenTaskInfo }}</h1>
+            <p class="info">{{ props.hiddenTaskInfo }}</p>
         </template>
     </div>
 </template>
@@ -29,13 +35,14 @@ const showInfo = ref(false);
     width: 400px;
     padding: 1rem;
     color: white;
-
+    z-index: 11;
     aspect-ratio: 671 / 205;
     border-radius: 0.5rem;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
     text-align: center;
+    cursor: pointer;
     background-image: url("/src/assets/games/gameAssets/craftsmen/board.png");
 
     &[data-id="0"] {
@@ -55,6 +62,14 @@ const showInfo = ref(false);
     }
     h1 {
         font-size: 1.8rem;
+    }
+
+    &:hover {
+        filter: brightness(1.1);
+    }
+
+    .info {
+        font-size: 1.25rem;
     }
 }
 </style>

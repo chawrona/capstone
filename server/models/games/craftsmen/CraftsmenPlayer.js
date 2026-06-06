@@ -90,6 +90,7 @@ export default class CraftsmenPlayer extends Player {
             coinsPaidToOthers: 0,
             rotations: 0,
             rerolls: 0,
+            superRotations: 0,
             amberSpent: 0,
             tradesBought: 0,
             tradeSoldAmount: 0,

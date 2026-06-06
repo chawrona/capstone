@@ -337,7 +337,7 @@ export default class Craftsmen extends Game {
             const current = player.getData("maxInventorySpace");
             const target = this.maxPlayersInventorySpace;
 
-            return `Pojemność magazynu: ${current}/${target}`;
+            return `Twoja maksymalna pojemność magazynu to ${current} z ${target}`;
         }
 
         // Szara Eminencja
@@ -355,25 +355,25 @@ export default class Craftsmen extends Game {
                 }
             }
 
-            return `Masz ${guildCount}/3 gildie (zajętych gildii: ${takenGuilds}/${this.guilds.outer.length})`;
+            return `Posiadasz  ${guildCount} z 3 gildii (wszystkie: ${takenGuilds}/${this.guilds.outer.filter((x) => x !== null).length})`;
         }
 
         // Kolekcjoner Luksusów
         if (hiddenTask.id === 2) {
             const current = player.getData("stats").amberSpent;
-            return `Wydałeś ${current}/12 bursztynów`;
+            return `Użyłeś ${current} z 12 bursztynów`;
         }
 
         // Król Kupców
         if (hiddenTask.id === 3) {
             const current = player.getData("stats").tradesBoughtAmount;
-            return `Kupiłeś ${current}/40 towarów`;
+            return `Wydałeś ${current} z 40 monet na zakup towarów.`;
         }
 
         // Bóg RNG
         if (hiddenTask.id === 4) {
-            const current = player.getData("stats").rotations;
-            return `Wykonałeś ${current}/14 rotacji`;
+            const current = player.getData("stats").superRotations;
+            return `RNG siadło ${current} z 4 razy`;
         }
 
         return "Nieznane zadanie";
@@ -419,7 +419,7 @@ export default class Craftsmen extends Game {
 
         // Bóg RNG
         if (hiddenTask.id === 4) {
-            return player.getData("stats").rotations >= 14;
+            return player.getData("stats").superRotations >= 4;
         }
     }
 
@@ -1014,8 +1014,15 @@ export default class Craftsmen extends Game {
         this.payWithAmber(player, this.rotateCost.resources);
 
         const randomChance = getRandomNumber(0, 10);
-        if (randomChance === 1) {
+
+        const isRNGGod = player.getData("hiddenTask").title === "Bóg RNG";
+
+        if (randomChance === 1 || (isRNGGod && randomChance === 2)) {
             this.resetCircle();
+            player.setData("stats", (stats) => {
+                stats.superRotations += 1;
+                return stats;
+            });
         } else {
             this.innerCircleRotation += 1;
             this.outerCircleRotation += 1;
