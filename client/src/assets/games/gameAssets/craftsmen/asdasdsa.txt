@@ -1,0 +1,95 @@
+Opakowanie:
+    - Standardowe - pudełko dwuczęściowe z tektury litej
+
+Nakład produkcyjny:
+    - 1 (jeden) egzemplarz gry
+
+Lista elementów:
+- Instrukcja w formacie A4, 12 stron
+
+- Karty (wszystkie karty 89 x 57 mm):
+  -- 160 (8 rodzajów x 20 kart) 
+  -- 4 (1 rodzaj x 4 kart)
+  -- 40 unikalnych kart 
+  -- 10 unikalnych kart
+  łącznie 214 kart.
+
+- 1 kartonowy żeton 25 mm średnicy
+
+- 48 kartonowych żetonów 25 mm średnicy
+
+https://portaart.pl/pionki-do-gier/ - Tutaj u państwa na zdjęciu są drewniane pionki.
+-Zestaw dla jednego gracza. Potrzebuję 4 takie zestawy w różnych kolorach (czerwony, niebieski, zielony, żółty)
+  -- 3 drewniane pionki takie jak w pierwszym rzędzie na zdjęciu
+  -- 1 drewniane pionek taki jak w drugim rzędzie na zdjęciu
+  -- 4 okrągłe znaczniki o średnicy ~12 mm, wysokość 8-10mm góra i dół płaska (kształt cylindra)
+  -- 3 tekturowe znaczniki 25 mm średnicy, które mają wchodzić do elementów opisanych niżej 
+     przy opisie planszy (wersja 2, pierścień nr 2)
+
+- Jedna kostka D10
+
+- Jedna tekturowa plansza pomocnicza 100 x 200 mm
+
+- żetony pieniędzy (wszystkie ~13mm):
+  -- 40 żetonów nr 1
+  -- 10 żetonów nr 2
+  -- 20 żetonów nr 3
+  Łącznie 70 żetonów
+
+
+- 1x plansza:
+===========================================
+	WERSJA 1 (plansza podstawowa
+===========================================
+
+Wymiary: 520 × 520 mm (52 × 52 cm)
+Konstrukcja: plansza składana, 4 części.
+Wykonanie: jedna powierzchnia z nadrukiem (jedna grafika / jedna tekstura)
+Brak dodatkowych elementów
+
+===========================================
+		WERSJA 2:
+===========================================
+
+Grafika podglądowa w pliku wersja2_chawrona.png.
+
+1. Plansza bazowa
+Wymiary: 510 × 510 mm
+Konstrukcja: plansza składana, 4 części.
+Nadruk: powierzchnia bazowa gry
+Dodatkowa informacja w punkcie czwartym.
+
+2. Pierścień nr 1 (wewnętrzny)
+Średnica wewnętrzna: 140 mm
+Średnica zewnętrzna: 260 mm
+
+Konstrukcja:
+- podzielony na 3 segmenty
+- segmenty łączone systemem „puzzlowym” (ząbki / zatrzaski)
+- każdy segment musi mieć:
+ -- jedną stronę "męską"
+ -- jedną stronę "żeńską"
+- możliwość dowolnego ułożenia 3 elementów w pełny pierścień
+
+3. Pierścień nr 2 (zewnętrzny)
+Średnica wewnętrzna: 380 mm
+Średnica zewnętrzna: 500 mm
+
+Konstrukcja:
+- podzielony na 8 segmentów
+- łączenie jak w pierścieniu nr 1 (system puzzlowy)
+- możliwość złożenia pełnego pierścienia z 8 elementów
+- Dodatkowo 2 puzzle, które będą jako zamienniki. Czyli łącznie 10 części.
+
+Tylko w przypadku segmentów w pierścieniu nr 2:
+- Każdy z tych segmentów powinien posiadać wyciętą dziurę w kształcie okręgu o średnicy ~25 mm. Umiejscowienie na grafice podglądowej.
+W zestawach dla poszczególnych graczy pisałem o żetonach, które mogą zostać włożone w te dziury i wypełnić je, a potem po rozgrywce mogą zostać z nich wypchnięte.
+Podglądowa funkcja -> gracz wkłada swój żeton w tę dziurę rezerwując pole (segment/puzzla). Po grze wypychamy stamtąd te żetony.
+Zależy mi na tym, aby łatwo było je tam włożyć i żeby się trzymały mniej więcej.
+
+
+4. Połączenie
+Chciałbym, aby plansza bazowa miała lekkie zagłębienie dla pierścieni nr 1 i 2, tak aby to zagłębienie pełniło funkcję prowadnicy podczas obracania pierścienia.
+Nie musi być bardzo duże, funkcja ma być taka, aby ten pierścień podczas obracania nie ruszał się po całej planszy.
+Z tego powodu pierścienie mają dodatkowe 10 mm (1 cm) szerokość pierścienia już wyliczone w wymiarach, które podałem powyżej. 
+Można zmiejszyć ich szerokość na poczet tego wgłębienia, ale nie trzeba.
