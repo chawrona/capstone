@@ -41,7 +41,7 @@ export default class CraftsmenPlayer2 extends Player {
         });
         this.setData("rotateCost", () => [["iron", 1]]);
         this.setData("coins", () =>
-            process.env.DEVELOPMENT === "true" ? 100 : 5,
+            process.env.DEVELOPMENT === "true" ? 100 : 3,
         );
         this.setData("maxInventorySpace", () => 5);
         this.setData("canBuyCraftsman", () => true);
