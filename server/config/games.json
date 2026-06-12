@@ -28,7 +28,7 @@
   { "name": "crimson", "hex": "#dc143c" },
   { "name": "indigo", "hex": "#4b0082" },
   { "name": "violet", "hex": "#ee82ee" },
-  { "name": "magenta", "hex": "#ff00ff" },
+
 
   { "name": "emerald", "hex": "#50c878" },
   { "name": "amber", "hex": "#ffbf00" },
