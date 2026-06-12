@@ -7,14 +7,42 @@
     "description": "Ekonomiczna gra stategiczna w której próbujesz stać się najbogatszym właścicielem firmy",
     "time": "20-30 min.",
     "difficulty": "Trudny",
-    "colors": [
-      { "name": "black", "hex": "#000000" },
-      { "name": "white", "hex": "#ffffff" },
-      { "name": "green", "hex": "#00ff00" },
-      { "name": "red", "hex": "#ff0000" },
-      { "name": "blue", "hex": "royalblue" },
-      { "name": "yellow", "hex": "#ffff00" }
-    ]
+   "colors": [
+  { "name": "black", "hex": "#000000" },
+  { "name": "white", "hex": "#ffffff" },
+  { "name": "green", "hex": "#00ff00" },
+  { "name": "red", "hex": "#ff0000" },
+  { "name": "blue", "hex": "royalblue" },
+  { "name": "yellow", "hex": "#ffff00" },
+
+  { "name": "orange", "hex": "#ffa500" },
+  { "name": "purple", "hex": "#800080" },
+  { "name": "pink", "hex": "#ff69b4" },
+  { "name": "turquoise", "hex": "#40e0d0" },
+  { "name": "teal", "hex": "#008080" },
+  { "name": "navy", "hex": "#000080" },
+  { "name": "lime", "hex": "#bfff00" },
+  { "name": "gold", "hex": "#ffd700" },
+  { "name": "silver", "hex": "#c0c0c0" },
+  { "name": "coral", "hex": "#ff7f50" },
+  { "name": "crimson", "hex": "#dc143c" },
+  { "name": "indigo", "hex": "#4b0082" },
+  { "name": "violet", "hex": "#ee82ee" },
+  { "name": "magenta", "hex": "#ff00ff" },
+
+  { "name": "emerald", "hex": "#50c878" },
+  { "name": "amber", "hex": "#ffbf00" },
+  { "name": "azure", "hex": "#007fff" },
+  { "name": "lavender", "hex": "#e6e6fa" },
+  { "name": "peach", "hex": "#ffe5b4" },
+  { "name": "mint", "hex": "#98ff98" },
+  { "name": "chocolate", "hex": "#d2691e" },
+  { "name": "slategray", "hex": "#708090" },
+  { "name": "rose", "hex": "#ff007f" },
+  { "name": "sapphire", "hex": "#0f52ba" },
+  { "name": "olive", "hex": "#808000" },
+  { "name": "burgundy", "hex": "#800020" }
+]
   },
   {
     "title": "craftsmen",
