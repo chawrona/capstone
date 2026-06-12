@@ -19,6 +19,11 @@ const routes = [
         path: "/:id/craftsmen",
     },
     {
+        component: () => import("@/pages/games/craftsmen2/Craftsmen.vue"),
+        name: "craftsmen2",
+        path: "/:id/craftsmen2",
+    },
+    {
         component: () => import("@/pages/games/eurobusiness/Eurobusiness.vue"),
         name: "eurobusiness",
         path: "/:id/eurobusiness",

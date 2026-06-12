@@ -1,5 +1,22 @@
 [
   {
+    "title": "craftsmen2",
+    "polishTitle": "Rzemieślnicy 2",
+    "maxPlayers": 4,
+    "minPlayers": 3,
+    "description": "Ekonomiczna gra stategiczna w której próbujesz stać się najbogatszym właścicielem firmy",
+    "time": "20-30 min.",
+    "difficulty": "Trudny",
+    "colors": [
+      { "name": "black", "hex": "#000000" },
+      { "name": "white", "hex": "#ffffff" },
+      { "name": "green", "hex": "#00ff00" },
+      { "name": "red", "hex": "#ff0000" },
+      { "name": "blue", "hex": "royalblue" },
+      { "name": "yellow", "hex": "#ffff00" }
+    ]
+  },
+  {
     "title": "craftsmen",
     "polishTitle": "Rzemieślnicy",
     "maxPlayers": 4,
