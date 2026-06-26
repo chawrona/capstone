@@ -54,7 +54,6 @@ const STAT_COLUMNS = [
         label: "Zrealizowane kontrakty",
     },
     { icon: () => Coins, key: "coins", label: "Monety na koniec gry" },
-    { icon: () => Hammer, key: "coinsFromGuild", label: "Monety z gildii" },
     { icon: () => Coins, key: "coinsFromStanding", label: "Monety z pozycji" },
     {
         icon: () => NoCoins,

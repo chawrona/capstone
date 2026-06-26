@@ -8,6 +8,10 @@ export default class CraftsmenPlayer2 extends Player {
 
     initalizeData() {
         this.setData("contracts", () => 0);
+        this.setData("contracts1", () => 0);
+        this.setData("contracts2", () => 0);
+        this.setData("contracts3", () => 0);
+        this.setData("points", () => 0);
         this.setData("craftsmen", () => 1);
         this.setData("trader", () => false);
         this.setData("trading", () => {
@@ -26,12 +30,7 @@ export default class CraftsmenPlayer2 extends Player {
             ];
         });
         this.setData("cartCost", () => {
-            const commonResources = ["wheat", "wood", "stone", "brick", "iron"];
-            const startResource =
-                commonResources[
-                    Math.floor(Math.random() * commonResources.length)
-                ];
-            return [[startResource, 2]];
+            return [["coins", 3]];
         });
         this.setData("guildCost", () => {
             return [
@@ -41,9 +40,9 @@ export default class CraftsmenPlayer2 extends Player {
         });
         this.setData("rotateCost", () => [["iron", 1]]);
         this.setData("coins", () =>
-            process.env.DEVELOPMENT === "true" ? 100 : 3,
+            process.env.DEVELOPMENT === "true" ? 0 : 3,
         );
-        this.setData("maxInventorySpace", () => 5);
+        this.setData("maxInventorySpace", () => 4);
         this.setData("canBuyCraftsman", () => true);
         this.setData("canBuyCart", () => true);
         this.setData("inventory", () => {

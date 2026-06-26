@@ -22,8 +22,9 @@ const props = defineProps([
             :available-actions="props.availableActions"
             :you="props.you"
             :style="`z-index: -${index}`"
-            :show-reroll="index === 2"
+            :show-reroll="true"
         />
+    
     </div>
 </template>
 

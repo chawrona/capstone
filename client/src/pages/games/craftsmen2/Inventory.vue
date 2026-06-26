@@ -109,10 +109,17 @@ const canBuyCart = computed(() => {
     let missingResources = 0;
 
     for (const [resource, cost] of cartCost) {
-        const available = inventory[resource] || 0;
+        if(resource === "coins") {
+            if (props.you.coins < cost) {
+                return false;
+            }
+        } else {
+            const available = inventory[resource] || 0;
         if (available < cost) {
             missingResources += cost - available;
         }
+        }
+        
     }
 
     return missingResources <= (inventory.amber || 0);

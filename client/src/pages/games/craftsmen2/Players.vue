@@ -29,9 +29,22 @@ const resourcesWithKeys = (inv, publicId) =>
             <div class="player-name">
                 <div class="contracts">
                     <div
-                        v-for="(contact, i) in player.contracts"
+                        v-for="(contract, i) in player.contracts1"
                         :key="i"
                         class="contract"
+                        :data-points="1"
+                    />
+                    <div
+                        v-for="(contract, i) in player.contracts2"
+                        :key="i"
+                        class="contract"
+                        :data-points="2"
+                    />
+                    <div
+                        v-for="(contract, i) in player.contracts3"
+                        :key="i"
+                        class="contract"
+                        :data-points="3"
                     />
                 </div>
 
@@ -142,6 +155,16 @@ const resourcesWithKeys = (inv, publicId) =>
         background-size: contain;
         background-position: center;
         background-image: url("/src/assets/games/gameAssets/craftsmen/board2.png");
+
+            &[data-points="1"] {
+         background-image: url("/src/assets/games/gameAssets/craftsmen/boardP1.png");
+    }
+    &[data-points="2"] {
+ background-image: url("/src/assets/games/gameAssets/craftsmen/boardP2.png");
+    }
+    &[data-points="3"] {
+ background-image: url("/src/assets/games/gameAssets/craftsmen/boardP3.png");
+    }
     }
 }
 

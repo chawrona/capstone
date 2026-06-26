@@ -81,6 +81,9 @@ const canCompleteContract = computed(() => {
     let missingResources = 0;
     const inventory = props.you.inventory;
 
+    console.log(["XD", props.contract, props.contract.requirements]);
+    
+
     for (const [resource, cost] of props.contract.requirements) {
         const available = inventory[resource] || 0;
         if (available < cost) {
@@ -103,13 +106,11 @@ const localCompleteContract = () => {
         :class="[animClass, { hidden: !displayContract.available }]"
     >
         <button
-            v-if="props.canReroll && props.showReroll"
             class="reroll"
             :disabled="!canReroll"
             @click="() => rerollContract(props.id)"
         >
-            Odśwież rynek
-            <!-- <img :src="Reroll" alt="" class="reroll-icon" /> -->
+            <img :src="Reroll" alt="" class="reroll-icon" />
             {{ props.rerollCost }}
             <img :src="Coins" alt="" />
         </button>
@@ -118,6 +119,7 @@ const localCompleteContract = () => {
             class="wrap"
             :class="[animClass, { disable: !canCompleteContract }]"
             @click="localCompleteContract"
+            :data-points="displayContract.points"
         >
             <h1 class="title">{{ displayContract.title }}</h1>
 
@@ -175,6 +177,16 @@ const localCompleteContract = () => {
     background-position: center;
 
     background-image: url("/src/assets/games/gameAssets/craftsmen/board2.png");
+
+    &[data-points="1"] {
+         background-image: url("/src/assets/games/gameAssets/craftsmen/boardP1.png");
+    }
+    &[data-points="2"] {
+ background-image: url("/src/assets/games/gameAssets/craftsmen/boardP2.png");
+    }
+    &[data-points="3"] {
+ background-image: url("/src/assets/games/gameAssets/craftsmen/boardP3.png");
+    }
 
     &.disable {
         cursor: not-allowed;
@@ -248,19 +260,16 @@ const localCompleteContract = () => {
 }
 
 
-
-
-
 .reroll {
     display: flex;
     justify-content: center;
     position: absolute;
     align-items: center;
-    top: -5rem;
+    top: -4rem;
     right: 0;
     border: none;
     height: 3.25rem;
-    width: 17rem;
+    width: 10rem;
     padding: 0.75rem;
     font-size: 1.45rem;
     font-weight: bold;
@@ -286,7 +295,7 @@ const localCompleteContract = () => {
     }
 
     .reroll-icon {
-        margin-right: 0.25rem;
+        margin-right: 0rem;
         width: 2.25rem;
         transform: translateY(-2px);
     }
