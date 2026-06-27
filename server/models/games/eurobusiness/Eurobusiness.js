@@ -54,7 +54,7 @@ export default class Eurobusiness extends Game {
                 this.timer.subtract(1);
                 const targets = this.endTimerConsequences();
                 if (targets) {
-                    this.useEventEmmiter(targets);
+                    this.useEventEmitter(targets);
                 }
             }
         }, 1000);

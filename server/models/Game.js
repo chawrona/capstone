@@ -1,4 +1,4 @@
-import eventEmmiter from "../services/EventEmmiter.js";
+import EventEmitter from "../services/EventEmitter.js";
 import Logger from "../services/Logger.js";
 import Player from "./Player.js";
 
@@ -23,22 +23,22 @@ export default class Game {
         this.paused = false;
         this.gameEnded = false;
         this.lobbyId = lobbyId;
-        this.eventEmmiter = new eventEmmiter();
+        this.eventEmitter = new EventEmitter();
     }
 
-    useEventEmmiter(targets) {
+    useEventEmitter(targets) {
         try {
             for (const { target, eventName, data } of targets) {
                 if (target === "lobby") {
-                    this.eventEmmiter.toLobby(this.lobbyId, eventName, data);
+                    this.eventEmitter.toLobby(this.lobbyId, eventName, data);
                 } else if (eventName === "error") {
-                    this.eventEmmiter.toPublicUserError(target, data);
+                    this.eventEmitter.toPublicUserError(target, data);
                 } else {
-                    this.eventEmmiter.toPublicUser(target, eventName, data);
+                    this.eventEmitter.toPublicUser(target, eventName, data);
                 }
             }
         } catch (error) {
-            this.eventEmmiter.toLobbyError(this.lobbyId, error);
+            this.eventEmitter.toLobbyError(this.lobbyId, error);
         }
     }
 

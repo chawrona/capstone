@@ -1,5 +1,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useToast } from "vue-toast-notification";
 
 import { soundBus } from "../audio/soundBus";
 import PlaySoundtrack from "../components/common/PlaySoundtrack.vue";
@@ -7,6 +9,7 @@ import { usePageSounds } from "../composables/usePageSounds";
 import { useAppStore } from "../store/useAppStore";
 
 const store = useAppStore();
+const router = useRouter();
 
 usePageSounds({
     effects: [{ name: "click", poolSize: 5, url: "/sounds/click.mp3" }],
@@ -24,26 +27,45 @@ const hangleSocketError = () => {
     awaitingJoinLobby.value = false;
 };
 
-onMounted(() => {
-    store.socket.on("error", hangleSocketError);
-});
+onMounted(() => {});
 
-onUnmounted(() => {
-    if (store.socket) store.socket.off("error", hangleSocketError);
-});
+const createLobby = () => joinLobby(true);
 
-const createLobby = () => {
-    soundBus.playEffect("click");
-    awaitingCreateLobby.value = true;
-    store.emit("createLobby");
-};
-
-const joinLobby = () => {
+const joinLobby = async (createLobby) => {
+    const toast = useToast();
     awaitingJoinLobby.value = true;
     soundBus.playEffect("click");
-    store.emit("joinLobby", {
-        lobbyId: lobbyId.value,
-    });
+    try {
+        const response = await fetch(
+            `${import.meta.env.VITE_APP_IP}/api/joinLobby`,
+            {
+                body: JSON.stringify({
+                    lobbyId: createLobby ? "create" : lobbyId.value,
+                }),
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                method: "POST",
+            },
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        router.push(data.redirect);
+    } catch (error) {
+        toast.error(error.message, {
+            duration: 4000,
+            position: "top-left",
+            type: "error",
+        });
+    } finally {
+        awaitingJoinLobby.value = false;
+    }
 };
 </script>
 

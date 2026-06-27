@@ -76,7 +76,6 @@ export default class Lobby {
             throw new Error("Pokój jest pełny.");
         }
         this.users.add(userId);
-        ("Dołączył do pokoju");
     }
 
     getPlayerCount() {

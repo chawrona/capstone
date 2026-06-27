@@ -7,13 +7,13 @@ import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
-import EventEmmiter from "../services/EventEmmiter.js";
+import EventEmitter from "./EventEmitter.js";
 
 export default class EventHelper {
     constructor() {
         this.lobbyManager = new LobbyManager();
         this.userManager = new UserManager();
-        this.eventEmmiter = new EventEmmiter();
+        this.eventEmitter = new EventEmitter();
     }
 
     createLobbyData(lobbyId) {
@@ -43,7 +43,7 @@ export default class EventHelper {
             // czy return przy tym pierwszym erroru jest potrzebny
             if (error instanceof UserDoesNotExistError) return;
             if (error instanceof LobbyDoesNotExistError) return error;
-            this.eventEmmiter.toUserError(lobbyId, error);
+            this.eventEmitter.toUserError(lobbyId, error);
         }
     }
 
@@ -54,7 +54,7 @@ export default class EventHelper {
 
             for (const lobbyUserId of lobby.users) {
                 const user = this.userManager.getUser(lobbyUserId);
-                this.eventEmmiter.toUser(lobbyUserId, "lobbyData", {
+                this.eventEmitter.toUser(lobbyUserId, "lobbyData", {
                     ...lobbyData,
                     currentUser: user.publicId,
                 });
@@ -62,14 +62,14 @@ export default class EventHelper {
         } catch (error) {
             if (error instanceof UserDoesNotExistError) return;
             if (error instanceof LobbyDoesNotExistError) return;
-            this.eventEmmiter.toUserError(lobbyId, error);
+            this.eventEmitter.toUserError(lobbyId, error);
         }
     }
 
     isLobbyIdGiven(userId, lobbyId) {
         try {
             if (!lobbyId) {
-                return this.eventEmmiter.toUser(userId, "homepage");
+                return this.eventEmitter.toUser(userId, "homepage");
             }
 
             const lobby = this.lobbyManager.getLobby(lobbyId);
@@ -79,21 +79,21 @@ export default class EventHelper {
             lobby.joinUser(userId);
             const user = this.userManager.getUser(userId);
             user.lobbyId = lobbyId;
-            this.eventEmmiter.toUser(userId, "lobby", lobbyId);
+            this.eventEmitter.toUser(userId, "lobby", lobbyId);
             this.sendLobbyData(lobbyId);
 
             return true;
         } catch (error) {
             if (error instanceof LobbyDoesNotExistError) {
-                this.eventEmmiter.toUser(userId, "homepage", {
+                this.eventEmitter.toUser(userId, "homepage", {
                     error: `Pokój #${lobbyId} nie istnieje.`,
                 });
             } else if (error instanceof GameAlreadyStartedError) {
-                this.eventEmmiter.toUser(userId, "homepage", {
+                this.eventEmitter.toUser(userId, "homepage", {
                     error: `Gra wystartowała.`,
                 });
             } else {
-                this.eventEmmiter.toUserError(userId, error);
+                this.eventEmitter.toUserError(userId, error);
             }
         }
     }

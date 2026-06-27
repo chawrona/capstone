@@ -19,7 +19,6 @@ const props = defineProps([
     "rerollCost",
     "id",
     "canReroll",
-    "show-reroll",
 ]);
 
 const { completeContract, rerollContract } = useGameActions(

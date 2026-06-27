@@ -12,11 +12,10 @@ export default class UserManager {
         this.publicIdToId = new Map();
     }
 
-    createUser(userId, socketId, username) {
+    createUser(userId, username) {
         const user = new User(userId, username);
         this.users.set(userId, user);
         this.publicIdToId.set(user.publicId, userId);
-        this.updateUserSocketId(userId, socketId);
     }
 
     updateUserSocketId(userId, socketId) {

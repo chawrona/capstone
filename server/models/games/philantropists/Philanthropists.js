@@ -363,7 +363,7 @@ export default class Philanthropists extends Game {
                 if (this.timer.isTimerZero()) {
                     console.log("Robi się automatyczne");
 
-                    this.useEventEmmiter(this.dalej());
+                    this.useEventEmitter(this.dalej());
                 }
             }
         }, 1000);

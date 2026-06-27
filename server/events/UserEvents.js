@@ -3,15 +3,16 @@ import ColorDuplicatedError from "../errors/ColorDuplicatedError.js";
 import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
-import EventEmmiter from "../services/EventEmmiter.js";
+import EventEmitter from "../services/EventEmitter.js";
+import EventHelper from "../services/EventHelper.js";
 import Logger from "../services/Logger.js";
-import EventHelper from "./EventHelper.js";
+import parseCookie from "../utils/parseCookie.js";
 
 export default class UserEvents {
     constructor(socket) {
         this.socket = socket;
         this.registerEvents();
-        this.eventEmmiter = new EventEmmiter();
+        this.eventEmitter = new EventEmitter();
         this.eventHelper = new EventHelper();
         this.userManager = new UserManager();
         this.lobbyManager = new LobbyManager();
@@ -29,7 +30,11 @@ export default class UserEvents {
         this.socket.on("disconnect", () => this.onDisconnect());
     }
 
-    onChangeUserColor({ userId, data: { newColor } }) {
+    onChangeUserColor({ data: { newColor } }) {
+        const userId = parseCookie(
+            this.socket.handshake.headers.cookie,
+            "userId",
+        );
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
@@ -54,11 +59,15 @@ export default class UserEvents {
             user.color = newColor;
             this.eventHelper.sendLobbyData(user.lobbyId);
         } catch (error) {
-            this.eventEmmiter.toUserError(userId, error);
+            this.eventEmitter.toUserError(userId, error);
         }
     }
 
-    onChangeUsername({ userId, data: { newUsername } }) {
+    onChangeUsername({ data: { newUsername } }) {
+        const userId = parseCookie(
+            this.socket.handshake.headers.cookie,
+            "userId",
+        );
         try {
             this.eventHelper.validateUsername(newUsername);
 
@@ -69,14 +78,18 @@ export default class UserEvents {
             user.name = newUsername.trim();
 
             this.eventHelper.sendLobbyData(user.lobbyId);
-            this.eventEmmiter.toUser(userId, "usernameChanged", user.name);
+            this.eventEmitter.toUser(userId, "usernameChanged", user.name);
         } catch (error) {
-            this.eventEmmiter.toUserError(userId, error);
-            this.eventEmmiter.toUser(userId, "usernameChangedError");
+            this.eventEmitter.toUserError(userId, error);
+            this.eventEmitter.toUser(userId, "usernameChangedError");
         }
     }
 
-    onToggleReady({ userId }) {
+    onToggleReady() {
+        const userId = parseCookie(
+            this.socket.handshake.headers.cookie,
+            "userId",
+        );
         try {
             const user = this.userManager.getUser(userId);
 
@@ -86,25 +99,28 @@ export default class UserEvents {
             this.eventHelper.sendLobbyData(user.lobbyId);
         } catch (error) {
             if (error instanceof UserDoesNotExistError) {
-                this.eventEmmiter.toUser(userId, "homepage", {
+                this.eventEmitter.toUser(userId, "homepage", {
                     error: `Użytkownik o ID ${userId} nie istnieje.`,
                 });
             } else {
-                this.eventEmmiter.toUserError(userId, error);
+                this.eventEmitter.toUserError(userId, error);
             }
         }
     }
 
     onDisconnect() {
+        const userId = parseCookie(
+            this.socket.handshake.headers.cookie,
+            "userId",
+        );
         try {
-            const { userId } = this.socket.data;
             const user = this.userManager.getUser(userId);
 
             if (user.hasLobby()) {
                 const lobby = this.lobbyManager.getLobby(user.lobbyId);
                 if (!lobby.isActive) {
                     lobby.removeUser(userId);
-
+                    user.lobbyId = null;
                     if (!lobby.getPlayerCount()) {
                         this.lobbyManager.deleteLobby(lobby.id);
                     } else if (lobby.isAdmin) {
@@ -114,8 +130,6 @@ export default class UserEvents {
 
                     this.userManager.deleteUser(userId);
                 } else {
-                    lobby.game.pause(userId);
-                    this.eventEmmiter.toLobby(lobby.id, "pause");
                     user.isOnline = false;
                 }
             } else {

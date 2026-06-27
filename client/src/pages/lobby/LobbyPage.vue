@@ -35,6 +35,8 @@ const readyUsers = computed(
 onMounted(() => {
     const requestData = () => {
         store.socket.on("lobbyData", (lobbyData) => {
+            console.log("Dane przyszły");
+
             data.value = lobbyData;
         });
 
@@ -46,6 +48,8 @@ onMounted(() => {
     unwatch = watch(
         () => store.socket,
         (newSocket) => {
+            console.log("socket się zmienił");
+
             if (newSocket) {
                 requestData();
                 unwatch();

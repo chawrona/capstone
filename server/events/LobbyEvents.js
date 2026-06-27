@@ -4,14 +4,14 @@ import GameDoesNotExistError from "../errors/GameDoesNotExistError.js";
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import PlayerLacksColorError from "../errors/PlayerLacksColorError.js";
 import UserCountMismatchError from "../errors/UserCountMismatchError.js";
-import UserInLobbyError from "../errors/UserInLobbyError.js";
 import UserNotAdminError from "../errors/UserNotAdminError.js";
 import UsersNotReadyError from "../errors/UsersNotReadyError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
-import EventEmmiter from "../services/EventEmmiter.js";
+import EventEmitter from "../services/EventEmitter.js";
+import EventHelper from "../services/EventHelper.js";
 import Logger from "../services/Logger.js";
-import EventHelper from "./EventHelper.js";
+import parseCookie from "../utils/parseCookie.js";
 
 export default class LobbyEvents {
     constructor(socket) {
@@ -19,7 +19,7 @@ export default class LobbyEvents {
         this.registerEvents();
         this.lobbyManager = new LobbyManager();
         this.userManager = new UserManager();
-        this.eventEmmiter = new EventEmmiter();
+        this.eventEmitter = new EventEmitter();
         this.eventHelper = new EventHelper();
         this.logger = new Logger();
     }
@@ -37,92 +37,11 @@ export default class LobbyEvents {
         this.socket.on("onEndGame", (payload) => this.onEndGame(payload));
     }
 
-    onCreateLobby({ userId }) {
-        try {
-            const lobby = this.lobbyManager.createLobby();
-            const lobbyId = lobby.id;
-            const user = this.userManager.getUser(userId);
-
-            user.color = null;
-
-            user.lobbyId = lobbyId;
-
-            if (process.env.DEVELOPMENT === "true") {
-                user.color = {
-                    name: "crimson",
-                    hex: "#d72638",
-                };
-            }
-
-            this.socket.join(lobbyId);
-            lobby.joinUser(userId);
-            lobby.admin = userId;
-            this.eventEmmiter.toUser(userId, "lobby", lobbyId);
-
-            this.logger.log(
-                `Stworzono pokój o id ${lobbyId} przez gracza ${userId}`,
-            );
-        } catch (error) {
-            this.eventEmmiter.toUserError(userId, error);
-        }
-    }
-
-    onJoinLobby({ userId, data: { lobbyId } }) {
-        try {
-            if (process.env.DEVELOPMENT === "true") {
-                lobbyId = this.lobbyManager.lobbies.entries().next().value[0];
-            }
-
-            const lobby = this.lobbyManager.getLobby(lobbyId);
-
-            this.eventHelper.checkIfLobbyActive(lobby);
-
-            const user = this.userManager.getUser(userId);
-
-            if (process.env.DEVELOPMENT === "true") {
-                console.log(process.env.DEVELOPMENT);
-
-                console.log("Hello?");
-
-                user.color = {
-                    name:
-                        lobby.users.size === 1
-                            ? "blue"
-                            : lobby.users.size === 2
-                              ? "green"
-                              : "yellow",
-                    hex:
-                        lobby.users.size === 1
-                            ? "#3b82f6"
-                            : lobby.users.size === 2
-                              ? "#22c55e"
-                              : "#facc15",
-                };
-            }
-
-            if (user.lobbyId) throw new UserInLobbyError();
-
-            if (!process.env.DEVELOPMENT) {
-                user.color = null;
-            }
-
-            lobby.joinUser(userId);
-            user.lobbyId = lobbyId;
-            this.socket.join(lobbyId);
-
-            this.eventEmmiter.toUser(userId, "lobby", lobbyId);
-
-            this.logger.log(
-                `Użytkownik o id ${userId} dołączył do pokoju #${lobbyId}.`,
-            );
-
-            this.eventHelper.sendLobbyData(lobbyId);
-        } catch (error) {
-            this.eventEmmiter.toUserError(userId, error);
-        }
-    }
-
-    onLeaveLobby({ userId }) {
+    onLeaveLobby() {
+        const userId = parseCookie(
+            this.socket.handshake.headers.cookie,
+            "userId",
+        );
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
@@ -144,11 +63,15 @@ export default class LobbyEvents {
 
             this.logger.log(`Użytkownik o id ${userId} opuścił pokój.`);
         } catch (error) {
-            this.eventEmmiter.toUserError(userId, error);
+            this.eventEmitter.toUserError(userId, error);
         }
     }
 
-    onGameStart({ userId }) {
+    onGameStart() {
+        const userId = parseCookie(
+            this.socket.handshake.headers.cookie,
+            "userId",
+        );
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
@@ -200,7 +123,7 @@ export default class LobbyEvents {
             }
 
             const gameTitle = lobby.start(players);
-            this.eventEmmiter.toLobby(lobby.id, "game", {
+            this.eventEmitter.toLobby(lobby.id, "game", {
                 gameTitle: gameTitle,
                 lobbyId: lobby.id,
             });
@@ -208,11 +131,15 @@ export default class LobbyEvents {
             this.logger.log(`Gra ${gameTitle} została wystartowana.`);
         } catch (error) {
             console.log(error);
-            this.eventEmmiter.toUserError(userId, error);
+            this.eventEmitter.toUserError(userId, error);
         }
     }
 
-    onLobbyDataRequest({ userId }) {
+    onLobbyDataRequest() {
+        const userId = parseCookie(
+            this.socket.handshake.headers.cookie,
+            "userId",
+        );
         try {
             const user = this.userManager.getUser(userId);
 
@@ -222,7 +149,7 @@ export default class LobbyEvents {
                 throw lobbyData;
             }
 
-            this.eventEmmiter.toUser(userId, "lobbyData", {
+            this.eventEmitter.toUser(userId, "lobbyData", {
                 ...lobbyData,
                 currentUser: user.publicId,
             });
@@ -232,11 +159,15 @@ export default class LobbyEvents {
             // przekieruje na homepage Z tego powodu wysyła ponownie event z prośbą o dane,
             // jednak lobby już nie istnieje. Na chwilę obecną ignorujemy wysyłany event
             if (error instanceof LobbyDoesNotExistError) return;
-            this.eventEmmiter.toUserError(userId, error);
+            this.eventEmitter.toUserError(userId, error);
         }
     }
 
-    onRemoveUser({ userId, data: { userToKickPublicId } }) {
+    onRemoveUser({ data: { userToKickPublicId } }) {
+        const userId = parseCookie(
+            this.socket.handshake.headers.cookie,
+            "userId",
+        );
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
@@ -250,20 +181,24 @@ export default class LobbyEvents {
                 this.userManager.getUserIdByPublicId(userToKickPublicId);
             lobby.removeUser(userIdToKick);
 
-            this.eventEmmiter.toUser(userId, "info", {
+            this.eventEmitter.toUser(userId, "info", {
                 info: `Pomyślnie usunięto gracza z pokoju.`,
             });
-            this.eventEmmiter.toUser(userIdToKick, "homepage", {
+            this.eventEmitter.toUser(userIdToKick, "homepage", {
                 error: `Zostałeś wyrzucony z pokoju`,
             });
 
             this.eventHelper.sendLobbyData(lobby.id);
         } catch (error) {
-            this.eventEmmiter.toUserError(userId, error);
+            this.eventEmitter.toUserError(userId, error);
         }
     }
 
-    onEndGame({ userId }) {
+    onEndGame() {
+        const userId = parseCookie(
+            this.socket.handshake.headers.cookie,
+            "userId",
+        );
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
@@ -275,15 +210,19 @@ export default class LobbyEvents {
 
             lobby.endGame();
 
-            this.eventEmmiter.toUser(userId, "lobby", lobby.id);
+            this.eventEmitter.toUser(userId, "lobby", lobby.id);
 
             this.eventHelper.sendLobbyData(lobby.id);
         } catch (error) {
-            this.eventEmmiter.toUserError(userId, error);
+            this.eventEmitter.toUserError(userId, error);
         }
     }
 
-    onChangeGame({ userId, data: { gameTitle } }) {
+    onChangeGame({ data: { gameTitle } }) {
+        const userId = parseCookie(
+            this.socket.handshake.headers.cookie,
+            "userId",
+        );
         try {
             const user = this.userManager.getUser(userId);
             const lobby = this.lobbyManager.getLobby(user.lobbyId);
@@ -307,7 +246,7 @@ export default class LobbyEvents {
         } catch (error) {
             if (error instanceof LobbyDoesNotExistError) return;
             if (error instanceof GameDoesNotExistError) return;
-            this.eventEmmiter.toUserError(userId, error);
+            this.eventEmitter.toUserError(userId, error);
         }
     }
 }

@@ -1,13 +1,16 @@
 import UserManager from "../managers/UserManager.js";
 import Logger from "./Logger.js";
 
-export default class EventEmmiter {
+export default class EventEmitter {
     constructor(io) {
-        if (EventEmmiter.instance) {
-            return EventEmmiter.instance;
+        if (EventEmitter.instance) {
+            if (io) {
+                EventEmitter.instance.io = io;
+            }
+            return EventEmitter.instance;
         }
         this.io = io;
-        EventEmmiter.instance = this;
+        EventEmitter.instance = this;
 
         this.userManager = new UserManager();
         this.logger = new Logger();
