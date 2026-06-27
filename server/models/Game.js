@@ -20,7 +20,6 @@ export default class Game {
 
         this.logger = new Logger();
 
-        this.disconnectedPlayers = new Set();
         this.paused = false;
         this.gameEnded = false;
         this.lobbyId = lobbyId;
@@ -174,18 +173,12 @@ export default class Game {
         return [this.dataWithPlayerTarget(data.publicId)];
     }
 
-    pause(userId) {
-        this.disconnectedPlayers.add(userId);
+    pause() {
         this.paused = true;
     }
 
-    resume(userId) {
-        console.log("Gra ponownie w toku");
-        this.disconnectedPlayers.delete(userId);
-        if (this.disconnectedPlayers.size === 0) {
-            this.paused = false;
-            return true;
-        }
+    resume() {
+        this.paused = false;
         return false;
     }
 

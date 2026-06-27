@@ -1440,9 +1440,8 @@ export default class Eurobusiness extends Game {
         ];
     }
 
-    pause(userId) {
+    pause() {
         this.logger.log("Gra zapauzowana");
-        this.disconnectedPlayers.add(userId);
         this.paused = true;
     }
 }

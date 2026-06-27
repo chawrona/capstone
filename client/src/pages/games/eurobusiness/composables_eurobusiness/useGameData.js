@@ -49,8 +49,6 @@ export function useGameData(isPaused) {
                 if (!isPaused.value)
                     time.value = !time.value ? 0 : time.value - 1;
             }, 1000);
-
-            store.setLoading(false);
         });
 
         for (const eventName in eventsMap) {

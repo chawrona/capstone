@@ -32,10 +32,7 @@ onMounted(() => {
 });
 
 const goBackToLobby = () => {
-    store.setLoading(true);
-    setTimeout(() => {
-        router.push(`/${props.lobbyId}`);
-    }, 1000);
+    router.push(`/${props.lobbyId}`);
 };
 
 const players = computed(() => {
@@ -137,8 +134,6 @@ const bestPerStat = computed(() => {
                         </div>
                     </div>
                     <img :src="Hourglass" class="stat-icon" alt="czas" />
-                 
-                 
                 </div>
                 <div class="global-card"></div>
                 <div v-if="global.mostValuableResource" class="global-card">

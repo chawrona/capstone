@@ -14,7 +14,6 @@ export default function useGameData() {
             console.log(data);
 
             gameData.value = data;
-            store.setLoading(false);
         });
 
         store.emit("gameData", {

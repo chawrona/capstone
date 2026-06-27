@@ -19,7 +19,7 @@ const props = defineProps([
     "rerollCost",
     "id",
     "canReroll",
-    "show-reroll"
+    "show-reroll",
 ]);
 
 const { completeContract, rerollContract } = useGameActions(
@@ -82,7 +82,6 @@ const canCompleteContract = computed(() => {
     const inventory = props.you.inventory;
 
     console.log(["XD", props.contract, props.contract.requirements]);
-    
 
     for (const [resource, cost] of props.contract.requirements) {
         const available = inventory[resource] || 0;
@@ -118,8 +117,8 @@ const localCompleteContract = () => {
         <div
             class="wrap"
             :class="[animClass, { disable: !canCompleteContract }]"
-            @click="localCompleteContract"
             :data-points="displayContract.points"
+            @click="localCompleteContract"
         >
             <h1 class="title">{{ displayContract.title }}</h1>
 
@@ -133,7 +132,10 @@ const localCompleteContract = () => {
                 <div
                     v-for="[resource, amount] in displayContract.requirements"
                     :key="resource"
-                    :class="{ smallerImg: true, smaller: displayContract.requirements.length> 2 }"
+                    :class="{
+                        smallerImg: true,
+                        smaller: displayContract.requirements.length > 2,
+                    }"
                 >
                     {{ amount }}
                     <img :src="resourceImages[resource]" alt="" />
@@ -179,13 +181,13 @@ const localCompleteContract = () => {
     background-image: url("/src/assets/games/gameAssets/craftsmen/board2.png");
 
     &[data-points="1"] {
-         background-image: url("/src/assets/games/gameAssets/craftsmen/boardP1.png");
+        background-image: url("/src/assets/games/gameAssets/craftsmen/boardP1.png");
     }
     &[data-points="2"] {
- background-image: url("/src/assets/games/gameAssets/craftsmen/boardP2.png");
+        background-image: url("/src/assets/games/gameAssets/craftsmen/boardP2.png");
     }
     &[data-points="3"] {
- background-image: url("/src/assets/games/gameAssets/craftsmen/boardP3.png");
+        background-image: url("/src/assets/games/gameAssets/craftsmen/boardP3.png");
     }
 
     &.disable {
@@ -234,31 +236,25 @@ const localCompleteContract = () => {
         width: 2rem;
     }
 
-     div {
-    display: flex;
+    div {
+        display: flex;
 
-    gap: 0.2rem;
-    align-items: center;
-}
+        gap: 0.2rem;
+        align-items: center;
+    }
 
     .smaller {
-    
-  
         font-size: 1.3rem;
         img {
-
             width: 1.75rem;
         }
     }
 }
 
-.top
-
-.hidden {
+.top .hidden {
     opacity: 0;
     cursor: auto;
 }
-
 
 .reroll {
     display: flex;

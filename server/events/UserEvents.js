@@ -1,8 +1,6 @@
 import ColorDoesNotExistError from "../errors/ColorDoesNotExistError.js";
 import ColorDuplicatedError from "../errors/ColorDuplicatedError.js";
-import GameAbortedPlayerLeftError from "../errors/GameAbortedPlayerLeftError.js";
 import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
-import UserOnlineError from "../errors/UserOnlineError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmmiter from "../services/EventEmmiter.js";
@@ -21,10 +19,6 @@ export default class UserEvents {
     }
 
     registerEvents() {
-        this.socket.on("initialRequest", (redirectRequest) =>
-            this.onInitialRequest(redirectRequest),
-        );
-
         this.socket.on("toggleReady", (payload) => this.onToggleReady(payload));
         this.socket.on("changeUserColor", (payload) => {
             this.onChangeUserColor(payload);
@@ -33,72 +27,6 @@ export default class UserEvents {
             this.onChangeUsername(payload);
         });
         this.socket.on("disconnect", () => this.onDisconnect());
-    }
-
-    onInitialRequest(redirectRequest) {
-        try {
-            const userId = redirectRequest.userId;
-
-            if (!redirectRequest.data) return;
-            const lobbyId = redirectRequest.data.lobbyId;
-            let username = redirectRequest.data.username;
-
-            if (this.userManager.doesUserExist(userId)) {
-                const user = this.userManager.getUser(userId);
-
-                if (user.isOnline) {
-                    throw new UserOnlineError();
-                }
-
-                this.userManager.updateUserSocketId(userId, this.socket.id);
-                user.isOnline = true;
-
-                if (user.hasLobby()) {
-                    const lobby = this.lobbyManager.getLobby(user.lobbyId);
-
-                    if (this.userManager.hasTimeout(user.id)) {
-                        this.userManager.clearTimeout(user.id);
-                        if (lobby.game.resume(user.id)) {
-                            this.eventEmmiter.toLobby(lobby.id, "resume");
-                        }
-                    }
-
-                    this.socket.join(user.lobbyId);
-                    this.eventEmmiter.toUser(userId, "game", {
-                        gameTitle: lobby.gameInfo.title,
-                        lobbyId: lobby.id,
-                    });
-                } else {
-                    if (this.eventHelper.isLobbyIdGiven(userId, lobbyId)) {
-                        this.socket.join(lobbyId);
-                    }
-                }
-            } else {
-                try {
-                    !this.eventHelper.validateUsername(username);
-                } catch {
-                    username = null;
-                }
-
-                this.userManager.createUser(userId, this.socket.id, username);
-
-                if (this.eventHelper.isLobbyIdGiven(userId, lobbyId)) {
-                    this.socket.join(lobbyId);
-                }
-            }
-
-            this.socket.data.userId = userId;
-        } catch (error) {
-            if (error instanceof UserOnlineError) {
-                // Specyficzny przypadek, jak jesteście ciekaw to mnie spytajcie
-                this.eventEmmiter.toLobbyError(
-                    this.socket.id,
-                    new Error("Aplikacja jest już otwarta w innej karcie"),
-                );
-            } else {
-                this.eventEmmiter.toUserError(redirectRequest.userId, error);
-            }
-        }
     }
 
     onChangeUserColor({ userId, data: { newColor } }) {
@@ -188,35 +116,6 @@ export default class UserEvents {
                 } else {
                     lobby.game.pause(userId);
                     this.eventEmmiter.toLobby(lobby.id, "pause");
-                    const timeoutId = setTimeout(
-                        () => {
-                            for (const lobbyUserId of [
-                                ...lobby.game.disconnectedPlayers,
-                            ]) {
-                                this.userManager.clearTimeout(lobbyUserId);
-                            }
-
-                            for (const userId of lobby.users) {
-                                const user = this.userManager.getUser(userId);
-                                user.lobbyId = null;
-                                user.isReady = false;
-                            }
-
-                            this.eventEmmiter.toLobby(lobby.id, "homepage");
-
-                            this.eventEmmiter.toLobbyError(
-                                lobby.id,
-                                new GameAbortedPlayerLeftError(),
-                            );
-
-                            this.eventEmmiter.closeRoom(lobby.id);
-
-                            this.lobbyManager.deleteLobby(lobby.id);
-                            this.userManager.deleteUser(userId);
-                        },
-                        3 * 60 * 1000,
-                    );
-                    this.userManager.createTimeout(user.id, timeoutId);
                     user.isOnline = false;
                 }
             } else {

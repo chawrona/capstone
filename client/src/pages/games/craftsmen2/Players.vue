@@ -156,15 +156,15 @@ const resourcesWithKeys = (inv, publicId) =>
         background-position: center;
         background-image: url("/src/assets/games/gameAssets/craftsmen/board2.png");
 
-            &[data-points="1"] {
-         background-image: url("/src/assets/games/gameAssets/craftsmen/boardP1.png");
-    }
-    &[data-points="2"] {
- background-image: url("/src/assets/games/gameAssets/craftsmen/boardP2.png");
-    }
-    &[data-points="3"] {
- background-image: url("/src/assets/games/gameAssets/craftsmen/boardP3.png");
-    }
+        &[data-points="1"] {
+            background-image: url("/src/assets/games/gameAssets/craftsmen/boardP1.png");
+        }
+        &[data-points="2"] {
+            background-image: url("/src/assets/games/gameAssets/craftsmen/boardP2.png");
+        }
+        &[data-points="3"] {
+            background-image: url("/src/assets/games/gameAssets/craftsmen/boardP3.png");
+        }
     }
 }
 

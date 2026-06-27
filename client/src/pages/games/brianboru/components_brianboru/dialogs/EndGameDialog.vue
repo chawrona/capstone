@@ -21,10 +21,7 @@ const router = useRouter();
 const route = useRoute();
 
 const goBackToLobby = () => {
-    store.setLoading(true);
-    setTimeout(() => {
-        router.push(`/${props.lobbyId}`);
-    }, 1000);
+    router.push(`/${props.lobbyId}`);
 };
 
 const smallCoinCount = (money) => money % 5;

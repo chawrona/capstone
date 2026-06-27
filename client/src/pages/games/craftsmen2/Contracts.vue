@@ -24,7 +24,6 @@ const props = defineProps([
             :style="`z-index: -${index}`"
             :show-reroll="true"
         />
-    
     </div>
 </template>
 

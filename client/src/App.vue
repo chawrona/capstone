@@ -2,13 +2,11 @@
 import { storeToRefs } from "pinia";
 
 import LoadingScreen from "./components/common/LoadingScreen.vue";
+import useAuthentication from "./composables/useAuthentication.js";
 import { usePageSounds } from "./composables/usePageSounds";
-import useSocket from "./composables/useSocket";
 import { useAppStore } from "./store/useAppStore";
 
-const store = useAppStore();
-const { socket } = storeToRefs(store);
-useSocket();
+useAuthentication();
 
 usePageSounds({
     music: [{ name: "soundtrack", url: "/sounds/tale.mp3" }],
@@ -16,8 +14,7 @@ usePageSounds({
 </script>
 
 <template>
-    <LoadingScreen />
-    <router-view v-if="socket" />
+    <router-view />
 </template>
 
 <style scoped></style>

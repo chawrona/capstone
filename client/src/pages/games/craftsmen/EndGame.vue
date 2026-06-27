@@ -32,10 +32,7 @@ onMounted(() => {
 });
 
 const goBackToLobby = () => {
-    store.setLoading(true);
-    setTimeout(() => {
-        router.push(`/${props.lobbyId}`);
-    }, 1000);
+    router.push(`/${props.lobbyId}`);
 };
 
 const players = computed(() => {

@@ -184,7 +184,6 @@ onMounted(() => {
     if (store.socket) {
         store.socket.on("gameData", (data) => {
             gameData.value = data;
-            store.setLoading(false);
 
             isPaused.value = data.isPaused;
 

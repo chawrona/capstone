@@ -1,6 +1,6 @@
 import express from "express";
 
-export default class ClientRoutes {
+export default class ViewController {
     constructor() {
         this.router = express.Router();
         this.initRoutes();

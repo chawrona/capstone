@@ -77,10 +77,8 @@ const dunno = () => {
         coPokazujemyRef.value = "koniec";
     } else if (coPokazujemyRef.value === "koniec") {
         soundBus.playMusic("soundtrack");
-        store.setLoading(true);
-        setTimeout(() => {
-            router.push(`/${props.gameData.lobbyId}`);
-        }, 1000);
+
+        router.push(`/${props.gameData.lobbyId}`);
     }
 };
 </script>

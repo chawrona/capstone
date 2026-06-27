@@ -11,7 +11,6 @@ export default function useGameData() {
 
         store.socket.on("gameData", (data) => {
             gameData.value = data;
-            store.setLoading(false);
         });
 
         store.emit("gameData", {

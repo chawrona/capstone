@@ -10,11 +10,9 @@ const router = useRouter();
 const route = useRoute();
 
 const goToLobby = () => {
-    store.setLoading(true);
     soundBus.playMusic("soundtrack");
-    setTimeout(() => {
-        router.push(`/`);
-    }, 1000);
+
+    router.push(`/`);
 };
 
 const getPlayerName = (publicId) => {

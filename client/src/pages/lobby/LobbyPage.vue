@@ -18,6 +18,7 @@ usePageSounds({
 });
 
 const data = ref(null);
+let unwatch = null;
 
 const currentUser = computed(() =>
     data.value.lobbyUsers.find(
@@ -32,16 +33,31 @@ const readyUsers = computed(
 );
 
 onMounted(() => {
-    store.socket.on("lobbyData", (lobbyData) => {
-        data.value = lobbyData;
-        store.setLoading(false);
-    });
+    const requestData = () => {
+        store.socket.on("lobbyData", (lobbyData) => {
+            data.value = lobbyData;
+        });
 
-    store.emit("lobbyDataRequest");
+        store.emit("lobbyDataRequest");
+    };
+
+    if (store.socket) return requestData();
+
+    unwatch = watch(
+        () => store.socket,
+        (newSocket) => {
+            if (newSocket) {
+                requestData();
+                unwatch();
+                unwatch = null;
+            }
+        },
+    );
 });
 
 onUnmounted(() => {
     if (store.socket) store.socket.off("lobbyData");
+    if (unwatch) unwatch();
 });
 </script>
 

@@ -109,17 +109,16 @@ const canBuyCart = computed(() => {
     let missingResources = 0;
 
     for (const [resource, cost] of cartCost) {
-        if(resource === "coins") {
+        if (resource === "coins") {
             if (props.you.coins < cost) {
                 return false;
             }
         } else {
             const available = inventory[resource] || 0;
-        if (available < cost) {
-            missingResources += cost - available;
+            if (available < cost) {
+                missingResources += cost - available;
+            }
         }
-        }
-        
     }
 
     return missingResources <= (inventory.amber || 0);
@@ -130,7 +129,7 @@ const canBuyCart = computed(() => {
     <div class="eq">
         <div class="info">
             <h1>Inwentarz</h1>
-           
+
             <div class="wallet" :class="{ 'coins-pop': coinsAnimating }">
                 {{ props.you.coins }}
                 <img :src="Coins" alt="" />
