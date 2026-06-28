@@ -4,8 +4,6 @@ import BrianBoru from "./games/brianboru/BrianBoru.js";
 import BrianBoruPlayer from "./games/brianboru/BrianBoruPlayer.js";
 import Craftsmen from "./games/craftsmen/Craftsmen.js";
 import CraftsmenPlayer from "./games/craftsmen/CraftsmenPlayer.js";
-import Eurobusiness from "./games/eurobusiness/Eurobusiness.js";
-import Ludo from "./games/Ludo.js";
 import Philanthropists from "./games/philantropists/Philanthropists.js";
 import PhilanthropistsPlayer from "./games/philantropists/PhilanthropistsPlayer.js";
 
@@ -22,9 +20,6 @@ export default class Lobby {
 
     start(players) {
         switch (this.gameInfo.title) {
-            case "ludo":
-                this.game = new Ludo(players, () => this.endGame(), this.id);
-                break;
             case "craftsmen":
                 this.game = new Craftsmen(
                     players,
@@ -39,13 +34,6 @@ export default class Lobby {
                     () => this.endGame(),
                     this.id,
                     BrianBoruPlayer,
-                );
-                break;
-            case "eurobusiness":
-                this.game = new Eurobusiness(
-                    players,
-                    () => this.endGame(),
-                    this.id,
                 );
                 break;
             case "philanthropists":

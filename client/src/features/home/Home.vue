@@ -6,7 +6,7 @@ import { useToast } from "vue-toast-notification";
 import { soundBus } from "../../audio/soundBus";
 import { usePageSounds } from "../../composables/usePageSounds";
 import { useAppStore } from "../../store/useAppStore";
-import PlaySoundtrack from "../components/common/PlaySoundtrack.vue";
+import PlaySoundtrack from "../../components/common/PlaySoundtrack.vue";
 
 const store = useAppStore();
 const router = useRouter();

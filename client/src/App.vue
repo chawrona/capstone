@@ -18,7 +18,7 @@ usePageSounds({
 <template>
     <div class="small-screen-block">
         <p>
-            Gry planszowe nie mieszczą się realnie na małych ekranach,<br />dlatego
+            Gry planszowe nie mieszczą się realnie na małych ekranach, dlatego
             aplikacja wymaga komputera lub tabletu.
         </p>
     </div>
@@ -30,7 +30,7 @@ usePageSounds({
     display: none;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767px), (max-height: 600px) {
     .small-screen-block {
         display: flex;
         position: fixed;

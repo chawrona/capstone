@@ -1,5 +1,5 @@
 import Game from "../../Game.js";
-import Timer from "../eurobusiness/modules/Timer.js";
+import Timer from "./Timer.js";
 
 export default class Philanthropists extends Game {
     constructor(players, endGame, lobbyId, playerClass) {
