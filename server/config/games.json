@@ -88,35 +88,5 @@
     "time": "25-35 min.",
     "difficulty": "Trudny",
     "colors": null
-  },
-  {
-    "title": "eurobusiness",
-    "polishTitle": "Eurobiznes",
-    "maxPlayers": 4,
-    "minPlayers": 2,
-    "description": "Klasyczna gra planszowa, w której gracze kupują nieruchomości, pobierają czynsze i inwestują w zabudowę.",
-    "time": "45-75 min.",
-    "difficulty": "średni",
-    "colors": [
-      { "name": "black", "hex": "#111827" },
-      { "name": "white", "hex": "#f9fafb" },
-      { "name": "red", "hex": "#ef4444" },
-      { "name": "green", "hex": "#10b981" }
-    ]
-  },
-  {
-    "title": "ludo",
-    "polishTitle": "Chińczyk",
-    "maxPlayers": 4,
-    "minPlayers": 2,
-    "description": "Gra planszowa dla 2–4 osób, w której celem jest wprowadzenie wszystkich swoich czterech pionków na pola końcowe jako pierwszy.",
-    "time": "10-25 min.",
-    "difficulty": "łatwy",
-    "colors": [
-      { "name": "red", "hex": "#dc2626" },
-      { "name": "blue", "hex": "#2563eb" },
-      { "name": "green", "hex": "#16a34a" },
-      { "name": "yellow", "hex": "#eab308" }
-    ]
   }
 ]
