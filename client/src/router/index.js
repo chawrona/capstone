@@ -12,40 +12,24 @@ const routes = [
         path: "/",
     },
     {
-        component: () => import("@/pages/games/ludo/Ludo.vue"),
-        name: "ludo",
-        path: "/:id/ludo",
+        component: () => import("@/pages/LobbyPage.vue"),
+        name: "lobby",
+        path: "/:id",
     },
     {
-        component: () => import("@/pages/games/craftsmen/Craftsmen.vue"),
+        component: () => import("@/pages/games/CraftsmenPage.vue"),
         name: "craftsmen",
         path: "/:id/craftsmen",
     },
     {
-        component: () => import("@/pages/games/craftsmen2/Craftsmen.vue"),
-        name: "craftsmen2",
-        path: "/:id/craftsmen2",
-    },
-    {
-        component: () => import("@/pages/games/eurobusiness/Eurobusiness.vue"),
-        name: "eurobusiness",
-        path: "/:id/eurobusiness",
-    },
-    {
-        component: () => import("@/pages/games/brianboru/BrianBoru.vue"),
+        component: () => import("@/pages/games/BrianBoruPage.vue"),
         name: "brianboru",
         path: "/:id/brianboru",
     },
     {
-        component: () =>
-            import("@/pages/games/philanthropists/Philanthropists.vue"),
+        component: () => import("@/pages/games/PhilanthropistsPAge.vue"),
         name: "philanthropists",
         path: "/:id/philanthropists",
-    },
-    {
-        component: () => import("@/pages/lobby/LobbyPage.vue"),
-        name: "lobby",
-        path: "/:id",
     },
 ];
 
@@ -64,7 +48,6 @@ router.beforeEach((to, from, next) => {
         store.connectSocket(to.params.id, router, toast);
     }
 
-    // Pozwalamy na przejście do docelowej ścieżki
     next();
 });
 

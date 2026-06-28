@@ -1,9 +1,9 @@
 <script setup>
-import Home from "../features/home/Home.vue";
+import Lobby from "../features/lobby/Lobby.vue";
 </script>
 
 <template>
-    <Home />
+    <Lobby />
 </template>
 
 <style scoped></style>

@@ -1,11 +1,11 @@
 [
   {
-    "title": "craftsmen2",
-    "polishTitle": "Rzemieślnicy 2",
+    "title": "craftsmen",
+    "polishTitle": "Rzemieślnicy",
     "maxPlayers": 4,
     "minPlayers": 3,
-    "description": "Ekonomiczna gra stategiczna w której próbujesz stać się najbogatszym właścicielem firmy",
-    "time": "20-30 min.",
+    "description": "Ekonomiczna gra stategiczna w której próbujesz wykonać najwięcej kontraktów.",
+    "time": "55-75 min.",
     "difficulty": "Trudny",
     "colors": [
       { "name": "black", "hex": "#000000" },
@@ -41,23 +41,6 @@
       { "name": "sapphire", "hex": "#0f52ba" },
       { "name": "olive", "hex": "#808000" },
       { "name": "burgundy", "hex": "#800020" }
-    ]
-  },
-  {
-    "title": "craftsmen",
-    "polishTitle": "Rzemieślnicy",
-    "maxPlayers": 4,
-    "minPlayers": 3,
-    "description": "Ekonomiczna gra stategiczna w której próbujesz stać się najbogatszym właścicielem firmy",
-    "time": "20-30 min.",
-    "difficulty": "Trudny",
-    "colors": [
-      { "name": "black", "hex": "#000000" },
-      { "name": "white", "hex": "#ffffff" },
-      { "name": "green", "hex": "#00ff00" },
-      { "name": "red", "hex": "#ff0000" },
-      { "name": "blue", "hex": "royalblue" },
-      { "name": "yellow", "hex": "#ffff00" }
     ]
   },
   {

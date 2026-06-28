@@ -1,11 +1,8 @@
 <script setup>
-import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
 
-import LoadingScreen from "./components/common/LoadingScreen.vue";
 import useAuthentication from "./composables/useAuthentication.js";
 import { usePageSounds } from "./composables/usePageSounds";
-import { useAppStore } from "./store/useAppStore";
 
 const { authenticate } = useAuthentication();
 
@@ -19,7 +16,32 @@ usePageSounds({
 </script>
 
 <template>
+    <div class="small-screen-block">
+        <p>
+            Gry planszowe nie mieszczą się realnie na małych ekranach,<br />dlatego
+            aplikacja wymaga komputera lub tabletu.
+        </p>
+    </div>
     <router-view />
 </template>
 
-<style scoped></style>
+<style scoped>
+.small-screen-block {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .small-screen-block {
+        display: flex;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: #000;
+        color: #fff;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+    }
+}
+</style>
