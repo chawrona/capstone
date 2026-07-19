@@ -8,7 +8,8 @@ import OptionButton from "../common/OptionButton.vue";
 import PlaySoundtrack from "../common/PlaySoundtrack.vue";
 import SoundSettings from "../common/SoundSettings.vue";
 
-const { closeSettings, sendBugReport, showSettings, toggleSettings } = useGlobalSettings();
+const { closeSettings, sendBugReport, showSettings, toggleSettings } =
+    useGlobalSettings();
 
 const bugMessage = ref("");
 
@@ -21,13 +22,9 @@ const handleSendBugReport = () => {
 </script>
 
 <template>
-  
-
     <div v-if="showSettings" class="settings">
-    
         <PlaySoundtrack />
         <SoundSettings />
-   
 
         <div class="bug-report">
             <h2>Zgłoś błąd</h2>
@@ -36,7 +33,9 @@ const handleSendBugReport = () => {
                 placeholder="Opisz błąd..."
                 class="bug-input theme-input"
             />
-            <button class="bug-send theme-button" @click="handleSendBugReport">Wyślij</button>
+            <button class="bug-send theme-button" @click="handleSendBugReport">
+                Wyślij
+            </button>
         </div>
     </div>
 </template>
@@ -95,18 +94,18 @@ const handleSendBugReport = () => {
 }
 
 .bug-report {
-     display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        padding: 1.75rem 2.5rem;
-        border: 1px solid rgba(255, 230, 180, 0.2);
-        max-width: 600px;
-        width: 100%;
-        border-radius: 6px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.75rem 2.5rem;
+    border: 1px solid rgba(255, 230, 180, 0.2);
+    max-width: 600px;
+    width: 100%;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 
-       background-image: url("/src/assets/dialogBg.png");
+    background-image: url("/src/assets/dialogBg.png");
 }
 
 .bug-input {

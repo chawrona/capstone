@@ -1,7 +1,5 @@
 <script setup>
-import BrianBoru from '../../games/brianboru/BrianBoru.vue';
-
-
+import BrianBoru from "../../games/brianboru/BrianBoru.vue";
 </script>
 
 <template>

@@ -1,8 +1,6 @@
 <script setup>
-
 import GameSettings from "../../components/games/GameSettings.vue";
 import { usePageSounds } from "../../composables/usePageSounds.js";
-
 import useGameData from "../shared/useGameData.js";
 import { useGameResize } from "../shared/useGameResize.js";
 import Debug from "./components_brianboru/Debug.vue";
@@ -48,14 +46,13 @@ usePageSounds({
 
 const { scale } = useGameResize();
 
-
 const { gameData } = useGameData();
 const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
 </script>
 
 <template>
-    <GameSettings/>
-   
+    <GameSettings />
+
     <div class="background">
         <div
             v-if="gameData"

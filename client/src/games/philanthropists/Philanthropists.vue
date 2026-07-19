@@ -3,12 +3,10 @@ import "@/styles/philanthropists.scss";
 
 import { watch } from "vue";
 
-
-import GameSettings from "../../../components/common/GameSettings.vue";
 import { soundBus } from "../../audio/soundBus";
-import { usePageSounds } from "../../composables/usePageSounds";
-import { useGamePause } from "../composables_games/useGamePause";
-import { useGameResize } from "../composables_games/useGameResize";
+import GameSettings from "../../components/games/GameSettings.vue";
+import { usePageSounds } from "../../composables/usePageSounds.js"
+import { useGameResize } from "../composables_games/useGameResize.js";
 import useGameData from "../shared/useGameData.js";
 import Bottom from "./Bottom/Bottom.vue";
 import Mid from "./Mid/Mid.vue";
@@ -27,7 +25,6 @@ usePageSounds({
 });
 
 const { scale } = useGameResize();
-const { isPaused } = useGamePause();
 const { gameData } = useGameData();
 
 watch(

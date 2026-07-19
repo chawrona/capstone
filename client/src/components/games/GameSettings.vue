@@ -12,11 +12,17 @@ import SoundSettings from "../common/SoundSettings.vue";
 
 const props = defineProps(["url"]);
 
-const { endGame, sendBugReport, showEndGameButton, toggleGamePause, isGamePaused } = useGameSettings();
+const {
+    endGame,
+    isGamePaused,
+    sendBugReport,
+    showEndGameButton,
+    toggleGamePause,
+} = useGameSettings();
 
 const bugMessage = ref("");
-const sfxVolume = ref(80)
-const musicVolume = ref(60)
+const sfxVolume = ref(80);
+const musicVolume = ref(60);
 
 const handleSendBugReport = () => {
     if (bugMessage.value) {
@@ -24,7 +30,6 @@ const handleSendBugReport = () => {
         bugMessage.value = "";
     }
 };
-
 
 const settingsStatus = ref("options");
 </script>
@@ -45,31 +50,31 @@ const settingsStatus = ref("options");
             </h1>
             <OptionButton
                 class="theme-button settings-button"
-                :content="
-                    isGamePaused ? 'Wznów grę' : 'Zatrzymaj grę'
-                "
-                @click="toggleGamePause"
+                :content="isGamePaused ? 'Wznów grę' : 'Zatrzymaj grę'"
                 :icon="isGamePaused ? Ready : Clock"
+                @click="toggleGamePause"
             />
             <OptionButton
                 class="theme-button settings-button"
                 content="Zakończ grę"
-                @click="endGame"
                 :icon="Cancel"
+                @click="endGame"
             />
         </div>
 
         <SoundSettings />
 
         <div class="bug-report">
-             <h2>Zgłoś błąd</h2>
+            <h2>Zgłoś błąd</h2>
             <textarea
                 v-model="bugMessage"
                 type="text"
                 placeholder="Opisz błąd..."
                 class="bug-input theme-input"
             />
-            <button class="bug-send theme-button" @click="handleSendBugReport">Wyślij</button>
+            <button class="bug-send theme-button" @click="handleSendBugReport">
+                Wyślij
+            </button>
         </div>
     </div>
 </template>
@@ -102,13 +107,11 @@ const settingsStatus = ref("options");
         border-radius: 6px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 
-       background-image: url("/src/assets/successBg.png");
+        background-image: url("/src/assets/successBg.png");
 
-     
         &:has(.paused) {
             background-image: url("/src/assets/errorBg.png");
         }
-
 
         &_title {
             display: flex;
@@ -123,7 +126,6 @@ const settingsStatus = ref("options");
             letter-spacing: 0.05em;
             text-align: center;
 
-           
             &.paused {
                 color: #db083d;
             }
@@ -140,18 +142,18 @@ const settingsStatus = ref("options");
 }
 
 .bug-report {
-     display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        padding: 1.75rem 2.5rem;
-        border: 1px solid rgba(255, 230, 180, 0.2);
-        max-width: 600px;
-        width: 100%;
-        border-radius: 6px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.75rem 2.5rem;
+    border: 1px solid rgba(255, 230, 180, 0.2);
+    max-width: 600px;
+    width: 100%;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 
-       background-image: url("/src/assets/dialogBg.png");
+    background-image: url("/src/assets/dialogBg.png");
 }
 
 .bug-input {

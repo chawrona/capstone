@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
+import GlobalSettings from "../../components/common/GlobalSettings.vue";
 import { usePageSounds } from "../../composables/usePageSounds.js";
 import { useAppStore } from "../../store/useAppStore.js";
 import BottomLeftPanel from "./components/panels/BottomLeftPanel.vue";
@@ -9,7 +10,6 @@ import CenterPanel from "./components/panels/CenterPanel.vue";
 import TopCenterPanel from "./components/panels/TopCenterPanel.vue";
 import TopLeftPanel from "./components/panels/TopLeftPanel.vue";
 import TopRightPanel from "./components/panels/TopRightPanel.vue";
-import GlobalSettings from "../../components/common/GlobalSettings.vue";
 
 const store = useAppStore();
 
@@ -79,7 +79,6 @@ onUnmounted(() => {
 <template>
     <div class="app-container">
         <main v-if="data" class="container">
-
             <GlobalSettings />
             <TopLeftPanel
                 :current-game="data.currentGame"

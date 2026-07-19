@@ -1,10 +1,8 @@
 <script setup>
 import PlaySoundtrack from "../../components/common/PlaySoundtrack.vue";
-
 import GameSettings from "../../components/games/GameSettings.vue";
 import { usePageSounds } from "../../composables/usePageSounds.js";
 import useGameData from "../shared/useGameData.js";
-import { useGamePause } from "../shared/useGamePause.js";
 import { useGameResize } from "../shared/useGameResize.js";
 import Board from "./Board.vue";
 import useGameEndGame from "./composables_craftsmen/useGameEndGame.js";
@@ -106,11 +104,11 @@ usePageSounds({
             url: "/sounds/craftsmen/takeResource8.mp3",
         },
     ],
-       music: SOUNDTRACK_URL,
+    music: SOUNDTRACK_URL,
 });
 
 const { scale } = useGameResize();
-const { isPaused } = useGamePause();
+
 
 const { endGameData } = useGameEndGame();
 const { gameData } = useGameData();
@@ -127,7 +125,7 @@ const turnInfo = {
 </script>
 
 <template>
-    <GameSettings/>
+    <GameSettings />
 
     <div class="background">
         <div

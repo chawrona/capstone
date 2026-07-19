@@ -1,7 +1,5 @@
 <script setup>
-import Philanthropists from '../../games/philanthropists/Philanthropists.vue';
-
-
+import Philanthropists from "../../games/philanthropists/Philanthropists.vue";
 </script>
 
 <template>
