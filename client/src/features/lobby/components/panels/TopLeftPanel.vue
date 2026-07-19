@@ -42,7 +42,6 @@ const blockButtons = () => {
 const toggleReady = () => {
     if (blockButtons()) return;
     store.emit("toggleReady");
-    soundBus.playEffect("click");
 };
 
 const areColorDuplicatedOrNotSelected = computed(() => {
@@ -93,7 +92,6 @@ const isCorrentCountOfPlayers = computed(
 const handleGameStart = () => {
     if (!canStartTheGame.value) return;
     store.emit("gameStart");
-    soundBus.playEffect("click");
 };
 </script>
 

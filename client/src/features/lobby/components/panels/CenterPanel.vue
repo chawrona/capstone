@@ -15,7 +15,6 @@ const isDialogOpen = ref(false);
 
 const toggleDialog = () => {
     isDialogOpen.value = !isDialogOpen.value;
-    soundBus.playEffect("click");
 };
 </script>
 
@@ -33,7 +32,6 @@ const toggleDialog = () => {
                 :icon="BoardGame"
                 :content="isDialogOpen ? 'Zamknij' : 'Inne gry'"
                 class="games-button"
-                @click="toggleDialog"
             />
         </div>
         <ChangeGameDialog
