@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import { useToast } from "vue-toast-notification";
 
 import Discord from "@/assets/discord.svg";
-import Info from "@/assets/list.svg";
+import Info from "@/assets/list-home.svg";
 
 import { soundBus } from "../../audio/soundBus";
 import GlobalSettings from "../../components/common/GlobalSettings.vue";
@@ -89,7 +89,7 @@ const joinLobby = async () => {
             <abbr title="Ustawienia">ESC</abbr>
         </div>
         <div class="Discord">
-            <a href="">
+            <a href="https://discord.gg/EJGXmCVJCT">
                 <img :src="Discord" alt="discord" />
                 Dołącz do nas
             </a>
@@ -306,4 +306,4 @@ const joinLobby = async () => {
     }
 }
 </style>
-<!-- https://discord.gg/EJGXmCVJCT -->
+
