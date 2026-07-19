@@ -153,7 +153,7 @@ const settingsStatus = ref("options");
     border-radius: 6px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 
-    background-image: url("/src/assets/dialogBg.png");
+    background-image: url("/src/assets/dialogbg.png");
 }
 
 .bug-input {
