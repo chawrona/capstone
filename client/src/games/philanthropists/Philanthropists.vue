@@ -5,7 +5,7 @@ import { watch } from "vue";
 
 import { soundBus } from "../../audio/soundBus";
 import GameSettings from "../../components/games/GameSettings.vue";
-import { usePageSounds } from "../../composables/usePageSounds.js"
+import { usePageSounds } from "../../composables/usePageSounds.js";
 import { useGameResize } from "../composables_games/useGameResize.js";
 import useGameData from "../shared/useGameData.js";
 import Bottom from "./Bottom/Bottom.vue";

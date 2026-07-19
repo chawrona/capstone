@@ -109,7 +109,6 @@ usePageSounds({
 
 const { scale } = useGameResize();
 
-
 const { endGameData } = useGameEndGame();
 const { gameData } = useGameData();
 
