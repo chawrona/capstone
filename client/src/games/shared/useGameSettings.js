@@ -1,6 +1,6 @@
 import { ref, onMounted, onUnmounted, watch } from "vue";
+import { useToast } from "vue-toast-notification";
 
-import { soundBus } from "../../audio/soundBus.js";
 import { usePageSounds } from "../../composables/usePageSounds.js";
 import { useAppStore } from "../../store/useAppStore.js";
 
@@ -8,6 +8,7 @@ export const useGameSettings = (cityId, props) => {
     const store = useAppStore();
     const showEndGameButton = ref(false);
     const isGamePaused = ref(undefined);
+    const toast = useToast();
     let unwatch = null;
 
     const toggleButton = () => {
@@ -16,11 +17,15 @@ export const useGameSettings = (cityId, props) => {
 
     const sendBugReport = (message) => {
         store.emit("onBugReport", message);
+        toast.info("Informacja o błędzie została wysłana", {
+            duration: 4000,
+            position: "top-left",
+        });
     };
 
     const endGame = () => {
         toggleButton();
-        soundBus.resetSoundtrack("/sounds/tale.mp3");
+
         store.emit("onEndGame");
     };
 

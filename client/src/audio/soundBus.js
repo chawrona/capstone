@@ -1,178 +1,204 @@
-import { reactive, ref } from "vue";
+import { reactive, shallowReactive } from "vue";
+
+const FADE_STEP_MS = 16;
+const VOLUME_FLOOR_DB = -40;
+
+function sliderToGain(v) {
+    return v <= 0 ? 0 : Math.pow(10, (VOLUME_FLOOR_DB * (1 - v / 100)) / 20);
+}
 
 class SoundBus {
     constructor() {
-        this.effects = reactive({});
+        this.effects = shallowReactive({});
 
-        this.music = reactive({});
+        this.state = reactive({
+            effectsMuted: false,
+            effectsVolume: 50,
+            musicMuted: false,
+            musicVolume: 40,
+            soundtrackPlaying: false,
+        });
 
-        // Aktualnie grająca muzyka
-        this.currentMusic = null;
+        this.sharedUrl = null;
+        this.sharedAudio = null;
+        this.overrideUrl = null;
+        this.overrideAudio = null;
+        this.currentAudio = null;
 
-        // głośność
-        this.musicVolume = 0.05;
-        this.effectsVolume = 1.0;
-
-        // Mute
-        this.musicMuted = false;
-        this.effectsMuted = false;
-
-        // Sprawdzanie czy podkład gra
-        this.soundtrackPlaying = ref(false);
+        this._fadeToken = 0;
     }
 
-    resetSoundtrack(url) {
-        this.unload("soundtrack");
-        this.preload("soundtrack", url, "music");
-        this.playMusic("soundtrack");
-        this.soundtrackPlaying.value = true;
+    setSharedMusic(url) {
+        if (this.sharedUrl === url && this.sharedAudio) {
+            if (!this.overrideAudio) this._crossTo(this.sharedAudio);
+            return;
+        }
+        this.sharedUrl = url;
+        this.sharedAudio = this._createAudio(url);
+        if (!this.overrideAudio) {
+            this._crossTo(this.sharedAudio);
+        }
+    }
+
+    enterMusic(url) {
+        if (this.overrideUrl === url && this.overrideAudio) return;
+        if (this.overrideAudio) this.overrideAudio.pause();
+
+        this.overrideUrl = url;
+        this.overrideAudio = this._createAudio(url);
+        this._crossTo(this.overrideAudio);
+    }
+
+    exitMusic() {
+        if (this.overrideAudio) this.overrideAudio.pause();
+        this.overrideAudio = null;
+        this.overrideUrl = null;
+        this._crossTo(this.sharedAudio);
+    }
+
+    resumeMusic() {
+        if (!this.currentAudio) return;
+        this.currentAudio.volume = this.state.musicMuted
+            ? 0
+            : sliderToGain(this.state.musicVolume);
+        this.currentAudio
+            .play()
+            .then(() => {
+                this.state.soundtrackPlaying = true;
+            })
+            .catch(() => {
+                this.state.soundtrackPlaying = false;
+            });
     }
 
     isSoundtrackNotPlaying() {
-        return !this.soundtrackPlaying.value;
+        return !this.state.soundtrackPlaying;
     }
 
-    // =============== PRELOAD ===============
-    preload(name, url, type = "effect", poolSize = 1) {
-        if (type === "music") {
-            const audio = new Audio(url);
-            audio.preload = "auto";
-            audio.volume = this.musicMuted ? 0 : this.musicVolume;
-            this.music[name] = audio;
-            return;
+    _createAudio(url) {
+        const audio = new Audio(url);
+        audio.preload = "auto";
+        audio.loop = true;
+        audio.volume = 0;
+        return audio;
+    }
+
+    _crossTo(next, fadeDuration = 500) {
+        const prev = this.currentAudio;
+        if (prev === next) return;
+
+        if (next) {
+            next.currentTime = 0;
+            next.play().catch(() => {
+                this.state.soundtrackPlaying = false;
+            });
         }
 
-        // efekty z poolowaniem
+        this.currentAudio = next;
+        this.state.soundtrackPlaying = !!next;
+
+        const myFade = ++this._fadeToken;
+        const targetVol = this.state.musicMuted
+            ? 0
+            : sliderToGain(this.state.musicVolume);
+        const steps = Math.max(1, fadeDuration / FADE_STEP_MS);
+        const stepOut = prev ? prev.volume / steps : 0;
+        const stepIn = targetVol / steps;
+
+        const fade = () => {
+            if (myFade !== this._fadeToken) return;
+
+            if (prev) prev.volume = Math.max(0, prev.volume - stepOut);
+            if (next) next.volume = Math.min(targetVol, next.volume + stepIn);
+
+            const prevDone = !prev || prev.volume <= 0;
+            const nextDone = !next || next.volume >= targetVol;
+
+            if (!prevDone || !nextDone) {
+                requestAnimationFrame(fade);
+            } else if (prev) {
+                prev.pause();
+            }
+        };
+        fade();
+    }
+
+    preload(name, url, type = "effect", poolSize = 1) {
+        if (type === "music") return;
+
+        const vol = this.state.effectsMuted
+            ? 0
+            : sliderToGain(this.state.effectsVolume);
         const pool = [];
         for (let i = 0; i < poolSize; i++) {
             const audio = new Audio(url);
             audio.preload = "auto";
-            audio.volume = this.effectsMuted ? 0 : this.effectsVolume;
+            audio.volume = vol;
             pool.push(audio);
         }
         this.effects[name] = pool;
     }
 
-    // =============== PLAY EFFECT WITH POOLING ===============
     playEffect(name) {
         const pool = this.effects[name];
-        if (!pool) return;
-
-        // znajdź pierwszy wolny obiekt Audio
+        if (!pool || !pool.length) return;
         const audio = pool.find((a) => a.paused) || pool[0];
-
         audio.currentTime = 0;
-        audio.play();
+        audio.play().catch(() => {});
     }
 
-    // =============== MUSIC WITH CROSS-FADE ===============
-    async playMusic(name, fadeDuration = 500) {
-        this.stopMusic();
-        const next = this.music[name];
-        if (!next) return;
-        this.soundtrackPlaying.value = true;
-        next.loop = true;
-        next.volume = this.musicMuted ? 0 : 0; // zaczyna od 0 przy cross-fade
-
-        // jeśli żadnej nie ma – po prostu odpal
-        if (!this.currentMusic) {
-            next.volume = this.musicMuted ? 0 : this.musicVolume;
-            next.play().catch(() => {
-                this.soundtrackPlaying.value = false;
-            });
-            this.currentMusic = next;
-            return;
-        }
-
-        const prev = this.currentMusic;
-
-        // jeśli gra ta sama – nic nie rób
-        if (prev === next) return;
-
-        next.currentTime = 0;
-        next.play().catch(() => {
-            this.soundtrackPlaying.value = false;
-        });
-
-        // crossfade
-        const step = 16;
-        const steps = fadeDuration / step;
-        const volStepOut = this.musicVolume / steps;
-        const volStepIn = this.musicVolume / steps;
-
-        return new Promise((resolve) => {
-            const fade = () => {
-                // fade out poprzedniej
-                if (!this.musicMuted) {
-                    prev.volume = Math.max(0, prev.volume - volStepOut);
-                    next.volume = Math.min(
-                        this.musicVolume,
-                        next.volume + volStepIn,
-                    );
-                }
-
-                if (prev.volume > 0 || next.volume < this.musicVolume) {
-                    requestAnimationFrame(fade);
-                } else {
-                    prev.pause();
-                    this.currentMusic = next;
-                    resolve();
-                }
-            };
-            fade();
-        });
-    }
-
-    stopMusic() {
-        console.log("Zatrzymano muzykę");
-
-        if (this.currentMusic) {
-            this.currentMusic.pause();
-
-            this.soundtrackPlaying.value = false;
-        }
-    }
-
-    // =============== GLOBAL VOLUME / MUTE ===============
     setMusicVolume(v) {
-        this.musicVolume = v;
-        if (!this.musicMuted && this.currentMusic) {
-            this.currentMusic.volume = v;
+        this.state.musicVolume = v;
+        if (!this.state.musicMuted && this.currentAudio) {
+            this.currentAudio.volume = sliderToGain(v);
         }
     }
 
     setEffectsVolume(v) {
-        this.effectsVolume = v;
+        this.state.effectsVolume = v;
+        if (!this.state.effectsMuted) {
+            const gain = sliderToGain(v);
+            Object.values(this.effects).forEach((pool) =>
+                pool.forEach((a) => (a.volume = gain)),
+            );
+        }
+    }
+
+    toggleMusicMute(forced) {
+        this.state.musicMuted = forced ?? !this.state.musicMuted;
+        if (this.currentAudio) {
+            this.currentAudio.volume = this.state.musicMuted
+                ? 0
+                : sliderToGain(this.state.musicVolume);
+        }
+    }
+
+    toggleEffectsMute(forced) {
+        this.state.effectsMuted = forced ?? !this.state.effectsMuted;
+        const v = this.state.effectsMuted
+            ? 0
+            : sliderToGain(this.state.effectsVolume);
         Object.values(this.effects).forEach((pool) =>
             pool.forEach((a) => (a.volume = v)),
         );
     }
 
-    muteMusic(mute = true) {
-        this.musicMuted = mute;
-        if (this.currentMusic) {
-            this.currentMusic.volume = mute ? 0 : this.musicVolume;
-        }
-    }
-
-    muteEffects(mute = true) {
-        this.effectsMuted = mute;
-        Object.values(this.effects).forEach((pool) =>
-            pool.forEach((a) => (a.volume = mute ? 0 : this.effectsVolume)),
-        );
-    }
-
-    // =============== UNLOAD ===============
     unload(name) {
+        const pool = this.effects[name];
+        if (pool) pool.forEach((a) => a.pause());
         delete this.effects[name];
-        delete this.music[name];
     }
 
     unloadAll() {
-        Object.keys(this.effects).forEach((k) => delete this.effects[k]);
-        Object.keys(this.music).forEach((k) => delete this.music[k]);
-        this.currentMusic = null;
-        // this.soundtrackPlaying.value = false;
+        Object.keys(this.effects).forEach((k) => this.unload(k));
+        if (this.overrideAudio) this.overrideAudio.pause();
+        if (this.sharedAudio) this.sharedAudio.pause();
+        this.overrideAudio = null;
+        this.overrideUrl = null;
+        this.sharedAudio = null;
+        this.sharedUrl = null;
+        this.currentAudio = null;
+        this.state.soundtrackPlaying = false;
     }
 }
 

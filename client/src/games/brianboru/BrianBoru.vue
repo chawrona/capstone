@@ -1,11 +1,10 @@
 <script setup>
-import PauseScreen from "../../../components/common/PauseScreen.vue";
-import PlaySoundtrack from "../../../components/common/PlaySoundtrack.vue";
-import Settings from "../../../components/common/Settings.vue";
+
+import GameSettings from "../../components/games/GameSettings.vue";
 import { usePageSounds } from "../../composables/usePageSounds.js";
-import { useGamePause } from "../composables_games/useGamePause.js";
-import { useGameResize } from "../composables_games/useGameResize.js";
+
 import useGameData from "../shared/useGameData.js";
+import { useGameResize } from "../shared/useGameResize.js";
 import Debug from "./components_brianboru/Debug.vue";
 import Dialogs from "./components_brianboru/Dialogs.vue";
 import ChosenCards from "./components_brianboru/dialogs/ChosenCardDialog.vue";
@@ -44,19 +43,19 @@ usePageSounds({
             url: "/sounds/brianboru/attackVikings.mp3",
         },
     ],
-    music: [{ name: "soundtrack", url: SOUNDTRACK_URL }],
+    music: SOUNDTRACK_URL,
 });
 
 const { scale } = useGameResize();
-const { isPaused } = useGamePause();
+
 
 const { gameData } = useGameData();
 const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
 </script>
 
 <template>
-    <Settings :url="SOUNDTRACK_URL" />
-    <PauseScreen v-if="isPaused" />
+    <GameSettings/>
+   
     <div class="background">
         <div
             v-if="gameData"

@@ -1,15 +1,13 @@
 <script setup>
 import Music from "@/assets/music.svg";
-
-import { soundBus } from "../../audio/soundBus";
-const props = defineProps(["url"]);
+import { soundBus } from "@/audio/soundBus";
 </script>
 
 <template>
     <button
         v-if="soundBus.isSoundtrackNotPlaying()"
         class="play-soundtrack-button theme-button"
-        @click="soundBus.resetSoundtrack(url)"
+        @click="soundBus.resumeMusic()"
     >
         Włącz ścieżkę dźwiękową
         <img :src="Music" alt="" />

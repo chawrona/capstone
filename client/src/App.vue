@@ -11,7 +11,7 @@ onMounted(() => {
 });
 
 usePageSounds({
-    music: [{ name: "soundtrack", url: "/sounds/tale.mp3" }],
+    sharedMusic: "/sounds/tale.mp3",
 });
 </script>
 

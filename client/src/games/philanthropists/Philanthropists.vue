@@ -3,8 +3,8 @@ import "@/styles/philanthropists.scss";
 
 import { watch } from "vue";
 
-import PauseScreen from "../../../components/common/PauseScreen.vue";
-import Settings from "../../../components/common/Settings.vue";
+
+import GameSettings from "../../../components/common/GameSettings.vue";
 import { soundBus } from "../../audio/soundBus";
 import { usePageSounds } from "../../composables/usePageSounds";
 import { useGamePause } from "../composables_games/useGamePause";
@@ -23,9 +23,7 @@ usePageSounds({
         { name: "turn", url: "/sounds/philanthropists/turn.mp3" },
         { name: "give", url: "/sounds/philanthropists/give.mp3" },
     ],
-    music: [
-        { name: "soundtrack", url: "/sounds/philanthropists/soundtrack.mp3" },
-    ],
+    music: SOUNDTRACK_URL,
 });
 
 const { scale } = useGameResize();
@@ -58,8 +56,7 @@ watch(
 </script>
 
 <template>
-    <Settings />
-    <PauseScreen v-if="isPaused" />
+    <GameSettings />
     <PodsumowanieFazy v-if="gameData" :game-data="gameData" />
     <div class="background">
         <div

@@ -3,27 +3,32 @@ import { onMounted, onUnmounted } from "vue";
 import { soundBus } from "@/audio/soundBus";
 
 export function usePageSounds(options = {}) {
-    const { effects = [], music = [] } = options;
+    const { effects = [], music = null, sharedMusic = null } = options;
 
-    const loadedResources = [];
+    const loadedEffectNames = [];
 
     onMounted(() => {
         effects.forEach((e) => {
-            soundBus.preload(e.name, e.url, "effect", e.pool || 1);
-            loadedResources.push({ name: e.name, type: "effect" });
+            soundBus.preload(e.name, e.url, "effect", e.poolSize || 1);
+            loadedEffectNames.push(e.name);
         });
 
-        music.forEach((m) => {
-            console.log("Hello?????", m);
+        if (sharedMusic) {
+            soundBus.setSharedMusic(sharedMusic);
+        }
 
-            soundBus.resetSoundtrack(m.url);
-            loadedResources.push({ name: m.name, type: "music" });
-        });
+        if (music) {
+            soundBus.enterMusic(music);
+        }
     });
 
     onUnmounted(() => {
-        loadedResources.forEach(({ name }) => {
+        loadedEffectNames.forEach((name) => {
             soundBus.unload(name);
         });
+
+        if (music) {
+            soundBus.exitMusic();
+        }
     });
 }

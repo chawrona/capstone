@@ -2,11 +2,13 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toast-notification";
-
+import Info from "@/assets/list.svg";
+import Discord from "@/assets/discord.svg";
 import { soundBus } from "../../audio/soundBus";
 import PlaySoundtrack from "../../components/common/PlaySoundtrack.vue";
 import { usePageSounds } from "../../composables/usePageSounds";
 import { useAppStore } from "../../store/useAppStore";
+import GlobalSettings from "../../components/common/GlobalSettings.vue";
 
 const store = useAppStore();
 const router = useRouter();
@@ -21,6 +23,7 @@ const awaitingJoinLobby = ref(false);
 const blockEverything = computed(
     () => awaitingCreateLobby.value || awaitingJoinLobby.value,
 );
+
 
 const hangleSocketError = () => {
     awaitingCreateLobby.value = false;
@@ -80,6 +83,20 @@ const joinLobby = async () => {
 
 <template>
     <div class="app-container">
+        <div class="Escape" @click="toggleSettings">
+            <img :src="Info" alt="info">
+            <abbr title="Ustawienia">ESC</abbr>
+        </div>
+        <div class="Discord">
+            <a href="">
+
+
+        
+            <img :src="Discord" alt="discord">
+            Dołącz do nas
+            </a>
+        </div>
+        <GlobalSettings />
         <PlaySoundtrack url="/sounds/tale.mp3" />
         <main class="content">
             <h2 class="theme-subtitle">Hungarian Vegas</h2>
@@ -247,4 +264,50 @@ const joinLobby = async () => {
         width: 100%;
     }
 }
+
+.Escape {
+    display: flex;
+    gap: 0.2rem;
+    position: absolute;
+    align-items: center;
+    top: 0.7rem;
+    left: 1.2rem;
+    font-size: 1.75rem;
+    color: #f5eac6;
+    font-weight: 500;
+    cursor: help;
+    img {
+        height: 2.8rem;
+        transform: translateY(-1.5px);
+    }
+}
+.Discord {
+ 
+    position: absolute;
+  
+    bottom: 1.25rem;
+    right: 1.5rem;
+    font-size: 1.75rem;
+ 
+
+    a {
+        padding: 0.5rem;
+           display: inline-flex;
+           flex-direction: row-reverse;
+    gap: 0.7rem;
+      align-items: center;
+   color: #f5eac6;
+   text-decoration: none;
+    font-weight: 500;   
+        &:hover {
+            text-decoration: underline;
+            filter: brightness(1.1)
+        }
+    }
+    img {
+        height: 2.25rem;
+        transform: translateY(-1px);
+    }
+}
 </style>
+<!-- https://discord.gg/EJGXmCVJCT -->

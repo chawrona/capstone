@@ -168,7 +168,7 @@ export default class LobbyEvents {
         }
     }
 
-    onRemoveUser({ data: { userToKickPublicId } }) {
+    onRemoveUser({ userToKickPublicId }) {
         const userId = parseCookie(
             this.socket.handshake.headers.cookie,
             "userId",
@@ -225,7 +225,7 @@ export default class LobbyEvents {
         }
     }
 
-    onChangeGame({ data: { gameTitle } }) {
+    onChangeGame({ gameTitle }) {
         const userId = parseCookie(
             this.socket.handshake.headers.cookie,
             "userId",

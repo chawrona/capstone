@@ -30,7 +30,7 @@ export default class UserEvents {
         this.socket.on("disconnect", () => this.onDisconnect());
     }
 
-    onChangeUserColor({ data: { newColor } }) {
+    onChangeUserColor({ newColor }) {
         const userId = parseCookie(
             this.socket.handshake.headers.cookie,
             "userId",
