@@ -89,7 +89,7 @@ const joinLobby = async () => {
             <abbr title="Ustawienia">ESC</abbr>
         </div>
         <div class="Discord">
-            <a href="https://discord.gg/EJGXmCVJCT" target="_blank"
+            <a href="https://discord.gg/EJGXmCVJCT" target="_blank">
                 <img :src="Discord" alt="discord" />
                 Dołącz do nas
             </a>
