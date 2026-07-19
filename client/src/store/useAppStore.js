@@ -1,17 +1,26 @@
 import { defineStore } from "pinia";
 import io from "socket.io-client";
+import { useToast } from "vue-toast-notification";
+
+import router from "../router/index.js";
 
 export const useAppStore = defineStore("socket", {
     actions: {
-        connectSocket(lobbyId, router, toast) {
+        connectSocket(lobbyId) {
             if (this.socket && this.socket.connected) return;
 
             // Połączenie socket.io
+
+            const toast = useToast();
+
             const VITE_APP_IP = import.meta.env.VITE_APP_IP;
             this.socket = io(VITE_APP_IP, {
                 auth: { lobbyId },
                 withCredentials: true,
             });
+
+            console.log("NASTĘPUJE POŁĄCZENIE Z SOCKETEM");
+            console.log(router);
 
             // Ścieżki
             this.socket.on("homepage", (payload) => router.push("/"));
@@ -62,7 +71,7 @@ export const useAppStore = defineStore("socket", {
 
         emit(event, data) {
             if (this.socket) {
-                this.socket.emit(event, { data });
+                this.socket.emit(event, data);
             }
         },
     },

@@ -2,8 +2,8 @@
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
 import PlaySoundtrack from "../../components/common/PlaySoundtrack.vue";
-import { usePageSounds } from "../composables/usePageSounds.js";
-import { useAppStore } from "../store/useAppStore.js";
+import { usePageSounds } from "../../composables/usePageSounds.js";
+import { useAppStore } from "../../store/useAppStore.js";
 import BottomLeftPanel from "./components/panels/BottomLeftPanel.vue";
 import BottomRightPanel from "./components/panels/BottomRightPanel.vue";
 import CenterPanel from "./components/panels/CenterPanel.vue";
@@ -33,30 +33,41 @@ const readyUsers = computed(
 );
 
 onMounted(() => {
-    const requestData = () => {
+    if (store.socket) {
         store.socket.on("lobbyData", (lobbyData) => {
-            console.log("Dane przyszły");
-
             data.value = lobbyData;
         });
 
-        store.emit("lobbyDataRequest");
-    };
+        store.socket.emit("lobbyDataRequest");
 
-    if (store.socket) return requestData();
-
-    unwatch = watch(
-        () => store.socket,
-        (newSocket) => {
-            console.log("socket się zmienił");
-
-            if (newSocket) {
-                requestData();
-                unwatch();
-                unwatch = null;
+        store.socket.once("connect", () => {
+            if (!data.value) {
+                store.socket.emit("lobbyDataRequest");
             }
-        },
-    );
+        });
+    } else {
+        unwatch = watch(
+            () => store.socket,
+            (newSocket) => {
+                if (newSocket) {
+                    store.socket.on("lobbyData", (lobbyData) => {
+                        data.value = lobbyData;
+                    });
+
+                    store.socket.emit("lobbyDataRequest");
+
+                    store.socket.once("connect", () => {
+                        if (!data.value) {
+                            store.socket.emit("lobbyDataRequest");
+                        }
+                    });
+
+                    unwatch();
+                    unwatch = null;
+                }
+            },
+        );
+    }
 });
 
 onUnmounted(() => {
@@ -95,6 +106,7 @@ onUnmounted(() => {
             />
             <BottomRightPanel />
         </main>
+        <div v-else class="loading"></div>
     </div>
 </template>
 
@@ -128,6 +140,34 @@ onUnmounted(() => {
         position: relative;
         align-items: center;
         padding: 0.5rem;
+    }
+}
+
+.loading {
+    &::before {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 2;
+        display: inline-block;
+        height: 20%;
+        border: 15px solid #e0d4b0;
+        animation: rotation 1s linear infinite;
+        aspect-ratio: 1 / 1;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        box-sizing: border-box;
+        content: "";
+        transform: translate(-50%, -50%);
+    }
+
+    @keyframes rotation {
+        0% {
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+        100% {
+            transform: translate(-50%, -50%) rotate(360deg);
+        }
     }
 }
 </style>

@@ -5,9 +5,9 @@ import { useRouter } from "vue-router";
 import Exit from "@/assets/exit.svg";
 import Remove from "@/assets/remove.svg";
 
+import OptionButton from "../../../../components/common/OptionButton.vue";
 import { useAppStore } from "../../../../store/useAppStore";
 import KickUserDialog from "../KickUserDialog.vue";
-import OptionButton from "../OptionButton.vue";
 const router = useRouter();
 const props = defineProps(["currentUser", "lobbyUsers"]);
 
@@ -38,6 +38,9 @@ const leaveLobby = () => {
             v-if="currentUser.isAdmin && usersAvailableToKick.length"
             :icon="Remove"
             content="Wyrzuć Gracza"
+            :disabled="!props.currentUser"
+            :data-awaiting="!props.currentUser"
+            ;
             @click="kickUserDialogRef?.openDialog"
         />
 

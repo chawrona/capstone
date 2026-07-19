@@ -16,6 +16,7 @@ export default class Lobby {
         this.users = new Set();
         this.admin = null;
         this.maxPlayers = 10;
+        this.usersCleared = true;
     }
 
     start(players) {
@@ -46,6 +47,7 @@ export default class Lobby {
                 break;
         }
         this.isActive = true;
+        this.usersCleared = false;
         return this.gameInfo.title;
     }
 

@@ -9,10 +9,10 @@ import Ready from "@/assets/ready.svg";
 import Start from "@/assets/start.svg";
 
 import { soundBus } from "../../../../audio/soundBus";
+import OptionButton from "../../../../components/common/OptionButton.vue";
 import { useAppStore } from "../../../../store/useAppStore";
 import ChangeUserColorDialog from "../ChangeUserColorDialog.vue";
 import ChangeUsernameDialog from "../ChangeUsernameDialog.vue";
-import OptionButton from "../OptionButton.vue";
 
 const props = defineProps([
     "currentUser",
@@ -115,13 +115,16 @@ const handleGameStart = () => {
         <OptionButton
             :icon="Edit"
             content="Zmień pseudonim"
+            :data-awaiting="!props.currentGame"
+            :disabled="!props.currentGame"
             @click="changeUsernameDialogRef?.openDialog"
         />
 
         <OptionButton
             :icon="Color"
-            :disabled="!props.availableColors"
+            :disabled="!props.availableColors || !props.currentGame"
             :content="props.currentUser.color ? 'Zmień kolor' : 'Wybierz kolor'"
+            :data-awaiting="!props.currentGame"
             @click="changeUserColorDialogRef?.openDialog"
         />
 
@@ -133,16 +136,23 @@ const handleGameStart = () => {
                     ? 'Jestem gotowy(-a)'
                     : 'Anuluj gotowość'
             "
+            :disabled="!props.currentGame"
+            :data-awaiting="!props.currentGame"
+            ;
             @click="toggleReady"
         />
 
         <OptionButton
             v-if="props.currentUser.isAdmin"
             :disabled="
-                !isCorrentCountOfPlayers || areColorDuplicatedOrNotSelected
+                !isCorrentCountOfPlayers ||
+                areColorDuplicatedOrNotSelected ||
+                !props.currentGame
             "
             :icon="Start"
             content="Zacznij grę"
+            :data-awaiting="!props.currentGame"
+            ;
             @click="handleGameStart"
         />
     </div>

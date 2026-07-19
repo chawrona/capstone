@@ -15,6 +15,7 @@ export default class AuthenticationController {
         this.userManager = new UserManager();
         this.lobbyManager = new LobbyManager();
         this.eventHelper = new EventHelper();
+
         this.initRoutes();
     }
 
@@ -29,7 +30,15 @@ export default class AuthenticationController {
         try {
             let requestedLobbyId = req.body?.lobbyId;
             let userId = parseCookie(req.headers.cookie, "userId");
+            console.log(req.headers.cookie);
+
             if (!userId) throw new UserDoesNotExistError();
+
+            if (!this.userManager.doesUserExist(userId)) {
+                this.userManager.createUser(userId);
+            }
+
+            console.log({ requestedLobbyId });
 
             if (requestedLobbyId === "create") {
                 const lobby = this.lobbyManager.createLobby();
@@ -50,8 +59,11 @@ export default class AuthenticationController {
                 this.connectToLobby(userId, requestedLobbyId);
             }
 
+            this.eventHelper.sendLobbyData(requestedLobbyId);
+
             return res.status(200).json({
                 redirect: `/${requestedLobbyId}`,
+                lobbyId: requestedLobbyId,
                 message: "Gracz dołączył do pokoju",
             });
         } catch (error) {
@@ -63,10 +75,6 @@ export default class AuthenticationController {
     }
 
     connectToLobby(userId, lobbyId) {
-        if (process.env.DEVELOPMENT === "true") {
-            lobbyId = this.lobbyManager.lobbies.entries().next().value[0];
-        }
-
         const lobby = this.lobbyManager.getLobby(lobbyId);
 
         const user = this.userManager.getUser(userId);
@@ -116,10 +124,11 @@ export default class AuthenticationController {
                         const lobby =
                             this.lobbyManager.getLobby(requestedLobbyId);
 
-                        this.joinLobby(userId, lobby.id);
+                        this.connectToLobby(userId, lobby.id);
 
                         return res.status(200).json({
                             redirect: `/${lobby.id}`,
+                            lobbyId: lobby.id,
                             message: "Gracz dołączył do czyjegoś pokoju",
                         });
                     } catch (error) {
@@ -148,11 +157,13 @@ export default class AuthenticationController {
                 if (lobby.isActive) {
                     return res.status(200).json({
                         redirect: `/${lobby.id}/${lobby.gameInfo.title}`,
+                        lobbyId: lobby.id,
                         message: "Powrót do trwającej gry",
                     });
                 } else {
                     return res.status(200).json({
                         redirect: `/${lobby.id}`,
+                        lobbyId: lobby.id,
                         message: "Powrót do trwającej gry",
                     });
                 }

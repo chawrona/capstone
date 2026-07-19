@@ -27,6 +27,7 @@ export default function useAuthentication() {
             const data = await response.json();
 
             if (data.redirect) {
+                store.connectSocket(data.lobbyId);
                 return router.push(data.redirect);
             }
 

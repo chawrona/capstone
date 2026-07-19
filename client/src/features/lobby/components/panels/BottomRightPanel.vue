@@ -1,5 +1,5 @@
 <script setup>
-import CopyUrl from "../../../../components/common/CopyUrl.vue";
+import CopyUrl from "../CopyUrl.vue";
 </script>
 
 <template>

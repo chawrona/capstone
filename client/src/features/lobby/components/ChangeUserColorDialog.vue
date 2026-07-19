@@ -79,7 +79,7 @@ const dialogTitle = computed(() => {
     position: relative;
     flex-direction: column;
     gap: 1.5rem;
-    width: 462px;
+    width: 730px;
     max-width: calc(100% - 2rem);
 
     &[open] {

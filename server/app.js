@@ -43,11 +43,11 @@ if (process.env.DEVELOPMENT === "true") {
     });
 }
 
-app.use("/api", authenticationController.getRouter());
-app.use("/", viewController.getRouter());
-
 new EventEmitter(io);
 new ConnectionController(io);
+
+app.use("/api", authenticationController.getRouter());
+app.use("/", viewController.getRouter());
 
 server.listen(process.env.PORT, () =>
     console.log(`Server running on http://localhost:${process.env.PORT}`),

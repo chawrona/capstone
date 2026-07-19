@@ -38,17 +38,4 @@ const router = createRouter({
     routes,
 });
 
-router.beforeEach((to, from, next) => {
-    const store = useAppStore();
-    const toast = useToast();
-
-    if (to.name === "home") {
-        store.disconnectSocket();
-    } else if (to.params.id) {
-        store.connectSocket(to.params.id, router, toast);
-    }
-
-    next();
-});
-
 export default router;

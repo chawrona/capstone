@@ -6,13 +6,14 @@ const props = defineProps([
     "padding",
     "background",
     "imageHeight",
+    "smallerInnerBorder",
 ]);
 </script>
 
 <template>
     <div
         class="vintage-border-container"
-        :style="`--border-padding: ${props.padding}; --border-color: ${props.color}; --bg-color: ${props.background}; --image-height: ${props.imageHeight}`"
+        :style="`--border-padding: ${props.padding}; --border-color: ${props.color}; --bg-color: ${props.background}; --image-height: ${props.imageHeight}; --smallerBorder: ${props.smallerInnerBorder ? props.smallerInnerBorder : 3}px`"
     >
         <img :src="props.image" alt="" class="border-corner top-left" />
         <img :src="props.image" alt="" class="border-corner top-right" />
@@ -25,6 +26,7 @@ const props = defineProps([
 <style scoped>
 .vintage-border-container {
     position: relative;
+    --smallerBorder: 3px;
     --image-translation: calc(1rem / 16 * var(--image-height));
     --minimum-dimensions: calc(
         3rem * var(--image-height) + 1rem * var(--border-padding)
@@ -32,7 +34,7 @@ const props = defineProps([
     min-height: var(--minimum-dimensions);
     height: 100%;
     min-width: var(--minimum-dimensions);
-    border: 3px solid var(--border-color);
+    border: var(--smallerBorder) solid var(--border-color);
     color: black;
     padding: calc(var(--border-padding) * 0.5rem);
 

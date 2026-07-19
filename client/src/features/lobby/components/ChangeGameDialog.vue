@@ -11,27 +11,14 @@ import VintageBorderContainer from "../../../components/common/VintageBorderCont
 import { useAppStore } from "../../../store/useAppStore";
 import DialogHeader from "./panels/DialogHeader.vue";
 
-const props = defineProps(["isAdmin", "availableGames", "currentGame"]);
+const props = defineProps([
+    "isAdmin",
+    "availableGames",
+    "currentGame",
+    "closeDialog",
+]);
 
 const store = useAppStore();
-
-const dialogRef = ref(null);
-const gamesList = ref(null);
-
-const closeDialog = () => dialogRef.value.close();
-const openDialog = () => dialogRef.value.showModal();
-
-defineExpose({
-    closeDialog,
-    openDialog,
-});
-
-const handleBackdropClick = (event) => {
-    if (event.target === dialogRef.value || event.target === gamesList.value) {
-        soundBus.playEffect("click");
-        closeDialog();
-    }
-};
 
 const changeGame = (gameTitle) => {
     if (!props.isAdmin) return;
@@ -39,16 +26,13 @@ const changeGame = (gameTitle) => {
         store.emit("changeGame", { gameTitle });
     }
     soundBus.playEffect("click");
-    closeDialog();
+    props.closeDialog();
 };
 </script>
 
 <template>
-    <dialog
-        ref="dialogRef"
-        class="theme-dialog change-game-dialog"
-        @click="handleBackdropClick"
-    >
+    <div class="change-game-dialog">
+        <!-- <h1>Lista gier planszowych</h1> -->
         <ul ref="gamesList" class="games">
             <li
                 v-for="game in props.availableGames"
@@ -57,245 +41,224 @@ const changeGame = (gameTitle) => {
                 :data-choosing="props.isAdmin"
                 @click="() => changeGame(game.title)"
             >
+                <p class="game-title">{{ game.polishTitle }}</p>
+
                 <VintageBorderContainer
+                    :smaller-inner-border="1"
                     color="#f0cd8d"
                     :image="BorderImage"
                     :padding="1"
                     background="#00000049"
                     class="boardgame-image"
-                    :image-height="2.5"
+                    :image-height="2"
                 >
                     <img
                         :src="`assets/games/gamePreviews/${game.title}_preview.png`"
                         class="game-bgImage"
                     />
 
-                    <div
+                    <!-- <div
                         class="game-info-wrapper"
                         :data-choosing="props.isAdmin"
                     >
                         <div class="container">
                             <p class="game-title">{{ game.polishTitle }}</p>
 
-                            <div class="game-info">
-                                <p class="game-difficulty">
-                                    <img class="game-info-icon" :src="Target" />
-                                    <span class="value">{{
-                                        game.difficulty
-                                    }}</span>
-                                </p>
-                                <p class="game-players-count">
-                                    <img
-                                        class="game-info-icon"
-                                        :src="Players"
-                                    />
-                                    <span class="value">
-                                        {{
-                                            game.minPlayers === game.maxPlayers
-                                                ? game.minPlayers
-                                                : `${game.minPlayers}-${game.maxPlayers}`
-                                        }}
-                                    </span>
-                                </p>
-                                <p class="game-time">
-                                    <img class="game-info-icon" :src="Clock" />
-                                    <span class="value">{{ game.time }}</span>
-                                </p>
-                            </div>
+                            
                         </div>
 
-                        <p class="game-description">
-                            {{ game.description }}
-                        </p>
-                    </div>
+                    
+                    </div> -->
                 </VintageBorderContainer>
+
+                <div class="game-info">
+                    <p>
+                        <span>Poziom trudności:</span>
+                        {{ game.difficulty }}
+                    </p>
+                    <p>
+                        <span>Ilość graczy:</span>
+                        {{ game.minPlayers }}-{{ game.maxPlayers }}
+                    </p>
+                    <p><span>Czas gry:</span> {{ game.time }}</p>
+                </div>
+                <div class="game-description">
+                    {{ game.description }}
+                </div>
             </li>
         </ul>
-    </dialog>
+    </div>
 </template>
 
 <style scoped lang="scss">
 .change-game-dialog {
-    top: 0;
-    display: none;
-    flex-direction: column;
-    width: 100%;
-    min-height: 100vh;
-    transform: none;
-    user-select: none;
-    padding: 4rem 3rem;
-    border: none;
-    background-image: none;
-    background: none;
+    display: flex;
+    justify-content: center;
 
-    &.theme-dialog::backdrop {
-        background: linear-gradient(
-            135deg,
-            rgba(0, 14, 0, 0.8) 0%,
-            rgba(9, 0, 0, 0.8) 50%,
-            rgba(13, 11, 0, 0.8) 100%
-        );
-    }
+    width: auto;
+    height: 336px;
+    margin-block: 0.5rem;
+    z-index: 3;
 
-    &[open] {
-        display: flex;
-    }
-
-    .close-dialog {
-        padding: 0;
-        display: grid;
-        place-items: center;
-        width: 2.5rem;
-        aspect-ratio: 1 / 1;
-        background-image: none;
-        background-color: transparent;
-        border: none;
-        backdrop-filter: unset;
-        flex-shrink: 0;
-        transform: translateX(10px);
-
-        &:hover {
-            background-image: none;
-            background-color: #ffffff25;
-        }
-    }
-
-    .close-icon {
-        width: 2rem;
+    h1 {
+        font-size: 1.5rem;
+        color: #e0d4b0;
+        text-align: center;
+        margin-bottom: 0.5rem;
     }
 }
 
 .games {
-    margin-inline: auto;
     display: flex;
-    justify-content: start;
-    width: 90%;
 
-    flex-wrap: wrap;
+    padding-inline: 2rem;
+
+    width: 1328px;
+    max-width: 90vw;
+    flex-shrink: 0;
+    height: 425px;
+    overflow-x: scroll;
+    justify-content: flex-start;
+    align-items: center;
+
     list-style: none;
-    gap: 3rem;
+
+    gap: 2rem;
+    transition: transform 0.5s;
+
+    scrollbar-width: thick;
+    scrollbar-color: #ab9265 rgba(0, 0, 0, 0.4);
+
+    &::-webkit-scrollbar {
+        height: 10px;
+        width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 6px;
+        border: 1px solid #332714;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #ab9265;
+        border-radius: 6px;
+        border: 2px solid rgba(0, 0, 0, 0);
+        background-clip: padding-box;
+
+        &:hover {
+            background-color: #e0d4b0;
+        }
+    }
+}
+
+.game-title {
+    font-weight: bold;
+    font-size: 2rem;
+    letter-spacing: 0.35px;
 }
 
 .game {
-    border-radius: 3px;
-    margin-left: 0.25rem;
-    max-width: 600px;
-    width: 100%;
-    min-height: 325px;
-    height: auto;
-    background-position: center;
-    background-size: cover;
     display: flex;
-    flex-direction: column;
-    font-weight: bold;
-    text-align: left;
-    container-type: inline-size;
-
     position: relative;
 
-    & > p {
-        z-index: 10;
-    }
+    flex-direction: column;
+    max-width: none;
+    gap: 0.35rem;
+    width: 400px;
+    border: 0px solid #ab9265;
 
+    flex-shrink: 0;
+
+    //    background-size: cover;
+    //    background-repeat: no-repeat;
+    // background-image: url("/src/assets//woodbg2.png");
     &[data-choosing="true"] {
         cursor: pointer;
     }
-}
 
-.boardgame-image {
-    .game-bgImage {
-        position: absolute;
-        inset: 0;
-        height: 100%;
-        width: 100%;
-    }
-
-    .game-info-wrapper {
-        position: absolute;
-        inset: 0;
-
-        padding: 2rem 2rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        background-color: rgba(0, 0, 0, 0.7);
-
-        .container {
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-
-        .game-title {
-            color: #ffffff;
-            font-size: 1.6rem;
-            font-family: "Cinzel Decorative";
-        }
-
-        .game-info {
-            display: flex;
-            gap: 1rem;
-            justify-content: space-between;
-        }
-
-        .game-info-icon {
-            transform: translateY(-0.1rem);
-            width: 1.5rem;
-        }
-
-        .game-time,
-        .game-players-count,
-        .game-difficulty {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: white;
-            font-size: 1.05rem;
-            line-height: 1.2;
-        }
-
-        .game-description {
-            align-items: start;
-            justify-self: start;
-            grid-column: -1 / 1;
-            font-size: 1rem;
-            color: #ffffff;
-        }
+    &[data-choosing="true"]:hover > .boardgame-image {
+        filter: brightness(1.3);
     }
 }
 
-.boardgame-image:hover {
-    .game-info-wrapper[data-choosing="true"] {
-        background-color: rgba(0, 0, 0, 0.4);
-    }
+.game-bgImage {
+    width: 100%;
+    height: 100%;
 }
 
-@media (width < 800px) {
-    .container {
-        flex-direction: column;
-    }
+.container {
+    width: 100%;
 
-    .boardgame-image {
-        .game-info-wrapper {
-            position: relative;
-            background-color: #ffffff00;
-            .game-info {
-                flex-direction: column;
-            }
-        }
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    justify-content: space-between;
+}
 
-        .game-bgImage {
-            position: absolute;
-            filter: brightness(0.26);
-            width: 100%;
-            height: 100%;
-        }
-    }
+.game-info {
+    display: flex;
 
-    .boardgame-image:hover {
-        .game-info-wrapper[data-choosing="true"] {
-            background-color: hsl(39, 77%, 3%);
-        }
+    font-size: 0.65rem;
+
+    margin-top: 0.5rem;
+    text-align: center;
+    width: calc(100% + 0.6rem);
+    gap: 1rem;
+    transform: translateX(-0.3rem);
+    justify-content: space-between;
+}
+
+.game-info-icon {
+    transform: translateY(-0.1rem);
+    width: 1rem;
+}
+
+.game-time,
+.game-players-count,
+.game-difficulty {
+    display: flex;
+
+    flex-direction: row-reverse;
+
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    font-size: 1.3rem;
+    line-height: 1.2;
+}
+
+.game-description {
+    text-align: left;
+    line-height: 1.3;
+    width: calc(100% + 0.6rem);
+
+    transform: translateX(-0.3rem);
+
+    color: #c7c0b3;
+
+    font-weight: 500;
+
+    font-size: 1.05rem;
+    width: 100%;
+    height: 4.25rem;
+}
+
+p {
+    display: flex;
+    font-size: 1rem;
+    text-align: left;
+
+    align-items: start;
+    flex-direction: column;
+    font-weight: bold;
+
+    text-align: left;
+    span {
+        font-size: 0.9rem;
+        color: #f0cd8e;
     }
 }
 </style>

@@ -5,6 +5,7 @@ import Settings from "../../../components/common/Settings.vue";
 import { usePageSounds } from "../../composables/usePageSounds.js";
 import { useGamePause } from "../composables_games/useGamePause.js";
 import { useGameResize } from "../composables_games/useGameResize.js";
+import useGameData from "../shared/useGameData.js";
 import Debug from "./components_brianboru/Debug.vue";
 import Dialogs from "./components_brianboru/Dialogs.vue";
 import ChosenCards from "./components_brianboru/dialogs/ChosenCardDialog.vue";
@@ -12,7 +13,6 @@ import Island from "./components_brianboru/Island.vue";
 import Map from "./components_brianboru/Map.vue";
 import PlayerData from "./components_brianboru/PlayerData.vue";
 import TurnInfo from "./components_brianboru/TurnInfo.vue";
-import useGameData from "./composables_brianboru/useGameData.js";
 import useGameDialogs from "./composables_brianboru/useGameDialogs.js";
 
 const SOUNDTRACK_URL = "/sounds/brianboru/brian_boru_soundtrack.opus";
@@ -55,9 +55,8 @@ const { allDialogs, closeDialog, openedDialog } = useGameDialogs();
 </script>
 
 <template>
-    <Settings />
+    <Settings :url="SOUNDTRACK_URL" />
     <PauseScreen v-if="isPaused" />
-    <PlaySoundtrack :url="SOUNDTRACK_URL" />
     <div class="background">
         <div
             v-if="gameData"

@@ -47,6 +47,26 @@ export default class EventHelper {
         }
     }
 
+    removeUnactivePlayersOnGameEnd(lobbyId) {
+        try {
+            const lobby = this.lobbyManager.getLobby(lobbyId);
+            if (lobby.usersCleared) return;
+
+            for (const lobbyUserId of lobby.users) {
+                const lobbyUser = this.userManager.getUser(lobbyUserId);
+
+                if (!lobbyUser.isOnline) {
+                    lobby.removeUser(lobbyUserId);
+                    this.userManager.deleteUser(lobbyUserId);
+                }
+            }
+
+            lobby.usersCleared = true;
+        } catch (error) {
+            this.eventEmitter.toUserError(lobbyId, error);
+        }
+    }
+
     sendLobbyData(lobbyId) {
         try {
             const lobby = this.lobbyManager.getLobby(lobbyId);

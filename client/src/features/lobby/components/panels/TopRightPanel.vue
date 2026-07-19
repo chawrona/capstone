@@ -8,16 +8,25 @@ const props = defineProps([
     "currentGame",
     "lobbyUsers",
 ]);
+
+
+
 </script>
 
 <template>
     <div class="panel top-right">
         <p class="theme-title ready-count">
-            <span class="count-description">Gotowi </span>
-            <span>{{ `(${readyUsers}/${props.currentGame.maxPlayers})` }}</span>
+            <div v-if="!lobbyUsers">
+                      <span class="count-description">Pobieranie Listy...</span>
+            </div>
+            <div v-else>
+                <span class="count-description">Gotowi </span>
+                <span>{{ `(${readyUsers}/${props.currentGame.maxPlayers})` }}</span>
+            </div>
+       
         </p>
 
-        <ul class="lobby-users">
+        <ul v-if="lobbyUsers" class="lobby-users">
             <li
                 v-for="user in props.lobbyUsers"
                 :key="user.publicId"

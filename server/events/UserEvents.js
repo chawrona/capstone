@@ -120,10 +120,11 @@ export default class UserEvents {
                 const lobby = this.lobbyManager.getLobby(user.lobbyId);
                 if (!lobby.isActive) {
                     lobby.removeUser(userId);
+                    this.eventHelper.removeUnactivePlayersOnGameEnd(lobby.id);
                     user.lobbyId = null;
                     if (!lobby.getPlayerCount()) {
                         this.lobbyManager.deleteLobby(lobby.id);
-                    } else if (lobby.isAdmin) {
+                    } else if (lobby.isAdmin(userId)) {
                         lobby.admin = [...lobby.users][0];
                         this.eventHelper.sendLobbyData(lobby.id);
                     }
@@ -131,6 +132,12 @@ export default class UserEvents {
                     this.userManager.deleteUser(userId);
                 } else {
                     user.isOnline = false;
+                    lobby.game.pause();
+                    return this.eventEmitter.toLobby(
+                        lobby.id,
+                        "pauseStatus",
+                        lobby.game.pause,
+                    );
                 }
             } else {
                 this.userManager.deleteUser(userId);

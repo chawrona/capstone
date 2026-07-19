@@ -115,6 +115,7 @@ export default class Game {
             if (this.paused && data.eventName !== "gameDataRequest") {
                 throw new Error("Gra wstrzymana");
             }
+
             return this[data.eventName](data);
         } catch (error) {
             const errorMessage = error ? error.message : "Nieprawidłowa akcja";
@@ -180,6 +181,10 @@ export default class Game {
     resume() {
         this.paused = false;
         return false;
+    }
+
+    toggleGamePause() {
+        this.paused = !this.paused;
     }
 
     getCurrentPlayerPublicId() {

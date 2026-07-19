@@ -25,7 +25,6 @@ export default class LobbyEvents {
     }
 
     registerEvents() {
-        this.socket.on("createLobby", (payload) => this.onCreateLobby(payload));
         this.socket.on("joinLobby", (payload) => this.onJoinLobby(payload));
         this.socket.on("leaveLobby", (payload) => this.onLeaveLobby(payload));
         this.socket.on("lobbyDataRequest", (payload) =>
@@ -49,6 +48,10 @@ export default class LobbyEvents {
             this.eventHelper.checkIfLobbyActive(lobby);
 
             lobby.removeUser(userId);
+
+            if (!lobby.isActive) {
+                this.eventHelper.removeUnactivePlayersOnGameEnd(lobby.id);
+            }
 
             if (!lobby.getPlayerCount()) {
                 this.lobbyManager.deleteLobby(lobby.id);
@@ -149,6 +152,8 @@ export default class LobbyEvents {
                 throw lobbyData;
             }
 
+            this.eventHelper.removeUnactivePlayersOnGameEnd(user.lobbyId);
+
             this.eventEmitter.toUser(userId, "lobbyData", {
                 ...lobbyData,
                 currentUser: user.publicId,
@@ -207,6 +212,8 @@ export default class LobbyEvents {
             // if (userId !== lobby.admin) {
             //     throw new UserNotAdminError();
             // }
+
+            this.eventHelper.removeUnactivePlayersOnGameEnd(lobby.id);
 
             lobby.endGame();
 

@@ -5,32 +5,46 @@ import BoardGame from "@/assets/boardGame.svg";
 import BorderImage from "@/assets/corner-decoration.png";
 
 import { soundBus } from "../../../../audio/soundBus";
+import OptionButton from "../../../../components/common/OptionButton.vue";
 import VintageBorderContainer from "../../../../components/common/VintageBorderContainer.vue";
 import ChangeGameDialog from "../ChangeGameDialog.vue";
-import OptionButton from "../OptionButton.vue";
 
 const props = defineProps(["availableGames", "currentGame", "isAdmin"]);
 
-const changeGameDialogRef = ref(null);
+const isDialogOpen = ref(false);
+
+const toggleDialog = () => {
+    isDialogOpen.value = !isDialogOpen.value;
+    soundBus.playEffect("click");
+};
 </script>
 
 <template>
-    <div class="panel center">
+    <div class="panel center" :data-awaiting="!props.currentGame">
         <div class="title-wrapper">
-            <h1 class="game-title">{{ props.currentGame.polishTitle }}</h1>
+            <h1 class="game-title">
+                {{
+                    isDialogOpen
+                        ? "Dostępne gry"
+                        : props.currentGame.polishTitle
+                }}
+            </h1>
             <OptionButton
                 :icon="BoardGame"
-                content="Inne gry"
+                :content="isDialogOpen ? 'Zamknij' : 'Inne gry'"
                 class="games-button"
-                @click="
-                    () => {
-                        changeGameDialogRef?.openDialog();
-                        soundBus.playEffect('click');
-                    }
-                "
+                @click="toggleDialog"
             />
         </div>
+        <ChangeGameDialog
+            v-if="isDialogOpen"
+            :is-admin="props.isAdmin"
+            :available-games="props.availableGames"
+            :current-game="props.currentGame"
+            :close-dialog="toggleDialog"
+        />
         <VintageBorderContainer
+            v-else
             color="#f0cd8d"
             :image="BorderImage"
             :padding="1"
@@ -47,14 +61,7 @@ const changeGameDialogRef = ref(null);
             </div>
         </VintageBorderContainer>
 
-        <ChangeGameDialog
-            ref="changeGameDialogRef"
-            :is-admin="props.isAdmin"
-            :available-games="props.availableGames"
-            :current-game="props.currentGame"
-        />
-
-        <div class="game-card">
+        <div class="game-card" :class="{ hide: isDialogOpen }">
             <div class="game-info">
                 <p>
                     <span>Poziom trudności:</span>
@@ -94,13 +101,41 @@ const changeGameDialogRef = ref(null);
     left: 50%;
     transform: translate(-50%, -50%);
     display: grid;
-    width: 600px;
+    width: 650px;
     padding: 0;
     min-height: 550px;
     font-size: 1.5rem;
     color: #ffffff;
     user-select: none;
     font-family: "Cinzel";
+}
+
+.center[data-awaiting="true"] {
+    &::before {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 2;
+        display: inline-block;
+        height: 30%;
+        border: 20px solid #e0d4b0;
+        animation: rotation 1s linear infinite;
+        aspect-ratio: 1 / 1;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        box-sizing: border-box;
+        content: "";
+        transform: translate(-50%, -50%);
+    }
+
+    @keyframes rotation {
+        0% {
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+        100% {
+            transform: translate(-50%, -50%) rotate(360deg);
+        }
+    }
 }
 
 // Title
@@ -122,6 +157,7 @@ const changeGameDialogRef = ref(null);
     position: relative;
     display: grid;
     place-items: center;
+    z-index: 2;
 }
 
 .game-image {
@@ -152,96 +188,20 @@ const changeGameDialogRef = ref(null);
     font-size: 1.25rem;
     text-align: left;
     line-height: 1.3;
+    height: 5.5rem;
+
     color: #c7c0b3;
     margin-top: 0.5rem;
     font-weight: 500;
 }
 
-@media (width < 1200px) {
-    .center {
-        transform: translate(-40%, -40%);
-        width: 450px;
-    }
-
-    .game-title {
-        font-size: 1.75rem;
-        line-height: 0.8em;
-    }
-
-    .game-info p {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .game-description {
-        font-size: 1rem;
-    }
-
-    .games-button {
-        font-size: 0.6rem;
-        width: 160px;
-        padding: 0.35rem 0.75rem;
-    }
+.hide {
+    opacity: 0;
 }
 
-@media (width < 768px) {
+@media (width < 1250px) {
     .center {
-        order: 4;
-        left: auto;
-        top: auto;
-        transform: none;
-        margin: 2rem auto;
-    }
-
-    .game-info p {
-        font-size: 0.85rem;
-    }
-}
-
-@media (width < 540px) {
-    .center {
-        width: 300px;
-    }
-
-    .title-wrapper {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .game-title {
-        line-height: 1.2;
-    }
-
-    .games-button {
-        width: 218px;
-        padding: 1rem;
-        font-size: 0.83rem;
-    }
-
-    .game-image-wrapper {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 160px;
-        transform: translate(-50%, -50%);
-    }
-
-    .game-info {
-        flex-direction: column;
-        align-items: center;
-        p {
-            align-items: center;
-        }
-    }
-
-    .game-description {
-        text-align: center;
-    }
-}
-
-@media (width < 360px) {
-    .center {
-        width: 250px;
+        transform: translate(-50%, -40%);
     }
 }
 </style>

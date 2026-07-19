@@ -1,9 +1,9 @@
 <script setup>
-import Craftsman from "../games/craftsmen/Craftsman.vue";
+import Craftsmen from "../../games/craftsmen/Craftsmen.vue";
 </script>
 
 <template>
-    <Craftsman />
+    <Craftsmen />
 </template>
 
 <style scoped></style>

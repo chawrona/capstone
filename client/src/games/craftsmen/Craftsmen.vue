@@ -1,12 +1,13 @@
 <script setup>
-import PauseScreen from "../../../components/common/PauseScreen.vue";
-import PlaySoundtrack from "../../../components/common/PlaySoundtrack.vue";
-import Settings from "../../../components/common/Settings.vue";
+import PlaySoundtrack from "../../components/common/PlaySoundtrack.vue";
+import PauseScreen from "../../components/games/PauseScreen.vue";
+import Settings from "../../components/games/Settings.vue";
 import { usePageSounds } from "../../composables/usePageSounds.js";
+import useGameData from "../shared/useGameData.js";
 import { useGamePause } from "../shared/useGamePause.js";
 import { useGameResize } from "../shared/useGameResize.js";
 import Board from "./Board.vue";
-import useGameData from "./composables_craftsmen/useGameData.js";
+import useGameEndGame from "./composables_craftsmen/useGameEndGame.js";
 import Contracts from "./Contracts.vue";
 import EndGame from "./EndGame.vue";
 import HiddenGoal from "./HiddenGoal.vue";
@@ -111,7 +112,8 @@ usePageSounds({
 const { scale } = useGameResize();
 const { isPaused } = useGamePause();
 
-const { endGameData, gameData } = useGameData();
+const { endGameData } = useGameEndGame();
+const { gameData } = useGameData();
 
 const turnInfo = {
     player: {
@@ -125,9 +127,7 @@ const turnInfo = {
 </script>
 
 <template>
-    <Settings />
-    <PauseScreen v-if="isPaused" />
-    <PlaySoundtrack :url="SOUNDTRACK_URL" />
+    <Settings :url="SOUNDTRACK_URL" />
 
     <div class="background">
         <div

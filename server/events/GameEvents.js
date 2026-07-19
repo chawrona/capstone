@@ -3,6 +3,7 @@ import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmitter from "../services/EventEmitter.js";
+import EventHelper from "../services/EventHelper.js";
 import Logger from "../services/Logger.js";
 import parseCookie from "../utils/parseCookie.js";
 
@@ -12,16 +13,23 @@ export default class GameEvents {
         this.registerEvents();
         this.userManager = new UserManager();
         this.lobbyManager = new LobbyManager();
+        this.eventHelper = new EventHelper();
         this.eventEmitter = new EventEmitter();
         this.logger = new Logger();
     }
 
     registerEvents() {
         this.socket.on("gameData", (payload) => this.onGameData(payload));
-        this.socket.on("onBugReport", (payload) => this.onBugReport(payload));
+        this.socket.on("bugReport", (payload) => this.onBugReport(payload));
+        this.socket.on("gamePauseStatusRequest", (payload) =>
+            this.onGamePauseStatusRequest(payload),
+        );
+        this.socket.on("toggleGamePause", (payload) =>
+            this.onToggleGamePause(payload),
+        );
     }
 
-    onBugReport({ data }) {
+    onBugReport(data) {
         const userId = parseCookie(
             this.socket.handshake.headers.cookie,
             "userId",
@@ -29,7 +37,60 @@ export default class GameEvents {
         this.logger.bugReport({ userId, message: data });
     }
 
-    onGameData({ data }) {
+    onGamePauseStatusRequest() {
+        const userId = parseCookie(
+            this.socket.handshake.headers.cookie,
+            "userId",
+        );
+        try {
+            const user = this.userManager.getUser(userId);
+            const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
+            if (!lobby.isActive) {
+                return this.eventEmitter.toLobby(lobby.id, "lobby", lobby.id);
+            }
+
+            return this.eventEmitter.toUser(
+                userId,
+                "pauseStatus",
+                lobby.game.paused,
+            );
+        } catch (error) {
+            if (error instanceof UserDoesNotExistError) return;
+            if (error instanceof LobbyDoesNotExistError) return;
+            this.eventEmitter.toUserError(userId, error);
+        }
+    }
+
+    onToggleGamePause() {
+        const userId = parseCookie(
+            this.socket.handshake.headers.cookie,
+            "userId",
+        );
+
+        try {
+            const user = this.userManager.getUser(userId);
+            const lobby = this.lobbyManager.getLobby(user.lobbyId);
+
+            if (!lobby.isActive) {
+                this.eventEmitter.toLobby(lobby.id, "lobby", lobby.id);
+            }
+
+            lobby.game.toggleGamePause();
+
+            return this.eventEmitter.toLobby(
+                lobby.id,
+                "pauseStatus",
+                lobby.game.paused,
+            );
+        } catch (error) {
+            if (error instanceof UserDoesNotExistError) return;
+            if (error instanceof LobbyDoesNotExistError) return;
+            this.eventEmitter.toUserError(userId, error);
+        }
+    }
+
+    onGameData(data) {
         const userId = parseCookie(
             this.socket.handshake.headers.cookie,
             "userId",

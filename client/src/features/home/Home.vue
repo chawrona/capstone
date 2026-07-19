@@ -4,9 +4,9 @@ import { useRouter } from "vue-router";
 import { useToast } from "vue-toast-notification";
 
 import { soundBus } from "../../audio/soundBus";
+import PlaySoundtrack from "../../components/common/PlaySoundtrack.vue";
 import { usePageSounds } from "../../composables/usePageSounds";
 import { useAppStore } from "../../store/useAppStore";
-import PlaySoundtrack from "../../components/common/PlaySoundtrack.vue";
 
 const store = useAppStore();
 const router = useRouter();
@@ -27,20 +27,27 @@ const hangleSocketError = () => {
     awaitingJoinLobby.value = false;
 };
 
-onMounted(() => {});
+onMounted(() => {
+    store.disconnectSocket();
+});
 
-const createLobby = () => joinLobby(true);
+const createLobby = () => {
+    lobbyId.value = "";
+    joinLobby();
+};
 
-const joinLobby = async (createLobby) => {
+const joinLobby = async () => {
     const toast = useToast();
     awaitingJoinLobby.value = true;
     soundBus.playEffect("click");
     try {
+        console.log({ createLobby });
+
         const response = await fetch(
             `${import.meta.env.VITE_APP_IP}/api/joinLobby`,
             {
                 body: JSON.stringify({
-                    lobbyId: createLobby ? "create" : lobbyId.value,
+                    lobbyId: !lobbyId.value ? "create" : lobbyId.value,
                 }),
                 credentials: "include",
                 headers: {
@@ -55,6 +62,8 @@ const joinLobby = async (createLobby) => {
         if (!response.ok) {
             throw new Error(data.message);
         }
+
+        store.connectSocket(data.lobbyId);
 
         router.push(data.redirect);
     } catch (error) {
