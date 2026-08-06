@@ -63,7 +63,7 @@ export default class UserEvents {
         }
     }
 
-    onChangeUsername({ data: { newUsername } }) {
+    onChangeUsername({ newUsername }) {
         const userId = parseCookie(
             this.socket.handshake.headers.cookie,
             "userId",
