@@ -306,4 +306,3 @@ const joinLobby = async () => {
     }
 }
 </style>
-

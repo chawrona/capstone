@@ -32,6 +32,7 @@ const toggleDialog = () => {
                 :icon="BoardGame"
                 :content="isDialogOpen ? 'Zamknij' : 'Inne gry'"
                 class="games-button"
+                @click="toggleDialog"
             />
         </div>
         <ChangeGameDialog
