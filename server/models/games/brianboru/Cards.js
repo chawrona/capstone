@@ -145,16 +145,9 @@ export default class Cards {
             );
         }
 
-        // To w ogóle do wywalenia, bo lockedCards to SET kart, a nie ID
-        const lockedCards = player.getData("lockedCards");
-        const lockedCardsIds = Array.from(lockedCards).map((card) => card.id);
-        for (const card of lockedCardsIds) {
-            if (lockedCards.has(card)) {
-                throw new Error(
-                    `Nie możesz przekazać karty, którą dostałeś: ${card}`,
-                );
-            }
-        }
+        const lockedCardsIds = Array.from(player.getData("lockedCards")).map(
+            (card) => card.id,
+        );
 
         const cardsToPass = player
             .getData("cards")
@@ -211,6 +204,10 @@ export default class Cards {
             .getData("cards")
             .find((card) => card.id === cardId);
 
+        if (!chosenCard) {
+            throw new Error("Nie posiadasz tej karty.");
+        }
+
         this.chosenCards.push([chosenCard, player]);
 
         player.setData("cards", (oldCards) => {
@@ -245,6 +242,10 @@ export default class Cards {
         const chosenCard = player
             .getData("cards")
             .find((card) => card.id === cardId);
+
+        if (!chosenCard) {
+            throw new Error("Nie posiadasz tej karty.");
+        }
 
         this.chosenCards.push([chosenCard, player]);
 
