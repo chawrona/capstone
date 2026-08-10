@@ -57,7 +57,11 @@ export default class GameEvents {
             );
         } catch (error) {
             if (error instanceof UserDoesNotExistError) return;
-            if (error instanceof LobbyDoesNotExistError) return;
+            if (error instanceof LobbyDoesNotExistError) {
+                return this.eventEmitter.toUser(userId, "homepage", {
+                    error: "Pokój nie istnieje.",
+                });
+            }
             this.eventEmitter.toUserError(userId, error);
         }
     }
@@ -85,7 +89,11 @@ export default class GameEvents {
             );
         } catch (error) {
             if (error instanceof UserDoesNotExistError) return;
-            if (error instanceof LobbyDoesNotExistError) return;
+            if (error instanceof LobbyDoesNotExistError) {
+                return this.eventEmitter.toUser(userId, "homepage", {
+                    error: "Pokój nie istnieje.",
+                });
+            }
             this.eventEmitter.toUserError(userId, error);
         }
     }
@@ -122,7 +130,11 @@ export default class GameEvents {
             }
         } catch (error) {
             if (error instanceof UserDoesNotExistError) return;
-            if (error instanceof LobbyDoesNotExistError) return;
+            if (error instanceof LobbyDoesNotExistError) {
+                return this.eventEmitter.toUser(userId, "homepage", {
+                    error: "Pokój nie istnieje.",
+                });
+            }
             this.eventEmitter.toUserError(userId, error);
         }
     }
