@@ -99,12 +99,14 @@ export default class LobbyEvents {
                 this.userManager.getUser(userId),
             );
 
-            const colorsInUse = new Set();
-            for (const user of users) {
-                if (!user.color) throw new PlayerLacksColorError();
-                if (colorsInUse.has(user.color))
-                    throw new ColorDuplicatedError();
-                colorsInUse.add(user.color);
+            if (lobby.gameInfo.colors) {
+                const colorsInUse = new Set();
+                for (const user of users) {
+                    if (!user.color) throw new PlayerLacksColorError();
+                    if (colorsInUse.has(user.color))
+                        throw new ColorDuplicatedError();
+                    colorsInUse.add(user.color);
+                }
             }
 
             if (
