@@ -188,6 +188,11 @@ export default class LobbyEvents {
                 this.userManager.getUserIdByPublicId(userToKickPublicId);
             lobby.removeUser(userIdToKick);
 
+            const kickedUser = this.userManager.getUser(userIdToKick);
+            kickedUser.lobbyId = null;
+            kickedUser.isReady = false;
+            this.eventEmitter.leaveRoom(userIdToKick, lobby.id);
+
             this.eventEmitter.toUser(userId, "info", {
                 info: `Pomyślnie usunięto gracza z pokoju.`,
             });
