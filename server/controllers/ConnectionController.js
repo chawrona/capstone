@@ -40,9 +40,14 @@ export default class ConnectionController {
 
             this.registerEvents(socket);
         } catch (error) {
-            console.log("CO JEST NIE TAK: ", error.message);
-
-            this.eventEmitter.toUserError(userId, error);
+            // At this point the userId -> socketId mapping may not be set
+            // yet (that's often exactly what's failing here), so routing
+            // through EventEmitter.toUser/toUserError would resolve a
+            // stale or undefined socket id and reach nobody. Also,
+            // registerEvents() never ran, so this socket will never get
+            // lobbyData/gameData - send it home directly instead of
+            // leaving the client stuck on whatever page it's on.
+            socket.emit("homepage", { error: error.message });
             this.logger.error(error.message);
         }
     }
