@@ -23,7 +23,15 @@ export const useAppStore = defineStore("socket", {
             console.log(router);
 
             // Ścieżki
-            this.socket.on("homepage", (payload) => router.push("/"));
+            this.socket.on("homepage", (payload) => {
+                if (payload?.error) {
+                    toast.error(payload.error, {
+                        duration: 4000,
+                        position: "top",
+                    });
+                }
+                router.push("/");
+            });
             this.socket.on("lobby", (lobbyId) => router.push(`/${lobbyId}`));
             this.socket.on("game", (data) =>
                 router.push(`/${data.lobbyId}/${data.gameTitle}`),

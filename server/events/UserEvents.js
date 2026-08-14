@@ -114,6 +114,10 @@ export default class UserEvents {
             "userId",
         );
         try {
+            if (this.userManager.getUserSocketId(userId) !== this.socket.id) {
+                return;
+            }
+
             const user = this.userManager.getUser(userId);
 
             if (user.hasLobby()) {
@@ -124,8 +128,10 @@ export default class UserEvents {
                     user.lobbyId = null;
                     if (!lobby.getPlayerCount()) {
                         this.lobbyManager.deleteLobby(lobby.id);
-                    } else if (lobby.isAdmin(userId)) {
-                        lobby.admin = [...lobby.users][0];
+                    } else {
+                        if (lobby.isAdmin(userId)) {
+                            lobby.admin = [...lobby.users][0];
+                        }
                         this.eventHelper.sendLobbyData(lobby.id);
                     }
 

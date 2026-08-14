@@ -60,4 +60,10 @@ export default class EventEmitter {
     closeRoom(roomId) {
         this.io.in(roomId).socketsLeave(roomId);
     }
+
+    leaveRoom(userId, roomId) {
+        const socketId = this.userManager.getUserSocketId(userId);
+        const socket = this.io.sockets.sockets.get(socketId);
+        if (socket) socket.leave(roomId);
+    }
 }

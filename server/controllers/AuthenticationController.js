@@ -74,6 +74,31 @@ export default class AuthenticationController {
         }
     }
 
+    attemptJoinByLink(userId, requestedLobbyId, res) {
+        if (!requestedLobbyId) return null;
+
+        try {
+            const lobby = this.lobbyManager.getLobby(requestedLobbyId);
+
+            this.connectToLobby(userId, lobby.id);
+
+            return res.status(200).json({
+                redirect: `/${lobby.id}`,
+                lobbyId: lobby.id,
+                message: "Gracz dołączył do czyjegoś pokoju",
+            });
+        } catch (error) {
+            if (error instanceof LobbyDoesNotExistError) {
+                return res.status(400).json({
+                    redirect: null,
+                    message:
+                        "Pokój, do którego gracz chciał dołączyć, nie istnieje",
+                });
+            }
+            return null;
+        }
+    }
+
     connectToLobby(userId, lobbyId) {
         const lobby = this.lobbyManager.getLobby(lobbyId);
 
@@ -119,28 +144,12 @@ export default class AuthenticationController {
                 this.userManager.createUser(userId);
                 console.log("Użytkownik nie istniał. Został stworzony");
 
-                if (requestedLobbyId) {
-                    try {
-                        const lobby =
-                            this.lobbyManager.getLobby(requestedLobbyId);
-
-                        this.connectToLobby(userId, lobby.id);
-
-                        return res.status(200).json({
-                            redirect: `/${lobby.id}`,
-                            lobbyId: lobby.id,
-                            message: "Gracz dołączył do czyjegoś pokoju",
-                        });
-                    } catch (error) {
-                        if (error instanceof LobbyDoesNotExistError) {
-                            return res.status(400).json({
-                                redirect: null,
-                                message:
-                                    "Pokój, do którego gracz chciał dołączyć, nie istnieje",
-                            });
-                        }
-                    }
-                }
+                const joinResult = this.attemptJoinByLink(
+                    userId,
+                    requestedLobbyId,
+                    res,
+                );
+                if (joinResult) return joinResult;
 
                 return res.status(200).json({
                     redirect: null,
@@ -168,6 +177,13 @@ export default class AuthenticationController {
                     });
                 }
             }
+
+            const joinResult = this.attemptJoinByLink(
+                userId,
+                requestedLobbyId,
+                res,
+            );
+            if (joinResult) return joinResult;
 
             return res.status(200).json({
                 redirect: null,

@@ -40,9 +40,7 @@ export default class ConnectionController {
 
             this.registerEvents(socket);
         } catch (error) {
-            console.log("CO JEST NIE TAK: ", error.message);
-
-            this.eventEmitter.toUserError(userId, error);
+            socket.emit("homepage", { error: error.message });
             this.logger.error(error.message);
         }
     }

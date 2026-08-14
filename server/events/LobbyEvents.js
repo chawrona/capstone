@@ -60,7 +60,7 @@ export default class LobbyEvents {
                 this.eventHelper.sendLobbyData(lobby.id);
             }
 
-            this.socket.leave(user.lobbyId);
+            this.eventEmitter.leaveRoom(userId, lobby.id);
             user.lobbyId = null;
             user.isReady = false;
 
@@ -161,11 +161,11 @@ export default class LobbyEvents {
                 currentUser: user.publicId,
             });
         } catch (error) {
-            // Jak użytkownik odświeża stronę, a był w lobby, to serwer wyrzuca go z lobby
-            // Ale jednocześnie klient ładuje komponent z lobby zanim serwer go ponownie
-            // przekieruje na homepage Z tego powodu wysyła ponownie event z prośbą o dane,
-            // jednak lobby już nie istnieje. Na chwilę obecną ignorujemy wysyłany event
-            if (error instanceof LobbyDoesNotExistError) return;
+            if (error instanceof LobbyDoesNotExistError) {
+                return this.eventEmitter.toUser(userId, "homepage", {
+                    error: "Pokój nie istnieje.",
+                });
+            }
             this.eventEmitter.toUserError(userId, error);
         }
     }
@@ -187,6 +187,11 @@ export default class LobbyEvents {
             const userIdToKick =
                 this.userManager.getUserIdByPublicId(userToKickPublicId);
             lobby.removeUser(userIdToKick);
+
+            const kickedUser = this.userManager.getUser(userIdToKick);
+            kickedUser.lobbyId = null;
+            kickedUser.isReady = false;
+            this.eventEmitter.leaveRoom(userIdToKick, lobby.id);
 
             this.eventEmitter.toUser(userId, "info", {
                 info: `Pomyślnie usunięto gracza z pokoju.`,

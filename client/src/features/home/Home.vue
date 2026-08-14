@@ -51,7 +51,9 @@ const joinLobby = async () => {
             `${import.meta.env.VITE_APP_IP}/api/joinLobby`,
             {
                 body: JSON.stringify({
-                    lobbyId: !lobbyId.value ? "create" : lobbyId.value,
+                    lobbyId: lobbyId.value.trim()
+                        ? lobbyId.value.trim().toUpperCase()
+                        : "create",
                 }),
                 credentials: "include",
                 headers: {
@@ -117,6 +119,7 @@ const joinLobby = async () => {
                         maxlength="6"
                         placeholder="Wprowadź kod pokoju"
                         class="theme-input"
+                        style="text-transform: uppercase"
                         :disabled="blockEverything"
                     />
                     <!-- :disabled="blockEverything || lobbyId.length < 4" -->

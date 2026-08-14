@@ -21,7 +21,7 @@ export default class LobbyManager {
     }
 
     getLobby(lobbyId) {
-        const lobby = this.lobbies.get(lobbyId);
+        const lobby = this.lobbies.get(String(lobbyId).trim().toUpperCase());
         if (!lobby) {
             throw new LobbyDoesNotExistError("Lobby nie istnieje");
         }
