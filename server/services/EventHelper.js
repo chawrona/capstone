@@ -39,8 +39,6 @@ export default class EventHelper {
                 availableGames: games,
             };
         } catch (error) {
-            // to-do: jak macie czas to zbadajcie
-            // czy return przy tym pierwszym erroru jest potrzebny
             if (error instanceof UserDoesNotExistError) return;
             if (error instanceof LobbyDoesNotExistError) return error;
             this.eventEmitter.toUserError(lobbyId, error);

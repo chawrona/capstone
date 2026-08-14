@@ -1,5 +1,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
+import { useToast } from "vue-toast-notification";
 
 import GlobalSettings from "../../components/common/GlobalSettings.vue";
 import { usePageSounds } from "../../composables/usePageSounds.js";
@@ -12,6 +14,8 @@ import TopLeftPanel from "./components/panels/TopLeftPanel.vue";
 import TopRightPanel from "./components/panels/TopRightPanel.vue";
 
 const store = useAppStore();
+const router = useRouter();
+const toast = useToast();
 
 usePageSounds({
     effects: [{ name: "click", poolSize: 5, url: "/sounds/click.mp3" }],
@@ -19,6 +23,21 @@ usePageSounds({
 
 const data = ref(null);
 let unwatch = null;
+let loadingTimeout = null;
+
+// Zabezpieczenie: jeśli z jakiegokolwiek powodu "lobbyData" nigdy nie przyjdzie,
+// nie zostawiaj usera zawieszonego na kółku ładowania w nieskończoność.
+function startLoadingTimeout() {
+    loadingTimeout = setTimeout(() => {
+        if (!data.value) {
+            toast.error("Nie udało się załadować pokoju. Spróbuj ponownie.", {
+                duration: 4000,
+                position: "top",
+            });
+            router.push("/");
+        }
+    }, 4000);
+}
 
 const currentUser = computed(() =>
     data.value.lobbyUsers.find(
@@ -33,9 +52,12 @@ const readyUsers = computed(
 );
 
 onMounted(() => {
+    startLoadingTimeout();
+
     if (store.socket) {
         store.socket.on("lobbyData", (lobbyData) => {
             data.value = lobbyData;
+            clearTimeout(loadingTimeout);
         });
 
         store.socket.emit("lobbyDataRequest");
@@ -52,6 +74,7 @@ onMounted(() => {
                 if (newSocket) {
                     store.socket.on("lobbyData", (lobbyData) => {
                         data.value = lobbyData;
+                        clearTimeout(loadingTimeout);
                     });
 
                     store.socket.emit("lobbyDataRequest");
@@ -73,6 +96,7 @@ onMounted(() => {
 onUnmounted(() => {
     if (store.socket) store.socket.off("lobbyData");
     if (unwatch) unwatch();
+    clearTimeout(loadingTimeout);
 });
 </script>
 

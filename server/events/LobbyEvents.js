@@ -60,7 +60,7 @@ export default class LobbyEvents {
                 this.eventHelper.sendLobbyData(lobby.id);
             }
 
-            this.socket.leave(user.lobbyId);
+            this.eventEmitter.leaveRoom(userId, lobby.id);
             user.lobbyId = null;
             user.isReady = false;
 
@@ -161,13 +161,6 @@ export default class LobbyEvents {
                 currentUser: user.publicId,
             });
         } catch (error) {
-            // Jak użytkownik odświeża stronę, a był w lobby, to serwer wyrzuca go z lobby
-            // Ale jednocześnie klient ładuje komponent z lobby zanim serwer go ponownie
-            // przekieruje na homepage Z tego powodu wysyła ponownie event z prośbą o dane,
-            // jednak lobby już nie istnieje. Zamiast ignorować event (co zostawiało klienta
-            // zablokowanego na ekranie ładowania, gdy żadne inne przekierowanie nie było
-            // w drodze), jawnie wysyłamy "homepage" - jeśli przekierowanie już trwa, kolejne
-            // wywołanie router.push("/") po stronie klienta jest bezpieczne (no-op).
             if (error instanceof LobbyDoesNotExistError) {
                 return this.eventEmitter.toUser(userId, "homepage", {
                     error: "Pokój nie istnieje.",
