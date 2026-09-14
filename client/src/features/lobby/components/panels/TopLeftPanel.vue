@@ -45,6 +45,7 @@ const toggleReady = () => {
 };
 
 const areColorDuplicatedOrNotSelected = computed(() => {
+    if (!props.availableColors) return false;
     const usedColors = [];
     for (const user of props.lobbyUsers) {
         if (!user.color || usedColors.includes(user.color.name)) return true;
@@ -85,7 +86,7 @@ const canStartTheGame = computed(() => {
 
 const isCorrentCountOfPlayers = computed(
     () =>
-        // props.readyUsers >= props.currentGame.minPlayers &&
+        props.readyUsers >= props.currentGame.minPlayers &&
         props.readyUsers <= props.currentGame.maxPlayers,
 );
 
@@ -139,7 +140,6 @@ const handleGameStart = () => {
             ;
             @click="toggleReady"
         />
-
         <OptionButton
             v-if="props.currentUser.isAdmin"
             :disabled="
