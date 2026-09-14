@@ -13,6 +13,8 @@ import Mid from "./Mid/Mid.vue";
 import PodsumowanieFazy from "./PodsumowanieFazy.vue";
 import Top from "./Top/Top.vue";
 
+const SOUNDTRACK_URL = "/sounds/philanthropists/soundtrack.mp3";
+
 usePageSounds({
     effects: [
         { name: "buy", poolSize: 3, url: "/sounds/philanthropists/buy.mp3" },
