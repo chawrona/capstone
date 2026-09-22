@@ -224,7 +224,11 @@ export default class LobbyEvents {
 
             lobby.endGame();
 
-            this.eventEmitter.toUser(userId, "lobby", lobby.id);
+            this.eventEmitter.toLobbyError(
+                lobby.id,
+                "lobby",
+                `Gracz ${user.name} zakończył grę.`,
+            );
 
             this.eventHelper.sendLobbyData(lobby.id);
         } catch (error) {
