@@ -76,6 +76,7 @@ const canYouBuyACity = computed(() => {
 const useCardEffect = (bottom, card) => {
     if (props.chosenCards.length > 1 && bottom === "top") return;
     if (props.status !== statuses.CHOOSE_CARD_EFFECT) return;
+    if (card.id !== props.chosenCards[0]?.[0].id) return;
     chosenCard.value = card;
     chosenBottom.value = bottom;
     additionalResource.value = 0;
@@ -127,6 +128,7 @@ const activateCardEffect = () => {
         data: {
             buildCity: buyingCity.value,
             buyAdditional: additionalResource.value,
+            cardId: chosenCard.value.id,
             chosenBottom: chosenBottom.value,
         },
         eventName: "chooseCardEffect",
