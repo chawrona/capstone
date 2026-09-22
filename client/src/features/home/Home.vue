@@ -86,9 +86,9 @@ const joinLobby = async () => {
 
 <template>
     <div class="app-container">
-        <div class="Escape" @click="toggleSettings">
-            <img :src="Info" alt="info" />
-            <abbr title="Ustawienia">ESC</abbr>
+        <div class="Escape">
+
+            <p>ESC <span class="options"> (ustawienia)</span> </p>
         </div>
         <div class="Discord">
             <a href="https://discord.gg/EJGXmCVJCT" target="_blank">
@@ -281,6 +281,20 @@ const joinLobby = async () => {
         height: 2.8rem;
         transform: translateY(-1.5px);
     }
+
+    p {
+        display: flex;
+     
+        align-items: center;
+        
+        gap: 0.5rem;
+    
+    }
+
+    .options {
+        opacity: 0.9;
+        font-size: 1rem;
+    }
 }
 .Discord {
     position: absolute;
@@ -308,4 +322,6 @@ const joinLobby = async () => {
         transform: translateY(-1px);
     }
 }
+
+
 </style>
