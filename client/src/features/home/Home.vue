@@ -87,8 +87,7 @@ const joinLobby = async () => {
 <template>
     <div class="app-container">
         <div class="Escape">
-
-            <p>ESC <span class="options"> (ustawienia)</span> </p>
+            <p>ESC <span class="options"> (ustawienia)</span></p>
         </div>
         <div class="Discord">
             <a href="https://discord.gg/EJGXmCVJCT" target="_blank">
@@ -284,11 +283,10 @@ const joinLobby = async () => {
 
     p {
         display: flex;
-     
+
         align-items: center;
-        
+
         gap: 0.5rem;
-    
     }
 
     .options {
@@ -322,6 +320,4 @@ const joinLobby = async () => {
         transform: translateY(-1px);
     }
 }
-
-
 </style>
