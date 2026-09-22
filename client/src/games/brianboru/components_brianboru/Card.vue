@@ -48,7 +48,10 @@ const props = defineProps([
     >
         <img v-if="props.card.id === 25" :src="Rysa" class="rysa" />
         <div class="cardData">
-            <div class="top" @click="() => props.callback?.('top', card)">
+            <div
+                class="top"
+                @click="() => props.chooseTop && props.callback?.('top', card)"
+            >
                 <span
                     class="cardId"
                     :class="{ owned: props.owner }"
@@ -74,7 +77,11 @@ const props = defineProps([
                         singleBottom: props.card.bottom2.length === 0,
                         lessGap: props.card.bottom1.length > 3,
                     }"
-                    @click="() => props.callback?.('bottom1', card)"
+                    @click="
+                        () =>
+                            props.chooseBottoms &&
+                            props.callback?.('bottom1', card)
+                    "
                 >
                     <span
                         v-for="(value, index) in props.card.bottom1"
@@ -91,7 +98,11 @@ const props = defineProps([
                     v-if="props.card.bottom2.length > 0"
                     class="bottom2"
                     :class="{ lessGap: props.card.bottom2.length > 3 }"
-                    @click="() => props.callback?.('bottom2', card)"
+                    @click="
+                        () =>
+                            props.chooseBottoms &&
+                            props.callback?.('bottom2', card)
+                    "
                 >
                     <span
                         v-for="(value, index) in props.card.bottom2"

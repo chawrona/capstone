@@ -320,6 +320,10 @@ export default class Cards {
             throw new Error("Brak kart do rozpatrzenia.");
         }
 
+        if (this.chosenCards[0][0].id !== data.data.cardId) {
+            throw new Error("Ta karta nie jest teraz rozpatrywana.");
+        }
+
         // { chosenBottom: 'top', buyAdditional: 0, buildCity: false }
         const [card, player] = this.chosenCards.shift();
         player.setStatus(statuses.WAITING);
