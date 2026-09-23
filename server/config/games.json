@@ -46,5 +46,24 @@
     "time": "25-35 min.",
     "difficulty": "Trudny",
     "colors": null
+  },
+  {
+    "title": "yetanotherhungariandefense",
+    "polishTitle": "Yet Another Hungarian Defense",
+    "maxPlayers": 5,
+    "minPlayers": 2,
+    "description": "Yet Another Hungarian Defense",
+    "time": "30-45 min.",
+    "difficulty": "Średni",
+    "colors": [
+      { "name": "azure", "hex": "#007fff" },
+      { "name": "crimson", "hex": "#dc143c" },
+      { "name": "gold", "hex": "#ffd700" },
+      { "name": "white", "hex": "#ffffff" },
+      { "name": "green", "hex": "#00ff00" },
+      { "name": "turquoise", "hex": "#40e0d0" },
+      { "name": "coral", "hex": "#ff7f50" },
+      { "name": "violet", "hex": "#ee82ee" }
+    ]
   }
 ]
