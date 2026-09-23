@@ -3,21 +3,25 @@ import { ref } from "vue";
 
 import Cancel from "@/assets/exit.svg";
 
+import { sendBugReport } from "../../composables/sendBugReport.js";
 import { useGlobalSettings } from "../../composables/useGlobalSettings.js";
 import OptionButton from "../common/OptionButton.vue";
 import PlaySoundtrack from "../common/PlaySoundtrack.vue";
 import SoundSettings from "../common/SoundSettings.vue";
 
-const { closeSettings, sendBugReport, showSettings, toggleSettings } =
-    useGlobalSettings();
+const { closeSettings, showSettings, toggleSettings } = useGlobalSettings();
 
 const bugMessage = ref("");
 
-const handleSendBugReport = () => {
-    if (bugMessage.value) {
-        sendBugReport(bugMessage.value);
-        bugMessage.value = "";
-    }
+const isSendingBug = ref(false);
+
+const handleSendBugReport = async () => {
+    if (!bugMessage.value.trim() || isSendingBug.value) return;
+
+    isSendingBug.value = true;
+    // czyścimy tylko po sukcesie, żeby treść nie przepadła
+    if (await sendBugReport(bugMessage.value)) bugMessage.value = "";
+    isSendingBug.value = false;
 };
 </script>
 
@@ -31,9 +35,14 @@ const handleSendBugReport = () => {
             <textarea
                 v-model="bugMessage"
                 placeholder="Opisz błąd..."
+                maxlength="1000"
                 class="bug-input theme-input"
             />
-            <button class="bug-send theme-button" @click="handleSendBugReport">
+            <button
+                class="bug-send theme-button"
+                :disabled="isSendingBug"
+                @click="handleSendBugReport"
+            >
                 Wyślij
             </button>
         </div>
