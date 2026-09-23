@@ -5,6 +5,7 @@ import Clock from "@/assets/clock.svg";
 import Cancel from "@/assets/exit.svg";
 import Ready from "@/assets/ready.svg";
 
+import { sendBugReport } from "../../composables/sendBugReport.js";
 import { useGameSettings } from "../../games/shared/useGameSettings.js";
 import OptionButton from "../common/OptionButton.vue";
 import PlaySoundtrack from "../common/PlaySoundtrack.vue";
@@ -12,23 +13,22 @@ import SoundSettings from "../common/SoundSettings.vue";
 
 const props = defineProps(["url"]);
 
-const {
-    endGame,
-    isGamePaused,
-    sendBugReport,
-    showEndGameButton,
-    toggleGamePause,
-} = useGameSettings();
+const { endGame, isGamePaused, showEndGameButton, toggleGamePause } =
+    useGameSettings();
 
 const bugMessage = ref("");
 const sfxVolume = ref(80);
 const musicVolume = ref(60);
 
-const handleSendBugReport = () => {
-    if (bugMessage.value) {
-        sendBugReport(bugMessage.value);
-        bugMessage.value = "";
-    }
+const isSendingBug = ref(false);
+
+const handleSendBugReport = async () => {
+    if (!bugMessage.value.trim() || isSendingBug.value) return;
+
+    isSendingBug.value = true;
+    // czyścimy tylko po sukcesie, żeby treść nie przepadła
+    if (await sendBugReport(bugMessage.value)) bugMessage.value = "";
+    isSendingBug.value = false;
 };
 
 const settingsStatus = ref("options");
@@ -70,9 +70,14 @@ const settingsStatus = ref("options");
                 v-model="bugMessage"
                 type="text"
                 placeholder="Opisz błąd..."
+                maxlength="1000"
                 class="bug-input theme-input"
             />
-            <button class="bug-send theme-button" @click="handleSendBugReport">
+            <button
+                class="bug-send theme-button"
+                :disabled="isSendingBug"
+                @click="handleSendBugReport"
+            >
                 Wyślij
             </button>
         </div>

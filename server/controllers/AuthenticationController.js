@@ -1,11 +1,15 @@
 import express from "express";
 
+import BugReportLimitError from "../errors/BugReportLimitError.js";
+import InvalidBugReportError from "../errors/InvalidBugReportError.js";
 import LobbyDoesNotExistError from "../errors/LobbyDoesNotExistError.js";
 import UserDoesNotExistError from "../errors/UserDoesNotExistError.js";
 import UserInLobbyError from "../errors/UserInLobbyError.js";
 import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
+import BugReportLimiter from "../services/BugReportLimiter.js";
 import EventHelper from "../services/EventHelper.js";
+import Logger from "../services/Logger.js";
 import generateUUID from "../utils/generateUuid.js";
 import parseCookie from "../utils/parseCookie.js";
 
@@ -15,6 +19,8 @@ export default class AuthenticationController {
         this.userManager = new UserManager();
         this.lobbyManager = new LobbyManager();
         this.eventHelper = new EventHelper();
+        this.bugReportLimiter = new BugReportLimiter();
+        this.logger = new Logger();
 
         this.initRoutes();
     }
@@ -24,6 +30,40 @@ export default class AuthenticationController {
             this.authenticateUser(req, res),
         );
         this.router.post("/joinLobby", (req, res) => this.joinLobby(req, res));
+        this.router.post("/bugReport", (req, res) => this.bugReport(req, res));
+    }
+
+    bugReport(req, res) {
+        try {
+            const userId = parseCookie(req.headers.cookie, "userId");
+
+            if (!userId || !this.userManager.doesUserExist(userId)) {
+                throw new UserDoesNotExistError();
+            }
+
+            const message = this.bugReportLimiter.validate(req.body?.message);
+            this.bugReportLimiter.check(userId);
+
+            this.logger.bugReport({ userId, message });
+            this.bugReportLimiter.register(userId);
+
+            return res.status(200).json({
+                message: "Informacja o błędzie została wysłana",
+            });
+        } catch (error) {
+            if (error instanceof BugReportLimitError) {
+                return res.status(429).json({ message: error.message });
+            }
+            if (
+                error instanceof InvalidBugReportError ||
+                error instanceof UserDoesNotExistError
+            ) {
+                return res.status(400).json({ message: error.message });
+            }
+            return res.status(500).json({
+                message: "Nie udało się wysłać zgłoszenia.",
+            });
+        }
     }
 
     joinLobby(req, res) {

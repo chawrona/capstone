@@ -1,0 +1,421 @@
+RZEMIEŚLNICY (CRAFTSMEN) – ZASADY GRY I WSZYSTKIE MECHANIKI
+=============================================================
+
+Materiał roboczy do przeredagowania na pełną instrukcję. Opisuje wyłącznie
+mechaniki, które aktualnie działają w grze.
+
+
+1. W SKRÓCIE
+------------
+- Liczba graczy: 3–4. Czas: ok. 55–75 min. Poziom: trudny.
+- Jesteś rzemieślnikiem w mieście zbudowanym z dwóch obracających się
+  pierścieni dzielnic. Swoimi pionkami (rzemieślnikami) chodzisz po
+  ścieżkach wokół dzielnic i zbierasz z nich surowce.
+- Surowce oddajesz, żeby wykonywać kontrakty. Każdy kontrakt daje punkty
+  (1, 2 albo 3).
+- Gra kończy się natychmiast, gdy ktoś zdobędzie 12 lub więcej punktów.
+
+
+2. SUROWCE I PIENIĄDZE
+----------------------
+Surowce zwykłe (zdobywane na zewnętrznym pierścieniu):
+- Drewno
+- Kamień
+- Cegła
+- Żelazo
+- Zboże (pszenica)
+
+Surowce luksusowe (zdobywane tylko na wewnętrznym pierścieniu, albo kupowane
+od handlarza stojącego w środku):
+- Szkło
+- Jedwab
+- Bursztyn – "joker": przy wykonywaniu kontraktu każdy brakujący surowiec
+  można zastąpić 1 bursztynem (1 za 1). Działa to TYLKO przy kontraktach –
+  za wózek, rzemieślnika, handlarza czy obrót planszy trzeba zapłacić
+  dokładnie tym surowcem, którego się wymaga.
+
+Monety – środek płatniczy. Nie zajmują miejsca w ekwipunku i nie mają limitu.
+
+Do czego co się przydaje:
+- Zboże: wejście na wewnętrzną ścieżkę, zakup rzemieślnika, kontrakty.
+- Żelazo: obrót planszy, zakup rzemieślnika, kontrakty.
+- Szkło: trzeci rzemieślnik, powiększanie ekwipunku, kontrakty.
+- Jedwab: odblokowanie handlarza, powiększanie ekwipunku, kontrakty.
+- Bursztyn: zamiennik w kontraktach, powiększanie ekwipunku.
+- Drewno, kamień, cegła: głównie kontrakty.
+- Monety: opłaty za wchodzenie na zajęte pola, wymiana kontraktu, zakup
+  wózków, kupowanie u handlarza.
+
+
+3. PLANSZA
+----------
+Plansza składa się z czterech pierścieni (licząc od zewnątrz):
+
+a) Zewnętrzne dzielnice – 8 dzielnic, OBRACAJĄ SIĘ.
+b) Zewnętrzna ścieżka – 8 pól, po których chodzą pionki, NIERUCHOMA.
+c) Wewnętrzne dzielnice – 3 dzielnice, OBRACAJĄ SIĘ.
+d) Wewnętrzna ścieżka – 3 pola, NIERUCHOMA.
+
+Ścieżki są stałe, obracają się tylko dzielnice. Dlatego to, jaki surowiec
+leży "obok" danego pola ścieżki, zmienia się w trakcie gry.
+
+Każde pole ścieżki ma na stałe przypisaną liczbę 1 albo 2 ("wydajność pola").
+- Zewnętrzna ścieżka, po kolei dookoła: 1, 2, 2, 1, 1, 2, 1, 2
+- Wewnętrzna ścieżka: 1, 1, 2
+
+Zewnętrzne dzielnice (8 sztuk) – losowane na początku gry:
+- zawsze: Cegła, Żelazo, Kamień, Zboże, Drewno oraz Bank (dzielnica złota),
+- plus 2 losowe dzielnice mieszane spośród: Kamień+Zboże, Drewno+Zboże,
+  Żelazo+Zboże, Cegła+Zboże.
+Kolejność dzielnic wokół planszy też jest losowa.
+
+Wewnętrzne dzielnice (3 sztuki): Szkło, Jedwab, Bursztyn – w losowej
+kolejności.
+
+Połączenia między ścieżkami: każde pole wewnętrznej ścieżki łączy się
+z kilkoma sąsiadującymi polami zewnętrznej ścieżki. Numerując pola
+zewnętrzne Z1–Z8 i wewnętrzne W1–W3 (tak jak idą na planszy):
+- W1 łączy się z Z1, Z2, Z3
+- W2 łączy się z Z3, Z4, Z5, Z6
+- W3 łączy się z Z6, Z7, Z8
+Pola Z3 i Z6 są "przejściowe" – z każdego z nich da się wejść na dwa różne
+pola wewnętrzne. W interfejsie połączone pola mają podobny odcień szarości.
+
+
+4. PRZYGOTOWANIE GRY
+--------------------
+- Kolejność graczy jest losowana.
+- Każdy gracz dostaje: 3 monety, 1 rzemieślnika, ekwipunek na 4 surowce.
+- Rekompensata za późniejszą kolejność:
+    gracz 1 – nic,
+    gracz 2 – 1 zboże,
+    gracz 3 – 1 drewno,
+    gracz 4 – 1 drewno + 1 zboże.
+- Wykładane są kontrakty (patrz rozdział 12).
+
+Runda rozstawienia:
+- Po kolei każdy gracz stawia swojego rzemieślnika na DOWOLNYM polu
+  zewnętrznej ścieżki. Postawienie nie daje surowców.
+- Opłaty za zajęte pole OBOWIĄZUJĄ już przy rozstawieniu (rozdział 7),
+  np. stawiając pionek obok cudzego zapłacisz mu 1 monetę. Pole przy Banku
+  jest zawsze darmowe.
+- Po rozstawieniu wszystkich pionków plansza obraca się o losową liczbę pól
+  (zewnętrzna 2–10 kroków, wewnętrzna 2–4 kroków). Stawiając pionka nie
+  wiesz więc, jaka dzielnica będzie obok niego na starcie właściwej gry.
+
+
+5. PRZEBIEG TURY
+----------------
+Gracze wykonują tury po kolei. W swojej turze możesz w DOWOLNEJ kolejności
+i (o ile nie napisano inaczej) DOWOLNĄ liczbę razy:
+
+- ruszyć każdym swoim pionkiem (rzemieślnikiem i handlarzem) – każdym
+  maksymalnie raz na turę,
+- wykonać kontrakt(y),
+- wymienić kontrakt za 3 monety,
+- obrócić planszę za 1 żelazo,
+- kupić wózek (powiększyć ekwipunek),
+- kupić rzemieślnika,
+- odblokować handlarza,
+- handlować przez handlarza,
+- sprzedać surowiec z ekwipunku (szybka sprzedaż).
+
+Ruch nie jest obowiązkowy – możesz zakończyć turę bez ruszania się, ale
+surowce zdobywa się TYLKO ruszając pionek.
+
+Turę kończysz przyciskiem "Zakończ ruch".
+
+Automatyczny obrót planszy: gdy ostatni gracz w kolejce zakończy turę
+(czyli gdy wszyscy zagrali raz), obie tarcze dzielnic przesuwają się o jedno
+pole:
+- zewnętrzne dzielnice – o 1 pole zgodnie z ruchem wskazówek zegara,
+- wewnętrzne dzielnice – o 1 pole w przeciwnym kierunku.
+
+
+6. RUCH PIONKÓW
+---------------
+Rzemieślnik porusza się zawsze o jedno pole:
+- na zewnętrznej ścieżce: na sąsiednie pole w lewo albo w prawo,
+- na wewnętrznej ścieżce: na jedno z dwóch pozostałych pól,
+- między ścieżkami: tylko na połączone pole (patrz połączenia w rozdz. 3).
+Nie można stać w miejscu i jednocześnie zbierać – żeby coś zebrać trzeba
+wejść na nowe pole. Na jednym polu może stać dowolnie wiele pionków.
+
+Koszt wejścia na WEWNĘTRZNĄ ścieżkę (dotyczy każdego ruchu, który kończy się
+na polu wewnętrznym – zarówno z zewnątrz do środka, jak i ze środka na inne
+pole w środku):
+- pole wewnętrzne z liczbą 1 → 2 zboża,
+- pole wewnętrzne z liczbą 2 → 3 zboża.
+(czyli: wydajność pola + 1). Zejście ze środka na zewnątrz nie kosztuje
+zboża. Na wewnętrznej ścieżce nie ma opłat dla innych graczy.
+
+Koszt wejścia na ZEWNĘTRZNĄ ścieżkę – ewentualne opłaty dla innych graczy
+(rozdział 7). Jeśli nie stać cię na opłatę, nie możesz wykonać tego ruchu.
+
+
+7. OPŁATY – PŁACENIE INNYM GRACZOM
+----------------------------------
+Dotyczy tylko zewnętrznej ścieżki i tylko rzemieślników (nie handlarzy).
+Opłata pobierana jest w chwili wejścia (lub postawienia) rzemieślnika
+na pole.
+
+Podstawowa zasada: za każdego obcego rzemieślnika stojącego na polu, na
+które wchodzisz, płacisz 1 monetę jego właścicielowi.
+- 1 obcy rzemieślnik → 1 moneta dla jego właściciela.
+- 2 rzemieślników dwóch różnych graczy → po 1 monecie dla każdego.
+- 2 rzemieślników tego samego gracza → 2 monety dla niego.
+
+Kiedy NIE płacisz nic:
+- Na polu stoi już twój inny rzemieślnik (twój handlarz się nie liczy) –
+  wtedy wejście jest w całości darmowe.
+- Pole leży przy dzielnicy Bank – tam nigdy nie ma opłat.
+- Handlarze innych graczy – nie pobierają opłat.
+
+Zasada "słabszego" (ważna!): jeśli masz MNIEJ rzemieślników niż właściciel
+pionka stojącego na polu, NIE płacisz temu graczowi. Płacisz tylko tym,
+którzy mają tyle samo albo mniej rzemieślników co ty. Liczą się wszyscy
+twoi zakupieni rzemieślnicy (także ci jeszcze niepostawieni w tej turze),
+handlarz się nie liczy.
+Przykład: masz 1 rzemieślnika, Ania ma 2, Bartek ma 1. Wchodzisz na pole,
+na którym stoi rzemieślnik Ani i rzemieślnik Bartka → płacisz tylko
+1 monetę Bartkowi.
+
+Monety za opłaty trafiają bezpośrednio do właściciela pionka – to jest
+jedno ze źródeł dochodu (stanie na popularnych polach się opłaca).
+
+
+8. ZBIERANIE SUROWCÓW – OD CZEGO ZALEŻY ILE DOSTAJESZ
+----------------------------------------------------
+Surowce dostajesz w momencie, gdy rzemieślnik WEJDZIE na pole ścieżki (ruchem
+w trakcie normalnej tury). Nie dostajesz nic przy rozstawieniu na początku
+gry ani przy stawianiu nowo kupionego rzemieślnika. Handlarz nigdy nie
+zbiera surowców.
+
+Ilość zależy od trzech rzeczy:
+1) Wydajności pola ścieżki (1 albo 2) – liczba na polu jest stała.
+2) Dzielnicy, która W TEJ CHWILI przylega do pola – to zmienia się przez
+   obroty planszy.
+3) Wolnego miejsca w ekwipunku – dostajesz najwyżej tyle, ile się zmieści.
+   Nadmiar przepada.
+
+Szczegółowo:
+- Zwykła dzielnica (drewno, kamień, cegła, żelazo, zboże): dostajesz tyle
+  sztuk, ile wynosi wydajność pola (1 lub 2).
+- Dzielnica mieszana (np. Kamień+Zboże):
+    pole z liczbą 1 → 1 sztuka surowca głównego (np. kamienia),
+    pole z liczbą 2 → 1 sztuka surowca głównego + 1 zboże.
+  Jeśli masz tylko 1 wolne miejsce, na polu "2" dostaniesz tylko surowiec
+  główny, bez zboża.
+- Bank: zamiast surowca dostajesz monety:
+    pole z liczbą 1 → 2 monety,
+    pole z liczbą 2 → 3 monety.
+  Monety nie zajmują miejsca, więc pełny ekwipunek nie przeszkadza.
+  Na Banku nie płacisz też nikomu opłat.
+- Wewnętrzna dzielnica (szkło, jedwab, bursztyn): dostajesz tyle sztuk
+  surowca luksusowego, ile wynosi wydajność pola (1 lub 2). Zboże za wejście
+  jest pobierane PRZED zbiorem, więc zwolnione przez nie miejsce w ekwipunku
+  już się liczy.
+
+
+9. OBRACANIE PLANSZY
+--------------------
+Automatyczny obrót – po każdej pełnej kolejce graczy (rozdział 5).
+
+Ręczny obrót – w swojej turze możesz zapłacić 1 żelazo, żeby obrócić obie
+tarcze dzielnic o 1 pole (tak samo jak przy obrocie automatycznym). Można to
+robić wiele razy w turze, dopóki masz żelazo.
+- Szansa na SUPER-OBRÓT: przy każdym ręcznym obrocie jest ok. 9% szansy
+  (1 na 11), że zamiast o 1 pole plansza obróci się losowo (zewnętrzna tarcza
+  o 1–9 pól, wewnętrzna o 1–3 pola).
+- Obrót nie daje żadnych surowców – po obrocie trzeba jeszcze ruszyć
+  pionkiem, żeby zebrać z nowej dzielnicy.
+- UWAGA: ręczny obrót wyłącza handel handlarzem do końca twojej tury
+  (niezależnie od tego, czy handlarz już się ruszył, czy dopiero się ruszy).
+
+Po co obracać: żeby przy polu, na które możesz wejść, pojawiła się
+dzielnica z potrzebnym surowcem, albo żeby "przysunąć" Bank.
+
+
+10. EKWIPUNEK I WÓZKI
+---------------------
+- Start: 4 miejsca. Maksimum: 9 miejsc.
+- Każdy surowiec zajmuje 1 miejsce, monety nie zajmują miejsca.
+- Każdy kupiony wózek daje +1 miejsce. Koszty kolejnych wózków:
+    5. miejsce – 3 monety
+    6. miejsce – 2 sztuki jednego losowego zwykłego surowca + 1 sztuka
+                 innego losowego zwykłego surowca
+    7. miejsce – 1 losowy surowiec luksusowy
+    8. miejsce – po 1 sztuce z dwóch pozostałych surowców luksusowych
+                 (innych niż ten zapłacony za 7. miejsce)
+    9. miejsce – 10 monet
+  Koszt następnego wózka jest losowany w chwili zakupu poprzedniego i jest
+  od razu widoczny na przycisku. Każdy gracz ma własną ścieżkę kosztów.
+
+Szybka sprzedaż: w swojej turze możesz kliknąć dowolny surowiec w ekwipunku
+i sprzedać go od ręki (bez handlarza, bez limitu):
+- zwykły surowiec lub bursztyn → 1 moneta,
+- jedwab → 2 monety,
+- szkło → 3 monety.
+Służy do robienia miejsca i szybkiego zdobycia monet.
+
+Ekwipunki i monety wszystkich graczy są jawne (widać je w panelu graczy).
+
+
+11. RZEMIEŚLNICY I HANDLARZ
+---------------------------
+RZEMIEŚLNICY
+- Startujesz z 1, możesz mieć maksymalnie 3.
+- 2. rzemieślnik: 3 zboża + 2 żelaza.
+- 3. rzemieślnik: 3 zboża + 2 żelaza + 1 szkło.
+- Po zakupie od razu stawiasz nowego rzemieślnika na DOWOLNYM polu
+  zewnętrznej ścieżki. Postawienie nie daje surowców, ale opłaty dla innych
+  obowiązują (z uwzględnieniem zasady "słabszego" – nowy pionek już się
+  liczy do twojej liczby rzemieślników). Nowy rzemieślnik nie może się już
+  ruszyć w tej turze.
+- Więcej rzemieślników = więcej zbiorów na turę, ale też tracisz ochronę
+  z zasady "słabszego" (inni gracze częściej będą musieli ci płacić,
+  a ty im).
+
+HANDLARZ – specjalny pionek
+- Odblokowanie: 3 jedwabie. Każdy gracz może mieć tylko jednego handlarza.
+- Po zakupie handlarz pojawia się na polu zewnętrznej ścieżki leżącym przy
+  Banku. W turze zakupu nie może się już ruszyć i nie handluje.
+- Ruch: tak jak rzemieślnik (1 pole, także między ścieżkami), ale:
+    * nie płaci żadnych opłat innym graczom,
+    * nie płaci zboża za wejście do środka,
+    * zawsze może wejść na każde sąsiednie/połączone pole.
+- Handlarz NIE zbiera surowców.
+- Handlarz NIE pobiera opłat od innych (kto wchodzi na jego pole, nic mu nie
+  płaci) i NIE chroni swojego właściciela przed opłatami (twój handlarz na
+  polu nie zwalnia cię z płacenia, tak jak robi to twój rzemieślnik).
+- Handlarz nie liczy się do liczby rzemieślników.
+
+HANDEL
+- Handlować można dopiero PO ruchu handlarza w bieżącej turze. Na początku
+  każdej tury handel jest zablokowany, dopóki handlarz się nie ruszy.
+- Handlujesz surowcem dzielnicy przylegającej do pola, na które wszedł
+  handlarz. Przy dzielnicy mieszanej (np. Kamień+Zboże) handlujesz tylko
+  surowcem głównym (kamieniem). Przy Banku nie da się handlować.
+- Limit: tyle kupna i tyle sprzedaży, ile wynosi wydajność pola (1 lub 2).
+  Limity kupna i sprzedaży są osobne (na polu "2" możesz 2x kupić i 2x
+  sprzedać). Handel dotyczy 1 sztuki na raz.
+- Ceny:
+    Zewnętrzna ścieżka (surowce zwykłe):
+        kupno 3 monety za sztukę, sprzedaż 2 monety za sztukę.
+    Wewnętrzna ścieżka (surowce luksusowe):
+        kupno 6 monet za sztukę,
+        sprzedaż: jedwab 4, szkło 5, bursztyn 2 monety.
+- Kupowanie wymaga wolnego miejsca w ekwipunku i odpowiedniej ilości monet.
+  Sprzedaż wymaga posiadania surowca.
+- Ręczny obrót planszy blokuje handel do końca tury (rozdział 9).
+- Po każdej transakcji dostępne ruchy są przeliczane – np. za monety ze
+  sprzedaży możesz już opłacić wejście na zajęte pole, a kupione zboże
+  pozwala wejść do środka.
+
+
+12. KONTRAKTY
+-------------
+W puli jest 36 kontraktów:
+- 18 łatwych – 1 punkt,
+- 10 średnich – 2 punkty,
+- 8 trudnych – 3 punkty.
+
+Na stole zawsze leżą (maksymalnie) 3 kontrakty, wspólne dla wszystkich.
+Początkowy układ:
+- 1. karta – zawsze łatwa,
+- 2. karta – łatwa albo średnia (mniej więcej pół na pół),
+- 3. karta – łatwa (ok. 1/3), średnia albo trudna.
+Pozostałe karty wszystkich poziomów są tasowane razem w jedną talię.
+
+Wykonanie kontraktu:
+- W swojej turze klikasz kontrakt i oddajesz wymagane surowce.
+- Brakujące surowce możesz zastąpić bursztynem (1 bursztyn = 1 dowolny
+  brakujący surowiec).
+- Dostajesz punkty kontraktu. W jednej turze możesz wykonać kilka kontraktów.
+- Na miejsce wykonanego kontraktu od razu wchodzi losowa karta z talii
+  (dowolnego poziomu trudności).
+
+Wymiana kontraktu:
+- Za 3 monety możesz wymienić wybrany kontrakt ze stołu na losowy z talii.
+  Stara karta wraca do talii. Można to robić wiele razy.
+
+Lista kontraktów:
+
+Łatwe (1 pkt):
+- Świerkowa szafa: 4 drewna
+- Kamienna ścieżka: 4 kamienie
+- Kamienne fundamenty: 3 kamienie, 2 cegły
+- Ceglany mur: 4 cegły
+- Żeliwne zawiasy: 4 żelaza
+- Wózek: 3 drewna, 1 żelazo
+- Studnia: 2 kamienie, 2 zboża
+- Dębowa szafa: 3 drewna, 2 żelaza
+- Palenisko: 3 cegły, 1 żelazo
+- Jesionowy stół: 3 drewna, 1 zboże
+- Narzędzia: 3 żelaza, 2 drewna
+- Zapas prowiantu: 4 zboża
+- Żelazny pług: 4 żelaza, 1 drewno
+- Most: 3 kamienie, 2 drewna
+- Stoisko: 3 drewna, 2 zboża
+- Parter gospody: 4 cegły, 1 drewno
+- Ceglany dach: 3 cegły, 2 żelaza
+- Stodoła: 4 zboża, 1 drewno
+
+Średnie (2 pkt):
+- Dzwon: 3 żelaza, 2 cegły, 1 kamień
+- Ceglany piec: 3 cegły, 2 kamienie, 1 zboże
+- Żelazna brama: 4 żelaza, 2 kamienie
+- Piec: 3 kamienie, 2 cegły, 1 drewno
+- Obelisk: 3 kamienie, 1 żelazo, 1 bursztyn
+- Łóżko: 2 drewna, 1 zboże, 1 jedwab
+- Fontanna: 3 kamienie, 1 cegła
+- Tron: 1 żelazo, 1 drewno, 1 jedwab
+- Szklarnia: 3 cegły, 1 zboże, 1 szkło
+- Królewskie łoże: 3 drewna, 1 jedwab
+
+Trudne (3 pkt):
+- Obserwatorium: 4 kamienie, 3 szkła
+- Szlacheckie lustro: 3 żelaza, 1 drewno, 1 szkło, 1 bursztyn
+- Witraż: 1 kamień, 1 cegła, 3 szkła
+- Królewskie szaty: 2 zboża, 2 żelaza, 1 jedwab, 1 bursztyn
+- Odnowa katedry: 2 kamienie, 2 cegły, 3 szkła
+- Marmurowa wanna: 2 kamienie, 1 zboże, 3 bursztyny
+- Gobelin: 4 drewna, 2 jedwabie
+- Karoca: 2 żelaza, 2 drewna, 1 jedwab, 1 bursztyn
+
+Uwaga: pojemność ekwipunku ogranicza, jakie kontrakty w ogóle da się
+zebrać – kontrakt wymagający 7 surowców wymaga co najmniej 7 miejsc
+(bursztyn jako zamiennik też zajmuje miejsce). Stąd sens kupowania wózków.
+
+
+13. KONIEC GRY I ZWYCIĘZCA
+--------------------------
+- Gra kończy się natychmiast, gdy którykolwiek gracz osiągnie 12 lub więcej
+  punktów z kontraktów (w momencie wykonania kontraktu, nie trzeba kończyć
+  tury).
+- Na ekranie końcowym gracze są ustawiani według LICZBY WYKONANYCH
+  KONTRAKTÓW (nie punktów!), a przy remisie – według liczby monet.
+  Może się więc zdarzyć, że gracz, który zakończył grę 12 punktami z kilku
+  trudnych kontraktów, nie zajmie pierwszego miejsca.
+- Ekran końcowy pokazuje statystyki: wykonane kontrakty, monety na koniec,
+  monety zarobione z opłat ("z pozycji"), monety zapłacone innym, liczbę
+  obrotów, liczbę wymian kontraktów, wydany bursztyn, liczbę kupionych
+  i sprzedanych towarów.
+
+
+14. WSKAZÓWKI / ZALEŻNOŚCI, KTÓRE WARTO ZNAĆ
+--------------------------------------------
+- Pola "2" są dwa razy wydajniejsze – ale przy dzielnicy mieszanej "2" daje
+  surowiec + zboże, a nie 2 sztuki surowca.
+- Bank to darmowe pole (bez opłat) i źródło 2–3 monet – dobre miejsce na
+  przeczekanie i zarobek.
+- Środek planszy to jedyne źródło luksusów, ale wejście kosztuje 2–3 zboża
+  za każdy ruch w środku. Zboże jest więc "paliwem" do luksusów.
+- Mając mniej rzemieślników niż rywale nie płacisz im za wchodzenie na ich
+  pola – to naturalna ochrona dla gracza, który zostaje w tyle.
+- Pełny ekwipunek = zbiory przepadają. Przed ruchem zrób miejsce (szybka
+  sprzedaż, kontrakt) albo kup wózek.
+- Obrót za 1 żelazo pozwala "dopasować" dzielnicę do pola, ale wyłącza handel
+  na resztę tury – najpierw handluj, potem obracaj.
+- Kolejność działań w turze jest dowolna: np. rusz rzemieślnika, wykonaj
+  kontrakt, sprzedaj nadwyżkę, obróć planszę, rusz drugiego rzemieślnika.

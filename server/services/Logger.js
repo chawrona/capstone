@@ -36,7 +36,9 @@ export default class Logger {
 
     bugReport(report) {
         const timestamp = new Date().toISOString();
-        const logLine = `[${report.userId}] [${timestamp}] ${report.message}`;
+        // jedno zgłoszenie = jedna linia w logu
+        const message = report.message.replace(/[\r\n]+/g, " ");
+        const logLine = `[BUG] [${report.userId}] [${timestamp}] ${message}`;
         return this.enqueueWrite(logLine);
     }
 }

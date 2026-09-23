@@ -4,7 +4,6 @@ import LobbyManager from "../managers/LobbyManager.js";
 import UserManager from "../managers/UserManager.js";
 import EventEmitter from "../services/EventEmitter.js";
 import EventHelper from "../services/EventHelper.js";
-import Logger from "../services/Logger.js";
 import parseCookie from "../utils/parseCookie.js";
 
 export default class GameEvents {
@@ -15,26 +14,16 @@ export default class GameEvents {
         this.lobbyManager = new LobbyManager();
         this.eventHelper = new EventHelper();
         this.eventEmitter = new EventEmitter();
-        this.logger = new Logger();
     }
 
     registerEvents() {
         this.socket.on("gameData", (payload) => this.onGameData(payload));
-        this.socket.on("bugReport", (payload) => this.onBugReport(payload));
         this.socket.on("gamePauseStatusRequest", (payload) =>
             this.onGamePauseStatusRequest(payload),
         );
         this.socket.on("toggleGamePause", (payload) =>
             this.onToggleGamePause(payload),
         );
-    }
-
-    onBugReport(data) {
-        const userId = parseCookie(
-            this.socket.handshake.headers.cookie,
-            "userId",
-        );
-        this.logger.bugReport({ userId, message: data });
     }
 
     onGamePauseStatusRequest() {
