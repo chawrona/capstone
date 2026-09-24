@@ -6,6 +6,51 @@ export default class YetAnotherHungarianDefensePlayer extends Player {
     }
 
     initalizeData() {
-        // tu startowe dane gracza, np. this.setData("points", () => 0);
+        this.data = {
+            position: {
+                x: 0,
+                y: 0,
+            },
+            speed: 5,
+        };
+    }
+
+    moveRandomly() {
+        const angle = Math.random() * Math.PI * 2;
+
+        this.data.position.x += Math.cos(angle) * 10;
+        this.data.position.y += Math.sin(angle) * 10;
+
+        this.normalizePosition();
+    }
+
+    normalizePosition() {
+        this.data.position.x = Math.max(
+            0,
+            Math.min(1920, this.data.position.x),
+        );
+        this.data.position.y = Math.max(0, Math.min(950, this.data.position.y));
+    }
+
+    updatePosition(movement) {
+        let x = 0;
+        let y = 0;
+
+        if (movement.up) y -= 1;
+        if (movement.down) y += 1;
+        if (movement.left) x -= 1;
+        if (movement.right) x += 1;
+
+        const length = Math.hypot(x, y);
+
+        if (length > 0) {
+            x /= length;
+            y /= length;
+
+            this.data.position.x += x * this.data.speed;
+            this.data.position.y += y * this.data.speed;
+        }
+
+        this.normalizePosition();
     }
 }

@@ -86,7 +86,7 @@ const canStartTheGame = computed(() => {
 
 const isCorrentCountOfPlayers = computed(
     () =>
-        props.readyUsers >= props.currentGame.minPlayers &&
+        // props.readyUsers >= props.currentGame.minPlayers &&
         props.readyUsers <= props.currentGame.maxPlayers,
 );
 
