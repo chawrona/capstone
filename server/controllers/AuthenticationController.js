@@ -85,6 +85,12 @@ export default class AuthenticationController {
                 const lobbyId = lobby.id;
                 const user = this.userManager.getUser(userId);
                 user.color = null;
+                if (process.env.DEVELOPMENT === "true") {
+                    user.color = {
+                        name: "red",
+                        hex: "#ff0000",
+                    };
+                }
                 user.lobbyId = lobbyId;
                 lobby.joinUser(userId);
                 lobby.admin = userId;

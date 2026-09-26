@@ -1,9 +1,11 @@
 <script setup>
+import { ref } from "vue";
+
 import GameSettings from "../../components/games/GameSettings.vue";
 import { usePageSounds } from "../../composables/usePageSounds.js";
 import useGameData from "../shared/useGameData.js";
 import { useGameResize } from "../shared/useGameResize.js";
-import Grid from "./components_yetanotherhungariandefense/Grid.vue";
+import GameRender from "./components_yetanotherhungariandefense/GameRender.vue";
 
 const SOUNDTRACK_URL =
     "/sounds/yetanotherhungariandefense/yetanotherhungariandefense_soundtrack.opus";
@@ -26,7 +28,7 @@ const { gameData } = useGameData();
             class="game"
             :style="{ transform: `scale(${scale}) translate(-50%, -50%)` }"
         >
-            <Grid :players="gameData.players"/>
+            <GameRender />
         </div>
     </div>
 </template>
@@ -40,9 +42,9 @@ const { gameData } = useGameData();
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-    background-color: rgb(168, 42, 42);
+    background-color: rgb(70, 70, 70);
     overflow: hidden;
-    background-image: url("/src/assets/games/gameAssets/yetanotherhungariandefense/dirt.png");
+    // background-image: url("/src/assets/games/gameAssets/yetanotherhungariandefense/dirt.png");
 }
 
 .game {
@@ -56,15 +58,20 @@ const { gameData } = useGameData();
 
     width: 1920px;
     height: 950px;
-  
+
     margin-block: auto;
     transform-origin: top left;
     font-family: "Open sans";
     overflow: hidden;
-  
 
     * {
         user-select: none;
     }
+}
+
+.game-render {
+    width: 1920px;
+    height: 950px;
+    background-color: rgba(255, 0, 0, 0.168);
 }
 </style>

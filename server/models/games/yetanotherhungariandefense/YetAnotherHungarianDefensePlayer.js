@@ -32,23 +32,21 @@ export default class YetAnotherHungarianDefensePlayer extends Player {
         this.data.position.y = Math.max(0, Math.min(950, this.data.position.y));
     }
 
-    updatePosition(movement) {
+    updatePosition(data) {
         let x = 0;
         let y = 0;
-
-        if (movement.up) y -= 1;
-        if (movement.down) y += 1;
-        if (movement.left) x -= 1;
-        if (movement.right) x += 1;
+        if (data.up) y -= 1;
+        if (data.down) y += 1;
+        if (data.left) x -= 1;
+        if (data.right) x += 1;
 
         const length = Math.hypot(x, y);
 
         if (length > 0) {
             x /= length;
             y /= length;
-
-            this.data.position.x += x * this.data.speed;
-            this.data.position.y += y * this.data.speed;
+            this.data.position.x += x * this.data.speed * data.dt;
+            this.data.position.y += y * this.data.speed * data.dt;
         }
 
         this.normalizePosition();
