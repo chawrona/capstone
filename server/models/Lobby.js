@@ -6,6 +6,8 @@ import Craftsmen from "./games/craftsmen/Craftsmen.js";
 import CraftsmenPlayer from "./games/craftsmen/CraftsmenPlayer.js";
 import Philanthropists from "./games/philantropists/Philanthropists.js";
 import PhilanthropistsPlayer from "./games/philantropists/PhilanthropistsPlayer.js";
+import YetAnotherHungarianDefense from "./games/yetanotherhungariandefense/YetAnotherHungarianDefense.js";
+import YetAnotherHungarianDefensePlayer from "./games/yetanotherhungariandefense/YetAnotherHungarianDefensePlayer.js";
 
 export default class Lobby {
     constructor() {
@@ -43,6 +45,14 @@ export default class Lobby {
                     () => this.endGame(),
                     this.id,
                     PhilanthropistsPlayer,
+                );
+                break;
+            case "yetanotherhungariandefense":
+                this.game = new YetAnotherHungarianDefense(
+                    players,
+                    () => this.endGame(),
+                    this.id,
+                    YetAnotherHungarianDefensePlayer,
                 );
                 break;
         }

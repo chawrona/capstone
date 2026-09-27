@@ -31,6 +31,12 @@ const routes = [
         name: "philanthropists",
         path: "/:id/philanthropists",
     },
+    {
+        component: () =>
+            import("@/pages/games/YetAnotherHungarianDefensePage.vue"),
+        name: "yetanotherhungariandefense",
+        path: "/:id/yetanotherhungariandefense",
+    },
 ];
 
 const router = createRouter({

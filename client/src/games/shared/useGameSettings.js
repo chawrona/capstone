@@ -47,7 +47,7 @@ export const useGameSettings = (cityId, props) => {
 
             store.emit("gamePauseStatusRequest");
 
-            store.socket.once("connect", () => {
+            store.socket.once("connect", (data) => {
                 if (data === undefined) {
                     store.emit("gamePauseStatusRequest");
                 }
@@ -69,7 +69,7 @@ export const useGameSettings = (cityId, props) => {
 
                         store.emit("gamePauseStatusRequest");
 
-                        store.socket.once("connect", () => {
+                        store.socket.once("connect", (data) => {
                             if (data === undefined) {
                                 store.emit("gamePauseStatusRequest");
                             }
