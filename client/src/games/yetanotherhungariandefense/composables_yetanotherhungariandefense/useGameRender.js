@@ -1,40 +1,80 @@
-import { onMounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 
 import StreetLamp from "@/assets/games/gameAssets/yetanotherhungariandefense/lamp.webp";
 
-const WIDTH = 1920;
-const HEIGHT = 950;
-const MIDDLE = [960, 475];
-const TILE = 35;
+export default class GameRenderer {
+    constructor(canvas) {
+        this.canvasParameters = {
+            height: 950,
+            middle: [960, 475],
+            middleTileX: 27,
+            middleTileY: 14,
+            tileSize: 35,
+            tilesX: 53,
+            tilesY: 27,
+            width: 1920,
+        };
 
-// Gra ma 27 kafelków wysokości i 53 kafelki szerokości
-// Środkowy kafelek to 14 i 27
-// Każdy kafelek ma 35 na 35 pikseli
+        this.lastTime = 0;
+        this.time = 0;
+        this.frameId = 0;
 
-function getMiddlePoint(x, y) {
-    return [x / 2, y / 2];
-}
+        onMounted(async () => {
+            this.canvas = canvas.value;
+            this.context = this.canvas.getContext("2d");
+            this.setupCanvas();
+            await this.loadAssets();
 
-// Na starcie załadować wszystkie grafiki, może pomyśleć nad sprite sheetem, że jedna grafika z wszystkimi grafikami i tylko renderuje się wycinek jeden.
-export default function useGameRender(cv) {
-    const lamp = new Image();
-    lamp.src = StreetLamp;
+            this.lastTime = performance.now();
+            this.frameId = requestAnimationFrame((now) => this.tick(now));
+        });
 
-    onMounted(async () => {
-        cv.value.height = HEIGHT;
-        cv.value.width = WIDTH;
-        const canvas = cv.value.getContext("2d");
+        onUnmounted(() => {
+            cancelAnimationFrame(this.frameId);
+        });
+    }
 
+    setupCanvas() {
+        this.canvas.height = this.canvasParameters.height;
+        this.canvas.width = this.canvasParameters.width;
+        this.context.font = "24px sans-serif";
+        this.context.textBaseline = "top";
+    }
+
+    async loadAssets() {
+        this.assets = {};
+        const lamp = new Image();
+        lamp.src = StreetLamp;
         await lamp.decode();
 
-        // Lampa ma wymiary 1x4 kafelki
-        // lampa jest idealnie na środkowym kafelku w osi X, na jego środku
-        // natomiast jest o jeden kafelek wyżej niż środek w osi Y, też na środku kafelka
-        // Kolizja planowana jest na tylko kafelek na dole
-        // Renderowanie gracza musi być przed i z lampą w zależności od tego czy jest wyżejczy niżej w osi Y
-        const [lampX, lampY] = getMiddlePoint(35, 140);
-        canvas.drawImage(lamp, 960 - lampX, 475 - 35 - lampY, 35, 140);
-    });
+        this.assets.lamp = lamp;
+    }
+
+    getAsset(asset) {
+        return this.assets[asset];
+    }
+
+    getMiddlePoint(x, y) {
+        return [x / 2, y / 2];
+    }
+
+    // Main game engine loop
+    tick(now) {
+        // Czyszczenie całego canvasu
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        const dt = now - this.lastTime;
+        this.lastTime = now;
+        this.time += dt;
+
+        const lamp = this.getAsset("lamp");
+        const [lampX, lampY] = this.getMiddlePoint(35, 140);
+        this.context.drawImage(lamp, 960 - lampX, 475 - 35 - lampY, 35, 140);
+
+        this.context.fillText((this.time / 1000).toFixed(1), 0, 0);
+
+        this.frameId = requestAnimationFrame((now) => this.tick(now));
+    }
 }
 
 // To do
