@@ -2,7 +2,7 @@ import { onMounted, onUnmounted } from "vue";
 
 import StreetLamp from "@/assets/games/gameAssets/yetanotherhungariandefense/lamp.webp";
 
-export default class GameRenderer {
+export default class GameEngine {
     constructor(canvas) {
         this.canvasParameters = {
             height: 950,

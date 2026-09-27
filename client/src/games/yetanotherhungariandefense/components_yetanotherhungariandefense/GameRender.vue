@@ -1,10 +1,8 @@
 <script setup>
 import { ref } from "vue";
-
-import useGameRender from "../composables_yetanotherhungariandefense/useGameRender";
-
+import GameEngine from "../composables_yetanotherhungariandefense/GameEngine";
 const gameRender = ref(null);
-useGameRender(gameRender);
+const gameEngine = new GameEngine(gameRender)
 </script>
 
 <template>
